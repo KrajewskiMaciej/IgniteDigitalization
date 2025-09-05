@@ -1,0 +1,213 @@
+<template>
+    <div class="w-full flex">
+        <div class="flex relative flex-col flex-1 justify-center items-center m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary">
+            <h1 class="text-3xl font-nasalization text-white mt-5">Eksport gry do PDF</h1>
+
+            <form class="w-full max-w-lg mt-4 flex flex-col items-center">
+                <!--Wybór talii kart-->
+                <div class="w-full mb-4">
+                    <label class="block text-white mb-1">Wybierz talię:</label>
+                    <dropDown 
+                        :items="decksData"
+                        v-model="selectedDeck"
+                        :item-key="'id'"
+                        :display-format="(deck: Deck) => `#${deck.id} ${deck.title}`"
+                        item-label="title"
+                        placeholder="Wybierz talię..."
+                    />
+                </div>
+                <div class="flex justify-center w-full text-white">
+                    <button 
+                        type="button"
+                        @click="exportDeckToPDF"
+                        :disabled="!isFormDeckValid || isLoading"
+                        :class="isFormDeckValid ? 'bg-accent/70 hover:bg-accent' : 'bg-gray-500 cursor-not-allowed'" 
+                        class="py-3 px-6 rounded-md mt-5 mb-3 transition-all w-64 text-center"
+                    >
+                        <font-awesome-icon v-if="!isLoading" :icon="faFileExport" class="h-4 mr-2"/>
+                        {{ isLoading ? 'Generowanie...' : 'Generuj PDF z Kartami' }}
+                    </button>
+                </div>          
+                
+                <!--Wybór plansz-->
+                <label class="block text-white mb-1 mt-6">Wybierz plansze:</label>
+                <div class="space-y-3 w-full border-2 border-lgray-accent rounded-md bg-primary p-4">
+                    <!--Wybór Planszy Stołu-->
+                    <div class="mb-1 sm:mb-2">
+                        <label for="selectBoard" class="block font-bold text-left text-xs text-white mb-1">Wybierz planszę stołu</label>
+                        <select v-model="selectedBoard" id="selectBoard" required class="text-white bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full">
+                            <option :value="null" disabled>Wybierz planszę stołu</option>
+                            <option v-for="board in boardsData" :key="board.boardId" :value="board.boardId">{{ board.name }}</option>
+                        </select>
+                    </div>
+                
+                    <!-- Wybór Planszy konkurencji -->
+                    <div class="mb-1 sm:mb-2">
+                        <label for="selectOpponentBoard" class="block font-bold text-left text-xs text-white mb-1">Wybierz planszę konkurencji</label>
+                        <select v-model="selectedOponentBoard" id="selectOpponentBoard" required class="text-white bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full">
+                            <option :value="null" disabled>Wybierz planszę konkurencji</option>
+                            <option v-for="board in boardsData" :key="board.boardId" :value="board.boardId">{{ board.name }}</option>
+                        </select>
+                    </div> 
+                </div>
+
+                <div class="flex justify-center w-full text-white">
+                    <button 
+                        type="button"
+                        @click="exportBoardsToPDF"
+                        :disabled="!isFormBoardsValid || isLoading"
+                        :class="isFormBoardsValid ? 'bg-accent/70 hover:bg-accent' : 'bg-gray-500 cursor-not-allowed'" 
+                        class="py-3 px-6 rounded-md mt-5 mb-3 transition-all w-64 text-center">
+                        <font-awesome-icon v-if="!isLoading" :icon="faFileExport" class="h-4 mr-2"/>
+                        {{ isLoading ? 'Generowanie...' : 'Generuj PDF z planszami' }}
+                    </button>
+                </div>
+            </form>
+            
+            <loadingSpinner v-if="isLoading" message="Generuję PDF..."/>
+        </div>
+    </div>
+</template>
+
+<script setup lang="ts">
+  import { ref, onMounted, computed } from 'vue';
+  import { useToast } from 'vue-toastification';
+  import { faFileExport } from '@fortawesome/free-solid-svg-icons';
+  
+  // FIX: Usunięto rozszerzenia .js
+  import apiConfig from '@/services/apiConfig';
+  import apiService from '@/services/apiServices';
+  import dropDown from '@/components/dropDown.vue';
+  import loadingSpinner from '@/components/loadingSpinner.vue';
+
+  // --- Definicje interfejsów ---
+  interface Deck {
+    id: number;
+    title: string;
+  }
+  interface Board {
+    boardId: number;
+    name: string;
+  }
+
+  const toast = useToast();
+
+  // FIX: Jawne typowanie dla zmiennych stanu
+  const decksData = ref<Deck[]>([]);
+  const selectedDeck = ref<number | null>(null);
+
+  const boardsData = ref<Board[]>([]);
+  const selectedBoard = ref<number | null>(null);
+  const selectedOponentBoard = ref<number | null>(null);
+
+  // FIX: Ujednolicony stan ładowania
+  const isLoading = ref(false);
+
+  const isFormBoardsValid = computed(() => selectedBoard.value !== null && selectedOponentBoard.value !== null);
+  const isFormDeckValid = computed(() => selectedDeck.value !== null);
+
+  // FIX: Dodano typ dla parametru response
+  const downloadFileFromResponse = (response: any) => {
+    const header = response.headers['content-disposition'];
+    let fileName = 'pobrany_plik.pdf';
+
+    if (header) {
+      let match = header.match(/filename\*=UTF-8''([^;]+)/);
+      if (match && match[1]) {
+        fileName = decodeURIComponent(match[1]);
+      } else {
+        match = header.match(/filename="?([^"]+)"?/);
+        if (match && match[1]) {
+          fileName = match[1];
+        }
+      }
+    }
+
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  };
+  
+  const exportDeckToPDF = async () => {
+    if (!isFormDeckValid.value) return;
+
+    isLoading.value = true;
+    try {
+      const response = await apiService.getFile(apiConfig.admin.export.cards, { deckId: selectedDeck.value });
+      downloadFileFromResponse(response);
+      toast.success("PDF z kartami został pomyślnie wygenerowany.");
+    } catch (error: any) {
+      toast.error("Wystąpił błąd podczas generowania PDF z kartami.");
+      console.error("Błąd generowania PDF z kartami:", error);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  const exportBoardsToPDF = async () => {
+    if (!isFormBoardsValid.value) return;
+
+    isLoading.value = true;
+    try {
+      const requestData = {
+        teamBoardId: selectedBoard.value,
+        rivalBoardId: selectedOponentBoard.value
+      };
+      const response = await apiService.postForFile(apiConfig.admin.export.boards, requestData);
+      downloadFileFromResponse(response);
+      toast.success("PDF z planszami został pomyślnie wygenerowany.");
+    } catch (error: any) {
+      toast.error("Wystąpił błąd podczas generowania PDF z planszami.");
+      console.error("Błąd generowania PDF z planszami:", error);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  const fetchBoardsFromAPI = async () => {
+    try {
+      const response = await apiService.get(apiConfig.boards.getAll);
+      boardsData.value = response.data as Board[];
+    } catch (error: any) {
+      toast.error(`Nie udało się pobrać plansz: ${error.message}`);
+      console.error('Błąd pobierania plansz:', error);
+    }
+  };
+
+  const fetchDecksFromAPI = async () => {
+    try {
+      const response = await apiService.get(apiConfig.admin.deck.getAll);
+      decksData.value = response.data as Deck[];
+    } catch (error: any) {
+      toast.error(`Nie udało się pobrać talii kart: ${error.message}`);
+      console.error('Błąd pobierania talii kart:', error);
+    }
+  };
+
+  onMounted(async () => {
+    await Promise.all([fetchDecksFromAPI(), fetchBoardsFromAPI()]);
+  });
+</script>
+
+<style scoped>
+    .custom-scrollbar::-webkit-scrollbar {
+    width: 0.6rem; 
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent; 
+    margin: 0.5rem 0.3rem; 
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #a78bfa; 
+    border-radius: 0.25rem; 
+    border: 0.1rem solid transparent; 
+    background-clip: content-box; 
+    }
+</style>
