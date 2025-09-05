@@ -18,7 +18,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
-      }
+      },
+      "spaProxyServerUrl": "https://localhost:61536"
     },
     "https": {
       "commandName": "Project",
@@ -29,7 +30,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
-      }
+      },
+      "spaProxyServerUrl": "https://localhost:61536"
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -38,8 +40,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
-      }
+      },
+      "spaProxyServerUrl": "https://localhost:61536"
     }
   }
 }
-

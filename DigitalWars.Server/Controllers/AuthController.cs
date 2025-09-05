@@ -8,20 +8,23 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 
-public class LoginRequest {
+public class LoginRequest
+{
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
 }
 
-public class RegisterRequest {
+public class RegisterRequest
+{
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
-    public bool EmailConfirmed{ get; set; } = false;
-    public string ConfirmationToken{ get; set; } = string.Empty;
+    public bool EmailConfirmed { get; set; } = false;
+    public string ConfirmationToken { get; set; } = string.Empty;
 }
 
-public class ResetPasswordRequest {
+public class ResetPasswordRequest
+{
     public string Email { get; set; } = string.Empty;
 }
 
@@ -167,9 +170,9 @@ namespace backend.Controllers
             }
 
             if (user.EmailConfirmed)
-                {
-                    return Ok(new { success = true, message = "Email already confirmed." });
-                }
+            {
+                return Ok(new { success = true, message = "Email already confirmed." });
+            }
 
             user.EmailConfirmed = true;
             user.LinkToken = null;

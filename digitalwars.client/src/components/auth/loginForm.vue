@@ -132,7 +132,11 @@
     isLoading.value = true;
 
     try {
-      const response = await apiService.post<{ success: boolean }>(apiConfig.auth.login, loginData.value);
+      const payload = {
+        username: loginData.value.email, // Przypisz wartość 'email' do klucza 'username'
+        password: loginData.value.password
+      };
+      const response = await apiService.post<{ success: boolean }>(apiConfig.auth.login, payload);
 
       if (response.data.success) {
         console.log('✅ Zalogowano pomyślnie');
