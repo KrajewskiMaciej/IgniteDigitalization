@@ -5,15 +5,13 @@ namespace backend.Data
 {
     public class Feedback
     {
-        public int FeedbackId { get; set; }
-        public int CardId { get; set; }
-        public Card Card { get; set; } = null!;
-        public int DeckId { get; set; }
-        public Deck Deck { get; set; } = null!;
+        public int Feedbacks_Id { get; set; }
+        public int Cards_Id { get; set; }
+        public Card Cards { get; set; } = null!;
         public bool Status { get; set; }
         [Column(TypeName = "TEXT")]
-        public string LongDescription { get; set; } = string.Empty;
+        public string Feedbacks_Long_Description { get; set; } = string.Empty;
         [Column(TypeName = "LONGBLOB")]
-        public byte[]? FeedbackPDF { get; set; }
+        public byte[]? Feedbacks_PDF { get; set; }
     }
 }

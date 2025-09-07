@@ -4,7 +4,6 @@
         <div class="flex flex-col flex-1 justify-center items-center m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary">
             <h1 class="text-3xl font-nasalization text-white mt-5">Edycja kart decyzji</h1>
 
-            <!-- Ukryty input do plików -->
             <input
                 type="file"
                 accept=".xls,.xlsx"
@@ -13,7 +12,6 @@
                 style="display: none;"
             />
 
-            <!-- Przycisk do wczytywania talii z pliku xls -->
             <button
                 @click="triggerFileInput"
                 class="bg-green-500 border-2 border-green-700 py-3 px-6 rounded-md mt-5 text-white">
@@ -22,7 +20,6 @@
             </button>
 
             <form class="w-full max-w-lg mt-4 flex flex-col items-center">
-                <!-- Wybór talii -->
                 <div class="w-full mb-4">
                     <label class="block text-white mb-1">Wybierz talię:</label>
                     <dropDown
@@ -34,11 +31,10 @@
                     />
                 </div>
 
-                <!-- Wybór karty (widoczny po wybraniu talii) -->
                 <div v-if="selectedDeckId" class="w-full">
                     <label class="block text-white mb-1">Wybierz kartę:</label>
                     <dropDown
-                        :items="filteredCards"
+                        :items="cardsData"
                         v-model="selectedCardId"
                         :item-key="'id'"
                         :display-format="(card: Card) => `#${card.id} ${card.title}`"
@@ -46,7 +42,6 @@
                     />
                 </div>
 
-                <!-- Formularz edycji karty (widoczny po wybraniu karty) -->
                 <div v-if="selectedCardId && currentCard" class="mt-6 space-y-4 text-white w-full">
                     <div class="flex flex-col">
                         <label for="title" class="mb-1">Tytuł karty:</label>
@@ -82,7 +77,7 @@
 
         <!-- SEKCJA EDYCJI FEEDBACKU -->
         <div v-if="currentCard && selectedCardId"
-            class="flex flex-col flex-1 items-center m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary">
+             class="flex flex-col flex-1 items-center m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary">
             <h1 class="text-3xl font-nasalization text-white mt-5">Edycja feedbacku</h1>
 
             <form class="w-full max-w-lg mt-4 flex flex-col items-center">
@@ -122,12 +117,9 @@
 </template>
 
 <script setup lang="ts">
-// BŁĄD TS2307: Ten błąd oznacza, że TypeScript nie może znaleźć typów dla biblioteki Font Awesome.
-// Aby to naprawić, upewnij się, że masz zainstalowane odpowiednie pakiety. Uruchom w terminalu:
-// npm install @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons @fortawesome/vue-fontawesome
 import { faSave, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import dropDown from '@/components/dropDown.vue';
-import { reactive, ref, watch, computed, onMounted } from 'vue';
+import { reactive, ref, watch, onMounted } from 'vue';
 import apiConfig from '@/services/apiConfig.js';
 import apiService from '@/services/apiServices.js';
 
@@ -150,8 +142,7 @@ interface Feedback {
   status: 'P' | 'N';
 }
 
-// --- ZMIENNE REAKTYWNE Z TYPOWANIEM ---
-// POPRAWKA BŁĘDU TS2322: Inicjalizujemy jako `undefined` zamiast `null`, aby pasowało do oczekiwanego typu v-model
+// --- ZMIENNE REAKTYWNE ---
 const selectedDeckId = ref<number | undefined>(undefined);
 const selectedCardId = ref<number | undefined>(undefined);
 const selectedFeedbackId = ref<number | undefined>(undefined);
@@ -168,11 +159,6 @@ const feedbackData = reactive<Feedback[]>([
 const currentCard = ref<Card | null>(null);
 const currentFeedback = ref<Feedback | null>(null);
 
-// --- WŁAŚCIWOŚCI OBLICZENIOWE (COMPUTED) ---
-const filteredCards = computed<Card[]>(() => {
-  if (!selectedDeckId.value) return [];
-  return cardsData.filter(card => card.deckId === selectedDeckId.value);
-});
 
 // --- FUNKCJE ---
 function triggerFileInput(): void {
@@ -215,15 +201,15 @@ async function saveFeedback(): Promise<void> {
 async function fetchDecks(): Promise<void> {
   try {
     const response = await apiService.get(apiConfig.admin.deck.getAll);
-    // POPRAWKA BŁĘDU TS2554: Zmieniono metodę aktualizacji tablicy na bardziej niezawodną
     decksData.length = 0;
-    decksData.push(...response.data);
+    // POPRAWKA: Dodajemy asercję typu (as Deck[]), aby poinformować TypeScript, że spodziewamy się tablicy.
+    decksData.push(...(response.data as Deck[]));
   } catch (error) {
     console.error("Błąd przy pobieraniu talii:", error);
   }
 }
 
-// --- WATCHERY (OBSERWATORZY ZMIAN) ---
+// --- WATCHERY ---
 watch(selectedDeckId, async (newDeckId) => {
   selectedCardId.value = undefined;
   currentCard.value = null;
@@ -234,10 +220,12 @@ watch(selectedDeckId, async (newDeckId) => {
   }
 
   try {
-    const response = await apiService.get(apiConfig.admin.deck.decisions, { params: { deckId: newDeckId } });
-    // POPRAWKA BŁĘDU TS2554
+    const url = apiConfig.admin.deck.decisions(newDeckId);
+    const response = await apiService.get(url);
+    
     cardsData.length = 0;
-    cardsData.push(...response.data);
+    // POPRAWKA: Dodajemy asercję typu (as Card[]), aby poinformować TypeScript, że spodziewamy się tablicy.
+    cardsData.push(...(response.data as Card[]));
   } catch (error) {
     console.error("Błąd przy pobieraniu kart z talii:", error);
     cardsData.length = 0;

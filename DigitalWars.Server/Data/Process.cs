@@ -5,15 +5,17 @@ namespace backend.Data
 {
     public class Process
     {
-        public int ProcessId { get; set; }
+        public int Processes_Id { get; set; }
         [MaxLength(25)]
-        public string ProcessDesc { get; set; } = string.Empty;
+        public string Processes_Desc { get; set; } = string.Empty;
         [MaxLength(100)]
-        public string ProcessLongDesc { get; set; } = string.Empty;
+        public string Processes_Long_Desc { get; set; } = string.Empty;
         [MaxLength(7)]
-        public string ProcessColor { get; set; } = string.Empty;
-        public double ProcessWeight { get; set; }
-        public int DeckId { get; set; }
-        public Deck Deck { get; set; } = null!;
+        public string Processes_Color { get; set; } = string.Empty;
+        public double Processes_Weight { get; set; }
+        public int Decks_Id { get; set; }
+        public Deck Decks { get; set; } = null!;
+        public int? Modules_Id { get; set; }
+        public Module? Modules { get; set; } = null!;
     }
 }

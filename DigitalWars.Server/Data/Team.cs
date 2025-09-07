@@ -4,26 +4,22 @@ namespace backend.Data
 {
     public class Team
     {
-        public int TeamId { get; set; }
-        public int GameId { get; set; }
-        public Game Game { get; set; } = null!;
-
+        public int Teams_Id { get; set; }
+        public int Games_Id { get; set; }
+        public Game Games { get; set; } = null!;
         [MaxLength(7)]
-        public string TeamColor { get; set; } = string.Empty;
-
+        public string Teams_Color { get; set; } = string.Empty;
         [MaxLength(50)]
-        public string TeamName { get; set; } = string.Empty;
-        public int TeamBud { get; set; }
-
+        public string Teams_Name { get; set; } = string.Empty;
+        public double Teams_Bud { get; set; }
+        public double? Teams_PD { get; set; }
         [MaxLength(6)]
-        public string? TeamToken { get; set; } = string.Empty;
+        public string? Teams_Token { get; set; } = string.Empty;
+        public int? Games_Events_Id { get; set; }
+        public GameEvent? Games_Events { get; set; }
+        public int? Turns_Left { get; set; }
+        public bool Is_Independent { get; set; }
 
-        public int? GameEventId { get; set; } 
-        public GameEvent? GameEvent { get; set; }
-
-        public int? TurnsLeft { get; set; }
-        public bool IsIndependent { get; set; }
-
-        public virtual ICollection<GameProcess> GameProcesses { get; set; } = new List<GameProcess>();
+        public virtual ICollection<GameProcess> Game_Processes { get; set; } = new List<GameProcess>();
     }
 }

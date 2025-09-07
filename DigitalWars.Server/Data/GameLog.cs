@@ -2,26 +2,24 @@ namespace backend.Data
 {
     public class GameLog
     {
-        public int GameLogId { get; set; }
+        public int Games_Logs_Id { get; set; }
         public DateTime Data { get; set; }
-        public int? TeamId { get; set; }
-        public Team? Team { get; set; } = null!;
-        public int GameId { get; set; }
-        public Game Game { get; set; } = null!;
-        public int? GameEventId { get; set; }
-        public GameEvent? GameEvent { get; set; }
-        public int? CardId { get; set; }
-        public Card? Card { get; set; } = null!;
-        public int? DeckId { get; set; }
-        public Deck? Deck { get; set; } = null!;
-        public int? BoardId { get; set; }
-        public Board? Board { get; set; } = null!;
-        public int? FeedbackId { get; set; }
-        public Feedback? Feedback { get; set; }
-        public double? Cost { get; set; }
+        public int? Teams_Id { get; set; }
+        public Team? Teams { get; set; } = null!;
+        public int Games_Id { get; set; }
+        public Game Games { get; set; } = null!;
+        public int? Games_Events_Id { get; set; }
+        public GameEvent? Games_Events { get; set; }
+        public int? Cards_Id { get; set; }
+        public Card? Cards { get; set; } = null!;
+        public int? Boards_Id { get; set; }
+        public Board? Boards { get; set; } = null!;
+        public int? Feedbacks_Id { get; set; }
+        public Feedback? Feedbacks { get; set; }
+        public double? Costs { get; set; }
         public bool? Status { get; set; }
 
-        public bool? IsApproved { get; set; }
+        public bool? Is_Approved { get; set; }
 
         public virtual ICollection<GameLogSpec> GameLogSpecs { get; set; } = new HashSet<GameLogSpec>();
     }

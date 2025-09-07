@@ -5,14 +5,15 @@ namespace backend.Data
 {
     public class GameProcess
     {
-        public int GameProcessId { get; set; }
-        public int ProcessId { get; set; }
-        public Process Process { get; set; } = null!;
+        public int Games_Processes_Id { get; set; }
+        public int Processes_Id { get; set; }
+        public Process Processes { get; set; } = null!;
 
-        public int GameId { get; set; }
-        public Game Game { get; set; } = null!;
+        public int Games_Id { get; set; }
+        public Game Games { get; set; } = null!;
 
-        public int TeamId { get; set; }
-        public Team Team { get; set; } = null!;
+        public int Teams_Id { get; set; }
+        public Team Teams { get; set; } = null!;
+        public int? Games_Processes_Weights { get; set; }
     }
 }

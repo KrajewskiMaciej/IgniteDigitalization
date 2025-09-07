@@ -26,9 +26,9 @@ namespace backend.PdfGeneration
         {
             Rows = board.Rows;
             Cols = board.Cols;
-            BorderColor = board.BorderColor;
-            CellColor = board.CellColor;
-            BorderColors = board.BorderColors;
+            BorderColor = board.Border_Color;
+            CellColor = board.Cell_Color;
+            BorderColors = board.Borders_Colors;
         }
     }
 
@@ -40,13 +40,13 @@ namespace backend.PdfGeneration
         {
             _boardsToRender = new List<Board>();
 
-            var rivalBoard = allBoards.FirstOrDefault(b => b.BoardId == rivalBoardId);
+            var rivalBoard = allBoards.FirstOrDefault(b => b.Boards_Id == rivalBoardId);
             if (rivalBoard != null) _boardsToRender.Add(rivalBoard);
 
-            var teamBoard = allBoards.FirstOrDefault(b => b.BoardId == teamBoardId);
+            var teamBoard = allBoards.FirstOrDefault(b => b.Boards_Id == teamBoardId);
             if (teamBoard != null) _boardsToRender.Add(teamBoard);
 
-            var otherBoards = allBoards.Where(b => b.BoardId != teamBoardId && b.BoardId != rivalBoardId);
+            var otherBoards = allBoards.Where(b => b.Boards_Id != teamBoardId && b.Boards_Id != rivalBoardId);
             _boardsToRender.AddRange(otherBoards);
         }
 
@@ -54,11 +54,9 @@ namespace backend.PdfGeneration
 
         public void Compose(IDocumentContainer container)
         {
-            // Przetwarzaj plansze w parach, aby umieścić dwie na jednej stronie
             for (int i = 0; i < _boardsToRender.Count; i += 2)
             {
                 var firstBoardInPair = _boardsToRender[i];
-                // Sprawdź, czy istnieje druga plansza w parze
                 var secondBoardInPair = (i + 1 < _boardsToRender.Count) ? _boardsToRender[i + 1] : null;
 
                 container.Page(page =>
@@ -75,13 +73,8 @@ namespace backend.PdfGeneration
                             columns.RelativeColumn();
                         });
 
-                        // --- WIERSZ 1 ---
-
-                        // Komórka (1,1) - lewy górny róg -> pusta
                         table.Cell();
 
-                        // Komórka (1,2) - prawy górny róg -> pierwsza plansza
-                        // DODANO .AlignCenter() i .AlignMiddle() aby wyśrodkować planszę w komórce
                         table.Cell()
                             .AlignCenter()
                             .AlignMiddle()
@@ -89,10 +82,6 @@ namespace backend.PdfGeneration
                             .PaddingBottom(-90)
                             .Element(c => ComposeBoard(c, firstBoardInPair));
 
-                        // --- WIERSZ 2 ---
-
-                        // Komórka (2,1) - lewy dolny róg -> druga plansza (jeśli istnieje)
-                        // DODANO .AlignCenter() i .AlignMiddle()
                         table.Cell()
                             .AlignCenter()
                             .AlignMiddle()
@@ -106,7 +95,6 @@ namespace backend.PdfGeneration
                                 }
                             });
 
-                        // Komórka (2,2) - prawy dolny róg -> pusta
                         table.Cell();
                     });
                 });
@@ -116,46 +104,37 @@ namespace backend.PdfGeneration
         private void ComposeBoard(IContainer container, Board boardData)
         {
             var config = new BoardDrawingConfig(boardData);
-            
+
             container.Scale(3.2f).Column(mainColumn =>
             {
                 mainColumn.Spacing(5);
 
-                // Item 1: Cała plansza z lewym opisem
                 mainColumn.Item()
                 .AlignCenter()
                 .Row(boardRow =>
                 {
                     boardRow.Spacing(5);
 
-                    // Lewy, pionowy opis osi
-                    if (!string.IsNullOrEmpty(boardData.DescriptionLeft))
+                    if (!string.IsNullOrEmpty(boardData.Description_Left))
                     {
                         boardRow.AutoItem()
                             .RotateLeft()
                             .AlignCenter()
-                            .Text(boardData.DescriptionLeft)
+                            .Text(boardData.Description_Left)
                             .FontSize(14).Bold();
                     }
 
-                    // Kontener na całą wizualną część planszy
                     boardRow.AutoItem().Column(boardColumn =>
                     {
-                        // Etykiety górne
-                        if (!string.IsNullOrEmpty(boardData.LabelsUp))
+                        if (!string.IsNullOrEmpty(boardData.Labels_Up))
                         {
-                            boardColumn.Item().Element(c => DrawTopLabels(c, config, boardData.LabelsUp));
+                            boardColumn.Item().Element(c => DrawTopLabels(c, config, boardData.Labels_Up));
                         }
 
-                        // Górna ramka
                         boardColumn.Item().AlignCenter().Element(c => DrawHorizontalBorder(c, config));
 
-                        // *** KLUCZOWA POPRAWKA: JEDEN WIERSZ DLA CAŁEJ ŚRODKOWEJ CZĘŚCI ***
                         boardColumn.Item().Row(coreRow =>
                         {
-                            
-
-                            // Numery wierszy (1-8)
                             coreRow.ConstantItem(config.RowLabelWidth).Column(numbers =>
                             {
                                 for (int r = 0; r < config.Rows; r++)
@@ -165,10 +144,8 @@ namespace backend.PdfGeneration
                                 }
                             });
 
-                            // Lewa ramka pionowa
                             coreRow.AutoItem().Element(c => DrawVerticalBorder(c, config));
 
-                            // Główna siatka
                             coreRow.ConstantItem(config.Cols * config.CellSize).Table(table =>
                             {
                                 table.ColumnsDefinition(cols =>
@@ -177,21 +154,19 @@ namespace backend.PdfGeneration
                                         cols.ConstantColumn(config.CellSize);
                                 });
                                 for (int r = 0; r < config.Rows; r++)
-                                for (int c = 0; c < config.Cols; c++)
-                                    table.Cell().Row((uint)r + 1).Column((uint)c + 1)
-                                         .Border(0.5f).BorderColor(config.BorderColor)
-                                         .Background(config.CellColor).Height(config.CellSize);
+                                    for (int c = 0; c < config.Cols; c++)
+                                        table.Cell().Row((uint)r + 1).Column((uint)c + 1)
+                                             .Border(0.5f).BorderColor(config.BorderColor)
+                                             .Background(config.CellColor).Height(config.CellSize);
                             });
 
-                            // Prawa ramka pionowa
                             coreRow.AutoItem().Element(c => DrawVerticalBorder(c, config));
 
-                            // Prawe etykiety (Nowicjusz, etc.)
-                            if (!string.IsNullOrEmpty(boardData.LabelsRight))
+                            if (!string.IsNullOrEmpty(boardData.Labels_Right))
                             {
                                 coreRow.ConstantItem(config.RightLabelWidth).Column(rightLabels =>
                                 {
-                                    var labels = boardData.LabelsRight.Split(';');
+                                    var labels = boardData.Labels_Right.Split(';');
                                     for (int i = 0; i < config.Rows; i += 2)
                                     {
                                         var labelIndex = i / 2;
@@ -204,35 +179,26 @@ namespace backend.PdfGeneration
                                     }
                                 });
                             }
-                            
-                            
                         });
 
-                        // Dolna ramka
                         boardColumn.Item().AlignCenter().Element(c => DrawHorizontalBorder(c, config));
-
-                        // Dolne etykiety (A, B, C...)
                         boardColumn.Item().Element(c => DrawBottomLabels(c, config));
                     });
                 });
 
-                // Item 2: Dolny opis osi
-                if (!string.IsNullOrEmpty(boardData.DescriptionDown))
+                if (!string.IsNullOrEmpty(boardData.Description_Down))
                 {
-                    mainColumn.Item().AlignCenter().Text(boardData.DescriptionDown).FontSize(14).Bold();
+                    mainColumn.Item().AlignCenter().Text(boardData.Description_Down).FontSize(14).Bold();
                 }
             });
         }
-        
-        // --- UPROSZCZONE METODY POMOCNICZE ---
 
         private void DrawTopLabels(IContainer container, BoardDrawingConfig config, string labelsUp)
         {
             container.Row(row =>
             {
-                // Puste miejsce na lewą ramkę i numery wierszy
                 row.ConstantItem(config.BorderWidth + config.RowLabelWidth);
-                
+
                 var labels = labelsUp.Split(';');
                 for (int i = 0; i < config.Cols; i += 2)
                 {
@@ -245,14 +211,13 @@ namespace backend.PdfGeneration
                 }
             });
         }
-        
+
         private void DrawBottomLabels(IContainer container, BoardDrawingConfig config)
         {
             container.Row(row =>
             {
-                // Puste miejsce na lewą ramkę i numery wierszy
                 row.ConstantItem(config.BorderWidth + config.RowLabelWidth);
-                
+
                 for (int i = 0; i < config.Cols; i++)
                 {
                     row.ConstantItem(config.CellSize).Height(config.ColumnLabelHeight)
@@ -263,7 +228,6 @@ namespace backend.PdfGeneration
 
         private void DrawHorizontalBorder(IContainer container, BoardDrawingConfig config)
         {
-            // ZMIANA: Parsujemy string z kolorami na tablicę
             if (string.IsNullOrEmpty(config.BorderColors)) return;
             var colors = config.BorderColors.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
             if (colors.Length == 0) return;
@@ -273,17 +237,15 @@ namespace backend.PdfGeneration
                 row.ConstantItem(config.RowLabelWidth);
                 for (int i = 0; i < config.Cols; i += 2)
                 {
-                    // Używamy sparsowanej tablicy 'colors'
                     var colorIndex = (i / 2) % colors.Length;
                     row.ConstantItem(config.CellSize * 2).Background(colors[colorIndex]);
                 }
                 row.ConstantItem(config.RightLabelWidth);
             });
         }
-        
+
         private void DrawVerticalBorder(IContainer container, BoardDrawingConfig config)
         {
-            // ZMIANA: Parsujemy string z kolorami na tablicę
             if (string.IsNullOrEmpty(config.BorderColors)) return;
             var colors = config.BorderColors.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
             if (colors.Length == 0) return;
@@ -292,7 +254,6 @@ namespace backend.PdfGeneration
             {
                 for (int i = config.Rows - 2; i >= 0; i -= 2)
                 {
-                    // Używamy sparsowanej tablicy 'colors'
                     var colorIndex = (i / 2) % colors.Length;
                     column.Item().Height(config.CellSize * 2).Background(colors[colorIndex]);
                 }

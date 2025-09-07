@@ -1,315 +1,267 @@
 using Microsoft.EntityFrameworkCore;
-// Upewnij się, że masz tutaj odpowiednie usingi do swoich modeli, np.:
-using backend.Data;
 
 namespace backend.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options)
-            : base(options)
-        {
-        }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        // DbSets
         public DbSet<User> Users { get; set; }
         public DbSet<Board> Boards { get; set; }
-        public DbSet<Game> Games { get; set; }
-        public DbSet<Team> Teams { get; set; }
+        // ... reszta Twoich DbSet ...
         public DbSet<Deck> Decks { get; set; }
         public DbSet<Card> Cards { get; set; }
         public DbSet<Decision> Decisions { get; set; }
-        public DbSet<DecisionEnabler> DecisionEnablers { get; set; }
-        public DbSet<DecisionWeight> DecisionWeights { get; set; }
+        public DbSet<Hardware> Hardwares { get; set; }
+        public DbSet<Software> Softwares { get; set; }
+        public DbSet<Process> Processes { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<CardWeight> CardWeights { get; set; }
+        public DbSet<CardEnabler> CardEnablers { get; set; }
+        public DbSet<GameEvent> GameEvents { get; set; }
+        public DbSet<Module> Modules { get; set; }
+        public DbSet<Game> Games { get; set; }
+        public DbSet<Team> Teams { get; set; }
         public DbSet<GameBoard> GameBoards { get; set; }
         public DbSet<GameLog> GameLogs { get; set; }
-        public DbSet<Item> Items { get; set; }
-        public DbSet<Process> Processes { get; set; }
         public DbSet<GameProcess> GameProcesses { get; set; }
         public DbSet<GameLogSpec> GameLogSpecs { get; set; }
-        public DbSet<GameEvent> GameEvents { get; set; }
 
-            protected override void OnModelCreating(ModelBuilder modelBuilder)
-            {
-                  base.OnModelCreating(modelBuilder);
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
 
-                  // User Configuration
-                  modelBuilder.Entity<User>(entity =>
-                  {
-                        entity.HasKey(u => u.UserId);
-                  });
+            // --- Konfiguracja kluczy głównych ---
+            modelBuilder.Entity<User>(e => e.HasKey(p => p.Users_Id));
+            modelBuilder.Entity<Board>(e => e.HasKey(p => p.Boards_Id));
+            // ... reszta konfiguracji kluczy ...
+            modelBuilder.Entity<Deck>(e => e.HasKey(p => p.Decks_Id));
+            modelBuilder.Entity<Card>(e => e.HasKey(p => p.Cards_Id));
+            modelBuilder.Entity<Decision>(e => e.HasKey(p => p.Decisions_Id));
+            modelBuilder.Entity<Hardware>(e => e.HasKey(p => p.Hardwares_Id));
+            modelBuilder.Entity<Software>(e => e.HasKey(p => p.Softwares_Id));
+            modelBuilder.Entity<Process>(e => e.HasKey(p => p.Processes_Id));
+            modelBuilder.Entity<Feedback>(e => e.HasKey(p => p.Feedbacks_Id));
+            modelBuilder.Entity<CardWeight>(e => e.HasKey(p => p.Cards_Weights_Id));
+            modelBuilder.Entity<CardEnabler>(e => e.HasKey(p => p.Cards_Enablers_Id));
+            modelBuilder.Entity<GameEvent>(e => e.HasKey(p => p.Games_Events_Id));
+            modelBuilder.Entity<Module>(e => e.HasKey(p => p.Modules_Id));
+            modelBuilder.Entity<Game>(e => e.HasKey(p => p.Games_Id));
+            modelBuilder.Entity<Team>(e => e.HasKey(p => p.Teams_Id));
+            modelBuilder.Entity<GameBoard>(e => e.HasKey(p => p.Games_Boards_Id));
+            modelBuilder.Entity<GameLog>(e => e.HasKey(p => p.Games_Logs_Id));
+            modelBuilder.Entity<GameProcess>(e => e.HasKey(p => p.Games_Processes_Id));
+            modelBuilder.Entity<GameLogSpec>(e => e.HasKey(p => p.Games_Logs_Specs_Id));
 
-                  // Board Configuration
-                  modelBuilder.Entity<Board>(entity =>
-                  {
-                        entity.HasKey(b => b.BoardId);
+            // Zastąp istniejącą konfigurację relacji Game -> Board tą poniżej
+            modelBuilder.Entity<Board>()
+                .HasMany(b => b.TeamGames)
+                .WithOne(g => g.Teams_Boards)
+                .HasForeignKey(g => g.Teams_Boards_Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
-                        entity.HasOne(b => b.User)
-                        .WithMany()
-                        .HasForeignKey(b => b.UserId);
-                  });
+            modelBuilder.Entity<Board>()
+                .HasMany(b => b.RivalGames)
+                .WithOne(g => g.Rivals_Boards)
+                .HasForeignKey(g => g.Rivals_Boards_Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
-                  // Deck Configuration
-                  modelBuilder.Entity<Deck>(entity =>
-                  {
-                        entity.HasKey(d => d.DeckId);
+            // Pozostałe relacje bez zmian
+            modelBuilder.Entity<Board>()
+                .HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.Users_Id);
 
-                        entity.HasOne(d => d.User)
-                              .WithMany()
-                              .HasForeignKey(d => d.UserId)
-                              .OnDelete(DeleteBehavior.Cascade);
-                  });
+            // ... reszta Twoich relacji ...
+            modelBuilder.Entity<Card>()
+                .HasOne(c => c.Deck)
+                .WithMany()
+                .HasForeignKey(c => c.Decks_Id);
 
-                  // Card Configuration
-                  modelBuilder.Entity<Card>(entity =>
-                  {
-                        entity.HasKey(c => c.CardId);
-                        entity.Property(c => c.CardType).HasConversion<string>();
+            modelBuilder.Entity<Card>()
+                .HasOne(c => c.Module)
+                .WithMany()
+                .HasForeignKey(c => c.Modules_Id);
 
-                        entity.HasMany(c => c.DecisionEnablers)
-                        .WithOne(de => de.Card)
-                        .HasForeignKey(de => de.CardId);
+            modelBuilder.Entity<CardEnabler>()
+                .HasOne(ce => ce.Cards)
+                .WithMany(c => c.DecisionEnablers)
+                .HasForeignKey(ce => ce.Cards_Id);
 
-                        entity.HasMany(c => c.DecisionEnablerOfThis)
-                        .WithOne(de => de.CardEnabler)
-                        .HasForeignKey(de => de.EnablerId);
-                  });
+            modelBuilder.Entity<CardEnabler>()
+                .HasOne(ce => ce.Enablers)
+                .WithMany(c => c.DecisionEnablerOfThis)
+                .HasForeignKey(ce => ce.Enablers_Id);
 
-                  // Game Configuration
-                  modelBuilder.Entity<Game>(entity =>
-                  {
-                        entity.HasKey(g => g.GameId);
-                        entity.Property(g => g.GameId).ValueGeneratedOnAdd();
+            modelBuilder.Entity<CardEnabler>()
+                .HasOne(ce => ce.Games)
+                .WithMany()
+                .HasForeignKey(ce => ce.Games_Id);
 
-                        entity.Property(g => g.GameStatus)
-                        .HasConversion<string>()
-                        .IsRequired(false);
-                        // Foreign Keys
-                        entity.HasOne(g => g.User)
-                        .WithMany()
-                        .HasForeignKey(g => g.UserId);
+            modelBuilder.Entity<CardEnabler>()
+                .HasOne(ce => ce.Teams)
+                .WithMany()
+                .HasForeignKey(ce => ce.Teams_Id);
 
-                        entity.HasOne(g => g.Deck)
-                        .WithMany()
-                        .HasForeignKey(g => g.DeckId);
+            modelBuilder.Entity<CardWeight>()
+                .HasOne(cw => cw.Cards)
+                .WithMany()
+                .HasForeignKey(cw => cw.Cards_Id);
 
-                        // --- POPRAWKA: Poprawna konfiguracja dwóch relacji do plansz (Board) ---
-                        entity.HasOne(g => g.TeamBoard)
-                        .WithMany() // Zakładając, że jedna plansza może być użyta w wielu grach
-                        .HasForeignKey(g => g.TeamBoardId);
+            modelBuilder.Entity<CardWeight>()
+                .HasOne(cw => cw.Processes)
+                .WithMany()
+                .HasForeignKey(cw => cw.Processes_Id);
 
-                        entity.HasOne(g => g.RivalBoard)
-                        .WithMany()
-                        .HasForeignKey(g => g.RivalBoardId);
+            modelBuilder.Entity<Decision>()
+                .HasOne(d => d.Card)
+                .WithMany()
+                .HasForeignKey(d => d.Cards_Id);
 
-                        // Relationships to other entities that reference Game
-                        entity.HasMany(g => g.Teams)
-                        .WithOne(t => t.Game)
-                        .HasForeignKey(t => t.GameId)
-                        .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Deck>()
+                .HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.Users_Id);
 
-                        entity.HasMany(g => g.GameProcesses)
-                        .WithOne(p => p.Game)
-                        .HasForeignKey(p => p.GameId)
-                        .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Feedback>()
+                .HasOne(f => f.Cards)
+                .WithMany()
+                .HasForeignKey(f => f.Cards_Id);
 
-                        entity.HasMany(g => g.GameBoards)
-                        .WithOne(gb => gb.Game)
-                        .HasForeignKey(gb => gb.GameId)
-                        .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Game>()
+                .HasOne(g => g.Decks)
+                .WithMany()
+                .HasForeignKey(g => g.Decks_Id);
 
-                        entity.HasMany(g => g.GameLogs)
-                        .WithOne(gl => gl.Game)
-                        .HasForeignKey(gl => gl.GameId)
-                        .OnDelete(DeleteBehavior.Cascade);
-                  });
+            modelBuilder.Entity<Game>()
+                .HasOne(g => g.Modules)
+                .WithMany()
+                .HasForeignKey(g => g.Modules_Id);
 
-                  // Team Configuration
-                  modelBuilder.Entity<Team>(entity =>
-                  {
-                        entity.HasKey(t => t.TeamId);
-                        entity.Property(t => t.TeamId).ValueGeneratedOnAdd();
+            modelBuilder.Entity<Game>()
+                .HasOne(g => g.Users)
+                .WithMany()
+                .HasForeignKey(g => g.Users_Id);
 
-                        entity.HasMany(t => t.GameProcesses)
-                            .WithOne(p => p.Team)
-                            .HasForeignKey(p => p.TeamId)
-                            .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<GameBoard>()
+                .HasOne(gb => gb.Teams)
+                .WithMany()
+                .HasForeignKey(gb => gb.Teams_Id);
 
-                        entity.HasOne(t => t.GameEvent)
-                        .WithMany(ge => ge.Teams)
-                        .HasForeignKey(t => t.GameEventId);    
-                  });
+            modelBuilder.Entity<GameBoard>()
+                .HasOne(gb => gb.Games)
+                .WithMany(g => g.GameBoards)
+                .HasForeignKey(gb => gb.Games_Id);
 
-                  // GameBoard Configuration
-                  modelBuilder.Entity<GameBoard>(entity =>
-                  {
-                        entity.HasKey(gb => gb.GameBoardId);
+            modelBuilder.Entity<GameBoard>()
+                .HasOne(gb => gb.Games_Processes)
+                .WithMany()
+                .HasForeignKey(gb => gb.Games_Processes_Id);
 
-                        entity.HasOne(gb => gb.Team)
-                        .WithMany()
-                        .HasForeignKey(gb => gb.TeamId);
+            modelBuilder.Entity<GameBoard>()
+                .HasOne(gb => gb.Boards)
+                .WithMany()
+                .HasForeignKey(gb => gb.Boards_Id);
 
-                        entity.HasOne(gb => gb.GameProcess)
-                        .WithMany()
-                        .HasForeignKey(gb => gb.GameProcessId);
+            modelBuilder.Entity<GameEvent>()
+                .HasOne(ge => ge.Decks)
+                .WithMany()
+                .HasForeignKey(ge => ge.Decks_Id);
 
-                        entity.HasOne(gb => gb.Board)
-                        .WithMany()
-                        .HasForeignKey(gb => gb.BoardId);
-                  });
+            modelBuilder.Entity<GameEvent>()
+                .HasOne(ge => ge.Modules)
+                .WithMany()
+                .HasForeignKey(ge => ge.Modules_Id);
 
-                  // GameLog Configuration
-                  modelBuilder.Entity<GameLog>(entity =>
-                  {
-                        entity.HasKey(gl => gl.GameLogId);
+            modelBuilder.Entity<GameLog>()
+                .HasOne(gl => gl.Teams)
+                .WithMany()
+                .HasForeignKey(gl => gl.Teams_Id);
 
-                        entity.HasOne(gl => gl.Team)
-                        .WithMany()
-                        .HasForeignKey(gl => gl.TeamId);
+            modelBuilder.Entity<GameLog>()
+                .HasOne(gl => gl.Games)
+                .WithMany(g => g.GameLogs)
+                .HasForeignKey(gl => gl.Games_Id);
 
-                        entity.HasOne(gl => gl.Card)
-                        .WithMany()
-                        .HasForeignKey(gl => gl.CardId);
+            modelBuilder.Entity<GameLog>()
+                .HasOne(gl => gl.Games_Events)
+                .WithMany(ge => ge.GameLogs)
+                .HasForeignKey(gl => gl.Games_Events_Id);
 
-                        entity.HasOne(gl => gl.Deck)
-                        .WithMany()
-                        .HasForeignKey(gl => gl.DeckId);
+            modelBuilder.Entity<GameLog>()
+                .HasOne(gl => gl.Cards)
+                .WithMany()
+                .HasForeignKey(gl => gl.Cards_Id);
 
-                        entity.HasOne(gl => gl.Feedback)
-                        .WithMany()
-                        .HasForeignKey(gl => gl.FeedbackId);
+            modelBuilder.Entity<GameLog>()
+                .HasOne(gl => gl.Boards)
+                .WithMany()
+                .HasForeignKey(gl => gl.Boards_Id);
 
-                        entity.HasOne(gl => gl.Board)
-                        .WithMany()
-                        .HasForeignKey(gl => gl.BoardId);
+            modelBuilder.Entity<GameLog>()
+                .HasOne(gl => gl.Feedbacks)
+                .WithMany()
+                .HasForeignKey(gl => gl.Feedbacks_Id);
 
-                        entity.HasOne(gl => gl.GameEvent)
-                        .WithMany(ge => ge.GameLogs)
-                        .HasForeignKey(gl => gl.GameEventId);
-                  });
+            modelBuilder.Entity<GameLogSpec>()
+                .HasOne(gls => gls.Games_Logs)
+                .WithMany(gl => gl.GameLogSpecs)
+                .HasForeignKey(gls => gls.Games_Logs_Id);
 
-                  // Decision Configuration
-                  modelBuilder.Entity<Decision>(entity =>
-                  {
-                        entity.HasKey(d => d.DecisionId);
+            modelBuilder.Entity<GameLogSpec>()
+                .HasOne(gls => gls.Games_Processes)
+                .WithMany()
+                .HasForeignKey(gls => gls.Games_Processes_Id);
 
-                        entity.HasOne(d => d.Deck)
-                        .WithMany(deck => deck.Decisions)
-                        .HasForeignKey(d => d.DeckId)
-                        .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<GameProcess>()
+                .HasOne(gp => gp.Processes)
+                .WithMany()
+                .HasForeignKey(gp => gp.Processes_Id);
 
-                        entity.HasOne(d => d.Card)
-                        .WithMany()
-                        .HasForeignKey(d => d.CardId);
-                  });
-                  // DecisionWeight Configuration
-                  modelBuilder.Entity<DecisionWeight>(entity =>
-                  {
-                        entity.HasKey(dw => dw.DecisionWeightId);
+            modelBuilder.Entity<GameProcess>()
+                .HasOne(gp => gp.Games)
+                .WithMany(g => g.GameProcesses)
+                .HasForeignKey(gp => gp.Games_Id);
 
-                        entity.HasOne(dw => dw.Card)
-                              .WithMany()
-                              .HasForeignKey(dw => dw.CardId);
+            modelBuilder.Entity<GameProcess>()
+                .HasOne(gp => gp.Teams)
+                .WithMany(t => t.Game_Processes)
+                .HasForeignKey(gp => gp.Teams_Id);
 
-                        entity.HasOne(dw => dw.Deck)
-                              .WithMany()
-                              .HasForeignKey(dw => dw.DeckId);
+            modelBuilder.Entity<Hardware>()
+                .HasOne(h => h.Cards)
+                .WithMany()
+                .HasForeignKey(h => h.Cards_Id);
 
-                        entity.HasOne(dw => dw.Process)
-                              .WithMany()
-                              .HasForeignKey(dw => dw.ProcessId);
-                  });
+            modelBuilder.Entity<Module>()
+                .HasOne(m => m.Deck)
+                .WithMany()
+                .HasForeignKey(m => m.Decks_Id);
 
-                  // DecisionEnabler Configuration
-                  modelBuilder.Entity<DecisionEnabler>(entity =>
-                  {
-                        entity.HasKey(de => de.DecisionEnablerId);
+            modelBuilder.Entity<Process>()
+                .HasOne(p => p.Decks)
+                .WithMany(d => d.Processes)
+                .HasForeignKey(p => p.Decks_Id);
 
-                        // --- POPRAWKA: Dodano konfigurację relacji, które nie są częścią Card ---
-                        entity.HasOne(de => de.Game)
-                        .WithMany()
-                        .HasForeignKey(de => de.GameId);
+            modelBuilder.Entity<Process>()
+                .HasOne(p => p.Modules)
+                .WithMany()
+                .HasForeignKey(p => p.Modules_Id);
 
-                        entity.HasOne(de => de.Team)
-                        .WithMany()
-                        .HasForeignKey(de => de.TeamId);
-                  });
-                  // Feedback Configuration
-                  modelBuilder.Entity<Feedback>(entity =>
-                  {
-                        entity.HasKey(f => f.FeedbackId);
+            modelBuilder.Entity<Software>()
+                .HasOne(s => s.Cards)
+                .WithMany()
+                .HasForeignKey(s => s.Cards_Id);
 
-                        entity.HasOne(f => f.Deck)
-                        .WithMany(deck => deck.Feedbacks)   
-                        .HasForeignKey(f => f.DeckId)
-                        .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Team>()
+                .HasOne(t => t.Games)
+                .WithMany(g => g.Teams)
+                .HasForeignKey(t => t.Games_Id);
 
-                        entity.HasOne(f => f.Card)
-                        .WithMany()
-                        .HasForeignKey(f => f.CardId);
-                  });
-
-                  // Item Configuration
-                  modelBuilder.Entity<Item>(entity =>
-                  {
-                        entity.HasKey(i => i.ItemsId);
-
-                        entity.HasOne(i => i.Deck)
-                        .WithMany(deck => deck.Items)
-                        .HasForeignKey(i => i.DeckId)
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                        entity.HasOne(i => i.Card)
-                        .WithMany()
-                        .HasForeignKey(i => i.CardId);
-                  });
-                  // GameProcess Configuration
-                  modelBuilder.Entity<GameProcess>(entity =>
-                  {
-                        entity.HasKey(gp => gp.GameProcessId);
-
-                        // Relacja z Process
-                        entity.HasOne(gp => gp.Process)
-                              .WithMany() // Process nie ma kolekcji GameProcess
-                              .HasForeignKey(gp => gp.ProcessId)
-                              .OnDelete(DeleteBehavior.Restrict);
-
-                        entity.HasOne(gp => gp.Game)
-                              .WithMany(g => g.GameProcesses)
-                              .HasForeignKey(gp => gp.GameId);
-
-                        entity.HasOne(gp => gp.Team)
-                              .WithMany(t => t.GameProcesses)
-                              .HasForeignKey(gp => gp.TeamId);
-                  });
-                  
-                  // GameLogSpec Configuration
-                  modelBuilder.Entity<GameLogSpec>(entity =>
-                  {
-                        entity.HasKey(gls => gls.GameLogSpecId);
-
-                        entity.HasOne<GameLog>(gls => gls.GameLog)
-                              .WithMany(gl => gl.GameLogSpecs)
-                              .HasForeignKey(gls => gls.GameLogId)
-                              .OnDelete(DeleteBehavior.Cascade);
-
-                        entity.HasOne(gls => gls.GameProcess)
-                              .WithMany()
-                              .HasForeignKey(gls => gls.GameProcessId)
-                              .OnDelete(DeleteBehavior.SetNull);
-                  });
-
-                  // GameEvent Configuration
-                  modelBuilder.Entity<GameEvent>(entity =>
-                  {
-                        entity.HasKey(e => e.GameEventId);
-
-                        entity.HasOne(e => e.User)
-                        .WithMany() 
-                        .HasForeignKey(e => e.UserId);
-                  });
-
-            }
-      }
+            modelBuilder.Entity<Team>()
+                .HasOne(t => t.Games_Events)
+                .WithMany(ge => ge.Teams)
+                .HasForeignKey(t => t.Games_Events_Id);
+        }
+    }
 }

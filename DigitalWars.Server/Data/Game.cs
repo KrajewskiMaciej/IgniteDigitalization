@@ -6,26 +6,27 @@ namespace backend.Data
 {
     public class Game
     {
-        public int GameId { get; set; }
+        public int Games_Id { get; set; }
         [MaxLength(50)]
-        public string GameDesc { get; set; } = string.Empty;
+        public string Games_Desc { get; set; } = string.Empty;
 
-        public int TeamBoardId { get; set; }
-        public Board TeamBoard { get; set; }
+        public int Teams_Boards_Id { get; set; }
+        public Board Teams_Boards { get; set; } = null!;
 
-        public int RivalBoardId { get; set; }
-        public Board RivalBoard { get; set; }
-
-        public int DeckId { get; set; }
-        public Deck Deck { get; set; }
-
-        public int UserId { get; set; }
-        public User User { get; set; }
+        public int Rivals_Boards_Id { get; set; }
+        public Board Rivals_Boards { get; set; } = null!;
+        public int Decks_Id { get; set; }
+        public Deck Decks { get; set; } = null!;
+        public int? Modules_Id { get; set; }
+        public Module? Modules { get; set; }
+        public int Users_Id { get; set; }
+        public User Users { get; set; } = null!;
 
         [Column(TypeName = "ENUM('During', 'Paused', 'End')")]
-        public GameStatus? GameStatus { get; set; }
+        public GameStatus? Game_Status { get; set; }
 
-        public bool IsOnline { get; set; }
+        public bool Is_Online { get; set; }
+
 
         public virtual ICollection<Team> Teams { get; set; } = new List<Team>();
         public virtual ICollection<GameBoard> GameBoards { get; set; } = new List<GameBoard>();

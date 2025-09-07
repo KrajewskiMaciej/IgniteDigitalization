@@ -5,26 +5,29 @@ namespace backend.Data
 {
     public class Board
     {
-        public int BoardId { get; set; }
-        public int? UserId { get; set; }
-        public User? User { get; set;}
+        public int Boards_Id { get; set; }
+        public int? Users_Id { get; set; }
+        public User? User { get; set; }
         [MaxLength(50)]
         public string Name { get; set; } = string.Empty;
         [Column(TypeName = "TEXT")]
-        public string LabelsUp { get; set; } = string.Empty;
+        public string Labels_Up { get; set; } = string.Empty;
         [Column(TypeName = "TEXT")]
-        public string LabelsRight { get; set; } = string.Empty;
+        public string Labels_Right { get; set; } = string.Empty;
         [MaxLength(50)]
-        public string DescriptionDown { get; set; } = string.Empty;
+        public string Description_Down { get; set; } = string.Empty;
         [MaxLength(50)]
-        public string DescriptionLeft { get; set; } = string.Empty;
+        public string Description_Left { get; set; } = string.Empty;
         public int Rows { get; set; }
         public int Cols { get; set; }
         [MaxLength(7)]
-        public string BorderColor { get; set; } = string.Empty;
+        public string Border_Color { get; set; } = string.Empty;
         [MaxLength(7)]
-        public string CellColor { get; set; } = string.Empty;
+        public string Cell_Color { get; set; } = string.Empty;
         [Column(TypeName = "TEXT")]
-        public string BorderColors { get; set; } = string.Empty;
+        public string Borders_Colors { get; set; } = string.Empty;
+
+        public virtual ICollection<Game> TeamGames { get; set; } = new List<Game>();
+        public virtual ICollection<Game> RivalGames { get; set; } = new List<Game>();
     }
 }

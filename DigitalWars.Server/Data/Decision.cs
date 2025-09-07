@@ -5,18 +5,20 @@ namespace backend.Data
 {
     public class Decision
     {
-        public int DecisionId { get; set; }
-        public int CardId { get; set; }
+        public int Decisions_Id { get; set; }
+        public int Cards_Id { get; set; }
         public Card Card { get; set; } = null!;
-
         [MaxLength(100)]
-        public string DecisionShortDesc { get; set; } = string.Empty;
+        public string Decisions_Short_Desc { get; set; } = string.Empty;
         [Column(TypeName = "TEXT")]
-        public string DecisionLongDesc { get; set; } = string.Empty;
-        public int DeckId { get; set; }
-        public Deck Deck { get; set; } = null!;
-
-        public double DecisionBaseCost { get; set; }
-        public double DecisionCostWeight { get; set; }
+        public string Decisions_Long_Desc { get; set; } = string.Empty;
+        public double Decisions_Cost_Bits { get; set; }
+        public double Decisions_Cost_Bits_Weight { get; set; }
+        public double? Decisions_Cost_PD { get; set; }
+        public double? Decisions_Cost_PD_Weight { get; set; }
+        public double? Decisions_Reward_Bits { get; set; }
+        public double? Decisions_Reward_Bits_Weight { get; set; }
+        public double? Decisions_Reward_PD { get; set; }
+        public double? Decisions_Reward_PD_Weight { get; set; }
     }
 }

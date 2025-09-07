@@ -31,14 +31,15 @@
             <label for="selectBoard" class="block font-bold text-left text-xs mb-1">Wybierz planszę</label>
             <select v-model="selectedBoardId" id="selectBoard" required class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-4">
               <option :value="null" disabled>Wybierz planszę</option>
-              <option v-for="board in data.boards" :key="board.boardId" :value="board.boardId">{{ board.name }}</option>
+              <option v-for="board in data.boards" :key="board.boards_Id" :value="board.boards_Id">{{ board.name }}</option>
             </select>
           </div>
           <div class="mb-1 sm:mb-2">
             <label for="selectOpponentBoard" class="block font-bold text-left text-xs mb-1">Wybierz planszę konkurencji</label>
+             <!-- POPRAWKA: Użycie filtrowanej listy plansz -->
             <select v-model="selectedOponentBoardId" id="selectOpponentBoard" required class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-4">
               <option :value="null" disabled>Wybierz planszę konkurencji</option>
-              <option v-for="board in data.boards" :key="board.boardId" :value="board.boardId">{{ board.name }}</option>
+              <option v-for="board in opponentBoardOptions" :key="board.boards_Id" :value="board.boards_Id">{{ board.name }}</option>
             </select>
           </div>
           <div class="mb-1 sm:mb-2">
@@ -51,7 +52,7 @@
           <p class="block font-bold text-left text-xs mb-2">Wybierz rodzaj rozgrywki</p>
           <div class="flex gap-2 w-full mb-5">
               <div class="flex flex-col items-center justify-center rounded-md w-full h-20 gap-2 cursor-pointer" :class="selectedGameMode === 'remote' ? 'bg-accent shadow-md shadow-accent/60' : 'bg-tertiary transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-accent/70 border-2 border-lgray-accent'" @click="selectedGameMode = 'remote'"><font-awesome-icon :icon="faGlobe" class="h-6" :class="selectedGameMode === 'remote' ? 'text-tertiary' : 'text-accent'" /><h2 class=" block font-nasalization font-semibold">Gra zdalna</h2></div>
-              <div class=" flex flex-col items-center justify-center rounded-md w-full h-20 gap-2 cursor-pointer" :class="selectedGameMode === 'stationary' ? 'bg-accent shadow-md shadow-accent/60' : 'bg-tertiary  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-accent/70 border-2 border-lgray-accent'" @click="selectedGameMode = 'stationary'"><font-awesome-icon :icon="faBuilding" class="h-6" :class="selectedGameMode === 'stationary' ? 'text-primary' : 'text-accent'" /><h2 class=" block font-nasalization font-semibold">Gra stacjonarna</h2></div>
+              <div class=" flex flex-col items-center justify-center rounded-md w-full h-20 gap-2 cursor-pointer" :class="selectedGameMode === 'stationary' ? 'bg-accent shadow-md shadow-accent/60' : 'bg-tertiary  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-accent/70 border-2 border-lgray-accent'" @click="selectedGameMode = 'stationary'"><font-awesome-icon :icon="faBuilding" class="h-6" :class="selectedGameMode === 'stationary' ? 'text-primary' : 'text-accent'" /><h2 class=" block font-nasalization font-semibold">Gra stacjonarna</h2></div>
           </div>
           <button @click="handleNextStep" type="button" class="bg-tertiary hover:bg-accent text-white w-full py-2 xl:py-4 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60 mb-5"><div class="flex items-center justify-center gap-2"><p class="mr-2">Dalej</p><font-awesome-icon :icon="faArrowRight" class="h-4 text-center" /></div></button>
         </div>
@@ -63,10 +64,10 @@
               <label for="numberOfTeams" class="block font-bold text-left text-xs sm:text-sm mb-1">Wybierz liczbę drużyn:</label>
               <input id="numberOfTeams" class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 text-white w-full mb-4" type="number" v-model="numberOfTeams" min="2" max="15" step="1">
             </div>
-             <div>
+              <div>
                 <label for="numberOfBits" class="block font-bold text-left text-xs sm:text-sm mb-1" >Wybierz liczbę bitów na start</label>
                 <input type="number" id="numberOfBits" class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 text-white w-full mb-4 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" v-model="numberOfBits" min="20" max="1000">
-             </div>
+              </div>
           </div>
           <div class="mb-6">
             <label class="block text-left text-xs sm:text-sm font-bold text-white mb-2">Wybierz drużynę do edycji:</label>
@@ -154,7 +155,6 @@
 <script setup lang="ts">
 import { faArrowRight, faArrowLeft, faXmark, faGlobe, faBuilding } from '@fortawesome/free-solid-svg-icons';
 import { ref, reactive, watch, computed, onMounted } from 'vue';
-// BŁĄD TS2307: Upewnij się, że biblioteka jest zainstalowana: npm install @fortawesome/free-regular-svg-icons
 import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 import { useToast } from 'vue-toastification';
 import DropDown from '../dropDown.vue';
@@ -162,11 +162,10 @@ import apiConfig from '@/services/apiConfig';
 import apiService from '@/services/apiServices';
 
 // --- DEFINICJE INTERFEJSÓW ---
-interface Board { boardId: number; name: string; }
+interface Board { boards_Id: number; name: string; }
 interface Deck { id: number; title: string; }
 interface Team { id: number; name: string; colour: string; isAbleToMakeDecisions: boolean; }
 interface GameProcess { processId: number; processDesc: string; processLongDesc: string; processColor: string; }
-// Pomocniczy typ dla błędów API
 type ApiError = {
   response?: { data?: { title?: string } };
   message: string;
@@ -178,23 +177,19 @@ const emits = defineEmits(['close', 'gameCreated']);
 
 // --- ZMIENNE REAKTYWNE Z TYPOWANIEM ---
 const toast = useToast();
-// Krok 1
 const gameName = ref('');
 const selectedBoardId = ref<number | null>(null);
 const selectedOponentBoardId = ref<number | null>(null);
 const selectedDeckId = ref<number | null>(null);
 const selectedGameMode = ref<'stationary' | 'remote'>('stationary');
-// Krok 2
 const numberOfTeams = ref(2);
 const numberOfBits = ref(20);
 const teams = ref<Team[]>([]);
 const currentlyEditingTeamId = ref<number | undefined>(0);
 const showTip = ref(false);
-// Krok 3
 const availableProcesses = ref<GameProcess[]>([]);
 const selectedProcessIds = ref<number[]>([]);
 const isLoadingProcesses = ref(false);
-// Nawigacja
 const step = ref(1);
 const direction = ref('');
 const data = reactive<{ boards: Board[]; decks: Deck[] }>({ boards: [], decks: [] });
@@ -203,6 +198,15 @@ const data = reactive<{ boards: Board[]; decks: Deck[] }>({ boards: [], decks: [
 const selectedTeam = computed<Team | undefined>(() => {
   if (currentlyEditingTeamId.value === undefined) return undefined;
   return teams.value.find(team => team.id === currentlyEditingTeamId.value);
+});
+
+// POPRAWKA: Nowa właściwość obliczeniowa do filtrowania plansz przeciwnika
+const opponentBoardOptions = computed<Board[]>(() => {
+  if (!selectedBoardId.value) {
+    return data.boards; // Jeśli żadna plansza drużyny nie jest wybrana, pokaż wszystkie
+  }
+  // Zwróć listę plansz, które nie mają ID wybranej planszy drużyny
+  return data.boards.filter(board => board.boards_Id !== selectedBoardId.value);
 });
 
 // --- FUNKCJE ---
@@ -298,6 +302,13 @@ const handleSubmit = async () => {
 
 // --- WATCHERY I CYKL ŻYCIA ---
 const defaultColors = ['#8B0000', '#2D1B69', '#1B4332', '#A4133C', '#7209B7', '#6A994E', '#2B2D42', '#CC6600', '#B8860B', '#008B8B', '#8B008B', '#556B2F', '#722F37', '#4A4A4A', '#36454F'];
+
+// POPRAWKA: Nowy watcher, który resetuje wybór planszy przeciwnika, jeśli wystąpi konflikt
+watch(selectedBoardId, (newId) => {
+  if (newId === selectedOponentBoardId.value) {
+    selectedOponentBoardId.value = null;
+  }
+});
 
 watch(selectedDeckId, async (newDeckId) => {
   if (newDeckId) {

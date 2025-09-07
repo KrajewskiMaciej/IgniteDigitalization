@@ -2,9 +2,17 @@ using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
+using backend.Settings;
 
 namespace backend.Services
 {
+    public interface IEmailService
+    {
+        Task SendEmailAsync(string to, string subject, string body);
+        Task SendConfirmationEmailAsync(string userEmail, string confirmationToken, DateTime? dateTime);
+        // DODAJ NOWĄ METODĘ
+        Task SendPasswordResetEmailAsync(string userEmail, string resetToken, DateTime? dateTime);
+    }
 
     public class EmailSettings
     {
@@ -16,7 +24,7 @@ namespace backend.Services
         public string SenderName { get; set; } = string.Empty;
         private string? _senderEmail;
 
-    public string SenderEmail
+        public string SenderEmail
         {
             get => !string.IsNullOrEmpty(_senderEmail) ? _senderEmail : SmtpUsername;
             set => _senderEmail = value;
@@ -28,13 +36,15 @@ namespace backend.Services
         private readonly EmailSettings _emailSettings;
         private readonly ILogger<EmailService> _logger;
         private readonly IConfiguration _configuration;
+        private readonly FrontendSettings _frontendSettings;
 
         // Poprawny konstruktor
-        public EmailService(IOptions<EmailSettings> emailSettings, ILogger<EmailService> logger, IConfiguration configuration)
+        public EmailService(IOptions<EmailSettings> emailSettings, ILogger<EmailService> logger, IConfiguration configuration, IOptions<FrontendSettings> frontendSettings)
         {
             _emailSettings = emailSettings.Value;
             _logger = logger;
             _configuration = configuration;
+            _frontendSettings = frontendSettings.Value;
         }
 
         // Poprawiona metoda, oznaczona jako `public async Task`
@@ -55,7 +65,7 @@ namespace backend.Services
 
                 var alternateView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
                 var logoPath = Path.Combine(AppContext.BaseDirectory, "Templates", "ITM_poziom_biale.png");
-                
+
                 using (var client = new SmtpClient(_emailSettings.SmtpServer, _emailSettings.SmtpPort))
                 {
                     client.Credentials = new NetworkCredential(_emailSettings.SmtpUsername, _emailSettings.SmtpPassword);
@@ -89,8 +99,7 @@ namespace backend.Services
             var emailBody = await File.ReadAllTextAsync(templatePath);
 
             // Krok 3: Przygotuj dynamiczne dane do wstawienia
-            var frontendBaseUrl =  Environment.GetEnvironmentVariable("FRONTEND_URL");
-            var confirmationLink = $"{frontendBaseUrl}/confirm/{confirmationToken}";
+            var confirmationLink = $"{_frontendSettings.BaseUrl}/confirm/{confirmationToken}";
             string expireDateString = $"{expireDate.Value:dd.MM.yyyy HH:mm}";
 
             // Krok 4: Podmień placeholdery w szablonie
@@ -120,7 +129,7 @@ namespace backend.Services
 
             // Krok 3: Przygotuj dynamiczne dane do wstawienia
 
-            var frontendBaseUrl =  Environment.GetEnvironmentVariable("FRONTEND_URL");
+            var frontendBaseUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
             var resetLink = $"{frontendBaseUrl}/resetPassword/{resetToken}";
             string expireDateString = $"{expireDate.Value:dd.MM.yyyy HH:mm}";
 

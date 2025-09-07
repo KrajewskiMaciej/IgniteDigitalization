@@ -1,237 +1,94 @@
 using backend.Data;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using backend.Services;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-
-
-public class LoginRequest
-{
-    public string Username { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-}
-
-public class RegisterRequest
-{
-    public string Username { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-    public bool EmailConfirmed { get; set; } = false;
-    public string ConfirmationToken { get; set; } = string.Empty;
-}
-
-public class ResetPasswordRequest
-{
-    public string Email { get; set; } = string.Empty;
-}
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
+    // DTOs for Auth
+    public class LoginRequest { public string Username { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; }
+    public class RegisterRequest { public string Username { get; set; } = string.Empty; public string Email { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; }
 
     [Route("api/auth")]
-    [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseApiController
     {
-        private readonly AppDbContext _context;
-        private readonly IConfiguration _configuration;
-        private readonly IEmailService _emailService;
-        private readonly JwtService _jwtService;
-        private readonly IUserInitializationService _initializationService;
+        private readonly IAuthService _authService; // Używamy serwisu
 
-        public AuthController(AppDbContext context, IEmailService emailService, JwtService jwtService, IConfiguration configuration, IUserInitializationService initializationService)
+        public AuthController(IAuthService authService)
         {
-            _context = context;
-            _configuration = configuration;
-            _emailService = emailService;
-            _jwtService = jwtService;
-            _initializationService = initializationService;
-
+            _authService = authService;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
+            try
             {
-                return BadRequest("Username and password are required.");
+                var (user, claims) = await _authService.ValidateUserCredentialsAsync(request.Username, request.Password);
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+                return Ok(new { success = true, user = new { id = user.Users_Id, name = user.Names, email = user.Email } });
             }
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Username || u.Name == request.Username);
-
-            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+            catch (Exception ex)
             {
-                return Unauthorized("Invalid credentials");
+                return BadRequest(ex.Message);
             }
-
-            if (!user.EmailConfirmed)
-            {
-                // wygeneruj nowy token
-                user.LinkToken = Guid.NewGuid().ToString();
-                user.TokenExpireDate = DateTime.Now.AddMinutes(15).RoundUpToNearestMinute();
-                await _context.SaveChangesAsync();
-
-                _ = _emailService.SendConfirmationEmailAsync(user.Email, user.LinkToken, user.TokenExpireDate.Value);
-
-                return BadRequest("E-mail nie został potwierdzony. Wysłano ponownie link aktywacyjny.");
-            }
-
-
-            var claims = JwtService.GenerateToken(user);
-
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var authProperties = new AuthenticationProperties
-            {
-                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7),
-                IsPersistent = true,
-            };
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity),
-                authProperties);
-
-            return Ok(new
-            {
-                success = true,
-                user = new
-                {
-                    id = user.UserId,
-                    name = user.Name,
-                    email = user.Email
-                }
-            });
-        }
-
-        [HttpPost("logout")]
-        [Authorize]
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Ok(new { success = true, message = "Wylogowano pomyślnie" });
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            try
             {
-                return BadRequest("Email already exist.");
+                await _authService.RegisterUserAsync(request.Username, request.Email, request.Password);
+                return Ok(new { success = true, message = "Rejestracja pomyślna. Sprawdź email, aby aktywować konto." });
             }
-
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
-            var confirmationToken = Guid.NewGuid().ToString();
-
-            var user = new User
+            catch (Exception ex)
             {
-                Name = request.Username,
-                Email = request.Email,
-                Password = hashedPassword,
-                EmailConfirmed = false,
-                LinkToken = confirmationToken,
-                TokenExpireDate = DateTime.Now.AddMinutes(15).RoundUpToNearestMinute()
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            // 1. Inicjalizacja danych w bazie
-            _ = _initializationService.InitializeUserAsync(user.UserId);
-
-            // 2. Wysyłka e-maila
-            _ = _emailService.SendConfirmationEmailAsync(user.Email, user.LinkToken, user.TokenExpireDate.Value);
-
-            // --- Zwróć odpowiedź NATYCHMIAST ---
-            return Ok(new { success = true, message = "Registration successful. Please check your email for a confirmation link." });
-
+                return BadRequest(ex.Message);
+            }
         }
-
 
         [HttpGet("confirm/{token}")]
         public async Task<IActionResult> ConfirmEmail(string token)
         {
-            Console.WriteLine("Potwierdzanie maila");
-            if (string.IsNullOrEmpty(token))
+            try
             {
-                return BadRequest("Invalid token.");
+                await _authService.ConfirmUserEmailAsync(token);
+                return Ok(new { success = true, message = "Email pomyślnie potwierdzony." });
             }
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.LinkToken == token);
-
-            if (user == null)
+            catch (Exception ex)
             {
-                return BadRequest("Invalid or expired confirmation token.");
+                return BadRequest(ex.Message);
             }
-            Console.WriteLine($"Obecny czas {DateTime.Now}");
-            if (user.TokenExpireDate < DateTime.Now)
-            {
-                return BadRequest("Expired Link");
-            }
-
-            if (user.EmailConfirmed)
-            {
-                return Ok(new { success = true, message = "Email already confirmed." });
-            }
-
-            user.EmailConfirmed = true;
-            user.LinkToken = null;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { success = true, message = "Email confirmed successfully. You can now log in." });
         }
 
-
-        [HttpGet("me")]
         [Authorize]
+        [HttpGet("me")]
         public async Task<IActionResult> Me()
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = CurrentUserId;
+            if (userId == null) return Unauthorized();
 
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                return Unauthorized(new { message = "User ID not found in claims." });
-            }
+            var user = await _authService.GetUserByIdAsync(userId.Value);
+            if (user == null) return Unauthorized();
 
-            if (!int.TryParse(userIdString, out int userId))
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Invalid user ID format in claims." });
-            }
-
-            var user = await _context.Users.FindAsync(userId);
-
-            if (user == null)
-            {
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                return Unauthorized(new { message = "User not found or session expired." });
-            }
-
-            return Ok(new
-            {
-                id = user.UserId,
-                name = user.Name,
-                email = user.Email
-            });
+            return Ok(new { id = user.Users_Id, name = user.Names, email = user.Email });
         }
-    }
-    public static class DateTimeExtensions
-    {
-        public static DateTime RoundUpToNearestMinute(this DateTime dateTime)
-        {
-            if (dateTime.Second > 0 || dateTime.Millisecond > 0)
-            {
-                dateTime = dateTime.AddMinutes(1);
-            }
 
-            return new DateTime(
-                dateTime.Year,
-                dateTime.Month,
-                dateTime.Day,
-                dateTime.Hour,
-                dateTime.Minute,
-                0,
-                dateTime.Kind
-            );
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return Ok(new { success = true, message = "Wylogowano pomyślnie" });
         }
     }
 }

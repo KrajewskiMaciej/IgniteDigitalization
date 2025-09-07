@@ -5,15 +5,13 @@ namespace backend.Data
 {
     public class Card
     {
-        public int CardId { get; set; }
-        [Column(TypeName ="ENUM('Decision', 'Item')")]
-        public CardType CardType { get; set; }
-        public ICollection<DecisionEnabler> DecisionEnablers { get; set; } = new List<DecisionEnabler>();
-        public ICollection<DecisionEnabler> DecisionEnablerOfThis  { get; set; } = new List<DecisionEnabler>();
-    }
-    
-    public enum CardType { 
-        Decision,
-        Item
+        public int Cards_Id { get; set; }
+        public int Decks_Id { get; set; }
+        public Deck? Deck { get; set; }
+        public int? Modules_Id { get; set; }
+        public Module? Module { get; set; }
+        public int Card_Id { get; set; }
+        public ICollection<CardEnabler> DecisionEnablers { get; set; } = new List<CardEnabler>();
+        public ICollection<CardEnabler> DecisionEnablerOfThis { get; set; } = new List<CardEnabler>();
     }
 }

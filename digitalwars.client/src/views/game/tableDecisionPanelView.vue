@@ -156,7 +156,18 @@
   import apiServices from '@/services/apiServices';
   import signalService from '@/services/signalService';
 
-  // --- INTERFEJSY DANYCH ---
+  // --- INTERFEJSY ---
+  interface SessionData {
+    teamId: number;
+    teamName: string;
+    teamBud: number;
+    deckId: number;
+    boardConfig: BoardConfig & { boardId: number };
+  }
+  interface AvailableCardsResponse {
+    decisionCards: Card[];
+    itemCards: Item[];
+  }
   interface TeamData {
     teamId: number;
     teamName: string;
@@ -169,7 +180,7 @@
   interface DecisionLog { isEventNotification: boolean; timestamp: string; feedbackDescription: string; cardId?: number; cardTitle?: string; tableId?: number; tableName?: string; result?: 'Pozytywny' | 'Negatywny'; eventAppliedId?: number | null; }
   interface PendingDecision { logId: number; cardId: number; cardTitle: string; tableId: number; tableName: string; timestamp: string; }
   interface Pawn { id: number; x: number; y: number; color: string; name: string; }
-  interface BoardConfig { name: string; labelsUp: string[]; labelsRight: string[]; descriptionDown: string; descriptionLeft: string; rows: number; cols: number; cellColor: string; borderColor: string; borderColors: string[]; }
+  interface BoardConfig { name: string; labelsUp: string[]; labelsRight: string[]; descriptionDown: string; descriptionLeft: string; Rows: number; Cols: number; cellColor: string; borderColor: string; borderColors: string[]; }
   interface RawHistoryLog { isEventNotification: boolean; eventDescription: string; timestamp: string; cardId: number; cardTitle: string; teamId: number; teamName: string; feedbackDescription: string; status: boolean; gameEventId: number | null; }
   interface RawPendingLog { logId: number; cardId: number; cardTitle: string; teamId: number; teamName: string; timestamp: string; }
   interface RawPawn { gpId: number; posX: string; posY: string; color: string; name: string; }
@@ -197,7 +208,7 @@
 
   const formData = reactive<BoardConfig>({
     name: 'Plansza podstawowa', labelsUp: [], labelsRight: [], descriptionDown: '', descriptionLeft: '',
-    rows: 8, cols: 8, cellColor: '#fefae0', borderColor: '#595959', borderColors: []
+    Rows: 8, Cols: 8, cellColor: '#fefae0', borderColor: '#595959', borderColors: []
   });
 
   const selectedCard = computed<Card | undefined>(() => cards.value.find(c => c.id === selectedCardId.value));
@@ -212,7 +223,8 @@
     Object.keys(loading).forEach(k => loading[k as keyof typeof loading] = true);
 
     try {
-      const response = await apiServices.get(apiConfig.player.getTeamFullInfo(gameIdNum, teamIdNum));
+      // Wywołanie jest teraz zgodne z poprawioną definicją w apiConfig.ts
+      const response = await apiServices.get<SessionData>(apiConfig.player.getTeamInfo(gameIdNum, teamIdNum));
       const sessionData = response.data;
 
       if (sessionData.boardConfig) {
@@ -245,7 +257,7 @@
   const fetchAvailableCardsAndItems = async () => {
     if (!teamData.value?.deckId) return;
     try {
-      const response = await apiServices.get(apiConfig.player.getCards(teamData.value.deckId), {
+      const response = await apiServices.get<AvailableCardsResponse>(apiConfig.player.getCards(teamData.value.deckId), {
         params: { gameId: props.gameId, teamId: props.teamId }
       });
       cards.value = response.data.decisionCards || [];
@@ -255,8 +267,8 @@
   
   const fetchDecisionHistory = async () => {
     try {
-      const response = await apiServices.post(apiConfig.player.getPlayerHistory, { gameId: props.gameId, teamId: props.teamId });
-      const logs = response.data as RawHistoryLog[];
+      const response = await apiServices.post<RawHistoryLog[]>(apiConfig.player.getPlayerHistory, { gameId: props.gameId, teamId: props.teamId });
+      const logs = response.data;
       if (Array.isArray(logs)) {
         decisions.value = logs.map(log => log.isEventNotification
           ? { isEventNotification: true, feedbackDescription: log.eventDescription || "Aktywowano nowe wydarzenie.", timestamp: log.timestamp }
@@ -268,18 +280,25 @@
 
   const fetchPendingDecisions = async () => {
     try {
-      const response = await apiServices.get(apiConfig.games.getPendingLogs(props.gameId));
-      pendingDecisions.value = (response.data as RawPendingLog[])
+      const response = await apiServices.get<RawPendingLog[]>(apiConfig.games.getPendingLogs(Number(props.gameId)));
+      pendingDecisions.value = (response.data)
         .filter(log => log.teamId === Number(props.teamId))
-        .map(log => ({ ...log }));
+        .map(log => ({
+          logId: log.logId,
+          cardId: log.cardId,
+          cardTitle: log.cardTitle,
+          tableId: log.teamId,
+          tableName: log.teamName,
+          timestamp: log.timestamp
+        }));
     } catch (error) { toast.error("Błąd pobierania sugestii."); }
   };
 
   const fetchPawns = async () => {
     if (!teamData.value?.boardId) return;
     try {
-      const response = await apiServices.get(apiConfig.player.getPawns, { params: { gameId: props.gameId, teamId: props.teamId, boardId: teamData.value.boardId } });
-      pawns.value = (response.data as RawPawn[]).map(p => ({ id: p.gpId, x: Number(p.posX), y: Number(p.posY), color: p.color, name: p.name }));
+      const response = await apiServices.get<RawPawn[]>(apiConfig.player.getPawns, { params: { gameId: props.gameId, teamId: props.teamId, boardId: teamData.value.boardId } });
+      pawns.value = (response.data).map(p => ({ id: p.gpId, x: Number(p.posX), y: Number(p.posY), color: p.color, name: p.name }));
     } catch (err) { console.error("Błąd pobierania pionków:", err); }
   };
 
@@ -287,18 +306,31 @@
   const executeCardOrItemAction = async (isCard: boolean) => {
     const entity = isCard ? selectedCard.value : selectedItem.value;
     const team = teamData.value;
-    if (!entity || !team) return;
+
+    // POPRAWKA: Usunięto błąd "Object is possibly 'undefined'"
+    // Ten warunek `if` jest wystarczającym zabezpieczeniem (type guard) dla TypeScript
+    if (!entity || !team) {
+      return;
+    }
     if (team.teamBud < (entity.cost || 0)) {
       toast.error(`Brak wystarczającej liczby bitów!`);
       return;
     }
-    const wasSuccess = isCard ? !(entity.enablers && entity.enablers.length > 0) : true;
+
+    // Rozdzielono logikę na `if`, aby ułatwić TypeScriptowi analizę typów
+    let wasSuccess = true;
+    if (isCard) {
+      // W tym bloku TypeScript wie, że `entity` to `Card`
+      const cardEntity = entity as Card;
+      wasSuccess = !(cardEntity.enablers && cardEntity.enablers.length > 0);
+    }
+    
     const endpoint = wasSuccess ? apiConfig.player.playCardSuccess(entity.id) : apiConfig.player.playCardFailure(entity.id);
     const payload = { gameId: Number(props.gameId), teamId: team.teamId, deckId: team.deckId, boardId: team.boardId, cost: entity.cost || 0, ForceExecution: false };
 
     try {
-      const response = await apiServices.post(endpoint, payload);
-      toast.success((response.data as { message: string }).message || 'Akcja przetworzona pomyślnie.');
+      const response = await apiServices.post<{ message: string }>(endpoint, payload);
+      toast.success(response.data.message || 'Akcja przetworzona pomyślnie.');
       await fetchAllDataForTeam(); // Odśwież wszystko
     } catch (error: any) {
       toast.error(error.response?.data?.message || `Wystąpił błąd podczas akcji.`);
@@ -354,8 +386,6 @@
       console.error("Błąd połączenia SignalR: ", err);
       toast.error("Nie udało się połączyć z serwerem czasu rzeczywistego.");
     }
-
-    await fetchAllDataForTeam();
   });
 
   onUnmounted(() => {
