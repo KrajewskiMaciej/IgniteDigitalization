@@ -29,6 +29,7 @@ namespace backend.Services
             if (!await _context.Decks.AnyAsync(d => d.Decks_Id == deckId))
                 throw new Exception($"Talia o ID {deckId} nie została znaleziona.");
 
+            // Get a list of cards that have already been successfully played by the team in this game.
             var playedCardIds = await _context.GameLogs
                 .AsNoTracking()
                 .Where(gl => gl.Games_Id == gameId && gl.Teams_Id == teamId && gl.Status == true)
@@ -36,20 +37,23 @@ namespace backend.Services
                 .Distinct()
                 .ToListAsync();
 
+            // Create a lookup for card enablers (dependencies).
             var enablersMap = await _context.CardEnablers
                 .AsNoTracking()
                 .Where(de => de.Enablers_Id.HasValue && !playedCardIds.Contains(de.Enablers_Id.Value))
                 .GroupBy(de => de.Cards_Id)
                 .ToDictionaryAsync(g => g.Key, g => g.Select(de => de.Enablers_Id.Value).ToList());
 
+            // Fetch Decision cards, filtering out any that have already been played.
             var decisionCards = await _context.Decisions
                 .AsNoTracking()
                 .Include(d => d.Card)
                 .Where(d => d.Card.Decks_Id == deckId && !playedCardIds.Contains(d.Cards_Id))
-                .OrderBy(d => d.Cards_Id)
+                .OrderBy(d => d.Card.Card_Id)
                 .Select(d => new UnifiedCardDto
                 {
-                    Id = d.Cards_Id,
+                    // CORRECTED: Use the public Card_Id instead of the primary key.
+                    Id = d.Card.Card_Id,
                     DeckId = deckId,
                     Title = d.Decisions_Short_Desc,
                     Description = d.Decisions_Long_Desc,
@@ -58,21 +62,44 @@ namespace backend.Services
                     Enablers = enablersMap.ContainsKey(d.Cards_Id) ? enablersMap[d.Cards_Id] : new List<int>()
                 }).ToListAsync();
 
-            var itemCards = await _context.Hardwares
+            // Fetch Hardware cards, treating them as items.
+            var hardwareCards = await _context.Hardwares
                 .AsNoTracking()
-                 .Include(d => d.Cards)
-                .Where(i => i.Cards.Decks_Id == deckId && !playedCardIds.Contains(i.Cards_Id))
-                .OrderBy(i => i.Cards_Id)
-                .Select(i => new UnifiedCardDto
+                .Include(h => h.Cards)
+                .Where(h => h.Cards.Decks_Id == deckId && !playedCardIds.Contains(h.Cards_Id))
+                .Select(h => new UnifiedCardDto
                 {
-                    Id = i.Cards_Id,
+                    // CORRECTED: Use the public Card_Id.
+                    Id = h.Cards.Card_Id,
                     DeckId = deckId,
-                    Title = i.Hardwares_Short_Desc,
-                    Description = i.Hardwares_Long_Desc,
+                    Title = h.Hardwares_Short_Desc,
+                    Description = h.Hardwares_Long_Desc,
                     CardType = "Item",
-                    Cost = i.Hardwares_Cost_Bits,
+                    Cost = h.Hardwares_Cost_Bits,
                     Enablers = new List<int>()
                 }).ToListAsync();
+
+            // NEW: Fetch Software cards, also treating them as items.
+            var softwareCards = await _context.Softwares
+                .AsNoTracking()
+                .Include(s => s.Cards)
+                .Where(s => s.Cards.Decks_Id == deckId && !playedCardIds.Contains(s.Cards_Id))
+                .Select(s => new UnifiedCardDto
+                {
+                    // CORRECTED: Use the public Card_Id.
+                    Id = s.Cards.Card_Id,
+                    DeckId = deckId,
+                    Title = s.Softwares_Short_Desc,
+                    Description = s.Softwares_Long_Desc,
+                    CardType = "Item",
+                    Cost = s.Softwares_Cost_Bits,
+                    Enablers = new List<int>()
+                }).ToListAsync();
+
+            // NEW: Combine Hardware and Software cards into a single list of items and sort them.
+            var itemCards = hardwareCards.Concat(softwareCards)
+                                         .OrderBy(i => i.Id)
+                                         .ToList();
 
             return new CategorizedCardsDto { DecisionCards = decisionCards, ItemCards = itemCards };
         }

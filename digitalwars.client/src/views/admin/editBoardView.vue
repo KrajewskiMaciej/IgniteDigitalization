@@ -1,89 +1,89 @@
 <template>
-  <div class="w-full">
-    <div class="grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-4">
+    <div class="w-full">
+        <div class="grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-4">
 
-      <div class="order-2 md:order-1 flex flex-col justify-start border-2 border-lgray-accent py-6 px-4 m-4 rounded-md text-white bg-tertiary">
-        <div class="flex flex-row w-full items-center justify-center gap-5 flex-shrink-0">
-          <button
-            class="border-2 border-lgray-accent py-2 px-2 rounded-md w-60 text-center hover:border-accent transition-colors duration-300"
-            :class="{'border-accent': activeView === 'add'}"
-            @click="activeView = 'add'">
-            <font-awesome-icon :icon="faPlus" class="h-4 text-accent"/>
-            Dodaj nową planszę
-          </button>
-          <button
-            class="border-2 border-lgray-accent py-2 px-2 rounded-md w-60 text-center hover:border-accent transition-colors duration-300"
-            :class="{'border-accent': activeView === 'edit'}"
-            @click="activeView = 'edit'">
-            <font-awesome-icon :icon="faPenToSquare" class="h-4 text-accent"/>
-            Edytuj planszę
-          </button>
+            <div class="order-2 md:order-1 flex flex-col justify-start border-2 border-lgray-accent py-6 px-4 m-4 rounded-md text-white bg-tertiary">
+                <div class="flex flex-row w-full items-center justify-center gap-5 flex-shrink-0">
+                    <button
+                        class="border-2 border-lgray-accent py-2 px-2 rounded-md w-60 text-center hover:border-accent transition-colors duration-300"
+                        :class="{'border-accent': activeView === 'add'}"
+                        @click="activeView = 'add'">
+                        <font-awesome-icon :icon="faPlus" class="h-4 text-accent"/>
+                        Dodaj nową planszę
+                    </button>
+                    <button
+                        class="border-2 border-lgray-accent py-2 px-2 rounded-md w-60 text-center hover:border-accent transition-colors duration-300"
+                        :class="{'border-accent': activeView === 'edit'}"
+                        @click="activeView = 'edit'">
+                        <font-awesome-icon :icon="faPenToSquare" class="h-4 text-accent"/>
+                        Edytuj planszę
+                    </button>
+                </div>
+
+                <div class="w-full">
+                    <h1 class="mt-8 font-nasalization text-lg md:text-xl lg-text-2xl xl:test-3xl ">
+                        {{ activeView === 'add' ? 'Dodaj nową planszę' : 'Edytuj planszę' }}
+                    </h1>
+
+                    <boardSelector
+                        :boards="boardsForSelector"
+                        v-model="selectedBoardId"
+                        :activeView="activeView"
+                        @delete="deleteBoard"
+                    />
+
+                    <form class="mt-4">
+                        <boardInfo
+                            v-model:name="formData.Name"
+                            :cols="formData.LabelsUp.length * 2"
+                            :rows="formData.LabelsRight.length * 2"
+                            @update="validateDescriptions"
+                        />
+
+                        <boardColorSettings
+                            v-model:cellColor="formData.CellColor"
+                            v-model:borderColor="formData.BorderColor"
+                            v-model:borderColors="formData.BorderColors"
+                            @update="validateDescriptions"
+                        />
+
+                        <boardLabelsEditors
+                            v-model:labelsUp="formData.LabelsUp"
+                            v-model:labelsRight="formData.LabelsRight"
+                            @update="validateDescriptions"
+                        />
+
+                        <boardDescriptions
+                            v-model:descriptionDown="formData.DescriptionDown"
+                            v-model:descriptionLeft="formData.DescriptionLeft"
+                            @update="validateDescriptions"
+                        />
+
+                        <button
+                            type="button"
+                            class="bg-accent border-2 border-accent py-3 px-6 rounded-md mt-5 hover:bg-opacity-80 transition-all"
+                            @click="saveBoard">
+                            <font-awesome-icon :icon="faSave" class="h-4 mr-2" />
+                            {{ activeView === 'add' ? 'Dodaj planszę' : 'Zapisz zmiany' }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="order-1 md:order-2 border-2 border-lgray-accent py-6 px-8 m-4 rounded-md text-white bg-tertiary flex flex-col
+                         md:sticky md:top-4 self-start md:max-h-[calc(100vh-2rem)]">
+                
+                <h2 class="text-xl mb-4 text-center flex-shrink-0">Podgląd planszy</h2>
+
+                <div class="relative flex-grow min-h-0">
+                    <myBoard
+                        :config="previewConfig"
+                    />
+                </div>
+            </div>
+
         </div>
-
-        <div class="w-full">
-          <h1 class="mt-8 font-nasalization text-lg md:text-xl lg-text-2xl xl:test-3xl ">
-            {{ activeView === 'add' ? 'Dodaj nową planszę' : 'Edytuj planszę' }}
-          </h1>
-
-          <boardSelector
-            :boards="data.boards"
-            v-model="selectedBoardId"
-            :activeView="activeView"
-            @delete="deleteBoard"
-          />
-
-          <form class="mt-4">
-            <boardInfo
-              v-model:name="formData.Name"
-              :cols="formData.LabelsUp.length * 2"
-              :rows="formData.LabelsRight.length * 2"
-              @update="validateDescriptions"
-            />
-
-            <boardColorSettings
-              v-model:cellColor="formData.CellColor"
-              v-model:borderColor="formData.BorderColor"
-              v-model:borderColors="formData.BorderColors"
-              @update="validateDescriptions"
-            />
-
-            <boardLabelsEditors
-              v-model:labelsUp="formData.LabelsUp"
-              v-model:labelsRight="formData.LabelsRight"
-              @update="validateDescriptions"
-            />
-
-            <boardDescriptions
-              v-model:descriptionDown="formData.DescriptionDown"
-              v-model:descriptionLeft="formData.DescriptionLeft"
-              @update="validateDescriptions"
-            />
-
-            <button
-              type="button"
-              class="bg-accent border-2 border-accent py-3 px-6 rounded-md mt-5 hover:bg-opacity-80 transition-all"
-              @click="saveBoard">
-              <font-awesome-icon :icon="faSave" class="h-4 mr-2" />
-              {{ activeView === 'add' ? 'Dodaj planszę' : 'Zapisz zmiany' }}
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <div class="order-1 md:order-2 border-2 border-lgray-accent py-6 px-8 m-4 rounded-md text-white bg-tertiary flex flex-col
-                  md:sticky md:top-4 self-start md:max-h-[calc(100vh-2rem)]">
-        
-        <h2 class="text-xl mb-4 text-center flex-shrink-0">Podgląd planszy</h2>
-
-        <div class="relative flex-grow min-h-0">
-          <myBoard
-            :config="previewConfig"
-          />
-        </div>
-      </div>
-
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -97,22 +97,22 @@ import boardColorSettings from '@/components/editBoard/boardColorSettings.vue';
 import boardLabelsEditors from '@/components/editBoard/boardLabelsEditors.vue';
 import boardDescriptions from '@/components/editBoard/boardDescriptions.vue';
 
-import apiConfig from '@/services/apiConfig.js';
-import apiService from '@/services/apiServices.js';
+import apiConfig from '@/services/apiConfig';
+import apiService from '@/services/apiServices';
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Board {
-  boardId: number;
+  boards_Id: number;
   name: string;
-  labelsUp: string; // string rozdzielany średnikami
-  labelsRight: string;
-  descriptionDown: string;
-  descriptionLeft: string;
+  labels_Up: string;
+  labels_Right: string;
+  description_Down: string;
+  description_Left: string;
   rows: number;
   cols: number;
-  cellColor: string;
-  borderColor: string;
-  borderColors: string;
+  cell_Color: string;
+  border_Color: string;
+  borders_Colors: string;
 }
 
 interface FormData {
@@ -166,6 +166,15 @@ const getDefaultFormData = (): FormData => ({
 });
 
 const formData = reactive<FormData>(getDefaultFormData());
+
+// --- WŁAŚCIWOŚCI OBLICZENIOWE ---
+// POPRAWKA: Tworzy nową tablicę z poprawną nazwą klucza 'boardId' dla komponentu boardSelector
+const boardsForSelector = computed(() => {
+  return data.boards.map(board => ({
+    boardId: board.boards_Id,
+    name: board.name
+  }));
+});
 
 // --- WATCHERY ---
 watch(() => formData.LabelsUp, (newLabels) => {
@@ -227,23 +236,23 @@ const loadSelectedBoard = () => {
     return;
   }
   
-  const selectedBoard = data.boards.find(board => board.boardId === selectedBoardId.value);
+  const selectedBoard = data.boards.find(board => board.boards_Id === selectedBoardId.value);
   if (!selectedBoard) {
     toast.error('Nie znaleziono wybranej planszy.');
     return;
   }
 
-  formData.BoardId = selectedBoard.boardId;
+  formData.BoardId = selectedBoard.boards_Id;
   formData.Name = selectedBoard.name;
-  formData.LabelsUp = stringToArray(selectedBoard.labelsUp);
-  formData.LabelsRight = stringToArray(selectedBoard.labelsRight);
-  formData.DescriptionDown = selectedBoard.descriptionDown;
-  formData.DescriptionLeft = selectedBoard.descriptionLeft;
+  formData.LabelsUp = stringToArray(selectedBoard.labels_Up);
+  formData.LabelsRight = stringToArray(selectedBoard.labels_Right);
+  formData.DescriptionDown = selectedBoard.description_Down;
+  formData.DescriptionLeft = selectedBoard.description_Left;
   formData.Rows = selectedBoard.rows;
   formData.Cols = selectedBoard.cols;
-  formData.CellColor = selectedBoard.cellColor;
-  formData.BorderColor = selectedBoard.borderColor;
-  formData.BorderColors = stringToArray(selectedBoard.borderColors);
+  formData.CellColor = selectedBoard.cell_Color;
+  formData.BorderColor = selectedBoard.border_Color;
+  formData.BorderColors = stringToArray(selectedBoard.borders_Colors);
 
   toast.success(`Załadowano planszę: ${formData.Name}`);
 };
@@ -258,18 +267,18 @@ const saveBoard = async () => {
       toast.error('Wszystkie etykiety muszą być wypełnione!');
       return;
     }
-
+    
     const payload = {
       Name: formData.Name,
-      LabelsUp: arrayToString(formData.LabelsUp),
-      LabelsRight: arrayToString(formData.LabelsRight),
-      DescriptionDown: formData.DescriptionDown,
-      DescriptionLeft: formData.DescriptionLeft,
+      Labels_Up: arrayToString(formData.LabelsUp),
+      Labels_Right: arrayToString(formData.LabelsRight),
+      Description_Down: formData.DescriptionDown,
+      Description_Left: formData.DescriptionLeft,
       Rows: formData.Rows,
       Cols: formData.Cols,
-      CellColor: formData.CellColor,
-      BorderColor: formData.BorderColor,
-      BorderColors: arrayToString(formData.BorderColors)
+      Cell_Color: formData.CellColor,
+      Border_Color: formData.BorderColor,
+      Borders_Colors: arrayToString(formData.BorderColors)
     };
 
     if (activeView.value === 'add') {
@@ -298,8 +307,8 @@ const deleteBoard = async () => {
     toast.warning('Nie wybrano planszy do usunięcia!');
     return;
   }
-
-  const boardToDelete = data.boards.find(b => b.boardId === selectedBoardId.value);
+  
+  const boardToDelete = data.boards.find(b => b.boards_Id === selectedBoardId.value);
   const boardName = boardToDelete ? boardToDelete.name : "wybrana plansza";
 
   if (confirm(`Czy na pewno chcesz usunąć planszę "${boardName}"?`)) {
@@ -349,3 +358,4 @@ const previewConfig = computed<PreviewConfig>(() => {
 
 onMounted(fetchBoardsFromAPI);
 </script>
+

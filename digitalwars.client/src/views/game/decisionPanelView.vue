@@ -252,124 +252,30 @@
   import apiServices from '@/services/apiServices';
   import signalService from '@/services/signalService';
 
-  // --- DEFINICJE TYPÓW DLA DANYCH Z API ---
-  interface Team {
-    teamId: number;
-    teamName: string;
-    teamBud: number;
-    deckId: number;
-    boardId: number;
-  }
-
-  interface Card {
-    id: number;
-    title: string;
-    description: string;
-    cost?: number;
-    enablers?: unknown[]; // Zmieniono z 'any[]' na 'unknown[]' dla bezpieczeństwa typów
-  }
-
-  interface Item {
-    id: number;
-    title: string;
-    description: string;
-    cost?: number;
-  }
-
-  interface DecisionLog {
-    isEventNotification: boolean;
-    timestamp: string;
-    feedbackDescription: string;
-    cardId?: number;
-    cardTitle?: string;
-    tableId?: number;
-    tableName?: string;
-    result?: 'Pozytywny' | 'Negatywny';
-    eventAppliedId?: number | null;
-  }
-
-  interface PendingDecision {
-    logId: number;
-    cardId: number;
-    cardTitle: string;
-    tableId: number;
-    tableName: string;
-    timestamp: string;
-  }
-
-  interface GameEvent {
-    eventId: number | null;
-    shortDesc: string;
-    longDesc: string;
-  }
-
-  interface Pawn {
-    id: number;
-    x: number;
-    y: number;
-    color: string;
-    name: string;
-  }
-
-  // Interfejsy dla "surowych" danych z API
-  interface RawApiLog {
-    logId: number;
-    gameEventId: number | null;
-    teamId: number | null;
-    timestamp: string;
-    cardId: number;
-    cardTitle: string;
-    teamName: string;
-    feedbackDescription: string;
-    status: boolean;
-  }
-
-  interface RawPendingLog {
-    logId: number;
-    cardId: number;
-    cardTitle: string;
-    teamId: number;
-    teamName: string;
-    timestamp: string;
-  }
-  
-  interface RawPawnData {
-    teamId: number;
-    posX: string | number;
-    posY: string | number;
-    teamColor: string;
-    teamName: string;
-  }
-
-  interface RivalBoardConfig {
-    boardId: number;
-    name: string;
-    labelsUp: string[];
-    labelsRight: string[];
-    descriptionDown: string;
-    descriptionLeft: string;
-    rows: number;
-    cols: number;
-    cellColor: string;
-    borderColor: string;
-    borderColors: string[];
-  }
+  // --- INTERFACES ---
+  interface Team { teamId: number; teamName: string; teamBud: number; deckId: number; boardId: number; }
+  interface Card { id: number; title: string; description: string; cost?: number; enablers?: unknown[]; }
+  interface Item { id: number; title: string; description: string; cost?: number; }
+  interface DecisionLog { isEventNotification: boolean; timestamp: string; feedbackDescription: string; cardId?: number; cardTitle?: string; tableId?: number | null; tableName?: string; result?: 'Pozytywny' | 'Negatywny'; eventAppliedId?: number | null; }
+  interface PendingDecision { logId: number; cardId: number; cardTitle: string; tableId: number; tableName: string; timestamp: string; }
+  interface GameEvent { eventId: number | null; shortDesc: string; longDesc: string; }
+  interface Pawn { id: number; x: number; y: number; color: string; name: string; }
+  interface RawApiLog { logId: number; gameEventId: number | null; teamId: number | null; timestamp: string; cardId: number; cardTitle: string; teamName: string; feedbackDescription: string; status: boolean; }
+  interface RawPendingLog { logId: number; cardId: number; cardTitle: string; teamId: number; teamName: string; timestamp: string; }
+  interface RawPawnData { teamId: number; posX: string | number; posY: string | number; teamColor: string; teamName: string; }
+  interface RivalBoardConfigFromApi { boardId: number; name: string; labelsUp: string[]; labelsRight: string[]; descriptionDown: string; descriptionLeft: string; rows: number; cols: number; cellColor: string; borderColor: string; borderColors: string[]; }
+  interface BoardConfigForComponent { name: string; LabelsUp: string[]; LabelsRight: string[]; DescriptionDown: string; DescriptionLeft: string; Rows: number; Cols: number; CellColor: string; BorderColor: string; BorderColors: string[]; boardId: number; }
 
   const props = defineProps({
-    gameId: Number,
-    teamId: Number
+    gameId: { type: [Number, String], required: true },
+    teamId: { type: [Number, String] }
   });
 
   const toast = useToast()
-  const gameId = props.gameId;
-  const teamId = computed(() => props.teamId);
+  const gameId = Number(props.gameId);
+  const teamId = computed(() => props.teamId ? Number(props.teamId) : undefined);
 
-  const loading = reactive({
-    teams: true,
-    cards: true,
-    items: true,
-  });
-
+  const loading = reactive({ teams: true, cards: true, items: true });
   const decisions = ref<DecisionLog[]>([])
   const loadingHistory = ref(true);
   const showMenu = ref(true)
@@ -380,43 +286,27 @@
   const selectedPendingEventIndex = ref<number | null>(null)
   const tables = ref<Team[]>([])
   const cards = ref<Card[]>([])
+  const items = ref<Item[]>([])
   const availableEvents = ref<GameEvent[]>([]);
-  const enemyformData = reactive({
-    Id: 1,
-    Name: 'Plansza podstawowa',
-    LabelsUp: ['Podstawowa kordynacja', 'Standaryzacja procesów', 'Zintegrowane działania', 'Pełna integracja strategiczna'],
-    LabelsRight: ['Nowicjusz', 'Naśladowca', 'Innowator', 'Lider cyfrowy'],
-    DescriptionDown: 'Poziom integracji wew/zew',
-    DescriptionLeft: 'Zawansowanie Cyfrowe',
-    Rows: 8,
-    Cols: 8,
-    CellColor: '#f0f0f0',
-    BorderColor: '#595959',
-    BorderColors: ['#008000', '#FFFF00', '#FFA500', '#FF0000'],
-    boardId: 0
-  });
+  const enemyformData = reactive<BoardConfigForComponent>({ name: 'Plansza Rywala', LabelsUp: [], LabelsRight: [], DescriptionDown: '', DescriptionLeft: '', Rows: 8, Cols: 8, CellColor: '#f0f0f0', BorderColor: '#595959', BorderColors: [], boardId: 0 });
   const pendingDecisions = ref<PendingDecision[]>([]);
   const loadingPending = ref(true);
 
   const selectedCard = computed<Card | undefined>(() => cards.value.find(c => c.id === selectedCardId.value));
+  const selectedItem = computed<Item | undefined>(() => items.value.find(i => i.id === selectedItemId.value));
   const selectedTeam = computed<Team | undefined>(() => tables.value.find(t => t.teamId === selectedTableId.value));
   const currentBits = computed(() => selectedTeam.value ? selectedTeam.value.teamBud : 0);
-  const selectedEvent = computed<GameEvent | undefined>(() => {
-    const selectedId = selectedPendingEventIndex.value;
-    return availableEvents.value.find(e => e.eventId === selectedId);
-  });
-
-  const historyVersion = ref<string | null>(null);
-  const pendingVersion = ref<string | null>(null);
-
-  let hasLoadedOnce = false;
+  const selectedEvent = computed<GameEvent | undefined>(() => availableEvents.value.find(e => e.eventId === selectedPendingEventIndex.value));
+  
+  const decisionMode = ref('history')
+  const actionMode = ref('cards')
+  const selectedItemId = ref<number | null>(null)
 
   watch(selectedTableId, (newTeamId) => {
     selectedCardId.value = null;
     selectedItemId.value = null;
     if (newTeamId) {
       fetchAvailableCardsForTeam();
-      fetchRivalPawns();
     } else {
       cards.value = [];
       items.value = [];
@@ -429,244 +319,82 @@
   });
 
   const fetchDecisionHistory = async () => {
-    if (!gameId) {
-      toast.error("Brak ID gry w adresie URL.");
-      return;
-    }
-    if (!hasLoadedOnce) loadingHistory.value = true;
-
-    try {
-      await fetchGameEvents();
-      const payload = { gameId: gameId };
-      const response = await apiServices.post(apiConfig.player.getLogs, payload);
-      const responseData = response.data as RawApiLog[];
-
-      let mappedLogs: DecisionLog[] = responseData.map((log: RawApiLog) => {
-        const isEvent = log.gameEventId && !log.teamId;
-        if (isEvent) {
-          const eventDetails = availableEvents.value.find(e => e.eventId === log.gameEventId);
-          return {
-            isEventNotification: true,
-            timestamp: log.timestamp,
-            feedbackDescription: eventDetails ? eventDetails.longDesc : `Aktywowano wydarzenie (ID: ${log.gameEventId})`
-          };
-        } else {
-          return {
-            isEventNotification: false,
-            cardId: log.cardId,
-            cardTitle: log.cardTitle,
-            tableId: log.teamId || 0,
-            tableName: log.teamName,
-            timestamp: log.timestamp,
-            feedbackDescription: log.feedbackDescription,
-            result: log.status ? 'Pozytywny' : 'Negatywny',
-            eventAppliedId: log.gameEventId
-          };
-        }
-      });
-
-      if (teamId.value) {
-        const id = teamId.value;
-        mappedLogs = mappedLogs.filter(entry =>
-          entry.isEventNotification || entry.tableId === id
-        );
-      }
-      decisions.value = mappedLogs;
-
-      const versionResponse = await apiServices.get(apiConfig.games.getHistoryVersion(gameId));
-      historyVersion.value = (versionResponse.data as { version: string }).version;
-    } catch (error) {
-      toast.error("Wystąpił błąd podczas ładowania historii decyzji.");
-      console.error("Błąd ładowania historii:", error);
-    } finally {
-      if (!hasLoadedOnce) loadingHistory.value = false;
-      hasLoadedOnce = true;
-    }
-  };
-
-  const decisionMode = ref('history')
-  const actionMode = ref('cards')
-  const items = ref<Item[]>([])
-  const selectedItemId = ref<number | null>(null)
-  const selectedItem = computed<Item | undefined>(() => items.value.find(i => i.id === selectedItemId.value));
-
-  async function applySelectedEvent() {
-    const eventId = selectedPendingEventIndex.value;
-    if (!eventId || !gameId) return;
-
-    try {
-      const payload = { eventId: eventId };
-      const response = await apiServices.post(apiConfig.games.applyEvent(gameId), payload);
-      toast.success((response.data as { message: string }).message || "Zdarzenie zostało aktywowane!");
-      fetchDecisionHistory();
-    } catch (error) {
-      toast.error("Wystąpił błąd podczas aktywacji zdarzenia.");
-      console.error("Błąd applySelectedEvent:", error);
-    }
-  }
-
-  async function playCard() {
-    const card = selectedCard.value;
-    const team = selectedTeam.value;
-    if (!card || !team) return;
-    if (team.teamBud < (card.cost || 0)) {
-      toast.error(`Drużyna ${team.teamName} ma za mało bitów!`);
-      return;
-    }
-
-    const hasEnablers = card.enablers && Array.isArray(card.enablers) && card.enablers.length > 0;
-    const wasSuccess = !hasEnablers;
-    const endpoint = wasSuccess ? apiConfig.player.playCardSuccess(card.id) : apiConfig.player.playCardFailure(card.id);
-
-    const payload = {
-      gameId: gameId,
-      teamId: team.teamId,
-      deckId: team.deckId,
-      boardId: team.boardId,
-      cost: card.cost || 0,
-      ForceExecution: true
-    };
-
-    try {
-      const response = await apiServices.post(endpoint, payload);
-      const resultText = wasSuccess ? "Sukces" : "Porażka";
-      toast.success(`${(response.data as { message: string }).message || 'Akcja przetworzona.'} Wynik: ${resultText}`);
-      await fetchTeams();
-      await fetchAvailableCardsForTeam();
-    } catch (error) {
-      toast.error("Wystąpił błąd podczas zagrywania karty.");
-      console.error(error);
-    }
-  }
-
-  async function giveItem() {
-    const item = selectedItem.value;
-    const team = selectedTeam.value;
-    if (!item || !team) return;
-    if (team.teamBud < (item.cost || 0)) {
-      toast.error(`Drużyna ${team.teamName} ma za mało bitów!`);
-      return;
-    }
-
-    const payload = {
-      gameId: gameId,
-      teamId: team.teamId,
-      deckId: team.deckId,
-      boardId: team.boardId,
-      cost: item.cost || 0,
-      ForceExecution: true
-    };
-
-    try {
-      const response = await apiServices.post(apiConfig.player.playCardSuccess(item.id), payload);
-      toast.success((response.data as { message: string }).message || `Użyto przedmiot dla ${team.teamName}.`);
-      await fetchTeams();
-      await fetchAvailableCardsForTeam();
-    } catch (error) {
-      toast.error("Wystąpił błąd podczas używania przedmiotu.");
-      console.error(error);
-    }
-  }
-
-  function formatDate(timestamp: string) {
-    const date = new Date(timestamp)
-    return date.toLocaleString('pl-PL')
-  }
-
-  let hasLoadedPendingOnce = false;
-
-  const fetchPendingDecisions = async () => {
     if (!gameId) return;
-    if (!hasLoadedPendingOnce) loadingPending.value = true;
-
+    loadingHistory.value = true;
     try {
-      const response = await apiServices.get(apiConfig.games.getPendingLogs(gameId));
-      let data = response.data as RawPendingLog[];
+      let response;
       if (teamId.value) {
-        data = data.filter((log: RawPendingLog) => log.teamId === teamId.value);
+        response = await apiServices.get(apiConfig.player.getLogs, { 
+          params: { gameId: gameId, teamId: teamId.value } 
+        });
+      } else {
+        response = await apiServices.post(apiConfig.player.getPlayerHistory, { gameId });
       }
-
-      pendingDecisions.value = data.map((log: RawPendingLog) => ({
-        logId: log.logId,
+      const responseData = response.data as RawApiLog[];
+      decisions.value = responseData.map(log => ({
+        isEventNotification: !!log.gameEventId && !log.teamId,
+        timestamp: log.timestamp,
+        feedbackDescription: log.feedbackDescription,
         cardId: log.cardId,
         cardTitle: log.cardTitle,
         tableId: log.teamId,
         tableName: log.teamName,
-        timestamp: log.timestamp,
+        result: log.status ? 'Pozytywny' : 'Negatywny',
+        eventAppliedId: log.gameEventId
       }));
-      
-      const versionResponse = await apiServices.get(apiConfig.games.getPendingVersion(gameId));
-      pendingVersion.value = (versionResponse.data as { version: string }).version;
-    } catch (error) {
-      toast.error("Błąd podczas pobierania sugestii do zatwierdzenia.");
-      console.error(error);
+    } catch (error: any) {
+      toast.error("Wystąpił błąd podczas ładowania historii decyzji.");
+      console.error("Błąd ładowania historii:", error.response?.data || error.message);
     } finally {
-      if (!hasLoadedPendingOnce) loadingPending.value = false;
-      hasLoadedPendingOnce = true;
+      loadingHistory.value = false;
     }
   };
-
-  const approveDecision = async (logId: number) => {
+  
+  const fetchPendingDecisions = async () => {
+    if (!gameId) return;
+    loadingPending.value = true;
     try {
-      await apiServices.post(apiConfig.games.approveLog(logId), {});
-      toast.success("Sugestia została zatwierdzona!");
-      fetchPendingDecisions();
-      fetchDecisionHistory();
-    } catch (error) {
-      toast.error("Wystąpił błąd podczas zatwierdzania sugestii.");
-      console.error(error);
-    }
-  };
-
-  const rejectDecision = async (logId: number) => {
-    try {
-      await apiServices.delete(apiConfig.games.rejectLog(logId));
-      toast.info("Sugestia została odrzucona.");
-      fetchPendingDecisions();
-    } catch (error) {
-      toast.error("Wystąpił błąd podczas odrzucania sugestii.");
-      console.error(error);
+      // POPRAWKA: Użyto poprawnej ścieżki z `apiConfig.player` zamiast `apiConfig.games`
+      const response = await apiServices.get(apiConfig.player.getPendingLogs(gameId));
+      let data = response.data as RawPendingLog[];
+      if (teamId.value) {
+        data = data.filter(log => log.teamId === teamId.value);
+      }
+      pendingDecisions.value = data.map(log => ({ ...log, tableId: log.teamId, tableName: log.teamName }));
+    } catch (error: any) {
+      toast.error("Błąd podczas pobierania sugestii.");
+      console.error("Błąd pobierania sugestii:", error.response?.data || error.message);
+    } finally {
+      loadingPending.value = false;
     }
   };
 
   const fetchTeams = async () => {
     if (!gameId) return;
     try {
-      const response = await apiServices.get(apiConfig.games.getTeamsManagement(gameId));
+      // POPRAWKA: Użyto poprawnej ścieżki z `apiConfig.player` zamiast `apiConfig.games`
+      const response = await apiServices.get(apiConfig.player.getTeamsManagement(gameId));
       tables.value = response.data as Team[];
-    } catch (error) {
+    } catch (error: any) {
       toast.error("Błąd pobierania drużyn.");
-      console.error(error);
+      console.error("Błąd pobierania drużyn:", error.response?.data || error.message);
     }
   };
-
+  
   const fetchAvailableCardsForTeam = async () => {
-    if (!selectedTableId.value) {
-      cards.value = [];
-      items.value = [];
-      return;
-    }
     const team = selectedTeam.value;
-    if (!team || !team.deckId) {
-      toast.error("Wybrana drużyna nie ma przypisanej talii.");
-      return;
-    }
+    if (!team || !team.deckId) return;
     loading.cards = true;
     loading.items = true;
     try {
-      const response = await apiServices.get(apiConfig.player.getCards(team.deckId), {
-        params: { gameId: gameId, teamId: team.teamId }
-      });
+      const url = apiConfig.player.getCards(team.deckId, gameId, team.teamId);
+      const response = await apiServices.get(url);
       const data = response.data as { decisionCards: Card[], itemCards: Item[] };
-      if (data && data.decisionCards && data.itemCards) {
-        cards.value = data.decisionCards;
-        items.value = data.itemCards;
-      } else {
-        toast.error("Otrzymano nieprawidłowe dane kart z serwera.");
-      }
-    } catch (error) {
-      toast.error("Wystąpił błąd podczas pobierania dostępnych kart.");
-      console.error(error);
+      cards.value = data.decisionCards || [];
+      items.value = data.itemCards || [];
+    } catch (error: any) {
+      toast.error("Błąd pobierania dostępnych kart.");
+      console.error("Błąd pobierania kart:", error.response?.data || error.message);
     } finally {
       loading.cards = false;
       loading.items = false;
@@ -675,28 +403,26 @@
 
   const fetchGameEvents = async () => {
     try {
-      const response = await apiServices.get(apiConfig.games.getGameEvents);
-      availableEvents.value = [
-        { eventId: null, shortDesc: "Brak zdarzenia", longDesc: "" },
-        ...(response.data as GameEvent[])
-      ];
-    } catch (error) {
-      toast.error("Nie udało się pobrać listy zdarzeń losowych.");
-      console.error("Błąd pobierania zdarzeń:", error);
+      // POPRAWKA: Użyto poprawnej ścieżki z `apiConfig.player` zamiast `apiConfig.games`
+      const response = await apiServices.get(apiConfig.player.getGameEvents);
+      availableEvents.value = [{ eventId: null, shortDesc: "Brak zdarzenia", longDesc: "" }, ...response.data as GameEvent[]];
+    } catch (error: any) {
+      toast.error("Nie udało się pobrać listy zdarzeń.");
+      console.error("Błąd pobierania zdarzeń:", error.response?.data || error.message);
     }
   };
 
   const fetchRivalBoard = async () => {
-    if (props.gameId == null) return;
-    
+    if (!gameId) return;
     try {
-      const response = await apiServices.get(apiConfig.games.getGameData, { params: { gameId: props.gameId } });
-      const data = response.data as { rivalBoardConfig: RivalBoardConfig };
-
+      // POPRAWKA: Użyto poprawnej ścieżki z `apiConfig.player` zamiast `apiConfig.games`
+      const url = apiConfig.player.getGameData(gameId);
+      const response = await apiServices.get(url);
+      const data = response.data as { rivalBoardConfig: RivalBoardConfigFromApi };
       if (data.rivalBoardConfig) {
         const config = data.rivalBoardConfig;
-        enemyformData.Id = config.boardId;
-        enemyformData.Name = config.name;
+        enemyformData.boardId = config.boardId;
+        enemyformData.name = config.name;
         enemyformData.LabelsUp = config.labelsUp;
         enemyformData.LabelsRight = config.labelsRight;
         enemyformData.DescriptionDown = config.descriptionDown;
@@ -706,75 +432,121 @@
         enemyformData.CellColor = config.cellColor;
         enemyformData.BorderColor = config.borderColor;
         enemyformData.BorderColors = config.borderColors;
-        enemyformData.boardId = config.boardId; 
         await fetchRivalPawns();
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error("Wystąpił błąd podczas ładowania danych planszy rywala.");
-      console.error("Błąd w fetchRivalBoard:", error);
+      console.error("Błąd w fetchRivalBoard:", error.response?.data || error.message);
     }
   };
 
   const enemypawns = ref<Pawn[]>([]);
   const fetchRivalPawns = async () => {
+    if (!gameId || !enemyformData.boardId) return;
     try {
-      const response = await apiServices.get(apiConfig.player.getRivalPawns, {
-        params: { gameId: gameId, boardId: enemyformData.Id }
-      });
-      enemypawns.value = (response.data as RawPawnData[]).map((p: RawPawnData) => ({
-        id: p.teamId,
-        x: Number(p.posX),
-        y: Number(p.posY),
-        color: p.teamColor,
-        name: p.teamName
+      const url = apiConfig.player.getRivalPawns(gameId, enemyformData.boardId);
+      const response = await apiServices.get(url);
+      enemypawns.value = (response.data as RawPawnData[]).map(p => ({
+        id: p.teamId, x: Number(p.posX), y: Number(p.posY), color: p.teamColor, name: p.teamName
       }));
-    } catch (err) {
-      console.error("Błąd pobierania pionków rywala:", err);
+    } catch (err: any) {
+      console.error("Błąd pobierania pionków rywala:", err.response?.data || err.message);
     }
   };
 
+  // --- ACTIONS ---
+  async function executeAction(isCard: boolean) {
+    const entity = isCard ? selectedCard.value : selectedItem.value;
+    const team = selectedTeam.value;
+    if (!entity || !team) return;
+    if (team.teamBud < (entity.cost || 0)) {
+      toast.error(`Drużyna ${team.teamName} ma za mało bitów!`);
+      return;
+    }
+    let wasSuccess: boolean;
+    if (isCard) {
+      const cardEntity = entity as Card;
+      wasSuccess = !(cardEntity.enablers && Array.isArray(cardEntity.enablers) && cardEntity.enablers.length > 0);
+    } else {
+      wasSuccess = true;
+    }
+    const endpoint = wasSuccess ? apiConfig.player.playCardSuccess(entity.id) : apiConfig.player.playCardFailure(entity.id);
+    const payload = { gameId, teamId: team.teamId, deckId: team.deckId, boardId: team.boardId, cost: entity.cost || 0, ForceExecution: true };
+    try {
+      const response = await apiServices.post(endpoint, payload);
+      toast.success((response.data as { message: string }).message || 'Akcja przetworzona pomyślnie.');
+      await fetchTeams();
+      await fetchAvailableCardsForTeam();
+    } catch (error: any) {
+      toast.error("Wystąpił błąd podczas akcji.");
+      console.error("Błąd akcji karty/przedmiotu:", error.response?.data || error.message);
+    }
+  }
+  const playCard = () => executeAction(true);
+  const giveItem = () => executeAction(false);
+
+  const approveDecision = async (logId: number) => {
+    try {
+      // POPRAWKA: Użyto poprawnej ścieżki z `apiConfig.player` zamiast `apiConfig.games`
+      await apiServices.post(apiConfig.player.approveLog(logId), {});
+      toast.success("Sugestia została zatwierdzona!");
+      await Promise.all([fetchPendingDecisions(), fetchDecisionHistory()]);
+    } catch (error: any) {
+      toast.error("Wystąpił błąd podczas zatwierdzania sugestii.");
+      console.error("Błąd zatwierdzania:", error.response?.data || error.message);
+    }
+  };
+
+  const rejectDecision = async (logId: number) => {
+    try {
+      // POPRAWKA: Użyto poprawnej ścieżki z `apiConfig.player` zamiast `apiConfig.games`
+      await apiServices.delete(apiConfig.player.rejectLog(logId));
+      toast.info("Sugestia została odrzucona.");
+      await fetchPendingDecisions();
+    } catch (error: any) {
+      toast.error("Wystąpił błąd podczas odrzucania sugestii.");
+      console.error("Błąd odrzucania:", error.response?.data || error.message);
+    }
+  };
+  
+  async function applySelectedEvent() {
+    if (!selectedTableId.value) {
+      toast("Proszę najpierw wybrać stół.");
+      return;
+    }
+    if (!selectedPendingEventIndex.value) {
+        toast("Proszę wybrać zdarzenie do aktywacji.");
+        return;
+    }
+    try {
+      // POPRAWKA: Użyto poprawnej ścieżki z `apiConfig.player` zamiast `apiConfig.games`
+      await apiServices.post(apiConfig.player.applyEvent(gameId), { eventId: selectedPendingEventIndex.value, teamId: selectedTableId.value });
+      toast.success("Zdarzenie zostało aktywowane!");
+    } catch (error: any) {
+      toast.error("Błąd podczas aktywacji zdarzenia.");
+      console.error("Błąd aktywacji zdarzenia:", error.response?.data || error.message);
+    }
+  }
+
+  const formatDate = (timestamp: string) => new Date(timestamp).toLocaleString('pl-PL');
+
   onMounted(async () => {
     if (!gameId) return;
-
-    await Promise.all([
-        fetchDecisionHistory(),
-        fetchPendingDecisions(),
-        fetchGameEvents(),
-        fetchRivalBoard(),
-    ]);
-
+    await Promise.all([ fetchTeams(), fetchDecisionHistory(), fetchPendingDecisions(), fetchGameEvents(), fetchRivalBoard() ]);
+    if (teamId.value) {
+      selectedTableId.value = teamId.value;
+    }
     try {
       await signalService.start();
       await signalService.joinGameRoom(gameId);
       console.log("Połączono z SignalR i dołączono do pokoju gry.");
-
-      signalService.connection.on("HistoryUpdated", () => {
-        console.log("Otrzymano powiadomienie: Historia się zmieniła. Odświeżam...");
-        fetchDecisionHistory();
-        fetchTeams();
-      });
-      signalService.connection.on("PendingUpdated", () => {
-        console.log("Otrzymano powiadomienie: Sugestie się zmieniły. Odświeżam...");
-        fetchPendingDecisions();
-      });
-      signalService.connection.on("BoardUpdated", () => {
-        console.log("SignalR: BoardUpdated – odświeżam pionki");
-        fetchRivalPawns();
-      });
-    } catch (err) {
+      signalService.connection.on("HistoryUpdated", () => fetchDecisionHistory());
+      signalService.connection.on("PendingUpdated", () => fetchPendingDecisions());
+      signalService.connection.on("BoardUpdated", () => fetchRivalPawns());
+    } catch (err: any) {
       console.error("Błąd połączenia SignalR: ", err);
     }
-
-    await fetchTeams();
-    if (teamId.value) {
-      selectedTableId.value = teamId.value;
-      await fetchAvailableCardsForTeam();
-    }
   });
-
-  onUnmounted(() => {
-    if (gameId) {
-        signalService.leaveGameRoom(gameId);
-    }
-  });
+  
+  onUnmounted(() => { if (gameId) signalService.leaveGameRoom(gameId); });
 </script>

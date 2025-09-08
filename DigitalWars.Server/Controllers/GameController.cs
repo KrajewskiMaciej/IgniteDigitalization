@@ -11,6 +11,12 @@ using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
+    // DTO for status updates
+    public class UpdateStatusDto
+    {
+        public string Status { get; set; }
+    }
+
     [Route("api/games")]
     public class GameController : BaseApiController
     {
@@ -59,8 +65,23 @@ namespace backend.Controllers
         }
 
         [Authorize]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetGameById(int id)
+        {
+            var userId = CurrentUserId;
+            var game = await _context.Games
+                .Where(g => g.Games_Id == id && g.Users_Id == userId)
+                .Select(g => new { Id = g.Games_Id, Name = g.Games_Desc, Status = g.Game_Status.ToString() })
+                .FirstOrDefaultAsync();
+
+            if (game == null) return NotFound();
+
+            return Ok(game);
+        }
+
+        [Authorize]
         [HttpPut("{gameId}/status")]
-        public async Task<IActionResult> UpdateGameStatus(int gameId, [FromBody] string status)
+        public async Task<IActionResult> UpdateGameStatus(int gameId, [FromBody] UpdateStatusDto dto)
         {
             var userId = CurrentUserId;
             if (userId == null) return Unauthorized("Nie można zidentyfikować użytkownika.");
@@ -69,7 +90,7 @@ namespace backend.Controllers
             if (game == null) return NotFound($"Gra o ID {gameId} nie została znaleziona.");
             if (game.Users_Id != userId.Value) return Forbid("Nie masz uprawnień do zmiany statusu tej gry.");
 
-            if (!Enum.TryParse<GameStatus>(status, true, out var newStatus))
+            if (!Enum.TryParse<GameStatus>(dto.Status, true, out var newStatus))
                 return BadRequest("Nieprawidłowa wartość statusu.");
 
             if (game.Game_Status == GameStatus.End && newStatus != GameStatus.End)
@@ -80,6 +101,35 @@ namespace backend.Controllers
             return Ok(new { message = $"Status gry pomyślnie zmieniony na '{newStatus}'.", newStatus = newStatus.ToString() });
         }
 
+        [Authorize]
+        [HttpPost("stop-all")]
+        public async Task<IActionResult> StopAllGames()
+        {
+            var userId = CurrentUserId;
+            var gamesToStop = await _context.Games
+                .Where(g => g.Users_Id == userId && g.Game_Status == GameStatus.During)
+                .ToListAsync();
+
+            gamesToStop.ForEach(g => g.Game_Status = GameStatus.Paused);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = $"Zatrzymano {gamesToStop.Count} gier." });
+        }
+
+        [Authorize]
+        [HttpPost("end-all")]
+        public async Task<IActionResult> EndAllGames()
+        {
+            var userId = CurrentUserId;
+            var gamesToEnd = await _context.Games
+                .Where(g => g.Users_Id == userId && g.Game_Status != GameStatus.End)
+                .ToListAsync();
+
+            gamesToEnd.ForEach(g => g.Game_Status = GameStatus.End);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = $"Zakończono {gamesToEnd.Count} gier." });
+        }
+
+        // Helper class for token generation
         public static class TokenGenerator
         {
             private static readonly Random _random = new Random();
@@ -92,3 +142,4 @@ namespace backend.Controllers
         }
     }
 }
+

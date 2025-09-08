@@ -33,35 +33,28 @@ namespace backend.Services
         {
             using var scope = _serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
             _logger.LogInformation("Rozpoczynanie inicjalizacji danych dla nowego użytkownika {UserId}", userId);
-
             var filePath = Path.Combine(AppContext.BaseDirectory, "Initializers", "DigitalWars_UserInitialization.xlsx");
             if (!File.Exists(filePath))
             {
-                _logger.LogError("Brak pliku inicjalizacyjnego. Nie można zainicjalizować użytkownika.");
+                _logger.LogError("Brak pliku inicjalacyjnego. Nie można zainicjalizować użytkownika.");
                 return;
             }
             using var workbook = new XLWorkbook(filePath);
-
             await SeedBoardsForUserFromFileAsync(context, workbook, userId);
             await CreateDeckFromWorkbookAsync(context, workbook, userId, "Talia podstawowa");
-
             _logger.LogInformation("Zakończono inicjalizację danych dla użytkownika {UserId}.", userId);
         }
 
         public async Task<Deck> CreateDeckFromFileForUserAsync(IFormFile file, int userId, string deckName)
         {
             if (file == null || file.Length == 0) throw new ArgumentException("Nie przesłano pliku.");
-
             using var scope = _serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
             using var stream = new MemoryStream();
             await file.CopyToAsync(stream);
             stream.Position = 0;
             using var workbook = new XLWorkbook(stream);
-
             return await CreateDeckFromWorkbookAsync(context, workbook, userId, deckName);
         }
 
@@ -74,9 +67,13 @@ namespace backend.Services
                 context.Decks.Add(newDeck);
                 await context.SaveChangesAsync();
 
+                // Krok 1: Wczytaj karty i stwórz niezawodną mapę ID
                 var cardIdMap = await LoadAndMapCardsAsync(context, workbook, newDeck.Decks_Id);
+
+                // Krok 2: Wczytaj procesy i stwórz ich mapę ID
                 var processIdMap = await LoadAndMapEntitiesAsync<Process, int>(context, workbook, "Processes", newDeck.Decks_Id, "Processes_Id", "Processes_Id");
 
+                // Krok 3: Wczytaj wszystkie encje powiązane, używając poprawnych map
                 LoadRelatedEntities<Decision>(context, workbook, "Decisions", cardIdMap);
                 LoadRelatedEntities<Hardware>(context, workbook, "Hardwares", cardIdMap);
                 LoadRelatedEntities<Software>(context, workbook, "Softwares", cardIdMap);
@@ -84,6 +81,7 @@ namespace backend.Services
                 LoadRelatedEntities<CardWeight>(context, workbook, "CardsWeights", cardIdMap, processIdMap);
                 LoadRelatedEntities<CardEnabler>(context, workbook, "CardsEnablers", cardIdMap);
 
+                // Krok 4: Zapisz wszystkie dodane encje powiązane w jednej transakcji
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
@@ -98,39 +96,17 @@ namespace backend.Services
             }
         }
 
-        // POPRAWIONA METODA
-        /// <summary>
-        /// Wczytuje tablice z pliku Excel i przypisuje je użytkownikowi, jeśli nie ma on jeszcze żadnych tablic.
-        /// </summary>
-        /// <param name="context">Kontekst bazy danych Entity Framework.</param>
-        /// <param name="workbook">Obiekt XLWorkbook zawierający arkusz z szablonami tablic.</param>
-        /// <param name="userId">Identyfikator użytkownika, dla którego mają zostać utworzone tablice.</param>
         private async Task SeedBoardsForUserFromFileAsync(AppDbContext context, XLWorkbook workbook, int userId)
         {
-            // 1. Sprawdź, czy użytkownik posiada już jakiekolwiek tablice. Jeśli tak, przerwij operację.
-            if (await context.Boards.AnyAsync(b => b.Users_Id == userId))
-            {
-                return;
-            }
-
-            // 2. Spróbuj uzyskać dostęp do arkusza o nazwie "Boards".
+            if (await context.Boards.AnyAsync(b => b.Users_Id == userId)) return;
             var sheet = workbook.Worksheet("Boards");
-            if (sheet == null)
-            {
-                // Opcjonalnie: można tutaj dodać logowanie informacji o braku arkusza.
-                return;
-            }
-
+            if (sheet == null) return;
             var boardsToAdd = new List<Board>();
-
-            // 3. Przejdź przez wszystkie używane wiersze w arkuszu, pomijając pierwszy (nagłówek).
             foreach (var row in sheet.RowsUsed().Skip(1))
             {
-                // 4. Dla każdego wiersza z szablonem utwórz nową instancję Board,
-                //    od razu przypisując jej docelowy identyfikator użytkownika (userId).
                 boardsToAdd.Add(new Board
                 {
-                    Users_Id = userId, // Bezpośrednie przypisanie ID użytkownika
+                    Users_Id = userId,
                     Name = row.Cell(1).GetString(),
                     Labels_Up = row.Cell(2).GetString(),
                     Labels_Right = row.Cell(3).GetString(),
@@ -141,13 +117,8 @@ namespace backend.Services
                     Border_Color = row.Cell(8).GetString(),
                     Cell_Color = row.Cell(9).GetString(),
                     Borders_Colors = row.Cell(10).GetString()
-                    // Zauważ, że nie ma już potrzeby sprawdzania komórki z ID użytkownika w pliku Excel,
-                    // ponieważ zakładamy, że cały ten arkusz służy jako źródło szablonów.
                 });
             }
-
-            // 5. Jeśli lista nowo utworzonych tablic nie jest pusta, dodaj je wszystkie
-            //    do bazy danych w ramach jednej transakcji.
             if (boardsToAdd.Any())
             {
                 context.Boards.AddRange(boardsToAdd);
@@ -155,42 +126,65 @@ namespace backend.Services
             }
         }
 
+        // =========================================================================================
+        // === GŁÓWNA POPRAWKA: CAŁKOWICIE PRZEPISANA METODA DLA NIEZAWODNOŚCI I WYDAJNOŚCI ===
+        // =========================================================================================
         private async Task<Dictionary<int, int>> LoadAndMapCardsAsync(AppDbContext context, XLWorkbook workbook, int deckId)
         {
-            var idMap = new Dictionary<int, int>();
             var sheet = workbook.Worksheet("Cards");
-            if (sheet == null) return idMap;
+            if (sheet == null)
+            {
+                _logger.LogWarning("Nie znaleziono arkusza 'Cards' w pliku Excel.");
+                return new Dictionary<int, int>();
+            }
 
+            // Krok 1: Odczytaj wszystkie karty z Excela i przygotuj je do wstawienia
+            var cardsToAdd = new List<Card>();
             foreach (var row in sheet.RowsUsed().Skip(1))
             {
                 if (row.Cell(1).TryGetValue(out int cardIdFromExcel))
                 {
-                    var newCard = new Card
+                    cardsToAdd.Add(new Card
                     {
                         Decks_Id = deckId,
-                        Card_Id = cardIdFromExcel,
-                    };
-                    context.Cards.Add(newCard);
-                    await context.SaveChangesAsync();
-                    idMap[cardIdFromExcel] = newCard.Cards_Id;
+                        Card_Id = cardIdFromExcel, // Zapisz oryginalne ID z Excela
+                    });
                 }
             }
+
+            if (!cardsToAdd.Any())
+            {
+                _logger.LogWarning("Arkusz 'Cards' jest pusty lub nie zawiera prawidłowych ID kart.");
+                return new Dictionary<int, int>();
+            }
+
+            // Krok 2: Dodaj wszystkie karty do bazy w jednej operacji i zapisz
+            context.Cards.AddRange(cardsToAdd);
+            await context.SaveChangesAsync();
+
+            // Krok 3: Stwórz mapę. Teraz `cardsToAdd` zawiera obiekty z nowymi,
+            // wygenerowanymi przez bazę kluczami głównymi `Cards_Id`.
+            // Mapa tłumaczy stary ID z Excela (`card.Card_Id`) na nowy ID z bazy (`card.Cards_Id`)
+            var idMap = cardsToAdd.ToDictionary(
+                card => card.Card_Id,      // Klucz: stary ID z Excela
+                card => card.Cards_Id      // Wartość: nowy, auto-inkrementowany ID z bazy danych
+            );
+
             return idMap;
         }
 
-        private async Task<Dictionary<TKey, TKey>> LoadAndMapEntitiesAsync<TEntity, TKey>(AppDbContext context, XLWorkbook workbook, string sheetName, int deckId, string excelIdColumn, string dbIdColumn) where TEntity : class, new()
+        private async Task<Dictionary<TKey, TKey>> LoadAndMapEntitiesAsync<TEntity, TKey>(AppDbContext context, XLWorkbook workbook, string sheetName, int deckId, string excelIdColumn, string dbIdColumn) where TEntity : class, new() where TKey : notnull
         {
             var idMap = new Dictionary<TKey, TKey>();
             var sheet = workbook.Worksheet(sheetName);
             if (sheet == null) return idMap;
-
-            var properties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToDictionary(p => p.Name, p => p);
+            var properties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
+            var entitiesToAdd = new List<TEntity>();
 
             foreach (var row in sheet.RowsUsed().Skip(1))
             {
                 var entity = new TEntity();
-                properties["Decks_Id"]?.SetValue(entity, deckId);
-
+                properties.GetValueOrDefault("Decks_Id")?.SetValue(entity, deckId);
                 foreach (var cell in row.CellsUsed())
                 {
                     var propName = sheet.Cell(1, cell.Address.ColumnNumber).GetString();
@@ -199,59 +193,64 @@ namespace backend.Services
                         prop.SetValue(entity, ConvertValue(cell.GetString(), prop.PropertyType, cell.DataType));
                     }
                 }
+                entitiesToAdd.Add(entity);
+            }
 
-                await context.Set<TEntity>().AddAsync(entity);
+            if (entitiesToAdd.Any())
+            {
+                await context.Set<TEntity>().AddRangeAsync(entitiesToAdd);
                 await context.SaveChangesAsync();
-
-                var excelId = (TKey)properties[excelIdColumn].GetValue(entity);
-                var dbId = (TKey)properties[dbIdColumn].GetValue(entity);
-                idMap[excelId] = dbId;
+                idMap = entitiesToAdd.ToDictionary(
+                    entity => (TKey)properties[excelIdColumn].GetValue(entity)!,
+                    entity => (TKey)properties[dbIdColumn].GetValue(entity)!
+                );
             }
             return idMap;
         }
 
-        private void LoadRelatedEntities<TEntity>(AppDbContext context, XLWorkbook workbook, string sheetName, Dictionary<int, int> cardIdMap, Dictionary<int, int> processIdMap = null) where TEntity : class, new()
+        private void LoadRelatedEntities<TEntity>(AppDbContext context, XLWorkbook workbook, string sheetName, Dictionary<int, int> cardIdMap, Dictionary<int, int>? processIdMap = null) where TEntity : class, new()
         {
             var sheet = workbook.Worksheet(sheetName);
             if (sheet == null) return;
-
-            var properties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToDictionary(p => p.Name, p => p);
+            var properties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
+            var cardForeignKeyPropertyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Cards_Id", "Enabler_Cards_Id" };
+            var headers = sheet.Row(1).CellsUsed().ToDictionary(cell => cell.Address.ColumnNumber, cell => cell.GetString());
 
             foreach (var row in sheet.RowsUsed().Skip(1))
             {
                 var entity = new TEntity();
-
+                bool isPrimaryCardIdSet = false;
                 foreach (var cell in row.CellsUsed())
                 {
-                    var propName = sheet.Cell(1, cell.Address.ColumnNumber).GetString();
+                    if (!headers.TryGetValue(cell.Address.ColumnNumber, out var headerName) || string.IsNullOrWhiteSpace(headerName)) continue;
+                    string propertyName = headerName;
+                    if (string.Equals(headerName, "Card_Id", StringComparison.OrdinalIgnoreCase) || string.Equals(headerName, "CardId", StringComparison.OrdinalIgnoreCase)) propertyName = "Cards_Id";
+                    else if (string.Equals(headerName, "ProcessId", StringComparison.OrdinalIgnoreCase)) propertyName = "Processes_Id";
 
-                    if (propName == "CardId" || propName == "Card_Id") propName = "Cards_Id";
-                    if (propName == "ProcessId") propName = "Processes_Id";
+                    if (!properties.TryGetValue(propertyName, out var prop)) continue;
 
-                    if (properties.TryGetValue(propName, out var prop))
+                    if (cardForeignKeyPropertyNames.Contains(propertyName))
                     {
-                        if (propName == "Cards_Id" && cell.TryGetValue(out int cardId) && cardIdMap.TryGetValue(cardId, out var mappedCardId))
+                        if (cell.TryGetValue(out int idFromExcel) && cardIdMap.TryGetValue(idFromExcel, out int mappedDbId))
                         {
-                            prop.SetValue(entity, mappedCardId);
+                            prop.SetValue(entity, mappedDbId);
+                            if (string.Equals(propertyName, "Cards_Id", StringComparison.OrdinalIgnoreCase)) isPrimaryCardIdSet = true;
                         }
-                        else if (processIdMap != null && propName == "Processes_Id" && cell.TryGetValue(out int processId) && processIdMap.TryGetValue(processId, out var mappedProcessId))
-                        {
-                            prop.SetValue(entity, mappedProcessId);
-                        }
-                        else if (propName == "Feedbacks_PDF" && prop.PropertyType == typeof(byte[]))
-                        {
-                            var pdfPath = Path.Combine(AppContext.BaseDirectory, "Initializers", cell.GetString());
-                            if (File.Exists(pdfPath))
-                            {
-                                prop.SetValue(entity, File.ReadAllBytes(pdfPath));
-                            }
-                        }
-                        else
-                        {
-                            prop.SetValue(entity, ConvertValue(cell.GetString(), prop.PropertyType, cell.DataType));
-                        }
+                        else if (cell.TryGetValue(out idFromExcel)) throw new InvalidDataException($"Błąd integralności w '{sheetName}' wiersz {row.RowNumber()}. Karta o ID={idFromExcel} (kolumna '{headerName}') nie istnieje w arkuszu 'Cards'.");
                     }
+                    else if (processIdMap != null && string.Equals(propertyName, "Processes_Id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (cell.TryGetValue(out int processId) && processIdMap.TryGetValue(processId, out var mappedProcessId)) prop.SetValue(entity, mappedProcessId);
+                        else if (cell.TryGetValue(out processId)) throw new InvalidDataException($"Błąd integralności w '{sheetName}' wiersz {row.RowNumber()}. Proces o ID={processId} nie istnieje w arkuszu 'Processes'.");
+                    }
+                    else if (string.Equals(propertyName, "Feedbacks_PDF", StringComparison.OrdinalIgnoreCase) && prop.PropertyType == typeof(byte[]))
+                    {
+                        var pdfPath = Path.Combine(AppContext.BaseDirectory, "Initializers", cell.GetString());
+                        if (File.Exists(pdfPath)) prop.SetValue(entity, File.ReadAllBytes(pdfPath));
+                    }
+                    else prop.SetValue(entity, ConvertValue(cell.GetString(), prop.PropertyType, cell.DataType));
                 }
+                if (properties.ContainsKey("Cards_Id") && !isPrimaryCardIdSet) throw new InvalidDataException($"Błąd integralności w '{sheetName}' wiersz {row.RowNumber()}. Brak wartości lub nieprawidłowa wartość w kolumnie 'Cards_Id' (lub 'Card_Id').");
                 context.Set<TEntity>().Add(entity);
             }
         }
@@ -268,4 +267,3 @@ namespace backend.Services
         }
     }
 }
-

@@ -12,78 +12,73 @@ const endpoints = {
     validateResetToken: (token: string) => `/password/validate-token/${token}`,
   },
   admin: {
+    // These are likely in an AdminPanelController, assumed to be correct.
     deck: {
       getAll: '/admin/deck/get',
       upload: '/admin/deck/upload',
-      decisions: (deckId: number) => `/admin/deck/decisions?deckId=${deckId}` // Poprawka: dodanie parametru
+      cards: (deckId: number) => `/admin/deck/decisions?deckId=${deckId}`,
+      items: (deckId: number) => `/admin/deck/items?deckId=${deckId}`,
+      updateItem: (cardId: number) => `/admin/deck/items/${cardId}`,
     },
     settings: {
       licenses: '/admin/licenses'
     },
     games: {
-      // Poprawka: Prawidłowa ścieżka do AdminPanelController
       getGames: (gameId: number) => `/AdminPanel/games/${gameId}`,
-      // Poprawka: Prawidłowa ścieżka do AdminPanelController
       getTeams: (gameId: number) => `/AdminPanel/teams/by-game/${gameId}`
     },
     export: {
-      // Poprawka: Dodanie parametru deckId
       cards: (deckId: number) => `/admin/exportCards?deckId=${deckId}`,
       boards: `/admin/exportBoards`
     }
   },
   games: {
+    // These are likely in a GamesController, assumed to be correct.
     create: '/games/create',
     getAll: '/games/active',
     updateStatus: (id: number) => `/games/${id}/status`,
-    // Poprawka: Prawidłowa ścieżka do PlayerController
-    approveLog: (logId: number) => `/player/approve-log/${logId}`,
-    // Poprawka: Prawidłowa ścieżka do PlayerController
-    rejectLog: (logId: number) => `/player/reject-log/${logId}`,
-    
-    // UWAGA: Poniższe endpointy nie zostały znalezione w kodzie backendu.
-    // Zostawiam je zgodnie z prośbą, ale mogą wymagać implementacji w C#.
-    getById: (id: number) => `/games/${id}`, // Brak implementacji
-    stopAll: '/games/stop-all', // Brak implementacji
-    endAll: '/games/end-all', // Brak implementacji
-    getTeamsManagement: (gameId: number) => `/player/game/${gameId}/teams-management`, // Brak implementacji
-    updateTeamBudget: (teamId: number) => `/player/team/${teamId}/budget`, // Brak implementacji
-    getDecisionCards: (gameId: number) => `/player/game/${gameId}/decision-cards`, // Brak implementacji
-    getItemCards: (gameId: number) => `/player/game/${gameId}/item-cards`, // Brak implementacji
-    unlockCard: (gameId: number) => `/player/game/${gameId}/unlock-card`, // Brak implementacji
-    getPendingLogs: (gameId: number) => `/player/game/${gameId}/pending-logs`, // Brak implementacji
-    getGameEvents: '/player/game-events', // Brak implementacji
-    applyEvent: (gameId: number) => `/player/game/${gameId}/apply-event`, // Brak implementacji
-    getHistoryVersion: (gameId: number) => `/player/game/${gameId}/history-version`, // Brak implementacji
-    getPendingVersion: (gameId: number) => `/player/game/${gameId}/pending-version`, // Brak implementacji
-    getGameData: `/player/gameRivalBoard` // Brak implementacji
+    getById: (id: number) => `/games/${id}`,
+    stopAll: '/games/stop-all',
+    endAll: '/games/end-all',
   },
   boards: {
+    // These are likely in a BoardController, assumed to be correct.
     create: '/board/add',
     getAll: '/board/get',
     delete: (id: number) => `/board/delete/${id}`,
     update: (id: number) => `/board/edit/${id}`,
   },
   player: {
-    // Poprawka: Prawidłowa ścieżka do PlayerController dla danych sesji gracza
+    // --- CORRECTED & VERIFIED ENDPOINTS from PlayerController ---
+    getTeamInfo: (gameId: number, teamId: number) => `/player/game/${gameId}/team/${teamId}/info`,
+    getTeamsManagement: (gameId: number) => `/player/game/${gameId}/teams-management`,
+    updateTeamBudget: (teamId: number) => `/player/team/${teamId}/budget`,
+    unlockCard: (gameId: number) => `/player/game/${gameId}/unlock-card`,
+    getPendingLogs: (gameId: number) => `/player/game/${gameId}/pending-logs`,
+    getGameEvents: '/player/game-events',
+    applyEvent: (gameId: number) => `/player/game/${gameId}/apply-event`,
+    getHistoryVersion: (gameId: number, teamId?: number) => teamId ? `/player/game/${gameId}/history-version?teamId=${teamId}` : `/player/game/${gameId}/history-version`,
+    getPendingVersion: (gameId: number) => `/player/game/${gameId}/pending-version`,
+    getLogs: '/player/getLogs', // Used for team-specific history. Expects gameId and teamId in query params.
+    getPlayerHistory: '/player/player-history', // Used for full game history (admin view). Expects gameId in POST body.
+    getCards: (deckId: number, gameId: number, teamId: number) => `/player/deck/${deckId}/unified-cards?gameId=${gameId}&teamId=${teamId}`,
     getPlayerSessionData: (teamToken: string) => `/player/team/${teamToken}`,
+    getPawns: (gameId: number, teamId: number, boardId: number) => `/player/team-board?gameId=${gameId}&teamId=${teamId}&boardId=${boardId}`,
+    getRivalPawns: (gameId: number, boardId: number) => `/player/rival-board?gameId=${gameId}&boardId=${boardId}`,
+    getGameData: (gameId: number) => `/player/game/${gameId}/rival-board-config`,
     playCardSuccess: (cardId: number) => `/player/success/${cardId}`,
     playCardFailure: (cardId: number) => `/player/failure/${cardId}`,
-    // Poprawka: Prawidłowa sygnatura z parametrami query
-    getCards: (deckId: number, gameId: number, teamId: number) => `/player/deck/${deckId}/unified-cards?gameId=${gameId}&teamId=${teamId}`,
-    // Poprawka: Prawidłowa sygnatura z parametrami query
-    getPawns: (gameId: number, teamId: number, boardId: number) => `/player/team-board?gameId=${gameId}&teamId=${teamId}&boardId=${boardId}`,
-    // Poprawka: Prawidłowa sygnatura z parametrami query
-    getRivalPawns: (gameId: number, boardId: number) => `/player/rival-board?gameId=${gameId}&boardId=${boardId}`,
+    approveLog: (logId: number) => `/player/approve-log/${logId}`,
+    rejectLog: (logId: number) => `/player/reject-log/${logId}`,
 
-    // UWAGA: Poniższe endpointy nie zostały znalezione w kodzie backendu.
-    getTeamInfo: (gameId: number, teamId: number) => `/player/game/${gameId}/team/${teamId}/info`, // Brak implementacji
-    getLogs: '/player/getLogs', // Brak implementacji
-    getCurrency: '/player/getCurrency', // Brak implementacji
-    getPlayerHistory: '/player/player-history', // Brak implementacji
-    getPlayerHistoryVersion: (gameId: number, teamId: number) => `/player/game/${gameId}/history-version?teamId=${teamId}` // Brak implementacji
+    // --- CONFIRMED MISSING from PlayerController.cs ---
+    // These endpoints were in your original file but do not exist in the provided C# controller.
+    getCurrency: '/player/getCurrency', // NOT IMPLEMENTED
+    getDecisionCards: (gameId: number) => `/player/game/${gameId}/decision-cards`, // NOT IMPLEMENTED
+    getItemCards: (gameId: number) => `/player/game/${gameId}/item-cards`, // NOT IMPLEMENTED
   },
   processes: {
+    // This is likely in a ProcessesController, assumed to be correct.
     getByDeck: (deckId: number) => `/processes/by-deck/${deckId}`
   }
 };

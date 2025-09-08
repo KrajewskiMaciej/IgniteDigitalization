@@ -3,10 +3,9 @@
         <div class="flex flex-col flex-1 justify-center items-center m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary">
             <h1 class="text-3xl font-nasalization text-white mt-5">Edycja Przedmiotów</h1>
 
-            <div v-if="isLoading" class="text-center text-gray-400 mt-10">Ładowanie danych...</div>
+            <div v-if="isLoadingDecks" class="text-center text-gray-400 mt-10">Ładowanie talii...</div>
             
             <form v-else class="w-full max-w-lg mt-4 flex flex-col items-center">
-                <!-- Dodanie wyboru talii -->
                 <div class="w-full mb-4">
                     <label class="block text-white mb-1">Wybierz talię:</label>
                     <dropDown 
@@ -14,30 +13,29 @@
                         v-model="selectedDeck"
                         item-key="id"
                         :display-format="(deck: Deck) => `#${deck.id} ${deck.title}`"
-                        item-label="title"
                         placeholder="Wybierz talię..."
                     />
                 </div>
                 
-                <!-- Wybór przedmiotu - widoczny tylko po wybraniu talii -->
-                <div v-if="selectedDeck" class="w-full">
+                <div v-if="isLoadingItems" class="text-center text-gray-400 mt-4">Ładowanie przedmiotów...</div>
+                
+                <div v-else-if="selectedDeck" class="w-full">
                     <label class="block text-white mb-1">Wybierz przedmiot:</label>
                     <dropDown 
-                        :items="filteredItems"
+                        :items="itemsData"
                         v-model="selectedItem"
                         item-key="id"
-                        :display-format="(item: Item) => `#${item.id} ${item.HardwareShortDesc}`"
+                        :display-format="(item: Item) => `#${item.id} ${item.shortDesc}`"
                         placeholder="Wybierz przedmiot..."
                     />
                 </div>
                 
-                <!-- Formularz edycji przedmiotu - widoczny po wybraniu przedmiotu -->
                 <div v-if="selectedItem && currentItem" class="mt-6 space-y-4 text-white w-full">
                     <div class="flex flex-col">
                         <label for="title" class="mb-1 font-semibold">Tytuł przedmiotu:</label>
                         <input 
                             id="title"
-                            v-model="currentItem.HardwareShortDesc"
+                            v-model="currentItem.shortDesc"
                             type="text"
                             class="bg-primary border-2 border-lgray-accent rounded-md px-3 py-2 text-white w-full focus:border-accent focus:ring-accent"
                         />
@@ -47,7 +45,7 @@
                         <label for="description" class="mb-1 font-semibold">Opis przedmiotu:</label>
                         <textarea
                             id="description"
-                            v-model="currentItem.HardwareLongDesc"
+                            v-model="currentItem.longDesc"
                             rows="8"
                             class="bg-primary border-2 border-lgray-accent rounded-md px-3 py-2 text-white resize-y w-full focus:border-accent focus:ring-accent"
                         ></textarea>
@@ -69,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch, computed, onMounted } from 'vue';
+  import { ref, watch, onMounted } from 'vue';
   import { useToast } from 'vue-toastification';
   import { faSave } from '@fortawesome/free-solid-svg-icons';
   import dropDown from '@/components/dropDown.vue';
@@ -85,13 +83,13 @@
   interface Item {
     id: number;
     deckId: number;
-    HardwareShortDesc: string;
-    HardwareLongDesc: string;
+    shortDesc: string;
+    longDesc: string;
+    type: 'Hardware' | 'Software';
   }
   
   const toast = useToast();
 
-  // FIX: Zmieniono inicjalizację z `null` na `undefined`
   const selectedDeck = ref<number | undefined>(undefined);
   const selectedItem = ref<number | undefined>(undefined);
 
@@ -100,28 +98,36 @@
   const itemsData = ref<Item[]>([]);
   const currentItem = ref<Item | null>(null);
   
-  const isLoading = ref(true);
+  const isLoadingDecks = ref(true);
+  const isLoadingItems = ref(false);
   const isSaving = ref(false);
 
   // --- Pobieranie danych z API ---
   const fetchDecks = async () => {
+    isLoadingDecks.value = true;
     try {
       const response = await apiService.get(apiConfig.admin.deck.getAll);
       decksData.value = response.data as Deck[];
     } catch (error) {
       toast.error("Nie udało się pobrać listy talii.");
       console.error("Błąd pobierania talii:", error);
+    } finally {
+      isLoadingDecks.value = false;
     }
   };
 
-  const fetchItems = async () => {
+  const fetchItemsForDeck = async (deckId: number) => {
+    isLoadingItems.value = true;
+    itemsData.value = []; // Wyczyść listę przed pobraniem nowych
     try {
-      // WAŻNE: Upewnij się, że `apiConfig.admin.items.getAll` istnieje w Twoim pliku `apiConfig.js`
-      const response = await apiService.get(apiConfig.admin.items.getAll); 
+      // WAŻNE: Upewnij się, że ten endpoint istnieje w Twoim pliku apiConfig
+      const response = await apiService.get(apiConfig.admin.deck.items(deckId)); 
       itemsData.value = response.data as Item[];
     } catch (error) {
-      toast.error("Nie udało się pobrać listy przedmiotów.");
+      toast.error("Nie udało się pobrać listy przedmiotów dla wybranej talii.");
       console.error("Błąd pobierania przedmiotów:", error);
+    } finally {
+      isLoadingItems.value = false;
     }
   };
 
@@ -133,9 +139,9 @@
     }
     isSaving.value = true;
     try {
-      // WAŻNE: Upewnij się, że `apiConfig.admin.items.update` istnieje w Twoim pliku `apiConfig.js`
-      await apiService.put(apiConfig.admin.items.update(currentItem.value.id), currentItem.value);
-      
+      // WAŻNE: Upewnij się, że ten endpoint istnieje w Twoim pliku apiConfig
+      await apiService.put(apiConfig.admin.deck.updateItem(currentItem.value.id), currentItem.value);
+
       const index = itemsData.value.findIndex(item => item.id === currentItem.value!.id);
       if (index !== -1) {
         itemsData.value[index] = { ...currentItem.value };
@@ -143,7 +149,7 @@
       
       toast.success("Przedmiot został pomyślnie zaktualizowany.");
 
-    } catch (error: unknown) { // FIX: Użycie `unknown` zamiast `any`
+    } catch (error: unknown) {
       let errorMessage = "Wystąpił nieoczekiwany błąd.";
       if (typeof error === 'object' && error !== null && 'response' in error) {
         const err = error as { response?: { data?: { message?: string } } };
@@ -155,16 +161,18 @@
       isSaving.value = false;
     }
   };
-
-  // --- Właściwości obliczeniowe i obserwatorzy ---
-  const filteredItems = computed(() => {
-    if (selectedDeck.value === undefined) return [];
-    return itemsData.value.filter(item => item.deckId === selectedDeck.value);
-  });
-
-  watch(selectedDeck, () => {
+  
+  // --- Obserwatorzy zmian ---
+  watch(selectedDeck, (newDeckId) => {
+    // Resetuj wybór przedmiotu przy zmianie talii
     selectedItem.value = undefined;
     currentItem.value = null;
+
+    if (newDeckId !== undefined) {
+      fetchItemsForDeck(newDeckId);
+    } else {
+      itemsData.value = []; // Wyczyść listę, jeśli żadna talia nie jest wybrana
+    }
   });
 
   watch(selectedItem, (newValue) => {
@@ -179,8 +187,6 @@
   });
 
   onMounted(async () => {
-    isLoading.value = true;
-    await Promise.all([fetchDecks(), fetchItems()]);
-    isLoading.value = false;
+    await fetchDecks();
   });
 </script>

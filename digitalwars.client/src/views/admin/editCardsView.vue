@@ -1,8 +1,8 @@
 <template>
     <div class="w-full flex">
-        <!-- SEKCJA EDYCJI KART DECYZJI -->
+        <!-- SEKCJA EDYCJI KART -->
         <div class="flex flex-col flex-1 justify-center items-center m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary">
-            <h1 class="text-3xl font-nasalization text-white mt-5">Edycja kart decyzji</h1>
+            <h1 class="text-3xl font-nasalization text-white mt-5">Edycja kart</h1>
 
             <input
                 type="file"
@@ -16,7 +16,7 @@
                 @click="triggerFileInput"
                 class="bg-green-500 border-2 border-green-700 py-3 px-6 rounded-md mt-5 text-white">
                 <font-awesome-icon :icon="faFileExcel" class="h-4 mr-2"/>
-                Wczytaj z pliku xls
+                Wczytaj talię z pliku xls
             </button>
 
             <form class="w-full max-w-lg mt-4 flex flex-col items-center">
@@ -120,8 +120,9 @@
 import { faSave, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import dropDown from '@/components/dropDown.vue';
 import { reactive, ref, watch, onMounted } from 'vue';
-import apiConfig from '@/services/apiConfig.js';
-import apiService from '@/services/apiServices.js';
+import apiConfig from '@/services/apiConfig';
+import apiService from '@/services/apiServices';
+import { useToast } from 'vue-toastification';
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Deck {
@@ -143,6 +144,7 @@ interface Feedback {
 }
 
 // --- ZMIENNE REAKTYWNE ---
+const toast = useToast();
 const selectedDeckId = ref<number | undefined>(undefined);
 const selectedCardId = ref<number | undefined>(undefined);
 const selectedFeedbackId = ref<number | undefined>(undefined);
@@ -179,33 +181,36 @@ async function handleFileChange(event: Event): Promise<void> {
       headers: { 'Content-Type': 'multipart/form-data' },
       withCredentials: true
     });
-    console.log("Plik został pomyślnie wysłany:", response.data);
+    toast.success("Plik został pomyślnie wczytany i talia została utworzona.");
     await fetchDecks();
-  } catch (error) {
+  } catch (error: any) {
+    toast.error(`Błąd przy wysyłaniu pliku: ${error.response?.data?.message || error.message}`);
     console.error("Błąd przy wysyłaniu pliku:", error);
   }
 }
 
 async function saveCard(): Promise<void> {
   if (!currentCard.value) return;
+  // TODO: Implementacja logiki zapisu karty do API
   console.log("Zapisywanie karty:", currentCard.value);
-  alert(`Zapisano kartę: ${currentCard.value.title}`);
+  toast.success(`Zapisano kartę: ${currentCard.value.title}`);
 }
 
 async function saveFeedback(): Promise<void> {
   if (!currentFeedback.value) return;
+  // TODO: Implementacja logiki zapisu feedbacku do API
   console.log("Zapisywanie feedbacku:", currentFeedback.value);
-  alert(`Zapisano feedback: ${currentFeedback.value.longDescription.substring(0, 30)}...`);
+  toast.success(`Zapisano feedback: ${currentFeedback.value.longDescription.substring(0, 30)}...`);
 }
 
 async function fetchDecks(): Promise<void> {
   try {
     const response = await apiService.get(apiConfig.admin.deck.getAll);
     decksData.length = 0;
-    // POPRAWKA: Dodajemy asercję typu (as Deck[]), aby poinformować TypeScript, że spodziewamy się tablicy.
     decksData.push(...(response.data as Deck[]));
   } catch (error) {
     console.error("Błąd przy pobieraniu talii:", error);
+    toast.error("Nie udało się pobrać dostępnych talii.");
   }
 }
 
@@ -220,14 +225,15 @@ watch(selectedDeckId, async (newDeckId) => {
   }
 
   try {
-    const url = apiConfig.admin.deck.decisions(newDeckId);
+    // Użyj poprawionego endpointu 'cards'
+    const url = apiConfig.admin.deck.cards(newDeckId);
     const response = await apiService.get(url);
     
     cardsData.length = 0;
-    // POPRAWKA: Dodajemy asercję typu (as Card[]), aby poinformować TypeScript, że spodziewamy się tablicy.
     cardsData.push(...(response.data as Card[]));
   } catch (error) {
     console.error("Błąd przy pobieraniu kart z talii:", error);
+    toast.error("Nie udało się pobrać kart dla wybranej talii.");
     cardsData.length = 0;
   }
 });
@@ -257,3 +263,4 @@ watch(selectedFeedbackId, (newFeedbackId) => {
 onMounted(fetchDecks);
 
 </script>
+

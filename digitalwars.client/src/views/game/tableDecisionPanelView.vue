@@ -255,15 +255,25 @@
   };
   
   const fetchAvailableCardsAndItems = async () => {
-    if (!teamData.value?.deckId) return;
-    try {
-      const response = await apiServices.get<AvailableCardsResponse>(apiConfig.player.getCards(teamData.value.deckId), {
-        params: { gameId: props.gameId, teamId: props.teamId }
-      });
-      cards.value = response.data.decisionCards || [];
-      items.value = response.data.itemCards || [];
-    } catch (error) { toast.error("Błąd pobierania kart i przedmiotów."); }
-  };
+  if (!teamData.value?.deckId || !props.gameId || !props.teamId) return;
+  try {
+    // FIX: Call the function from apiConfig with all required arguments
+    const url = apiConfig.player.getCards(
+      teamData.value.deckId,
+      Number(props.gameId),
+      Number(props.teamId)
+    );
+    
+    // FIX: The URL now contains all params, so the second argument is empty
+    const response = await apiServices.get<AvailableCardsResponse>(url); // Pass only the generated URL
+    
+    cards.value = response.data.decisionCards || [];
+    items.value = response.data.itemCards || [];
+  } catch (error) {
+    toast.error("Błąd pobierania kart i przedmiotów.");
+    console.error("Błąd pobierania kart:", error);
+  }
+};
   
   const fetchDecisionHistory = async () => {
     try {
@@ -294,13 +304,25 @@
     } catch (error) { toast.error("Błąd pobierania sugestii."); }
   };
 
-  const fetchPawns = async () => {
-    if (!teamData.value?.boardId) return;
-    try {
-      const response = await apiServices.get<RawPawn[]>(apiConfig.player.getPawns, { params: { gameId: props.gameId, teamId: props.teamId, boardId: teamData.value.boardId } });
-      pawns.value = (response.data).map(p => ({ id: p.gpId, x: Number(p.posX), y: Number(p.posY), color: p.color, name: p.name }));
-    } catch (err) { console.error("Błąd pobierania pionków:", err); }
-  };
+const fetchPawns = async () => {
+  if (!teamData.value?.boardId || !props.gameId || !props.teamId) return;
+  try {
+    // FIX: Call the function from apiConfig with the required arguments
+    const url = apiConfig.player.getPawns(
+      Number(props.gameId),
+      Number(props.teamId),
+      teamData.value.boardId
+    );
+    
+    // FIX: The URL now contains all params, so the second argument is empty
+    const response = await apiServices.get<RawPawn[]>(url); // Pass only the generated URL
+    
+    pawns.value = (response.data).map(p => ({ id: p.gpId, x: Number(p.posX), y: Number(p.posY), color: p.color, name: p.name }));
+  } catch (err) {
+    console.error("Błąd pobierania pionków:", err);
+    toast.error("Błąd pobierania pionków."); // Add user feedback
+  }
+};
 
   // --- AKCJE UŻYTKOWNIKA ---
   const executeCardOrItemAction = async (isCard: boolean) => {

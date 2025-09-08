@@ -2,7 +2,33 @@ using System.Collections.Generic;
 
 namespace backend.DTOs
 {
-    // Używane do wyświetlania kart w interfejsie gracza
+    // --- NOWE DTOs DLA BRAKUJĄCYCH ENDPOINTÓW ---
+    public class BoardConfigDto
+    {
+        public int BoardId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string[] LabelsUp { get; set; } = Array.Empty<string>();
+        public string[] LabelsRight { get; set; } = Array.Empty<string>();
+        public string DescriptionDown { get; set; } = string.Empty;
+        public string DescriptionLeft { get; set; } = string.Empty;
+        public int Rows { get; set; }
+        public int Cols { get; set; }
+        public string CellColor { get; set; } = string.Empty;
+        public string BorderColor { get; set; } = string.Empty;
+        public string[] BorderColors { get; set; } = Array.Empty<string>();
+    }
+
+    public class SessionDataDto
+    {
+        public int TeamId { get; set; }
+        public string TeamName { get; set; } = string.Empty;
+        public double TeamBud { get; set; }
+        public int DeckId { get; set; }
+        public BoardConfigDto BoardConfig { get; set; } = new BoardConfigDto();
+    }
+
+
+    // --- ISTNIEJĄCE DTOs (BEZ ZMIAN) ---
     public class UnifiedCardDto
     {
         public int Id { get; set; }
@@ -15,7 +41,6 @@ namespace backend.DTOs
         public List<int> Enablers { get; set; } = new List<int>();
     }
 
-    // Używane przy zagrywaniu karty
     public class CardDataDTO
     {
         public int GameId { get; set; }
@@ -26,27 +51,25 @@ namespace backend.DTOs
         public bool ForceExecution { get; set; } = false;
     }
 
-    // Używane do pobierania logów
     public class LogDataRequest
     {
         public int GameId { get; set; }
         public int TeamId { get; set; }
     }
 
-    // Używane w panelu admina
     public class TeamManagementDto
     {
         public int TeamId { get; set; }
         public string TeamName { get; set; } = string.Empty;
-        public int TeamBud { get; set; }
+        public double TeamBud { get; set; }
         public int BoardId { get; set; }
         public int? DeckId { get; set; }
-        public string TeamToken { get; set; } = string.Empty;
+        public string? TeamToken { get; set; } = string.Empty;
     }
 
     public class UpdateBudgetDto
     {
-        public int NewBudget { get; set; }
+        public double NewBudget { get; set; }
     }
 
     public class CardInfoDto
@@ -77,5 +100,14 @@ namespace backend.DTOs
     public class ApplyEventDto
     {
         public int EventId { get; set; }
+        public int TeamId { get; set; }
     }
+
+    public class PlayerHistoryRequestDto
+    {
+        public int GameId { get; set; }
+        public int TeamId { get; set; }
+    }
+
 }
+

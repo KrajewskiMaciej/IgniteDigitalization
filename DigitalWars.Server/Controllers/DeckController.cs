@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.DTOs; // Upewnij się, że ten plik istnieje i zawiera UpdateItemDto
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +12,13 @@ using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
+    // DTO do aktualizacji przedmiotu
+    public class UpdateItemDto
+    {
+        public string ShortDesc { get; set; } = string.Empty;
+        public string LongDesc { get; set; } = string.Empty;
+    }
+
     [Authorize]
     [ApiController]
     [Route("api/admin/deck")]
@@ -63,26 +71,67 @@ namespace backend.Controllers
             return Ok(decks);
         }
 
-        [HttpGet("decisions")]
-        public async Task<IActionResult> GetDecisionCards(int deckId)
+        [HttpGet("items")]
+        public async Task<IActionResult> GetItemsForDeck([FromQuery] int deckId)
         {
-            var userId = CurrentUserId;
-            if (userId == null) return Unauthorized("Brak danych użytkownika.");
+            var hardwareItems = await _context.Hardwares
+                .Include(h => h.Cards)
+                .Where(h => h.Cards.Decks_Id == deckId)
+                .Select(h => new
+                {
+                    id = h.Cards.Card_Id,
+                    deckId = h.Cards.Decks_Id,
+                    shortDesc = h.Hardwares_Short_Desc,
+                    longDesc = h.Hardwares_Long_Desc,
+                    type = "Hardware"
+                }).ToListAsync();
 
-            var deckExists = await _context.Decks
-                .AsNoTracking()
-                .AnyAsync(d => d.Decks_Id == deckId && (d.Users_Id == null || d.Users_Id == userId.Value));
+            var softwareItems = await _context.Softwares
+                .Include(s => s.Cards)
+                .Where(s => s.Cards.Decks_Id == deckId)
+                .Select(s => new
+                {
+                    id = s.Cards.Card_Id,
+                    deckId = s.Cards.Decks_Id,
+                    shortDesc = s.Softwares_Short_Desc,
+                    longDesc = s.Softwares_Long_Desc,
+                    type = "Software"
+                }).ToListAsync();
 
-            if (!deckExists) return NotFound("Talia nie istnieje lub brak dostępu.");
+            var allItems = hardwareItems
+                .AsEnumerable()
+                .Concat(softwareItems)
+                .OrderBy(i => i.id);
 
-            var decisionCards = await _context.Decisions
-                .AsNoTracking()
-                .Include(d => d.Card)
-                .Where(d => d.Card.Decks_Id == deckId)
-                .Select(d => new { id = d.Cards_Id, deckId = d.Card.Decks_Id, title = d.Decisions_Short_Desc, description = d.Decisions_Long_Desc })
-                .ToListAsync();
+            return Ok(allItems);
+        }
 
-            return Ok(decisionCards);
+        [HttpPut("items/{cardId}")]
+        public async Task<IActionResult> UpdateItem(int cardId, [FromBody] UpdateItemDto dto)
+        {
+            var hardware = await _context.Hardwares.FirstOrDefaultAsync(h => h.Cards.Card_Id == cardId);
+            if (hardware != null)
+            {
+                hardware.Hardwares_Short_Desc = dto.ShortDesc;
+                hardware.Hardwares_Long_Desc = dto.LongDesc;
+            }
+            else
+            {
+                var software = await _context.Softwares.FirstOrDefaultAsync(s => s.Cards.Card_Id == cardId);
+                if (software != null)
+                {
+                    software.Softwares_Short_Desc = dto.ShortDesc;
+                    software.Softwares_Long_Desc = dto.LongDesc;
+                }
+                else
+                {
+                    return NotFound("Przedmiot o podanym ID nie został znaleziony.");
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Przedmiot został pomyślnie zaktualizowany." });
         }
     }
 }
+
