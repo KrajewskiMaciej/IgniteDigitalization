@@ -4,7 +4,7 @@ using backend.Services;
 using backend.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using QuestPDF.Fluent;
+using System.Text.Json;
 using QuestPDF.Infrastructure;
 
 QuestPDF.Settings.License = LicenseType.Community;
@@ -20,7 +20,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddCors();
 
 // Rejestracja serwisów (bez zmian)
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            // Opcjonalnie: ignoruj cykliczne referencje, co jest częstym problemem w EF
+            // options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        });
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("FrontendSettings"));
 builder.Services.AddScoped<IEmailService, EmailService>();

@@ -71,6 +71,28 @@ namespace backend.Controllers
             return Ok(decks);
         }
 
+        [HttpGet("decisions")]
+        public async Task<IActionResult> GetDecisionCards(int deckId)
+        {
+            var userId = CurrentUserId;
+            if (userId == null) return Unauthorized("Brak danych użytkownika.");
+
+            var deckExists = await _context.Decks
+                .AsNoTracking()
+                .AnyAsync(d => d.Decks_Id == deckId && (d.Users_Id == null || d.Users_Id == userId.Value));
+
+            if (!deckExists) return NotFound("Talia nie istnieje lub brak dostępu.");
+
+            var decisionCards = await _context.Decisions
+                .AsNoTracking()
+                .Include(d => d.Card)
+                .Where(d => d.Card.Decks_Id == deckId)
+                .Select(d => new { id = d.Card.Card_Id, deckId = d.Card.Decks_Id, title = d.Decisions_Short_Desc, description = d.Decisions_Long_Desc })
+                .ToListAsync();
+
+            return Ok(decisionCards);
+        }
+
         [HttpGet("items")]
         public async Task<IActionResult> GetItemsForDeck([FromQuery] int deckId)
         {

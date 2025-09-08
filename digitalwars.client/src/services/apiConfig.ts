@@ -29,7 +29,8 @@ const endpoints = {
     },
     export: {
       cards: (deckId: number) => `/admin/exportCards?deckId=${deckId}`,
-      boards: `/admin/exportBoards`
+      // Zmieniono na funkcję, która przyjmuje ID i buduje URL
+      boards: (teamBoardId: number, rivalBoardId: number) => `/admin/exportBoards?teamBoardId=${teamBoardId}&rivalBoardId=${rivalBoardId}`
     }
   },
   games: {
@@ -55,7 +56,7 @@ const endpoints = {
     updateTeamBudget: (teamId: number) => `/player/team/${teamId}/budget`,
     unlockCard: (gameId: number) => `/player/game/${gameId}/unlock-card`,
     getPendingLogs: (gameId: number) => `/player/game/${gameId}/pending-logs`,
-    getGameEvents: '/player/game-events',
+    getGameEvents: (decks_Id: number) => `/player/game-events?decks_Id=${decks_Id}`, // Expects decks_Id as query param
     applyEvent: (gameId: number) => `/player/game/${gameId}/apply-event`,
     getHistoryVersion: (gameId: number, teamId?: number) => teamId ? `/player/game/${gameId}/history-version?teamId=${teamId}` : `/player/game/${gameId}/history-version`,
     getPendingVersion: (gameId: number) => `/player/game/${gameId}/pending-version`,

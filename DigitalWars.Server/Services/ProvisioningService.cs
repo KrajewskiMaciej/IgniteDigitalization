@@ -73,6 +73,8 @@ namespace backend.Services
                 // Krok 2: Wczytaj procesy i stwórz ich mapę ID
                 var processIdMap = await LoadAndMapEntitiesAsync<Process, int>(context, workbook, "Processes", newDeck.Decks_Id, "Processes_Id", "Processes_Id");
 
+                // Krok 2a: Wczytaj wydarzenia w grze (GameEvents) powiązane z talią
+                await LoadAndMapEntitiesAsync<GameEvent, int>(context, workbook, "GameEvents", newDeck.Decks_Id, "GameEvents_Id", "GameEvents_Id");
                 // Krok 3: Wczytaj wszystkie encje powiązane, używając poprawnych map
                 LoadRelatedEntities<Decision>(context, workbook, "Decisions", cardIdMap);
                 LoadRelatedEntities<Hardware>(context, workbook, "Hardwares", cardIdMap);

@@ -15,12 +15,12 @@ namespace backend.Controllers
 
     [Authorize]
     [ApiController]
-    [Route("api/admin")]
-    public class UserController : BaseApiController
+    [Route("api/[controller]")]
+    public class AdminController : BaseApiController
     {
         private readonly AppDbContext _context;
 
-        public UserController(AppDbContext context)
+        public AdminController(AppDbContext context)
         {
             _context = context;
             QuestPDF.Settings.License = LicenseType.Community;
@@ -73,17 +73,20 @@ namespace backend.Controllers
             return File(pdfBytes, "application/pdf", "DigitalWars_Karty.pdf");
         }
 
-        [HttpPost("exportBoards")]
-        public async Task<IActionResult> GenerateBoardsPdf([FromBody] BoardExportRequest request)
+        [HttpGet("exportBoards")]
+        // Zmieniono parametry z [FromBody] na [FromQuery]
+        public async Task<IActionResult> GenerateBoardsPdf([FromQuery] int teamBoardId, [FromQuery] int rivalBoardId)
         {
             var boards = await _context.Boards
                 .AsNoTracking()
-                .Where(b => b.Boards_Id == request.TeamBoardId || b.Boards_Id == request.RivalBoardId)
+                // Użyto nowych parametrów
+                .Where(b => b.Boards_Id == teamBoardId || b.Boards_Id == rivalBoardId)
                 .ToListAsync();
 
             if (boards.Count < 2) return NotFound("Nie znaleziono jednej lub obu plansz.");
 
-            var document = new BoardsDocument(boards, request.TeamBoardId, request.RivalBoardId);
+            // Użyto nowych parametrów
+            var document = new BoardsDocument(boards, teamBoardId, rivalBoardId);
             byte[] pdfBytes = document.GeneratePdf();
 
             return File(pdfBytes, "application/pdf", "DigitalWars_Plansze.pdf");

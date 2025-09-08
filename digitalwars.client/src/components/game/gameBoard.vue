@@ -18,15 +18,15 @@ import type { PropType } from 'vue';
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface BoardConfig {
-  Cols: number;
-  Rows: number;
-  CellColor?: string;
-  BorderColor?: string;
-  LabelsUp?: string[];
-  LabelsRight?: string[];
-  DescriptionLeft?: string;
-  DescriptionDown?: string;
-  BorderColors?: string[];
+  cols: number;
+  rows: number;
+  cellColor?: string;
+  borderColor?: string;
+  labelsUp?: string[];
+  labelsRight?: string[];
+  descriptionLeft?: string;
+  descriptionDown?: string;
+  borderColors?: string[];
 }
 
 interface Pawn {
@@ -76,12 +76,12 @@ const marginLeft = computed(() => 40);
 const marginRight = computed(() => 40);
 const marginTop = computed(() => 80);
 const marginBottom = computed(() => 80);
-const boardSizeX = computed(() => props.config.Cols * cellSize.value);
-const boardSizeY = computed(() => props.config.Rows * cellSize.value);
+const boardSizeX = computed(() => props.config.cols * cellSize.value);
+const boardSizeY = computed(() => props.config.rows * cellSize.value);
 const svgWidth = computed(() => boardSizeX.value + marginLeft.value + marginRight.value);
 const svgHeight = computed(() => boardSizeY.value + marginTop.value + marginBottom.value);
-const labelsX = computed(() => Array.from({ length: props.config.Cols }, (_, i) => String.fromCharCode(65 + i)));
-const labelsY = computed(() => Array.from({ length: props.config.Rows }, (_, i) => (i + 1).toString()));
+const labelsX = computed(() => Array.from({ length: props.config.cols }, (_, i) => String.fromCharCode(65 + i)));
+const labelsY = computed(() => Array.from({ length: props.config.rows }, (_, i) => (i + 1).toString()));
 
 // --- Funkcje ---
 // POPRAWKA: Dodano typy do parametrów
@@ -119,15 +119,15 @@ const drawBoard = () => {
   const svg = d3.select(board.value);
   svg.selectAll("*").remove();
 
-  for (let row = 0; row < props.config.Rows; row++) {
-    for (let col = 0; col < props.config.Cols; col++) {
+  for (let row = 0; row < props.config.rows; row++) {
+    for (let col = 0; col < props.config.cols; col++) {
       svg.append("rect")
         .attr("x", col * cellSize.value + marginLeft.value)
-        .attr("y", (props.config.Rows - 1 - row) * cellSize.value + marginTop.value)
+        .attr("y", (props.config.rows - 1 - row) * cellSize.value + marginTop.value)
         .attr("width", cellSize.value)
         .attr("height", cellSize.value)
-        .attr("fill", props.config.CellColor || '#fefae0')
-        .attr("stroke", props.config.BorderColor || '#595959')
+        .attr("fill", props.config.cellColor || '#fefae0')
+        .attr("stroke", props.config.borderColor || '#595959')
         .attr("stroke-width", 1);
     }
   }
@@ -137,8 +137,8 @@ const drawBoard = () => {
     svg.append("text").attr("x", i * cellSize.value + marginLeft.value + cellSize.value / 2).attr("y", boardSizeY.value + marginTop.value + 20).attr("text-anchor", "middle").attr("font-size", cellSize.value * 0.25).attr("fill", "white").text(label);
   });
 
-  if (props.config.LabelsUp) {
-    props.config.LabelsUp.forEach((label, i) => {
+  if (props.config.labelsUp) {
+    props.config.labelsUp.forEach((label, i) => {
       const centerX = marginLeft.value + (2 * i + 1) * cellSize.value;
       const baseY = marginTop.value - 20;
       const lines = splitLabelIntoLines(label);
@@ -150,29 +150,29 @@ const drawBoard = () => {
   }
 
   labelsY.value.forEach((label: string, i: number) => {
-    svg.append("text").attr("x", marginLeft.value - 20).attr("y", (props.config.Rows - 1 - i) * cellSize.value + marginTop.value + cellSize.value / 2).attr("text-anchor", "middle").attr("dominant-baseline", "middle").attr("font-size", cellSize.value * 0.25).attr("fill", "white").text(label);
+    svg.append("text").attr("x", marginLeft.value - 20).attr("y", (props.config.rows - 1 - i) * cellSize.value + marginTop.value + cellSize.value / 2).attr("text-anchor", "middle").attr("dominant-baseline", "middle").attr("font-size", cellSize.value * 0.25).attr("fill", "white").text(label);
   });
 
-  if (props.config.LabelsRight) {
-    props.config.LabelsRight.forEach((label, i) => {
-      svg.append("text").attr("transform", `translate(${marginLeft.value + boardSizeX.value + 20}, ${marginTop.value + (props.config.Rows - i * 2 - 1) * cellSize.value}) rotate(-90)`).attr("text-anchor", "middle").attr("dominant-baseline", "middle").attr("font-size", cellSize.value * 0.25).attr("fill", "white").text(label);
+  if (props.config.labelsRight) {
+    props.config.labelsRight.forEach((label, i) => {
+      svg.append("text").attr("transform", `translate(${marginLeft.value + boardSizeX.value + 20}, ${marginTop.value + (props.config.rows - i * 2 - 1) * cellSize.value}) rotate(-90)`).attr("text-anchor", "middle").attr("dominant-baseline", "middle").attr("font-size", cellSize.value * 0.25).attr("fill", "white").text(label);
     });
   }
 
-  svg.append("text").attr("transform", `translate(${marginLeft.value - 30}, ${marginTop.value + boardSizeY.value / 2}) rotate(-90)`).attr("text-anchor", "middle").attr("font-size", cellSize.value * 0.3).attr("font-weight", "bold").attr("fill", "white").text(props.config.DescriptionLeft || '');
-  svg.append("text").attr("x", marginLeft.value + boardSizeX.value / 2).attr("y", boardSizeY.value + marginTop.value + 40).attr("text-anchor", "middle").attr("font-size", cellSize.value * 0.3).attr("font-weight", "bold").attr("fill", "white").text(props.config.DescriptionDown || '');
+  svg.append("text").attr("transform", `translate(${marginLeft.value - 30}, ${marginTop.value + boardSizeY.value / 2}) rotate(-90)`).attr("text-anchor", "middle").attr("font-size", cellSize.value * 0.3).attr("font-weight", "bold").attr("fill", "white").text(props.config.descriptionLeft || '');
+  svg.append("text").attr("x", marginLeft.value + boardSizeX.value / 2).attr("y", boardSizeY.value + marginTop.value + 40).attr("text-anchor", "middle").attr("font-size", cellSize.value * 0.3).attr("font-weight", "bold").attr("fill", "white").text(props.config.descriptionDown || '');
 
-  const borderColors = props.config.BorderColors || ['#008000', '#FFFF00', '#FFA500', '#FF0000'];
-  for (let i = 0; i < props.config.Cols; i += 2) {
+  const borderColors = props.config.borderColors || ['#008000', '#FFFF00', '#FFA500', '#FF0000'];
+  for (let i = 0; i < props.config.cols; i += 2) {
     svg.append("line").attr("x1", marginLeft.value + i * cellSize.value).attr("y1", marginTop.value).attr("x2", marginLeft.value + (i + 2) * cellSize.value).attr("y2", marginTop.value).attr("stroke", borderColors[(i / 2) % borderColors.length]).attr("stroke-width", 3);
   }
-  for (let i = 0; i < props.config.Cols; i += 2) {
+  for (let i = 0; i < props.config.cols; i += 2) {
     svg.append("line").attr("x1", marginLeft.value + i * cellSize.value).attr("y1", marginTop.value + boardSizeY.value).attr("x2", marginLeft.value + (i + 2) * cellSize.value).attr("y2", marginTop.value + boardSizeY.value).attr("stroke", borderColors[(i / 2) % borderColors.length]).attr("stroke-width", 3);
   }
-  for (let i = 0; i < props.config.Rows; i += 2) {
+  for (let i = 0; i < props.config.rows; i += 2) {
     svg.append("line").attr("x1", marginLeft.value).attr("y1", marginTop.value + boardSizeY.value - i * cellSize.value).attr("x2", marginLeft.value).attr("y2", marginTop.value + boardSizeY.value - (i + 2) * cellSize.value).attr("stroke", borderColors[(i / 2) % borderColors.length]).attr("stroke-width", 3);
   }
-  for (let i = 0; i < props.config.Rows; i += 2) {
+  for (let i = 0; i < props.config.rows; i += 2) {
     svg.append("line").attr("x1", marginLeft.value + boardSizeX.value).attr("y1", marginTop.value + boardSizeY.value - i * cellSize.value).attr("x2", marginLeft.value + boardSizeX.value).attr("y2", marginTop.value + boardSizeY.value - (i + 2) * cellSize.value).attr("stroke", borderColors[(i / 2) % borderColors.length]).attr("stroke-width", 3);
   }
 
@@ -192,7 +192,7 @@ const drawBoard = () => {
     Object.entries(grouped).forEach(([key, group]) => {
       const [x, y] = key.split(',').map(Number);
       const baseX = x * cellSize.value + marginLeft.value + cellSize.value / 2;
-      const baseY = (props.config.Rows - 1 - y) * cellSize.value + marginTop.value + cellSize.value / 2;
+      const baseY = (props.config.rows - 1 - y) * cellSize.value + marginTop.value + cellSize.value / 2;
       const count = group.length;
       const radius = Math.min(cellSize.value / 4, 10 + count * 2);
       const scaleFactor = 1 / Math.sqrt(count);
@@ -216,7 +216,7 @@ const animatePawn = () => {
   if (pawn.empty()) return;
 
   const newX = props.posX * cellSize.value + marginLeft.value + cellSize.value / 2;
-  const newY = (props.config.Rows - 1 - props.posY) * cellSize.value + marginTop.value + cellSize.value / 2;
+  const newY = (props.config.rows - 1 - props.posY) * cellSize.value + marginTop.value + cellSize.value / 2;
 
   const baseScale = cellSize.value * 0.002;
   const originalCenterX = 147;

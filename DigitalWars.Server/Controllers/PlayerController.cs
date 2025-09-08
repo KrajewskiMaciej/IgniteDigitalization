@@ -187,10 +187,10 @@ namespace backend.Controllers
         }
 
         [HttpGet("game-events")]
-        public async Task<IActionResult> GetGameEvents()
+        public async Task<IActionResult> GetGameEvents([FromQuery] int Decks_Id)
         {
             var events = await _context.GameEvents
-                .Where(e => e.Decks_Id == null)
+                .Where(e => e.Decks_Id == Decks_Id)
                 .Select(e => new GameEventDto { EventId = e.Games_Events_Id, ShortDesc = e.Events_Short_Desc, LongDesc = e.Events_Long_Desc })
                 .ToListAsync();
             return Ok(events);
@@ -284,14 +284,15 @@ namespace backend.Controllers
         {
             // POPRAWKA: Zaimplementowano brakującą logikę bezpośrednio w kontrolerze (błąd CS1061)
             var pawns = await _context.GameBoards
+            .Include(p => p.Teams)
                 .Where(p => p.Games_Id == gameId && p.Boards_Id == boardId && p.Games_Processes_Id == null)
                 .Select(p => new
                 { // Zwróć dane w odpowiednim formacie DTO, jeśli istnieje
-                    GPId = p.Games_Processes_Id,
+                    TeamId = p.Teams_Id,
                     PosX = p.Poz_X,
                     PosY = p.Poz_Y,
-                    Color = p.Teams.Teams_Color,
-                    Name = p.Teams.Teams_Name
+                    TeamColor = p.Teams.Teams_Color,
+                    TeamName = p.Teams.Teams_Name
                 })
                 .ToListAsync();
 
@@ -356,19 +357,26 @@ namespace backend.Controllers
             }
         }
 
-        [HttpPost("player-history")]
+        [HttpPost("player-history")] // Upewnij się, że atrybut routingu jest poprawny
         public async Task<IActionResult> GetPlayerHistory([FromBody] PlayerHistoryRequestDto request)
         {
-            // Step 1: Fetch the raw log data including necessary IDs.
-            var rawLogs = await _context.GameLogs
-                .Include(l => l.Teams) // Include Teams to get the name
-                .Include(l => l.Cards) // Include Cards to get the public Card_Id
-                .Where(l => l.Games_Id == request.GameId && l.Teams_Id == request.TeamId && l.Is_Approved == true)
+            // Krok 1: Dynamiczne budowanie zapytania na podstawie obecności TeamId
+            var query = _context.GameLogs
+                .Include(l => l.Teams) // Dołączenie Teams dla nazwy
+                .Include(l => l.Cards) // Dołączenie Cards dla publicznego Card_Id
+                .Where(l => l.Games_Id == request.GameId && l.Is_Approved == true);
+
+            // POPRAWKA: Dynamiczne dodawanie warunku filtrowania po TeamId
+            if (request.TeamId.HasValue)
+            {
+                query = query.Where(l => l.Teams_Id == request.TeamId.Value);
+            }
+
+            var rawLogs = await query
                 .OrderByDescending(l => l.Data)
                 .ToListAsync();
 
-            // Step 2: Collect all unique internal card IDs from the logs.
-            // We filter for non-null values to be safe.
+            // Krok 2: Zebranie unikalnych wewnętrznych ID kart z logów
             var cardIds = rawLogs
                 .Where(l => l.Cards_Id.HasValue)
                 .Select(l => l.Cards_Id.Value)
@@ -377,14 +385,14 @@ namespace backend.Controllers
 
             if (!cardIds.Any())
             {
-                // If there are no cards, just return the logs (e.g., only events)
+                // Jeśli nie ma kart, zwróć tylko logi z wydarzeń
                 var eventOnlyLogs = rawLogs.Select(log => new
                 {
                     IsEventNotification = log.Games_Events_Id != null,
                     EventDescription = log.Games_Events != null ? log.Games_Events.Events_Long_Desc : null,
                     Timestamp = log.Data,
                     CardId = (int?)null,
-                    CardTitle = "N/A",
+                    CardTitle = "N/A", // Zmieniono nazwę na CardTitle dla spójności
                     TeamId = log.Teams_Id,
                     TeamName = log.Teams?.Teams_Name,
                     FeedbackDescription = log.Feedbacks,
@@ -394,7 +402,7 @@ namespace backend.Controllers
                 return Ok(eventOnlyLogs);
             }
 
-            // Step 3: Fetch all possible titles in three efficient lookups.
+            // Krok 3: Efektywne pobranie wszystkich możliwych tytułów
             var decisionTitles = await _context.Decisions
                 .Where(d => cardIds.Contains(d.Cards_Id))
                 .ToDictionaryAsync(d => d.Cards_Id, d => d.Decisions_Short_Desc);
@@ -407,13 +415,12 @@ namespace backend.Controllers
                 .Where(s => cardIds.Contains(s.Cards_Id))
                 .ToDictionaryAsync(s => s.Cards_Id, s => s.Softwares_Short_Desc);
 
-            // Step 4: Map the raw logs to the final result, combining data from the dictionaries.
+            // Krok 4: Mapowanie surowych logów na finalny rezultat
             var result = rawLogs.Select(log =>
             {
                 string cardTitle = "N/A";
                 if (log.Cards_Id.HasValue)
                 {
-                    // Find the title from one of the three dictionaries
                     cardTitle = decisionTitles.GetValueOrDefault(log.Cards_Id.Value) ??
                                 hardwareTitles.GetValueOrDefault(log.Cards_Id.Value) ??
                                 softwareTitles.GetValueOrDefault(log.Cards_Id.Value) ?? "N/A";
@@ -425,7 +432,7 @@ namespace backend.Controllers
                     EventDescription = log.Games_Events != null ? log.Games_Events.Events_Long_Desc : null,
                     Timestamp = log.Data,
                     CardId = log.Cards?.Card_Id,
-                    Card_Title = cardTitle,
+                    CardTitle = cardTitle, // Zmieniono nazwę na CardTitle dla spójności
                     TeamId = log.Teams_Id,
                     TeamName = log.Teams?.Teams_Name,
                     FeedbackDescription = log.Feedbacks,

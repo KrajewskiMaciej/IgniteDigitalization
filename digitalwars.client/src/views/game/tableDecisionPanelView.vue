@@ -180,7 +180,7 @@
   interface DecisionLog { isEventNotification: boolean; timestamp: string; feedbackDescription: string; cardId?: number; cardTitle?: string; tableId?: number; tableName?: string; result?: 'Pozytywny' | 'Negatywny'; eventAppliedId?: number | null; }
   interface PendingDecision { logId: number; cardId: number; cardTitle: string; tableId: number; tableName: string; timestamp: string; }
   interface Pawn { id: number; x: number; y: number; color: string; name: string; }
-  interface BoardConfig { name: string; labelsUp: string[]; labelsRight: string[]; descriptionDown: string; descriptionLeft: string; Rows: number; Cols: number; cellColor: string; borderColor: string; borderColors: string[]; }
+  interface BoardConfig { name: string; labelsUp: string[]; labelsRight: string[]; descriptionDown: string; descriptionLeft: string; rows: number; cols: number; cellColor: string; borderColor: string; borderColors: string[]; }
   interface RawHistoryLog { isEventNotification: boolean; eventDescription: string; timestamp: string; cardId: number; cardTitle: string; teamId: number; teamName: string; feedbackDescription: string; status: boolean; gameEventId: number | null; }
   interface RawPendingLog { logId: number; cardId: number; cardTitle: string; teamId: number; teamName: string; timestamp: string; }
   interface RawPawn { gpId: number; posX: string; posY: string; color: string; name: string; }
@@ -190,7 +190,8 @@
     teamId: { type: [Number, String], required: true }
   });
 
-  const toast = useToast();
+const toast = useToast();
+const formData = reactive<BoardConfig>({name: '', labelsUp: [], labelsRight: [], descriptionDown: '', descriptionLeft: '', rows: 8, cols: 8, cellColor: '#ffffff', borderColor: '#000000', borderColors: [] });
 
   const loading = reactive({ teamData: true, cards: true, items: true, history: true, pending: true });
   const teamData = ref<TeamData | null>(null);
@@ -206,11 +207,6 @@
   const selectedItemId = ref<number | null>(null);
   const showOwnBoard = ref(true);
 
-  const formData = reactive<BoardConfig>({
-    name: 'Plansza podstawowa', labelsUp: [], labelsRight: [], descriptionDown: '', descriptionLeft: '',
-    Rows: 8, Cols: 8, cellColor: '#fefae0', borderColor: '#595959', borderColors: []
-  });
-
   const selectedCard = computed<Card | undefined>(() => cards.value.find(c => c.id === selectedCardId.value));
   const selectedItem = computed<Item | undefined>(() => items.value.find(i => i.id === selectedItemId.value));
 
@@ -223,7 +219,6 @@
     Object.keys(loading).forEach(k => loading[k as keyof typeof loading] = true);
 
     try {
-      // Wywołanie jest teraz zgodne z poprawioną definicją w apiConfig.ts
       const response = await apiServices.get<SessionData>(apiConfig.player.getTeamInfo(gameIdNum, teamIdNum));
       const sessionData = response.data;
 
@@ -257,15 +252,13 @@
   const fetchAvailableCardsAndItems = async () => {
   if (!teamData.value?.deckId || !props.gameId || !props.teamId) return;
   try {
-    // FIX: Call the function from apiConfig with all required arguments
     const url = apiConfig.player.getCards(
       teamData.value.deckId,
       Number(props.gameId),
       Number(props.teamId)
     );
     
-    // FIX: The URL now contains all params, so the second argument is empty
-    const response = await apiServices.get<AvailableCardsResponse>(url); // Pass only the generated URL
+    const response = await apiServices.get<AvailableCardsResponse>(url);
     
     cards.value = response.data.decisionCards || [];
     items.value = response.data.itemCards || [];
@@ -290,7 +283,7 @@
 
   const fetchPendingDecisions = async () => {
     try {
-      const response = await apiServices.get<RawPendingLog[]>(apiConfig.games.getPendingLogs(Number(props.gameId)));
+      const response = await apiServices.get<RawPendingLog[]>(apiConfig.player.getPendingLogs(Number(props.gameId)));
       pendingDecisions.value = (response.data)
         .filter(log => log.teamId === Number(props.teamId))
         .map(log => ({
@@ -307,20 +300,18 @@
 const fetchPawns = async () => {
   if (!teamData.value?.boardId || !props.gameId || !props.teamId) return;
   try {
-    // FIX: Call the function from apiConfig with the required arguments
     const url = apiConfig.player.getPawns(
       Number(props.gameId),
       Number(props.teamId),
       teamData.value.boardId
     );
     
-    // FIX: The URL now contains all params, so the second argument is empty
-    const response = await apiServices.get<RawPawn[]>(url); // Pass only the generated URL
+    const response = await apiServices.get<RawPawn[]>(url);
     
     pawns.value = (response.data).map(p => ({ id: p.gpId, x: Number(p.posX), y: Number(p.posY), color: p.color, name: p.name }));
   } catch (err) {
     console.error("Błąd pobierania pionków:", err);
-    toast.error("Błąd pobierania pionków."); // Add user feedback
+    toast.error("Błąd pobierania pionków.");
   }
 };
 
@@ -329,8 +320,6 @@ const fetchPawns = async () => {
     const entity = isCard ? selectedCard.value : selectedItem.value;
     const team = teamData.value;
 
-    // POPRAWKA: Usunięto błąd "Object is possibly 'undefined'"
-    // Ten warunek `if` jest wystarczającym zabezpieczeniem (type guard) dla TypeScript
     if (!entity || !team) {
       return;
     }
@@ -339,10 +328,8 @@ const fetchPawns = async () => {
       return;
     }
 
-    // Rozdzielono logikę na `if`, aby ułatwić TypeScriptowi analizę typów
     let wasSuccess = true;
     if (isCard) {
-      // W tym bloku TypeScript wie, że `entity` to `Card`
       const cardEntity = entity as Card;
       wasSuccess = !(cardEntity.enablers && cardEntity.enablers.length > 0);
     }
@@ -353,7 +340,7 @@ const fetchPawns = async () => {
     try {
       const response = await apiServices.post<{ message: string }>(endpoint, payload);
       toast.success(response.data.message || 'Akcja przetworzona pomyślnie.');
-      await fetchAllDataForTeam(); // Odśwież wszystko
+      await fetchAllDataForTeam();
     } catch (error: any) {
       toast.error(error.response?.data?.message || `Wystąpił błąd podczas akcji.`);
       console.error(error);
@@ -365,7 +352,7 @@ const fetchPawns = async () => {
 
   const approveDecision = async (logId: number) => {
     try {
-      await apiServices.post(apiConfig.games.approveLog(logId), {});
+      await apiServices.post(apiConfig.player.approveLog(logId), {});
       toast.success("Sugestia została zatwierdzona!");
       await Promise.all([fetchPendingDecisions(), fetchDecisionHistory()]);
     } catch (error) { toast.error("Wystąpił błąd podczas zatwierdzania sugestii."); }
@@ -373,7 +360,7 @@ const fetchPawns = async () => {
 
   const rejectDecision = async (logId: number) => {
     try {
-      await apiServices.delete(apiConfig.games.rejectLog(logId));
+      await apiServices.delete(apiConfig.player.rejectLog(logId));
       toast.info("Sugestia została odrzucona.");
       await fetchPendingDecisions();
     } catch (error) { toast.error("Wystąpił błąd podczas odrzucania sugestii."); }
