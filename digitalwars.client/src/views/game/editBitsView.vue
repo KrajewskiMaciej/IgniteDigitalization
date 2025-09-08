@@ -84,7 +84,7 @@
   const fetchTeams = async () => {
     loading.value = true;
     try {
-      const response = await apiService.get(apiConfig.games.getTeamsManagement(gameId));
+      const response = await apiService.get(apiConfig.player.getTeamsManagement(gameId));
       // FIX: Rzutowanie typu danych z odpowiedzi API na zdefiniowany interfejs
       teams.value = response.data as Team[];
     } catch (error) {
@@ -105,7 +105,7 @@
 
     try {
       // Endpoint powinien przyjmować ID drużyny i nowy budżet
-      await apiService.put(apiConfig.games.updateTeamBudget(teamId), { newBudget: budgetInputValue.value });
+      await apiService.put(apiConfig.player.updateTeamBudget(teamId), { newBudget: budgetInputValue.value });
       toast.success(`Zapisano nowy budżet dla drużyny "${teamName}".`);
       
       // Odśwież dane, aby zobaczyć zmiany

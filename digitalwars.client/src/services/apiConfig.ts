@@ -52,8 +52,8 @@ const endpoints = {
   player: {
     // --- CORRECTED & VERIFIED ENDPOINTS from PlayerController ---
     getTeamInfo: (gameId: number, teamId: number) => `/player/game/${gameId}/team/${teamId}/info`,
-    getTeamsManagement: (gameId: number) => `/player/game/${gameId}/teams-management`,
-    updateTeamBudget: (teamId: number) => `/player/team/${teamId}/budget`,
+    getTeamsManagement: (gameId: number): string => `/api/games/${gameId}/teams-management`,
+    updateTeamBudget: (teamId: number): string => `/api/teams/${teamId}/budget`,
     unlockCard: (gameId: number) => `/player/game/${gameId}/unlock-card`,
     getPendingLogs: (gameId: number) => `/player/game/${gameId}/pending-logs`,
     getGameEvents: (decks_Id: number) => `/player/game-events?decks_Id=${decks_Id}`, // Expects decks_Id as query param
