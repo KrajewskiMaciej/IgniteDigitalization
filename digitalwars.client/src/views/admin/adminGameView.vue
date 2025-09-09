@@ -68,7 +68,6 @@ const getTeams = async () => {
   }
   
   try {
-    console.log('Fetching teams for gameId:', gameId);
     // Dodajemy typ generyczny do zapytania, aby TypeScript wiedział, czego się spodziewać
     const response = await apiServices.get<Table[]>(apiConfig.admin.games.getTeams(gameId));
     tables.value = response.data;

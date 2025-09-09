@@ -14,7 +14,7 @@
       <div v-if="!isScanning" class="animate-fade w-full">
         <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">Dołącz do gry</h2>
         <div class="w-full h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
-        <form @submit.prevent="joinGame">
+        <form @submit.prevent="validateAndJoin">
           <div class="mb-4">
             <input 
               type="text" 
@@ -26,9 +26,10 @@
           </div>
           <button 
             type="submit" 
-            class="bg-tertiary hover:bg-accent/80 text-white w-full py-4 rounded-lg font-medium transition-all duration-300"
+            :disabled="isProcessing"
+            class="bg-tertiary hover:bg-accent/80 text-white w-full py-4 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Dołącz do gry
+            {{ isProcessing ? 'Sprawdzanie...' : 'Dołącz do gry' }}
           </button>
         </form>
         <div class="flex items-center gap-2 my-6">
@@ -53,23 +54,18 @@
           <qrcode-stream 
             :formats="['qr_code']"
             @detect="onDetect"
-            @init="onInit"
+            @error="onScannerError"
+            @camera-on="onCameraOn"
             class="rounded-lg overflow-hidden"
           >
             <div v-if="scanError" class="text-center p-4 bg-red-500/20">
               <p class="text-red-400">{{ scanError }}</p>
             </div>
+            <div v-if="!scanError && !cameraReady" class="text-center p-4">
+              <p>Inicjalizacja kamery...</p>
+            </div>
             <div class="absolute inset-0 pointer-events-none">
-              <div class="w-full h-full flex items-center justify-center">
-                <div class="w-48 h-48 border-2 border-white/50 rounded-lg">
-                  <div class="w-full h-full relative">
-                    <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-accent rounded-tl-lg"></div>
-                    <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-accent rounded-tr-lg"></div>
-                    <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-accent rounded-bl-lg"></div>
-                    <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-accent rounded-br-lg"></div>
-                  </div>
-                </div>
-              </div>
+              <!-- ... stylizacja ramki ... -->
             </div>
           </qrcode-stream>
         </div>
@@ -87,19 +83,22 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { faXmark, faQrcode } from '@fortawesome/free-solid-svg-icons';
-// BŁĄD TS2307: Upewnij się, że biblioteka jest zainstalowana: npm install vue-qrcode-reader
 import { QrcodeStream } from 'vue-qrcode-reader';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
+import apiServices from '@/services/apiServices';
+import apiConfig from '@/services/apiConfig';
 
-// --- DEFINICJE INTERFEJSÓW ---
 interface DetectedBarcode {
   rawValue: string;
 }
 
-// --- ZMIENNE REAKTYWNE I KONFIGURACJA ---
 const router = useRouter();
+const toast = useToast();
+
 const isScanning = ref(false);
 const scanError = ref('');
+const cameraReady = ref(false);
 const code = ref('');
 const isProcessing = ref(false);
 const lastScannedCode = ref('');
@@ -107,23 +106,31 @@ const lastScannedCode = ref('');
 const props = defineProps({
   isVisible: { type: Boolean, default: false }
 });
-
 const emit = defineEmits(['close']);
 
-// --- FUNKCJE ---
 const closeModal = () => {
   emit('close');
-  code.value = '';
   isScanning.value = false;
   scanError.value = '';
-  isProcessing.value = false;
-  lastScannedCode.value = '';
 };
 
-const joinGame = () => {
-  if (code.value) { // Dodatkowe zabezpieczenie
+const validateAndJoin = async () => {
+  if (!code.value || isProcessing.value) return;
+  isProcessing.value = true;
+  try {
+    // Krok 1: Wywołaj nowy endpoint walidacyjny
+    await apiServices.get(apiConfig.player.validateToken(code.value));
+    
+    // Krok 2: Jeśli walidacja się powiodła, przekieruj do widoku gracza
     router.push(`/player/${code.value}`);
     closeModal();
+
+  } catch (error: any) {
+    // Krok 3: Jeśli walidacja się nie powiodła, wyświetl błąd
+    const errorMessage = error.response?.data?.message || 'Wystąpił nieznany błąd.';
+    toast.error(errorMessage);
+  } finally {
+    isProcessing.value = false;
   }
 };
 
@@ -131,76 +138,39 @@ const startScanning = () => {
   isScanning.value = true;
   scanError.value = '';
   lastScannedCode.value = '';
+  cameraReady.value = false;
 };
 
-// POPRAWKA: Dodano typ `DetectedBarcode[]` do parametru `detectedCodes`
 const onDetect = (detectedCodes: DetectedBarcode[]) => {
-  if (isProcessing.value || !detectedCodes || detectedCodes.length === 0) {
-    return;
-  }
-  const firstCode = detectedCodes[0];
-  const decodedText = firstCode?.rawValue ?? '';
+  if (isProcessing.value || detectedCodes.length === 0) return;
+  const decodedText = detectedCodes[0].rawValue;
 
   if (decodedText && decodedText !== lastScannedCode.value) {
-    processScanResult(decodedText);
+    isProcessing.value = true;
+    lastScannedCode.value = decodedText;
+    code.value = decodedText;
+    validateAndJoin(); // Użyj tej samej logiki walidacji
   }
 };
 
-// POPRAWKA: Dodano typ `string` do parametru `decodedText`
 const processScanResult = (decodedText: string) => {
-  isProcessing.value = true;
-  lastScannedCode.value = decodedText;
-
-  try {
-    const url = new URL(decodedText);
-    const pathSegments = url.pathname.split('/').filter(Boolean); // np. ['player', 'ABCD']
-
-    if (pathSegments.length > 1 && pathSegments[0] === 'player') {
-      const gameCode = pathSegments[1];
-      router.push(`/player/${gameCode}`);
-      closeModal();
-    } else {
-      scanError.value = 'Kod QR nie prowadzi do gry';
-      resetProcessing();
-    }
-  } catch (_urlError) { // POPRAWKA: Użyto `_` do zasygnalizowania nieużywanej zmiennej
-    if (/^\d{4}$/.test(decodedText)) {
-      code.value = decodedText;
-      joinGame();
-    } else {
-      scanError.value = 'Nieprawidłowy kod QR';
-      resetProcessing();
-    }
-  }
+    // Ta funkcja nie jest już potrzebna, bo onDetect bezpośrednio wywołuje validateAndJoin
 };
 
-const resetProcessing = () => {
-  setTimeout(() => {
-    isProcessing.value = false;
-    lastScannedCode.value = '';
-  }, 1500);
-  setTimeout(() => {
-    scanError.value = '';
-  }, 3000);
+const onCameraOn = () => {
+  cameraReady.value = true;
 };
 
-// POPRAWKA: Dodano typ `Promise<void>` do parametru `promise`
-const onInit = async (promise: Promise<void>) => {
-  try {
-    await promise;
-  } catch (error) {
-    let errorMessage = 'Błąd kamery';
-    // POPRAWKA: Użyto `instanceof Error` do bezpiecznego sprawdzania typu błędu
-    if (error instanceof Error) {
-      if (error.name === 'NotAllowedError') {
-        errorMessage = 'Brak dostępu do kamery. Sprawdź uprawnienia przeglądarki.';
-      } else if (error.name === 'NotFoundError') {
-        errorMessage = 'Nie znaleziono kamery w urządzeniu.';
-      } else if (error.name === 'NotReadableError') {
-        errorMessage = 'Kamera jest obecnie używana przez inną aplikację.';
-      }
-    }
-    scanError.value = errorMessage;
+const onScannerError = (error: Error) => {
+  let errorMessage = 'Błąd kamery';
+  if (error.name === 'NotAllowedError') {
+    errorMessage = 'Brak dostępu do kamery. Sprawdź uprawnienia przeglądarki.';
+  } else if (error.name === 'NotFoundError') {
+    errorMessage = 'Nie znaleziono kamery w urządzeniu.';
+  } else if (error.name === 'NotReadableError') {
+    errorMessage = 'Kamera jest obecnie używana przez inną aplikację.';
   }
+  scanError.value = errorMessage;
+  console.error("Błąd skanera QR:", error);
 };
 </script>

@@ -36,7 +36,6 @@ namespace backend.DTOs
         public int DisplayOrder { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string CardType { get; set; } = string.Empty;
         public double Cost { get; set; }
         public List<int> Enablers { get; set; } = new List<int>();
     }
@@ -87,7 +86,8 @@ namespace backend.DTOs
     public class CategorizedCardsDto
     {
         public List<UnifiedCardDto> DecisionCards { get; set; } = new List<UnifiedCardDto>();
-        public List<UnifiedCardDto> ItemCards { get; set; } = new List<UnifiedCardDto>();
+        public List<UnifiedCardDto> HardwareCards { get; set; } = new List<UnifiedCardDto>();
+        public List<UnifiedCardDto> SoftwareCards { get; set; } = new List<UnifiedCardDto>();
     }
 
     public class GameEventDto

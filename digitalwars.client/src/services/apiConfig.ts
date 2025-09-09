@@ -52,8 +52,8 @@ const endpoints = {
   player: {
     // --- CORRECTED & VERIFIED ENDPOINTS from PlayerController ---
     getTeamInfo: (gameId: number, teamId: number) => `/player/game/${gameId}/team/${teamId}/info`,
-    getTeamsManagement: (gameId: number): string => `/api/games/${gameId}/teams-management`,
-    updateTeamBudget: (teamId: number): string => `/api/teams/${teamId}/budget`,
+    getTeamsManagement: (gameId: number): string => `/admin/game/${gameId}/teams-management`,
+    updateTeamBudget: (teamId: number): string => `player/team/${teamId}/budget`,
     unlockCard: (gameId: number) => `/player/game/${gameId}/unlock-card`,
     getPendingLogs: (gameId: number) => `/player/game/${gameId}/pending-logs`,
     getGameEvents: (decks_Id: number) => `/player/game-events?decks_Id=${decks_Id}`, // Expects decks_Id as query param
@@ -63,7 +63,7 @@ const endpoints = {
     getLogs: '/player/getLogs', // Used for team-specific history. Expects gameId and teamId in query params.
     getPlayerHistory: '/player/player-history', // Used for full game history (admin view). Expects gameId in POST body.
     getCards: (deckId: number, gameId: number, teamId: number) => `/player/deck/${deckId}/unified-cards?gameId=${gameId}&teamId=${teamId}`,
-    getPlayerSessionData: (teamToken: string) => `/player/team/${teamToken}`,
+    getPlayerSessionDataByToken: (teamToken: string) => `/player/team/${teamToken}`,
     getPawns: (gameId: number, teamId: number, boardId: number) => `/player/team-board?gameId=${gameId}&teamId=${teamId}&boardId=${boardId}`,
     getRivalPawns: (gameId: number, boardId: number) => `/player/rival-board?gameId=${gameId}&boardId=${boardId}`,
     getGameData: (gameId: number) => `/player/game/${gameId}/rival-board-config`,
@@ -71,12 +71,10 @@ const endpoints = {
     playCardFailure: (cardId: number) => `/player/failure/${cardId}`,
     approveLog: (logId: number) => `/player/approve-log/${logId}`,
     rejectLog: (logId: number) => `/player/reject-log/${logId}`,
-
-    // --- CONFIRMED MISSING from PlayerController.cs ---
-    // These endpoints were in your original file but do not exist in the provided C# controller.
-    getCurrency: '/player/getCurrency', // NOT IMPLEMENTED
-    getDecisionCards: (gameId: number) => `/player/game/${gameId}/decision-cards`, // NOT IMPLEMENTED
-    getItemCards: (gameId: number) => `/player/game/${gameId}/item-cards`, // NOT IMPLEMENTED
+    getCurrency: '/player/getCurrency',
+    getDecisionCards: (deckId: number, gameId: number, teamId: number) => `/player/deck/${deckId}/unified-cards?gameId=${gameId}&teamId=${teamId}`,
+    getItemCards: (gameId: number) => `/player/game/${gameId}/item-cards`,
+    validateToken: (token: string) => `/player/validate-token/${token}`,
   },
   processes: {
     // This is likely in a ProcessesController, assumed to be correct.

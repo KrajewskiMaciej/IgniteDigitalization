@@ -115,7 +115,7 @@ async function fetchData() {
     // POPRAWKA: Dodano typy generyczne do wywołań API
     const [historyResponse, budgetResponse] = await Promise.all([
       apiServices.post<ApiLogEntry[]>(apiConfig.player.getPlayerHistory, { gameId: props.gameId, teamId: props.teamId }),
-      apiServices.get<{ teamBud: number }>(apiConfig.player.getCurrency, { params: { teamId: props.teamId } })
+      apiServices.get<{ teamBud: number }>(apiConfig.player.getCurrency, { teamId: props.teamId } )
     ]);
 
     if (Array.isArray(historyResponse.data)) {

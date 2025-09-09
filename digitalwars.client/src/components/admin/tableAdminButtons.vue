@@ -62,13 +62,14 @@
   // --- KROK 3: Jawne otypowanie parametrów funkcji ---
   const updateGameStatus = async (id: number, newStatus: GameStatus) => {
     try {
-      const response = await apiService.put<{ message?: string }>(apiConfig.games.updateStatus(id), newStatus);
+      const apiPayload = { status: newStatus };
+      const response = await apiService.put(apiConfig.games.updateStatus(gameId), apiPayload);
 
       if (game.value) {
         game.value.status = newStatus;
       }
       
-      toast.success(response.data?.message || `Status gry pomyślnie zaktualizowany.`);
+      toast.success((response.data as { message: string }).message || `Status gry został pomyślnie zaktualizowany.`);
       emit('update-status', { gameId: id, newStatus: newStatus });
 
       if (newStatus === 'End') {

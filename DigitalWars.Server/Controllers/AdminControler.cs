@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using backend.DTOs;
 
 namespace backend.Controllers
 {
@@ -90,6 +88,24 @@ namespace backend.Controllers
             byte[] pdfBytes = document.GeneratePdf();
 
             return File(pdfBytes, "application/pdf", "DigitalWars_Plansze.pdf");
+        }
+
+        [Authorize]
+        [HttpGet("game/{gameId}/teams-management")]
+        public async Task<IActionResult> GetTeamsManagement(int gameId)
+        {
+            var teams = await _context.Teams
+                .Where(t => t.Games_Id == gameId)
+                .Select(t => new TeamManagementDto
+                {
+                    TeamId = t.Teams_Id,
+                    TeamName = t.Teams_Name,
+                    TeamBud = t.Teams_Bud,
+                    TeamToken = t.Teams_Token,
+                    DeckId = t.Games.Decks_Id,
+                    BoardId = t.Games.Teams_Boards_Id
+                }).ToListAsync();
+            return Ok(teams);
         }
     }
 }

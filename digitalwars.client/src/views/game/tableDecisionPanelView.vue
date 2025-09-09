@@ -389,7 +389,7 @@ const fetchPawns = async () => {
 
     try {
       await signalService.start();
-      await signalService.joinGameRoom(gameIdNum);
+      await signalService.joinGameRoom(String(gameIdNum));
       console.log(`Pomyślnie dołączono do pokoju SignalR dla gry: ${gameIdNum}`);
     } catch (err) {
       console.error("Błąd połączenia SignalR: ", err);
@@ -399,7 +399,7 @@ const fetchPawns = async () => {
 
   onUnmounted(() => {
     if (props.gameId) {
-      signalService.leaveGameRoom(Number(props.gameId));
+      signalService.leaveGameRoom(String(props.gameId));
     }
   });
 </script>

@@ -140,12 +140,8 @@ const router = createRouter({
       ]
     },
     {
-      // Ta trasa jest bardziej ogólna, więc powinna być po tej z tokenem,
-      // ale w tym wypadku komponent jest ten sam, więc zostawiam.
       path: '/player',
-      name: 'player-dashboard-by-token',
-      // FIX: Poprawiono literówkę w nazwie komponentu
-      component: playerView,
+      redirect: '/', // Przekieruj na stronę główną, jeśli brakuje tokena
     },
     {
       path: '/player/:teamToken',

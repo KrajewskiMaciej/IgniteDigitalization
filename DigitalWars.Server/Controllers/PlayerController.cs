@@ -78,22 +78,6 @@ namespace backend.Controllers
         }
 
         [Authorize]
-        [HttpGet("game/{gameId}/teams-management")]
-        public async Task<IActionResult> GetTeamsManagement(int gameId)
-        {
-            var teams = await _context.Teams
-                .Where(t => t.Games_Id == gameId)
-                .Select(t => new TeamManagementDto
-                {
-                    TeamId = t.Teams_Id,
-                    TeamName = t.Teams_Name,
-                    TeamBud = t.Teams_Bud,
-                    TeamToken = t.Teams_Token
-                }).ToListAsync();
-            return Ok(teams);
-        }
-
-        [Authorize]
         [HttpPut("team/{teamId}/budget")]
         public async Task<IActionResult> UpdateTeamBudget(int teamId, [FromBody] UpdateBudgetDto dto)
         {
@@ -127,7 +111,7 @@ namespace backend.Controllers
                 Games_Id = gameId,
                 Teams_Id = dto.TeamId,
                 Cards_Id = card.Cards_Id,
-                Enablers_Id = card.Cards_Id // UWAGA: Enablers_Id to prawdopodobnie błąd w logice, powinno być Enabler_Cards_Id, ale trzymam się oryginalnego kodu
+                Enablers_Id = null // UWAGA: Enablers_Id to prawdopodobnie błąd w logice, powinno być Enabler_Cards_Id, ale trzymam się oryginalnego kodu
             };
             _context.CardEnablers.Add(enabler);
             await _context.SaveChangesAsync();
@@ -263,12 +247,20 @@ namespace backend.Controllers
         {
             try
             {
-                var sessionData = await _queryService.GetPlayerSessionDataAsync(teamToken);
-                return Ok(sessionData);
+                var result = await _queryService.GetPlayerSessionDataAsync(teamToken);
+                // Sprawdzamy, czy serwis zwrócił błąd, który możemy obsłużyć
+                if (result is ErrorResponseDto error)
+                {
+                    // Jeśli tak, zwracamy status 409 Conflict z obiektem błędu
+                    return Conflict(error);
+                }
+                // Jeśli wszystko jest w porządku, zwracamy dane sesji
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                // Ogólny catch na wypadek innych, nieprzewidzianych błędów
+                return Conflict(ex);
             }
         }
 
@@ -476,6 +468,42 @@ namespace backend.Controllers
                     borderColors = config.Borders_Colors?.Split(';')
                 }
             });
+        }
+
+        [HttpGet("getCurrency")]
+        public async Task<IActionResult> GetCurrency([FromQuery] int teamId)
+        {
+            // Walidacja, czy teamId jest poprawne
+            if (teamId <= 0)
+            {
+                return BadRequest(new { message = "Nieprawidłowe ID drużyny." });
+            }
+
+            // Wyszukanie budżetu w bazie danych
+            var teamBudget = await _context.Teams
+                .Where(t => t.Teams_Id == teamId)
+                .Select(t => (double?)t.Teams_Bud) // Użyj typu nullable, aby obsłużyć brak drużyny
+                .FirstOrDefaultAsync();
+
+            // Sprawdzenie, czy drużyna została znaleziona
+            if (teamBudget == null)
+            {
+                return NotFound(new { message = $"Drużyna o ID {teamId} nie została znaleziona." });
+            }
+
+            // Zwrócenie budżetu w prostym obiekcie JSON
+            return Ok(new { budget = teamBudget.Value });
+        }
+
+        [HttpGet("validate-token/{token}")]
+        public async Task<IActionResult> ValidateTeamToken(string token)
+        {
+            var tokenExists = await _context.Teams.AnyAsync(t => t.Teams_Token == token);
+            if (!tokenExists)
+            {
+                return NotFound(new { message = "Nie znaleziono gry dla podanego kodu." });
+            }
+            return Ok(new { message = "Token jest prawidłowy." });
         }
     }
 }

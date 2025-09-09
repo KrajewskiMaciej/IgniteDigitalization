@@ -466,33 +466,65 @@
   async function executeAction(isCard: boolean) {
     const entity = isCard ? selectedCard.value : selectedItem.value;
     const team = selectedTeam.value;
+
     if (!entity || !team || !deckId.value) {
-      toast.error("Brak kluczowych danych (drużyna, talia), aby wykonać akcję.");
-      return;
+        toast.error("Brak kluczowych danych (drużyna, talia, karta/przedmiot), aby wykonać akcję.");
+        return;
+    }
+    if (!team.boardId || team.boardId === 0) {
+        toast.error(`Wybrana drużyna "${team.teamName}" nie ma przypisanego ID planszy.`);
+        return;
     }
     if (team.teamBud < (entity.cost || 0)) {
-      toast.error(`Drużyna ${team.teamName} ma za mało bitów!`);
-      return;
+        toast.error(`Drużyna ${team.teamName} ma za mało bitów!`);
+        return;
     }
     let wasSuccess: boolean;
     if (isCard) {
-      const cardEntity = entity as Card;
-      wasSuccess = !(cardEntity.enablers && Array.isArray(cardEntity.enablers) && cardEntity.enablers.length > 0);
+        const cardEntity = entity as Card;
+        wasSuccess = !(cardEntity.enablers && Array.isArray(cardEntity.enablers) && cardEntity.enablers.length > 0);
     } else {
-      wasSuccess = true;
+        wasSuccess = true;
     }
-    const endpoint = wasSuccess ? apiConfig.player.playCardSuccess(entity.id) : apiConfig.player.playCardFailure(entity.id);
-    const payload = { gameId, teamId: team.teamId, deckId: deckId.value, boardId: team.boardId, cost: entity.cost || 0, ForceExecution: true };
+
+    const endpoint = wasSuccess
+        ? apiConfig.player.playCardSuccess(entity.id)
+        : apiConfig.player.playCardFailure(entity.id);
+
+    const payload = {
+        gameId: gameId,
+        teamId: team.teamId,
+        deckId: deckId.value,
+        boardId: team.boardId, // Pobierane z obiektu wybranej drużyny
+        cost: entity.cost || 0,
+        ForceExecution: true
+    };
+
     try {
-      const response = await apiServices.post(endpoint, payload);
-      toast.success((response.data as { message: string }).message || 'Akcja przetworzona pomyślnie.');
-      await fetchTeams();
-      await fetchAvailableCardsForTeam();
+      console.log("Wysyłany Id Karty: ", entity.id);
+        // Używamy typu generycznego, aby TypeScript wiedział, jak wygląda odpowiedź
+        const response = await apiServices.post<{ message?: string; newTeamBudget: number }>(endpoint, payload);
+
+        toast.success(response.data?.message || 'Akcja przetworzona pomyślnie.');
+
+        // BARDZIEJ WYDAJNA AKTUALIZACJA STANU:
+        // Zamiast ponownie pobierać wszystkie drużyny, aktualizujemy budżet tej jednej.
+        const teamToUpdate = tables.value.find(t => t.teamId === team.teamId);
+        if (teamToUpdate) {
+            teamToUpdate.teamBud = response.data.newTeamBudget;
+        } else {
+            // Jeśli z jakiegoś powodu nie znaleziono drużyny, awaryjnie pobierz wszystkie
+            await fetchTeams();
+        }
+
+        // Odśwież listę dostępnych kart/przedmiotów dla drużyny
+        await fetchAvailableCardsForTeam();
+
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Wystąpił błąd podczas akcji.");
-      console.error("Błąd akcji karty/przedmiotu:", error.response?.data || error.message);
+        toast.error(error.response?.data?.message || "Wystąpił błąd podczas wykonywania akcji.");
+        console.error("Błąd akcji karty/przedmiotu:", error.response?.data || error.message);
     }
-  }
+  };
   const playCard = () => executeAction(true);
   const giveItem = () => executeAction(false);
 
@@ -567,7 +599,7 @@
     
     try {
       await signalService.start();
-      await signalService.joinGameRoom(gameId);
+      await signalService.joinGameRoom(String(gameId));
       console.log("Połączono z SignalR i dołączono do pokoju gry.");
       signalService.connection.on("HistoryUpdated", () => fetchDecisionHistory());
       signalService.connection.on("PendingUpdated", () => fetchPendingDecisions());
@@ -576,6 +608,6 @@
       console.error("Błąd połączenia SignalR: ", err);
     }
   });
-  
-  onUnmounted(() => { if (gameId) signalService.leaveGameRoom(gameId); });
+
+  onUnmounted(() => { if (gameId) signalService.leaveGameRoom(String(gameId)); });
 </script>

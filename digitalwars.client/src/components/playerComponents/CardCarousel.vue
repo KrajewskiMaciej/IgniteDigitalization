@@ -23,14 +23,13 @@
         </select>
       </div>
 
+      <!-- Karta z dynamicznym tłem -->
       <div
         @mousedown="startHold"
         @mouseup="cancelHold"
         @mouseleave="cancelHold"
-        :class="[
-          'w-full h-full bg-gradient-to-br from-transparent to-transparent rounded-b-2xl shadow-2xl text-white'
-        ]"
-        style="--tw-gradient-from: #5DBB63; --tw-gradient-to: #607D3B;"
+        class="w-full h-full bg-gradient-to-br from-transparent to-transparent rounded-b-2xl shadow-2xl text-white"
+        :style="cardStyle"
       >
         <div class="flex h-full">
           <!-- Lewy przycisk -->
@@ -40,7 +39,6 @@
             aria-label="Poprzednia karta"
             :disabled="displayCards.length <= 1"
           >
-            <!-- POPRAWKA: Użyto encji HTML, aby uniknąć błędu parsowania -->
             <p>&lt;</p>
           </button>
 
@@ -64,7 +62,6 @@
             aria-label="Następna karta"
             :disabled="displayCards.length <= 1"
           >
-            <!-- POPRAWKA: Użyto encji HTML -->
             <p>&gt;</p>
           </button>
         </div>
@@ -95,23 +92,23 @@ interface Card {
   title: string;
   description: string;
   cost: number;
-  enablers: any[]; // Można doprecyzować, jeśli struktura jest znana
+  enablers: any[];
+  type: 'decision' | 'hardware' | 'software';
 }
 
 interface CardsApiResponse {
   decisionCards: Card[];
-  itemCards: Card[];
+  hardwareCards: Card[]; // Zakładamy, że API rozdziela karty przedmiotów
+  softwareCards: Card[];
 }
+
 
 // --- Reaktywne referencje i stałe ---
 const toast = useToast();
-
-// POPRAWKA: Jawne typowanie tablic za pomocą interfejsu `Card`
 const decisionCards = ref<Card[]>([]);
 const itemCards = ref<Card[]>([]);
 const currentIndex = ref(0);
 const loading = ref(true);
-// POPRAWKA: Poprawiono typ, aby akceptował string lub null
 const fetchError = ref<string | null>(null);
 
 // --- Definiowanie propsów i emitów ---
@@ -141,18 +138,41 @@ const selectedCard = computed<Card | null>(() => {
   return displayCards.value[currentIndex.value];
 });
 
+const cardStyle = computed(() => {
+  if (!selectedCard.value) return {};
+  
+  let colorFrom = '#5DBB63';
+  let colorTo = '#607D3B';
+
+  switch (selectedCard.value.type) {
+    case 'decision':
+      colorFrom = '#00b1eb';
+      colorTo = '#008bb5';
+      break;
+    case 'software':
+      colorFrom = '#009641';
+      colorTo = '#007534';
+      break;
+    case 'hardware':
+      colorFrom = '#ef7d00';
+      colorTo = '#c06400';
+      break;
+  }
+  return { '--tw-gradient-from': colorFrom, '--tw-gradient-to': colorTo };
+});
+
 const buttonLabel = computed(() => {
   return props.isIndependentTeam ? 'Wybierz kartę' : 'Sugeruj kartę';
 });
 
 // --- Metody ---
-
-// POPRAWKA: Dodano brakujące funkcje, których wymagał szablon
-const startHold = () => { /* Logika do ewentualnego wciśnięcia i przytrzymania */ };
-const cancelHold = () => { /* Logika do anulowania przytrzymania */ };
+const startHold = () => { /* ... */ };
+const cancelHold = () => { /* ... */ };
 
 async function fetchCards() {
-  if (!props.deckId) {
+  const { deckId, gameId, teamId } = props;
+  if (deckId == null || gameId == null || teamId == null) {
+    fetchError.value = "Brak wymaganych danych do pobrania kart.";
     loading.value = false;
     return;
   }
@@ -160,13 +180,23 @@ async function fetchCards() {
   fetchError.value = null;
 
   try {
-    // POPRAWKA: Dodano typ generyczny do wywołania API
-    const response = await apiServices.get<CardsApiResponse>(apiConfig.player.getCards(props.deckId), {
-      params: { gameId: props.gameId, teamId: props.teamId }
-    });
-    decisionCards.value = response.data?.decisionCards ?? [];
-    itemCards.value = response.data?.itemCards ?? [];
-  } catch (error: any) { // POPRAWKA: Otypowano błąd jako `any`
+    const response = await apiServices.get<CardsApiResponse>(
+      apiConfig.player.getCards(deckId, gameId, teamId), 
+      { params: { gameId, teamId } }
+    );
+    
+    decisionCards.value = (response.data?.decisionCards ?? []).map(card => ({ ...card, type: 'decision' }));
+    
+    // --- KLUCZOWA POPRAWKA ---
+    // Jawnie typujemy stałe jako Card[], aby TypeScript poprawnie
+    // zinterpretował typ właściwości 'type' i uniknął błędu.
+    const hardware: Card[] = (response.data?.hardwareCards ?? []).map(card => ({ ...card, type: 'hardware' }));
+    const software: Card[] = (response.data?.softwareCards ?? []).map(card => ({ ...card, type: 'software' }));
+    // --- KONIEC POPRAWKI ---
+    
+    itemCards.value = [...software, ...hardware ];
+
+  } catch (error: any) {
     decisionCards.value = [];
     itemCards.value = [];
     fetchError.value = "Wystąpił błąd podczas pobierania kart.";
@@ -217,14 +247,14 @@ const sendCardSelection = async () => {
       newBudget: response.data.newTeamBudget
     });
     await fetchCards();
-  } catch (err: any) { // POPRAWKA: Otypowano błąd jako `any`
+  } catch (err: any) {
     toast.error(err.response?.data?.message ?? "Wystąpił błąd podczas komunikacji z serwerem.");
     console.error("Błąd podczas zagrywania karty:", err);
     emit('card-action-completed', { success: false });
   }
 };
 
-// --- Watchers (Obserwatorzy) ---
+// --- Watchers ---
 watch(displayCards, () => {
   currentIndex.value = 0;
 });

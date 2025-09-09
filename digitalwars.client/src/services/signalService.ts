@@ -1,31 +1,36 @@
-// BŁĄD TS2307: Ten błąd oznacza, że TypeScript nie może znaleźć typów dla biblioteki SignalR.
-// Aby to naprawić, upewnij się, że masz zainstalowany pakiet. Uruchom w terminalu:
-// npm install @microsoft/signalr
+// Upewnij się, że masz zainstalowany pakiet: npm install @microsoft/signalr
 import * as signalR from "@microsoft/signalr";
 
+// Pobierz URL huba z zmiennych środowiskowych lub użyj domyślnego.
+const HUB_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/^http/, 'ws')}/gameHub`
+  : "http://localhost:5023/gameHub";
+
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("http://localhost:5023/gameHub") // Upewnij się, że URL jest poprawny dla Twojego backendu
+    .withUrl(HUB_URL)
     .withAutomaticReconnect()
     .build();
 
-// POPRAWKA: Jawnie typujemy `startPromise`. Może to być obietnica lub null.
+// Przechowuje obietnicę startu, aby uniknąć wielokrotnego wywoływania .start()
 let startPromise: Promise<void> | null = null;
 
-// Dla lepszej organizacji i typowania, możemy zdefiniować interfejs dla naszego serwisu
+// Definicja interfejsu dla serwisu dla lepszego typowania
 interface ISignalRService {
     connection: signalR.HubConnection;
     start: () => Promise<void>;
-    joinGameRoom: (gameId: number) => Promise<void> | undefined;
-    leaveGameRoom: (gameId: number) => Promise<void> | undefined;
+    joinGameRoom: (gameId: string) => Promise<void> | undefined;
+    leaveGameRoom: (gameId: string) => Promise<void> | undefined;
 }
 
 const signalRService: ISignalRService = {
     connection,
     
     start() {
+        // Jeśli połączenie nie zostało jeszcze zainicjowane, stwórz nową obietnicę startu.
+        // To zapobiega wielokrotnym próbom połączenia, gdy wiele komponentów próbuje to zrobić jednocześnie.
         if (!startPromise) {
             console.log("SignalR: Inicjowanie nowego połączenia...");
-            startPromise = connection.start().catch((err: any) => { // POPRAWKA: Typujemy parametr `err`
+            startPromise = connection.start().catch((err: any) => {
                 console.error("SignalR: Błąd podczas startu, resetowanie obietnicy.", err);
                 startPromise = null; // Zresetuj w razie błędu, aby umożliwić ponowną próbę
                 throw err; // Rzuć błąd dalej, aby kod wywołujący mógł na niego zareagować
@@ -35,18 +40,21 @@ const signalRService: ISignalRService = {
         return startPromise;
     },
     
-    joinGameRoom: (gameId: number) => { // POPRAWKA: Typujemy parametr `gameId`
+    // POPRAWKA: Typ parametru 'gameId' został zmieniony na 'string', aby pasował do backendu (GameHub.cs)
+    // i sposobu wywołania z playerView.vue.
+    joinGameRoom: (gameId: string) => {
         if (connection.state === signalR.HubConnectionState.Connected) {
-            return connection.invoke("JoinGameRoom", gameId.toString());
+            // Nie ma potrzeby konwertować na string, ponieważ już nim jest.
+            return connection.invoke("JoinGameRoom", gameId);
         }
-        // Opcjonalnie: można zwrócić odrzuconą obietnicę lub zalogować błąd, jeśli połączenie nie jest aktywne
         console.warn("SignalR: Próba dołączenia do pokoju bez aktywnego połączenia.");
         return undefined;
     },
     
-    leaveGameRoom: (gameId: number) => { // POPRAWKA: Typujemy parametr `gameId`
+    // POPRAWKA: Typ parametru 'gameId' również zmieniony na 'string'.
+    leaveGameRoom: (gameId: string) => {
         if (connection.state === signalR.HubConnectionState.Connected) {
-            return connection.invoke("LeaveGameRoom", gameId.toString());
+            return connection.invoke("LeaveGameRoom", gameId);
         }
         console.warn("SignalR: Próba opuszczenia pokoju bez aktywnego połączenia.");
         return undefined;

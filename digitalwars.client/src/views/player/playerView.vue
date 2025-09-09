@@ -1,11 +1,21 @@
 <template>
   <div class="flex flex-col h-screen bg-primary relative overflow-hidden">
     <PlayerNavbar
-      :team-name="gameData?.teamName"
-      :nav-bg-color="gameData?.teamColor"
+      :team-name="gameData?.teamName || 'Błąd ładowania'"
+      :nav-bg-color="gameData?.teamColor || 'bg-secondary'"
     />
 
-    <div class="flex flex-1 flex-row relative overflow-hidden">
+    <!-- --- GŁÓWNA ZMIANA --- -->
+    <!-- Widok błędu lub informacji o stanie gry -->
+    <div v-if="gameStatusError" class="flex-1">
+      <GameStatusDisplay
+        :title="gameStatusError.title"
+        :message="gameStatusError.message"
+      />
+    </div>
+
+    <!-- Widok normalnej rozgrywki (jeśli nie ma błędu) -->
+    <div v-else-if="gameData" class="flex flex-1 flex-row relative overflow-hidden">
       <!-- Lewy panel -->
       <Transition name="fade-slide" appear>
         <div
@@ -15,7 +25,7 @@
           <RouterView />
           <QuestionBox />
 
-                    <!-- 2. Dodajemy przyciski przełączające -->
+          <!-- Przyciski przełączające -->
           <div class="flex justify-center space-x-2 my-4">
               <button
                   @click="showingDecisionCards = true"
@@ -36,24 +46,20 @@
           <Suspense>
               <template #default>
                   <CardCarousel
-                      ref="cardCarouselRef"
                       v-if="gameData && gameData.deckId" 
                       :deck-id="gameData.deckId" 
                       :team-id="gameData.teamId"
                       :game-id="gameData.gameId"
                       :board-id="gameData.boardConfig?.boardId"
                       :current-budget="currentGlobalBudget"
-                    
                       :showing-decision-cards="showingDecisionCards"
-
-                      :is-online-game="gameData?.isOnline"
-                      :is-independent-team="gameData?.isIndependent"
-
+                      :is-online-game="gameData.IsOnline"
+                      :is-independent-team="gameData.IsIndependent"
                       @card-action-completed="handleCardActionCompleted"
                   />
               </template>
               <template #fallback>
-                  <div>Ładowanie karuzeli kart...</div>
+                  <div class="text-center text-white">Ładowanie karuzeli kart...</div>
               </template>
           </Suspense>
         </div>
@@ -86,32 +92,22 @@
         </div>
 
         <div class="flex justify-between items-center">
-          <!-- Lewy przycisk -->
-          <button
-            @click="showLeftPanel"
-            class="bg-gray-800 text-white px-4 py-2 rounded-md"
-          >
+          <button @click="showLeftPanel" class="bg-gray-800 text-white px-4 py-2 rounded-md">
             Panel kart
           </button>
-
-          <!-- Prawy przycisk -->
-          <button
-            @click="showRightPanel"
-            class="bg-gray-800 text-white px-4 py-2 rounded-md"
-          >
+          <button @click="showRightPanel" class="bg-gray-800 text-white px-4 py-2 rounded-md">
             Panel decyzji
           </button>
         </div>
-        <!-- Zamienić pawnCount na liczbe graczy w danym stole -->
-        <!-- Zamienić pawnPositions na pozycje pionkow w grze (w testgameboard jest lokiga dzielenia pionków na grid wiec podajemy 1,1 albo 1,2) -->
+        
         <GameBoard
-          v-if="currentBoard === 'player'"
+          v-if="currentBoard === 'player' && gameData?.boardConfig"
           :config="formData"
           :gameMode="true"
           :pawns="pawns"
         />
         <GameBoard
-          v-if="currentBoard === 'market'"
+          v-if="currentBoard === 'market' && gameData?.rivalBoardConfig"
           :config="enemyformData"
           :gameMode="true"
           :pawns="enemypawns"
@@ -126,8 +122,8 @@
         <PlayerMenu 
           ref="playerMenuRef"
           v-if="currentPanel === 'menu' && gameData"
-          :game-id="gameData?.gameId"
-          :team-id="gameData?.teamId"
+          :game-id="gameData.gameId"
+          :team-id="gameData.teamId"
           @budget-changed-in-menu="handleBudgetChangeFromMenu"
         />
       </div>
@@ -140,286 +136,273 @@
   </div>
 </template>
 
-
-
 <script setup lang="ts">
+import { reactive, ref, watch, onMounted, onUnmounted } from 'vue'
+import PlayerNavbar from '@/components/navbars/playerNavbar.vue'
+import QuestionBox from '@/components/playerComponents/questionBox.vue'
+import GameBoard from '@/components/game/gameBoard.vue'
+import Footer from '@/components/footers/adminFooter.vue'
+import CardCarousel from '@/components/playerComponents/CardCarousel.vue'
+import PlayerMenu from '@/components/playerComponents/playerMenu.vue'
+import { RouterView } from 'vue-router'
+import apiConfig from '@/services/apiConfig'
+import apiServices from '@/services/apiServices'
+import signalrService from '@/services/signalService';
+import GameStatusDisplay from '@/components/playerComponents/gameStatusDisplay.vue';
+
+// --- INTERFEJSY ---
+// POPRAWKA: Ujednolicono nazwy z camelCase, tak jak robi to serializator .NET
+interface BoardConfig {
+  boardId: number;
+  name: string;
+  labelsUp: string[];
+  labelsRight: string[];
+  borderColors: string[]; // <-- POPRAWIONA NAZWA
+  description_Down: string;
+  description_Left: string;
+  rows: number;
+  cols: number;
+  cellColor: string;
+  borderColor: string;
+}
+
+interface GameData {
+  teamName: string;
+  teamColor: string;
+  teamBudget: number;
+  deckId: number;
+  teamId: number;
+  gameId: number;
+  IsOnline: boolean;
+  IsIndependent: boolean;
+  boardConfig: BoardConfig;
+  rivalBoardConfig?: BoardConfig;
+}
+
+interface Pawn {
+  id: number;
+  x: number;
+  y: number;
+  color: string;
+  name: string;
+}
+
+interface RawPawnData {
+  gpId?: number;
+  teamId?: number;
+  posX: string | number;
+  posY: string | number;
+  color?: string;
+  teamColor?: string;
+  name?: string;
+  teamName?: string;
+}
+
+interface GameStatusError {
+  title: string;
+  message: string;
+}
 
 
-  //---------------------------------------------------------------
-  import { reactive, ref, watch, onMounted, onUnmounted } from 'vue'
-  import PlayerNavbar from '@/components/navbars/playerNavbar.vue'
-  import QuestionBox from '@/components/playerComponents/questionBox.vue'
-  import GameBoard from '@/components/game/gameBoard.vue'
-  import Footer from '@/components/footers/adminFooter.vue'
-  import CardCarousel from '@/components/playerComponents/CardCarousel.vue'
-  import PlayerMenu from '@/components/playerComponents/playerMenu.vue'
-  import { RouterView } from 'vue-router'
-  import apiConfig from '@/services/apiConfig'
-  import apiServices from '@/services/apiServices'
-  import signalrService from '@/services/signalService';
+// --- PROPSY ---
+const props = defineProps({
+  teamToken: String
+});
 
-  const showingDecisionCards = ref(true);
-  const currentPanel = ref('menu')
+// --- ZMIENNE STANU ---
+const showingDecisionCards = ref(true);
+const currentPanel = ref('menu');
+const leftOpen = ref(false);
+const rightOpen = ref(true);
+const currentBoard = ref('player');
 
-  const formData = reactive({
-    Name: 'Plansza podstawowa',
-    LabelsUp: ['Podstawowa kordynacja', 'Standaryzacja procesów', 'Zintegrowane działania', 'Pełna integracja strategiczna'],
-    LabelsRight: ['Nowicjusz', 'Naśladowca', 'Innowator', 'Lider cyfrowy'],
-    DescriptionDown: 'Poziom integracji wew/zew',
-    DescriptionLeft: 'Zawansowanie Cyfrowe',
-    Rows: 8,
-    Cols: 8,
-    CellColor: '#fefae0',
-    BorderColor: '#595959',
-    BorderColors: ['#008000', '#FFFF00', '#FFA500', '#FF0000']
-  });
-  const enemyformData = reactive({
-    Name: 'Plansza podstawowa',
-    LabelsUp: ['Podstawowa kordynacja', 'Standaryzacja procesów', 'Zintegrowane działania', 'Pełna integracja strategiczna'],
-    LabelsRight: ['Nowicjusz', 'Naśladowca', 'Innowator', 'Lider cyfrowy'],
-    DescriptionDown: 'Poziom integracji wew/zew',
-    DescriptionLeft: 'Zawansowanie Cyfrowe',
-    Rows: 8,
-    Cols: 8,
-    CellColor: '#fefae0',
-    BorderColor: '#595959',
-    BorderColors: ['#008000', '#FFFF00', '#FFA500', '#FF0000']
-  });
+const gameData = ref<GameData | null>(null);
+const isLoading = ref(true);
+const errorLoading = ref<string | null>(null);
 
-  const props = defineProps({
-    teamToken: String // Odbieramy teamToken jako prop dzięki `props: true` w routerze
-  });
-  const gameData = ref(null); // Tutaj będą przechowywane wszystkie dane gry
-  const isLoading = ref(true);
-  const errorLoading = ref(null);
+const currentGlobalBudget = ref(0);
+const pawns = ref<Pawn[]>([]);
+const enemypawns = ref<Pawn[]>([]);
 
-  const currentGlobalBudget = ref(0);
+const playerMenuRef = ref<{ fetchGameLog: () => void; fetchTeamBud: () => void; } | null>(null);
 
-  const playerMenuRef = ref(null);
-  const cardCarouselRef = ref(null);
+const createDefaultBoardConfig = (): BoardConfig => ({
+  boardId: 0, name: 'Ładowanie...', labelsUp: [], labelsRight: [], description_Down: '',
+  description_Left: '', rows: 8, cols: 8, cellColor: '#fefae0', borderColor: '#595959', borderColors: [] // <-- POPRAWIONA NAZWA
+});
 
-  const fetchGameDataByToken = async (token) => {
-    if (!token) {
-      errorLoading.value = "Brak tokena drużyny w adresie URL.";
-      isLoading.value = false;
-      return;
-    }
-    isLoading.value = true;
-    errorLoading.value = null;
-    gameData.value = null;
-    try {
-      const response = await apiServices.get(apiConfig.player.getTeamInfo(token));
-      console.log("Dane z backendu (team info):", response.data);
+const formData = reactive<BoardConfig>(createDefaultBoardConfig());
+const enemyformData = reactive<BoardConfig>(createDefaultBoardConfig());
 
+const gameStatusError = ref<GameStatusError | null>(null);
 
-      gameData.value = {
-        ...response.data,
-        boardConfig: response.data.boardConfig,
-      };
-
-      formData.Name = gameData.value.boardConfig.name;
-      formData.LabelsUp = gameData.value.boardConfig.labelsUp;
-      formData.LabelsRight = gameData.value.boardConfig.labelsRight;
-      formData.BorderColors = gameData.value.boardConfig.borderColors;
-      formData.DescriptionDown = gameData.value.boardConfig.descriptionDown;
-      formData.DescriptionLeft = gameData.value.boardConfig.descriptionLeft;
-      formData.Rows = gameData.value.boardConfig.rows;
-      formData.Cols = gameData.value.boardConfig.cols;
-      formData.CellColor = gameData.value.boardConfig.cellColor;
-      formData.BorderColor = gameData.value.boardConfig.borderColor;
-
-      if (playerMenuRef.value && currentPanel.value === 'menu') {
-        playerMenuRef.value.fetchGameLog();
-      }
-
-
-      if (gameData.value.rivalBoardConfig) {
-        enemyformData.Name = gameData.value.rivalBoardConfig.name;
-        enemyformData.LabelsUp = gameData.value.rivalBoardConfig.labelsUp;
-        enemyformData.LabelsRight = gameData.value.rivalBoardConfig.labelsRight;
-        enemyformData.BorderColors = gameData.value.rivalBoardConfig.borderColors;
-        enemyformData.DescriptionDown = gameData.value.rivalBoardConfig.descriptionDown;
-        enemyformData.DescriptionLeft = gameData.value.rivalBoardConfig.descriptionLeft;
-        enemyformData.Rows = gameData.value.rivalBoardConfig.rows;
-        enemyformData.Cols = gameData.value.rivalBoardConfig.cols;
-        enemyformData.CellColor = gameData.value.rivalBoardConfig.cellColor;
-        enemyformData.BorderColor = gameData.value.rivalBoardConfig.borderColor;
-      } else {
-        console.warn("Brak konfiguracji rivalBoardConfig dla planszy rywala/rynku. Prawdopodobnie gra offline lub brak planszy rywala.");
-      }
-
-      fetchPawns();
-      fetchRivalPawns();
-
-
-    } catch (err) {
-      console.error("Błąd ładowania danych gry przez token:", err);
-      errorLoading.value = err.response?.data?.message || err.message || "Nieznany błąd serwera.";
-      if (err.response?.status === 404) {
-        errorLoading.value = "Nie znaleziono gry lub drużyny dla podanego tokena.";
-      }
-    } finally {
-      isLoading.value = false;
-    }
-  };
-
-  const handleCardActionCompleted = async (eventPayload) => {
-    if (eventPayload.success) {
-      if (playerMenuRef.value && currentPanel.value === 'menu') {
-        playerMenuRef.value.fetchGameLog();
-        playerMenuRef.value.fetchTeamBud();
-      } else {
-        console.warn("PlayerView: Nie można wywołać fetchGameLog - PlayerMenu nie jest dostępne lub aktywne.");
-      }
-      fetchPawns();
-      fetchRivalPawns();
-    }
+// --- FUNKCJE ---
+const fetchGameDataByToken = async (token: string) => {
+  if (!token) {
+    gameStatusError.value = { title: "Błąd", message: "Brak tokena drużyny w adresie URL." };
+    isLoading.value = false;
+    return;
   }
+  isLoading.value = true;
+  gameStatusError.value = null; // Resetuj błąd przy każdym nowym ładowaniu
+  
+  try {
+    const response = await apiServices.get<GameData>(apiConfig.player.getPlayerSessionDataByToken(token));
+    gameData.value = response.data;
+    
+    currentGlobalBudget.value = gameData.value.teamBudget;
 
-  const handleBudgetChangeFromMenu = (newBudgetFromMenu) => {
-    currentGlobalBudget.value = newBudgetFromMenu;
-  };
+    Object.assign(formData, gameData.value.boardConfig);
 
-  //funckja pokazujaca aktualną planszę
-  const currentBoard = ref('player')
-
-  //logika rozsuwania paneli
-
-  const leftOpen = ref(false)
-  const rightOpen = ref(true)
-
-  function showLeftPanel() {
-    rightOpen.value = false
-    leftOpen.value = true
-  }
-
-  function showRightPanel() {
-    leftOpen.value = false
-    rightOpen.value = true
-  }
-
-  const pawns = ref([]);
-  const enemypawns = ref([]);
-
-  const fetchPawns = async () => {
-    try {
-      const response = await apiServices.get(apiConfig.player.getPawns, {
-        params: {
-          gameId: gameData.value.gameId,
-          teamId: gameData.value.teamId,
-          boardId: gameData.value.boardConfig.boardId
-        }
-      });
-
-      pawns.value = response.data
-        .map(p => ({
-          id: p.gpId,
-          x: Number(p.posX),
-          y: Number(p.posY),
-          color: p.color,
-          name: p.name
-        }));
-      console.log(pawns.value)
-
-    } catch (err) {
-      console.error("Błąd pobierania pionków:", err);
+    if (gameData.value.rivalBoardConfig) {
+      Object.assign(enemyformData, gameData.value.rivalBoardConfig);
+    } else {
+      console.warn("Brak konfiguracji rivalBoardConfig.");
     }
-  };
-
-  const fetchRivalPawns = async () => {
-    const game = gameData.value;
-    if (!game || !game.rivalBoardConfig) {
-      console.warn("Brak gameData lub rivalBoardConfig");
-      return;
-    }
-
-    try {
-      const response = await apiServices.get(apiConfig.player.getRivalPawns, {
-        params: {
-          gameId: game.gameId,
-          boardId: game.rivalBoardConfig.boardId
-        }
-      });
-
-      enemypawns.value = response.data.map(p => ({
-        id: p.teamId,
-        x: Number(p.posX),
-        y: Number(p.posY),
-        color: p.teamColor,
-        name: p.teamName
-      }));
-
-      console.log("ENEMY PAWNS:", enemypawns.value);
-
-    } catch (err) {
-      console.error("Błąd pobierania pionków rynku:", err);
-    }
-  };
-
-  const onBoardUpdate = (data) => {
-    console.log("SignalR: Otrzymano 'BoardUpdated'. Odświeżam stan planszy.", data);
-    // Niezależnie od tego, która drużyna się zmieniła, odświeżamy obie listy pionków.
-    // Jest to najprostsze i najbardziej niezawodne podejście.
-    fetchPawns();
-    fetchRivalPawns();
-  };
-
-  const onHistoryUpdate = () => {
-    console.log("SignalR: Otrzymano 'HistoryUpdated'. Odświeżam historię.");
+    
     if (playerMenuRef.value) {
       playerMenuRef.value.fetchGameLog();
     }
-  };
+    
+    await fetchPawns();
+    await fetchRivalPawns();
 
-  // Flaga, aby uniknąć wielokrotnego łączenia się z SignalR przy zmianach propsów
-  let isSignalRInitialized = false;
+  } catch (err: any) {
+    let title = "Wystąpił Błąd";
+    let message = err.message || "Nie można załadować danych gry.";
 
-  // Ten `watch` staje się głównym punktem startowym dla komponentu.
-  watch(() => props.teamToken, async (newToken) => {
-    if (!newToken) return;
+    if (err.response) {
+      const status = err.response.status;
+      const data = err.response.data;
 
-    // 1. Najpierw pobierz wszystkie dane gry. `await` gwarantuje, że poczekamy na wynik.
-    await fetchGameDataByToken(newToken);
-
-    // 2. Dopiero gdy dane są dostępne i SignalR nie był jeszcze inicjowany, skonfiguruj go.
-    if (gameData.value?.gameId && !isSignalRInitialized) {
-      isSignalRInitialized = true; // Ustawiamy flagę, aby nie robić tego ponownie
-
-      try {
-        await signalrService.start();
-        await signalrService.joinGameRoom(gameData.value.gameId.toString()); // Upewnijmy się, że ID jest stringiem
-        console.log(`SignalR: Połączono i dołączono do pokoju gry ${gameData.value.gameId}`);
-
-        // Rejestrujemy nasze funkcje jako listenery
-        signalrService.connection.on("BoardUpdated", onBoardUpdate);
-        signalrService.connection.on("HistoryUpdated", onHistoryUpdate);
-
-      } catch (err) {
-        console.error("Błąd połączenia SignalR w playerView: ", err);
+      if (status === 409 && data.errorCode) {
+        switch (data.errorCode) {
+          case 'GamePaused':
+            title = "Gra Wstrzymana";
+            message = data.message || "Gra jest obecnie wstrzymana. Skontaktuj się z Game Masterem.";
+            break;
+          case 'GameEnded':
+            title = "Gra Zakończona";
+            message = data.message || "Ta gra została już zakończona.";
+            break;
+        }
+      } else if (status === 404) {
+          title = "Nie znaleziono Gry";
+          message = data.message || "Nie znaleziono gry lub drużyny dla podanego tokena.";
       }
     }
-  }, { immediate: true }); // `immediate: true` uruchamia ten `watch` od razu po załadowaniu komponentu
+    
+    gameStatusError.value = { title, message };
+    console.error("Błąd ładowania danych gry przez token:", err);
+    
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-  // onMounted i onUnmounted pozostają, ale ich logika jest teraz czystsza.
-  // `onMounted` może być nawet pusty, ponieważ `watch` z `immediate:true` przejmuje jego rolę.
-  onMounted(() => {
-    // Cała logika inicjalizacji jest teraz w `watch`.
-    // Możemy tu zostawić puste lub dodać logikę, która nie zależy od propsów.
-    console.log("PlayerView zamontowany.");
-  });
 
-  onUnmounted(() => {
-    if (gameData.value?.gameId) {
-      console.log(`SignalR: Opuszczanie pokoju gry ${gameData.value.gameId}`);
-      signalrService.leaveGameRoom(gameData.value.gameId.toString());
-
-      // Usuwamy listenery, używając tych samych referencji do funkcji.
-      // To zapobiega wyciekom pamięci i wielokrotnym wywołaniom.
-      signalrService.connection.off("BoardUpdated", onBoardUpdate);
-      signalrService.connection.off("HistoryUpdated", onHistoryUpdate);
+const handleCardActionCompleted = async (eventPayload: { success: boolean, newBudget?: number }) => {
+  if (eventPayload.success && gameData.value) {
+    if (typeof eventPayload.newBudget === 'number') {
+      currentGlobalBudget.value = eventPayload.newBudget;
     }
-  });
+    if (playerMenuRef.value) {
+      playerMenuRef.value.fetchGameLog();
+      playerMenuRef.value.fetchTeamBud();
+    }
+    await fetchPawns();
+    await fetchRivalPawns();
+  }
+};
 
+const handleBudgetChangeFromMenu = (newBudgetFromMenu: number) => {
+  currentGlobalBudget.value = newBudgetFromMenu;
+};
+
+const showLeftPanel = () => { rightOpen.value = false; leftOpen.value = true; };
+const showRightPanel = () => { leftOpen.value = false; rightOpen.value = true; };
+
+const fetchPawns = async () => {
+  if (!gameData.value?.gameId || !gameData.value.boardConfig?.boardId) return;
+  try {
+    const response = await apiServices.get<RawPawnData[]>(
+      apiConfig.player.getPawns(gameData.value.gameId, gameData.value.teamId, gameData.value.boardConfig.boardId)
+    );
+    pawns.value = response.data.map(p => ({
+      id: p.gpId!,
+      x: Number(p.posX),
+      y: Number(p.posY),
+      color: p.color!,
+      name: p.name!
+    }));
+  } catch (err: any) {
+    console.error("Błąd pobierania pionków:", err);
+  }
+};
+
+const fetchRivalPawns = async () => {
+  if (!gameData.value?.gameId || !gameData.value.rivalBoardConfig?.boardId) return;
+  try {
+    const response = await apiServices.get<RawPawnData[]>(
+      apiConfig.player.getRivalPawns(gameData.value.gameId, gameData.value.rivalBoardConfig.boardId)
+    );
+    enemypawns.value = response.data.map(p => ({
+      id: p.teamId!,
+      x: Number(p.posX),
+      y: Number(p.posY),
+      color: p.teamColor!,
+      name: p.teamName!
+    }));
+  } catch (err: any) {
+    console.error("Błąd pobierania pionków rynku:", err);
+  }
+};
+
+// --- LOGIKA SIGNALR ---
+const onBoardUpdate = (data: any) => {
+  console.log("SignalR: Otrzymano 'BoardUpdated'. Odświeżam stan planszy.", data);
+  fetchPawns();
+  fetchRivalPawns();
+};
+
+const onHistoryUpdate = () => {
+  console.log("SignalR: Otrzymano 'HistoryUpdated'. Odświeżam historię.");
+  if (playerMenuRef.value) {
+    playerMenuRef.value.fetchGameLog();
+  }
+};
+
+let isSignalRInitialized = false;
+
+watch(() => props.teamToken, async (newToken) => {
+  if (!newToken) return;
+  await fetchGameDataByToken(newToken);
+  if (gameData.value?.gameId && !isSignalRInitialized) {
+    isSignalRInitialized = true;
+    try {
+      await signalrService.start();
+      await signalrService.joinGameRoom(String(gameData.value.gameId));
+      console.log(`SignalR: Połączono i dołączono do pokoju gry ${gameData.value.gameId}`);
+      signalrService.connection.on("BoardUpdated", onBoardUpdate);
+      signalrService.connection.on("HistoryUpdated", onHistoryUpdate);
+    } catch (err) {
+      console.error("Błąd połączenia SignalR w playerView: ", err);
+    }
+  }
+}, { immediate: true });
+
+onMounted(() => {
+  console.log("PlayerView zamontowany.");
+});
+
+onUnmounted(() => {
+  if (gameData.value?.gameId) {
+    console.log(`SignalR: Opuszczanie pokoju gry ${gameData.value.gameId}`);
+    signalrService.leaveGameRoom(String(gameData.value.gameId));
+    signalrService.connection.off("BoardUpdated", onBoardUpdate);
+    signalrService.connection.off("HistoryUpdated", onHistoryUpdate);
+  }
+});
 </script>
 
 <style scoped>

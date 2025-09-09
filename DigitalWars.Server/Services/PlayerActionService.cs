@@ -32,15 +32,24 @@ namespace backend.Services
 
         public async Task<object> PlayCardAsync(int cardId, CardDataDTO cardData, bool wasSuccess)
         {
+            var cardEntity = await _context.Cards.FirstOrDefaultAsync(c => c.Card_Id == cardId);
+
+            if (cardEntity == null)
+            {
+                throw new Exception($"Karta o identyfikatorze użytkownika (Card_Id) {cardId} nie została znaleziona.");
+            }
+
+            // --- DALSZA LOGIKA UŻYWA JUŻ POPRAWNEGO, BAZODANOWEGO ID ---
             var team = await _context.Teams
                 .Include(t => t.Games_Events)
                 .FirstOrDefaultAsync(t => t.Teams_Id == cardData.TeamId);
 
             if (team == null) throw new Exception($"Drużyna o ID {cardData.TeamId} nie została znaleziona.");
 
-            var isDecision = await _context.Decisions.AnyAsync(d => d.Cards_Id == cardId);
-            var isHardware = await _context.Hardwares.AnyAsync(h => h.Cards_Id == cardId);
-            var isSoftware = await _context.Softwares.AnyAsync(s => s.Cards_Id == cardId);
+            // ZMIANA: Używamy cardEntity.Cards_Id zamiast 'cardId'
+            var isDecision = await _context.Decisions.AnyAsync(d => d.Cards_Id == cardEntity.Cards_Id);
+            var isHardware = await _context.Hardwares.AnyAsync(h => h.Cards_Id == cardEntity.Cards_Id);
+            var isSoftware = await _context.Softwares.AnyAsync(s => s.Cards_Id == cardEntity.Cards_Id);
 
             bool isItem = isHardware || isSoftware;
             bool finalStatus = isItem || wasSuccess;
@@ -58,24 +67,26 @@ namespace backend.Services
                 }
             }
 
+            // ZMIANA: Używamy cardEntity.Cards_Id do znalezienia feedbacku
             var feedback = await _context.Feedbacks
                 .AsNoTracking()
-                .FirstOrDefaultAsync(f => f.Cards_Id == cardId && f.Cards.Decks_Id == cardData.DeckId && f.Status == finalStatus);
+                .FirstOrDefaultAsync(f => f.Cards_Id == cardEntity.Cards_Id && f.Cards.Decks_Id == cardData.DeckId && f.Status == finalStatus);
 
             var gameLogEntry = new GameLog
             {
                 Data = DateTime.UtcNow,
                 Teams_Id = cardData.TeamId,
                 Games_Id = cardData.GameId,
-                Cards_Id = cardId,
+                // KLUCZOWA ZMIANA: Przypisujemy prawdziwe ID z bazy danych, a nie to od użytkownika
+                Cards_Id = cardEntity.Cards_Id,
                 Boards_Id = cardData.BoardId,
                 Feedbacks_Id = feedback?.Feedbacks_Id,
                 Costs = finalCost,
                 Status = finalStatus,
-                Is_Approved = team.Is_Independent || cardData.ForceExecution ? (bool?)null : false
+                Is_Approved = team.Is_Independent || cardData.ForceExecution ? (bool?)true : false
             };
             _context.GameLogs.Add(gameLogEntry);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // Teraz to zapytanie powinno się powieść
 
             if (team.Games_Events != null && team.Turns_Left > 0)
             {
