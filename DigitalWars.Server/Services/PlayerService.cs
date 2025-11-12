@@ -37,8 +37,8 @@ namespace backend.Services
                     gls.Games_Logs.Games_Id == gameId &&
                     gls.Games_Logs.Teams_Id == teamId &&
                     gls.Games_Processes_Id.HasValue &&
-                    gls.Games_Processes.Processes_Id != null)
-                .GroupBy(gls => gls.Games_Processes.Processes_Id)
+                    gls.Games_Processes != null)
+                .GroupBy(gls => gls.Games_Processes!.Processes_Id)
                 .Select(group => new
                 {
                     ProcessId = group.Key,
@@ -61,14 +61,14 @@ namespace backend.Services
                     gb.Games_Id == gameId &&
                     gb.Teams_Id == teamId &&
                     gb.Games_Processes_Id != null &&
-                    gb.Games_Processes.Processes_Id != null)
+                    gb.Games_Processes != null)
                 .ToListAsync();
 
             _logger.LogInformation("Znaleziono {Count} pionków-procesów na planszy do potencjalnej aktualizacji.", gameBoardEntriesToUpdate.Count);
 
             foreach (var entry in gameBoardEntriesToUpdate)
             {
-                if (movesByGeneralProcessId.TryGetValue(entry.Games_Processes.Processes_Id, out var newPosition))
+                if (entry.Games_Processes != null && movesByGeneralProcessId.TryGetValue(entry.Games_Processes.Processes_Id, out var newPosition))
                 {
                     var finalX = newPosition.FinalPosX / PositionDivisor;
                     var finalY = newPosition.FinalPosY / PositionDivisor;
@@ -94,15 +94,20 @@ namespace backend.Services
         public async Task SetTeamPosAsync(int gameId, int teamId)
         {
             var processPawns = await _context.GameBoards
-                .Where(gb => gb.Games_Id == gameId && gb.Teams_Id == teamId && gb.Games_Processes_Id != null)
-                .Select(gb => new PawnData
-                {
-                    ProcessId = gb.Games_Processes.Processes_Id,
-                    PosX = gb.Poz_X,
-                    PosY = gb.Poz_Y,
-                    Weight = gb.Games_Processes.Processes.Processes_Weight
-                })
-                .ToListAsync();
+            .Where(gb =>
+                gb.Games_Id == gameId &&
+                gb.Teams_Id == teamId &&
+                gb.Games_Processes_Id != null &&
+                gb.Games_Processes != null &&
+                gb.Games_Processes.Processes != null)
+            .Select(gb => new PawnData
+            {
+                ProcessId = gb.Games_Processes!.Processes!.Processes_Id,
+                PosX = gb.Poz_X,
+                PosY = gb.Poz_Y,
+                Weight = gb.Games_Processes.Processes.Processes_Weight
+            })
+            .ToListAsync();
 
             if (!processPawns.Any())
             {

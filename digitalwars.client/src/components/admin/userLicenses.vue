@@ -42,19 +42,25 @@
   import apiConfig from '@/services/apiConfig.js';
   import apiService from '@/services/apiServices.js';
 
-  const licencesData = ref({
+interface LicencesData {
+    gamesInSession: number;
+    gamesInTotal:number;
+    licensesLeft: number;
+  }
+
+  const licencesData = ref<LicencesData>({
     gamesInSession: 0,
     gamesInTotal: 0,
     licensesLeft: 0,
   });
 
-  onMounted(async () => {
+ onMounted(async () => {
     try {
-      const response = await apiService.get(apiConfig.admin.settings.licenses)
+      const response = await apiService.get<LicencesData>(apiConfig.admin.settings.licenses)
 
       licencesData.value = {
         gamesInSession: response.data.gamesInSession,
-        gamesInTotal: response.data.gamesFinished,
+        gamesInTotal: response.data.gamesInTotal,
         licensesLeft: response.data.licensesLeft
       };
     } catch (error) {

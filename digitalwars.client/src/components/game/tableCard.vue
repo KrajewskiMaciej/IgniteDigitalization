@@ -82,7 +82,7 @@ import type { PropType } from 'vue';
 // ULEPSZENIE: Zdefiniowano interfejs dla obiektu `table`
 interface Table {
   id: number;
-  name: string;
+  name?: string;
   token: string;
 }
 

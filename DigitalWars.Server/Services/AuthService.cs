@@ -4,13 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using backend.Dtos;
+using BCrypt.Net;
 
 namespace backend.Services
 {
     public interface IAuthService
     {
         Task<(User user, List<Claim> claims)> ValidateUserCredentialsAsync(string username, string password);
-        Task RegisterUserAsync(string username, string email, string password);
+        Task<ErrorResponseDto?> RegisterUserAsync(string username, string email, string password);
         Task ConfirmUserEmailAsync(string token);
         Task InitiatePasswordResetAsync(string email);
         Task<bool> IsPasswordResetTokenValidAsync(string token);
@@ -23,12 +25,16 @@ namespace backend.Services
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IProvisioningService _provisioningService;
+        private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+        private readonly IServiceProvider _serviceProvider;
 
-        public AuthService(AppDbContext context, IEmailService emailService, IProvisioningService provisioningService)
+        public AuthService(AppDbContext context, IEmailService emailService, IProvisioningService provisioningService, IBackgroundTaskQueue backgroundTaskQueue, IServiceProvider serviceProvider)
         {
             _context = context;
             _emailService = emailService;
             _provisioningService = provisioningService;
+            _backgroundTaskQueue = backgroundTaskQueue;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task<(User user, List<Claim> claims)> ValidateUserCredentialsAsync(string username, string password)
@@ -50,10 +56,13 @@ namespace backend.Services
             return (user, claims);
         }
 
-        public async Task RegisterUserAsync(string username, string email, string password)
+        public async Task<ErrorResponseDto?> RegisterUserAsync(string username, string email, string password)
         {
             if (await _context.Users.AnyAsync(u => u.Email == email))
-                throw new Exception("Email już istnieje w systemie.");
+            {
+                // Zamiast "throw", zwracamy obiekt błędu
+                return new ErrorResponseDto { ErrorCode = "EmailExist", Message = "Ten Email już istnieje." };
+            }
 
             var user = new User
             {
@@ -68,8 +77,25 @@ namespace backend.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            await _provisioningService.InitializeNewUserAsync(user.Users_Id);
-            await _emailService.SendConfirmationEmailAsync(user.Email, user.Link_Token, user.Token_Expire_Date);
+            _backgroundTaskQueue.QueueBackgroundWorkItem(async token =>
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var scopedProvisioningService = scope.ServiceProvider.GetRequiredService<IProvisioningService>();
+                var scopedEmailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+
+                try
+                {
+                    await scopedProvisioningService.InitializeNewUserAsync(user.Users_Id);
+                    await scopedEmailService.SendConfirmationEmailAsync(user.Email, user.Link_Token, user.Token_Expire_Date);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            });
+
+            // Zwracamy null, co oznacza, że operacja się powiodła
+            return null;
         }
 
         public async Task ConfirmUserEmailAsync(string token)

@@ -21,5 +21,9 @@ export default defineConfig({
     port: 61536,
     //https: true, 
     strictPort: true, 
+  },
+  build: {
+    outDir: '../DigitalWars.Server/wwwroot',
+    emptyOutDir: true
   }
 })

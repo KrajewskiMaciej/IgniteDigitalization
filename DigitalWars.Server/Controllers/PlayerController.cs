@@ -1,4 +1,4 @@
-using backend.DTOs;
+using backend.Dtos;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -182,17 +182,31 @@ namespace backend.Controllers
 
         [Authorize]
         [HttpPost("game/{gameId}/apply-event")]
-        public async Task<IActionResult> ApplyEvent(int gameId, [FromBody] ApplyEventDto dto)
+        public async Task<IActionResult> ApplyEventToGame(int gameId, [FromBody] ApplyEventDto dto)
         {
-            var team = await _context.Teams.FindAsync(dto.TeamId);
             var gameEvent = await _context.GameEvents.FindAsync(dto.EventId);
+            if (gameEvent == null)
+            {
+                return NotFound(new { message = "Nie znaleziono wydarzenia o podanym ID." });
+            }
 
-            if (team == null || gameEvent == null || team.Games_Id != gameId) return BadRequest();
+            var teamsInGame = await _context.Teams
+                                            .Where(t => t.Games_Id == gameId)
+                                            .ToListAsync();
 
-            team.Games_Events_Id = dto.EventId;
-            team.Turns_Left = gameEvent.Turns_Time;
+            if (!teamsInGame.Any())
+            {
+                return NotFound(new { message = "Nie znaleziono gry o podanym ID lub gra nie ma przypisanych żadnych drużyn." });
+            }
+
+            foreach (var team in teamsInGame)
+            {
+                team.Games_Events_Id = dto.EventId;
+                team.Turns_Left = gameEvent.Turns_Time;
+            }
             await _context.SaveChangesAsync();
-            return Ok(new { message = $"Wydarzenie '{gameEvent.Events_Short_Desc}' zostało aktywowane dla drużyny '{team.Teams_Name}'." });
+
+            return Ok(new { message = $"Wydarzenie '{gameEvent.Events_Short_Desc}' zostało aktywowane dla wszystkich drużyn w grze." });
         }
 
         [HttpGet("game/{gameId}/history-version")]
@@ -292,7 +306,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("success/{cardId}")]
-        public async Task<IActionResult> SendSuccess(int cardId, [FromBody] CardDataDTO cardData)
+        public async Task<IActionResult> SendSuccess(int cardId, [FromBody] CardDataDto cardData)
         {
             try
             {
@@ -306,7 +320,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("failure/{cardId}")]
-        public async Task<IActionResult> SendFailure(int cardId, [FromBody] CardDataDTO cardData)
+        public async Task<IActionResult> SendFailure(int cardId, [FromBody] CardDataDto cardData)
         {
             try
             {
@@ -371,7 +385,7 @@ namespace backend.Controllers
             // Krok 2: Zebranie unikalnych wewnętrznych ID kart z logów
             var cardIds = rawLogs
                 .Where(l => l.Cards_Id.HasValue)
-                .Select(l => l.Cards_Id.Value)
+                .Select(l => l.Cards_Id!.Value)
                 .Distinct()
                 .ToList();
 

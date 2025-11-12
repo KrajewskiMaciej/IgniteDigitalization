@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
-using backend.DTOs;
+using backend.Dtos;
 
 namespace backend.Controllers
 {

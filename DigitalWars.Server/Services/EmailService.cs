@@ -100,7 +100,12 @@ namespace backend.Services
 
             // Krok 3: Przygotuj dynamiczne dane do wstawienia
             var confirmationLink = $"{_frontendSettings.BaseUrl}/confirm/{confirmationToken}";
-            string expireDateString = $"{expireDate.Value:dd.MM.yyyy HH:mm}";
+            string expireDateString = expireDate.HasValue ? $"{expireDate.Value:dd.MM.yyyy HH:mm}" : "brak daty";
+            // Lub jeśli jesteś pewien, że wartość istnieje:
+            if (expireDate.HasValue)
+            {
+                emailBody = emailBody.Replace("{{EXPIRE_DATE}}", $"{expireDate.Value:dd.MM.yyyy HH:mm}");
+            }
 
             // Krok 4: Podmień placeholdery w szablonie
             emailBody = emailBody.Replace("{{CONFIRMATION_LINK}}", confirmationLink);
@@ -131,7 +136,12 @@ namespace backend.Services
 
             var frontendBaseUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
             var resetLink = $"{frontendBaseUrl}/resetPassword/{resetToken}";
-            string expireDateString = $"{expireDate.Value:dd.MM.yyyy HH:mm}";
+            string expireDateString = expireDate.HasValue ? $"{expireDate.Value:dd.MM.yyyy HH:mm}" : "brak daty";
+            // Lub jeśli jesteś pewien, że wartość istnieje:
+            if (expireDate.HasValue)
+            {
+                emailBody = emailBody.Replace("{{EXPIRE_DATE}}", $"{expireDate.Value:dd.MM.yyyy HH:mm}");
+            }
 
             // Krok 4: Podmień placeholdery w szablonie
             emailBody = emailBody.Replace("{{RESET_LINK}}", resetLink);

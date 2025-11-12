@@ -14,7 +14,7 @@ namespace backend.Controllers
     // DTO for status updates
     public class UpdateStatusDto
     {
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
     }
 
     [Route("api/games")]
@@ -58,7 +58,7 @@ namespace backend.Controllers
 
             var activeGames = await _context.Games
                 .Where(g => g.Users_Id == userId.Value && (g.Game_Status == GameStatus.During || g.Game_Status == GameStatus.Paused))
-                .Select(g => new GameListItemDto { Id = g.Games_Id, Name = g.Games_Desc, Status = g.Game_Status.ToString() })
+                .Select(g => new GameListItemDto { Id = g.Games_Id, Name = g.Games_Desc, Status = g.Game_Status.ToString() ?? "" })
                 .ToListAsync();
 
             return Ok(activeGames);

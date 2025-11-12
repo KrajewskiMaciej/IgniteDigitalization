@@ -1,0 +1,25 @@
+{
+  "dependencies": {},
+  "parameters": {
+    "digitalwars-dev.resourceName": {
+      "Name": "digitalwars-dev.resourceName",
+      "Type": null,
+      "Value": "digitalwars-dev"
+    },
+    "digitalwars-dev.resourceGroupName": {
+      "Name": "digitalwars-dev.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "DigitalWars_Dev"
+    },
+    "digitalwars-dev.subscriptionId": {
+      "Name": "digitalwars-dev.subscriptionId",
+      "Type": "subscription",
+      "Value": "dcd48e7a-e6ac-443f-9b94-40413ec5b2ab"
+    },
+    "digitalwars-dev.resourceGroupLocation": {
+      "Name": "digitalwars-dev.resourceGroupLocation",
+      "Type": null,
+      "Value": "polandcentral"
+    }
+  }
+}

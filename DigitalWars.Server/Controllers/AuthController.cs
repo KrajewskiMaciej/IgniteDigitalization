@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using backend.Dtos;
 
 namespace backend.Controllers
 {
@@ -47,12 +48,18 @@ namespace backend.Controllers
         {
             try
             {
-                await _authService.RegisterUserAsync(request.Username, request.Email, request.Password);
+                var result = await _authService.RegisterUserAsync(request.Username, request.Email, request.Password);
+
+                if (result is ErrorResponseDto error)
+                {
+                    return Conflict(error);
+                }
+
                 return Ok(new { success = true, message = "Rejestracja pomyślna. Sprawdź email, aby aktywować konto." });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, $"Wystąpił nieoczekiwany błąd serwera.{ex}");
             }
         }
 

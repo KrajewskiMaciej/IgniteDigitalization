@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace backend.DTOs
+namespace backend.Dtos
 {
     // --- NOWE DTOs DLA BRAKUJĄCYCH ENDPOINTÓW ---
     public class BoardConfigDto
@@ -40,7 +40,7 @@ namespace backend.DTOs
         public List<int> Enablers { get; set; } = new List<int>();
     }
 
-    public class CardDataDTO
+    public class CardDataDto
     {
         public int GameId { get; set; }
         public int TeamId { get; set; }
@@ -100,7 +100,6 @@ namespace backend.DTOs
     public class ApplyEventDto
     {
         public int EventId { get; set; }
-        public int TeamId { get; set; }
     }
 
     public class PlayerHistoryRequestDto

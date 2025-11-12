@@ -149,60 +149,7 @@ import apiConfig from '@/services/apiConfig'
 import apiServices from '@/services/apiServices'
 import signalrService from '@/services/signalService';
 import GameStatusDisplay from '@/components/playerComponents/gameStatusDisplay.vue';
-
-// --- INTERFEJSY ---
-// POPRAWKA: Ujednolicono nazwy z camelCase, tak jak robi to serializator .NET
-interface BoardConfig {
-  boardId: number;
-  name: string;
-  labelsUp: string[];
-  labelsRight: string[];
-  borderColors: string[]; // <-- POPRAWIONA NAZWA
-  description_Down: string;
-  description_Left: string;
-  rows: number;
-  cols: number;
-  cellColor: string;
-  borderColor: string;
-}
-
-interface GameData {
-  teamName: string;
-  teamColor: string;
-  teamBudget: number;
-  deckId: number;
-  teamId: number;
-  gameId: number;
-  IsOnline: boolean;
-  IsIndependent: boolean;
-  boardConfig: BoardConfig;
-  rivalBoardConfig?: BoardConfig;
-}
-
-interface Pawn {
-  id: number;
-  x: number;
-  y: number;
-  color: string;
-  name: string;
-}
-
-interface RawPawnData {
-  gpId?: number;
-  teamId?: number;
-  posX: string | number;
-  posY: string | number;
-  color?: string;
-  teamColor?: string;
-  name?: string;
-  teamName?: string;
-}
-
-interface GameStatusError {
-  title: string;
-  message: string;
-}
-
+import type {BoardConfig, GameData, Pawn, RawPawnData, GameStatusError} from '@/interfaces/types'
 
 // --- PROPSY ---
 const props = defineProps({
@@ -227,8 +174,8 @@ const enemypawns = ref<Pawn[]>([]);
 const playerMenuRef = ref<{ fetchGameLog: () => void; fetchTeamBud: () => void; } | null>(null);
 
 const createDefaultBoardConfig = (): BoardConfig => ({
-  boardId: 0, name: 'Ładowanie...', labelsUp: [], labelsRight: [], description_Down: '',
-  description_Left: '', rows: 8, cols: 8, cellColor: '#fefae0', borderColor: '#595959', borderColors: [] // <-- POPRAWIONA NAZWA
+  boardId: 0, name: 'Ładowanie...', labelsUp: [], labelsRight: [], descriptionDown: '',
+  descriptionLeft: '', rows: 8, cols: 8, cellColor: '#fefae0', borderColor: '#595959', borderColors: [] // <-- POPRAWIONA NAZWA
 });
 
 const formData = reactive<BoardConfig>(createDefaultBoardConfig());
@@ -286,7 +233,7 @@ const fetchGameDataByToken = async (token: string) => {
             message = data.message || "Ta gra została już zakończona.";
             break;
         }
-      } else if (status === 404) {
+      } else{
           title = "Nie znaleziono Gry";
           message = data.message || "Nie znaleziono gry lub drużyny dla podanego tokena.";
       }
@@ -299,7 +246,6 @@ const fetchGameDataByToken = async (token: string) => {
     isLoading.value = false;
   }
 };
-
 
 const handleCardActionCompleted = async (eventPayload: { success: boolean, newBudget?: number }) => {
   if (eventPayload.success && gameData.value) {

@@ -83,11 +83,13 @@
   import apiConfig from '@/services/apiConfig.js';
   import apiService from '@/services/apiServices.js';
 
+  // --- POPRAWKA: Definicja interfejsu dla odpowiedzi API ---
+  interface ConfirmEmailResponse {
+    success: boolean;
+  }
+
   const router = useRouter();
-
   const time = ref(20);
-
-  //Ta zmienna przechowuje czy token jest poprawny (nie istnieje albo wygasł) domyślnie false
   const isTokenValid = ref(false);
 
   const handleReturnToLogin = () => {
@@ -96,13 +98,17 @@
   };
 
   onMounted(async () => {
-
-    const token = router.currentRoute.value.params.token;
+    const tokenParam = router.currentRoute.value.params.token;
+    // --- POPRAWKA: Upewniamy się, że token jest pojedynczym stringiem ---
+    const token = Array.isArray(tokenParam) ? tokenParam[0] : tokenParam;
 
     console.log("Token", token);
     if (token) {
       try {
-        const response = await apiService.get(apiConfig.auth.confirmEmail(token));
+        // --- POPRAWKA: Dodajemy typ generyczny do wywołania API ---
+        const response = await apiService.get<ConfirmEmailResponse>(apiConfig.auth.confirmEmail(token));
+        
+        // Teraz TypeScript wie, że response.data.success istnieje i jest typu boolean
         if (response.data.success) {
           isTokenValid.value = true;
         }
@@ -111,7 +117,7 @@
         isTokenValid.value = false;
       }
     }
-    //Odliczanie czasu do przekierowania z powrotem do logowania tylko jeżeli token jest poprawny
+
     if (isTokenValid.value) {
       const interval = setInterval(() => {
         if (time.value > 0) {

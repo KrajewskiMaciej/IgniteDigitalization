@@ -38,24 +38,28 @@
   import { reactive, ref } from 'vue';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { faArrowRight, faArrowLeft, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+  
+  // KROK 1: Zaimportuj interfejs, aby TypeScript pomagał w przyszłości
+  import type { BoardConfig } from '@/interfaces/types';
 
   const posX = ref(0);
   const posY = ref(0);
 
-  const formData = reactive({
-    Name: 'Plansza podstawowa',
-    LabelsUp: ['Podstawowa kordynacja', 'Standaryzacja procesów', 'Zintegrowane działania', 'Pełna integracja strategiczna'],
-    LabelsRight: ['Nowicjusz', 'Naśladowca', 'Innowator', 'Lider cyfrowy'],
-    DescriptionDown: 'Poziom integracji wew/zew',
-    DescriptionLeft: 'Zawansowanie Cyfrowe',
-    Rows: 8,
-    Cols: 8,
-    CellColor: '#fefae0',
-    BorderColor: '#595959',
-    BorderColors: ['#008000', '#FFFF00', '#FFA500', '#FF0000']
+  // KROK 2: Użyj interfejsu i popraw nazwy pól oraz dodaj brakujące 'boardId'
+  const formData = reactive<BoardConfig>({
+    boardId: 0, // <-- DODANE BRAKUJĄCE POLE
+    name: 'Plansza podstawowa', // <-- ZMIENIONA WIELKOŚĆ LITER
+    labelsUp: ['Podstawowa kordynacja', 'Standaryzacja procesów', 'Zintegrowane działania', 'Pełna integracja strategiczna'],
+    labelsRight: ['Nowicjusz', 'Naśladowca', 'Innowator', 'Lider cyfrowy'],
+    descriptionDown: 'Poziom integracji wew/zew',
+    descriptionLeft: 'Zawansowanie Cyfrowe',
+    rows: 8,
+    cols: 8,
+    cellColor: '#fefae0',
+    borderColor: '#595959',
+    borderColors: ['#008000', '#FFFF00', '#FFA500', '#FF0000']
   });
 
-  // Uproszczone funkcje ruchu bez sprawdzania granic
   const moveLeft = () => {
     posX.value--;
   };

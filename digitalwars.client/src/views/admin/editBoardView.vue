@@ -34,29 +34,27 @@
 
                     <form class="mt-4">
                         <boardInfo
-                            v-model:name="formData.Name"
-                            :cols="formData.LabelsUp.length * 2"
-                            :rows="formData.LabelsRight.length * 2"
-                            @update="validateDescriptions"
+                            v-model:name="formData.name"
+                            :cols="formData.cols"
+                            :rows="formData.rows"
+                            @blur="validateDescriptions"
                         />
 
                         <boardColorSettings
-                            v-model:cellColor="formData.CellColor"
-                            v-model:borderColor="formData.BorderColor"
-                            v-model:borderColors="formData.BorderColors"
-                            @update="validateDescriptions"
+                            v-model:cellColor="formData.cellColor"
+                            v-model:borderColor="formData.borderColor"
+                            v-model:borderColors="formData.borderColors"
                         />
 
                         <boardLabelsEditors
-                            v-model:labelsUp="formData.LabelsUp"
-                            v-model:labelsRight="formData.LabelsRight"
-                            @update="validateDescriptions"
+                            v-model:labelsUp="formData.labelsUp"
+                            v-model:labelsRight="formData.labelsRight"
                         />
 
                         <boardDescriptions
-                            v-model:descriptionDown="formData.DescriptionDown"
-                            v-model:descriptionLeft="formData.DescriptionLeft"
-                            @update="validateDescriptions"
+                            v-model:descriptionDown="formData.descriptionDown"
+                            v-model:descriptionLeft="formData.descriptionLeft"
+                            @blur="validateDescriptions"
                         />
 
                         <button
@@ -81,7 +79,6 @@
                     />
                 </div>
             </div>
-
         </div>
     </div>
 </template>
@@ -100,8 +97,10 @@ import boardDescriptions from '@/components/editBoard/boardDescriptions.vue';
 import apiConfig from '@/services/apiConfig';
 import apiService from '@/services/apiServices';
 
-// --- DEFINICJE INTERFEJSÓW ---
-interface Board {
+// --- INTERFEJSY ---
+
+// Interfejs reprezentujący obiekt Board zwracany przez API (z konwencją snake_case)
+interface ApiBoard {
   boards_Id: number;
   name: string;
   labels_Up: string;
@@ -115,60 +114,49 @@ interface Board {
   borders_Colors: string;
 }
 
-interface FormData {
-  BoardId: number;
-  Name: string;
-  LabelsUp: string[];
-  LabelsRight: string[];
-  DescriptionDown: string;
-  DescriptionLeft: string;
-  Rows: number;
-  Cols: number;
-  CellColor: string;
-  BorderColor: string;
-  BorderColors: string[];
+// Ujednolicony interfejs używany wewnątrz komponentu (z konwencją camelCase)
+interface BoardConfig {
+  boardId: number;
+  name: string;
+  labelsUp: string[];
+  labelsRight: string[];
+  descriptionDown: string;
+  descriptionLeft: string;
+  rows: number;
+  cols: number;
+  cellColor: string;
+  borderColor: string;
+  borderColors: string[];
 }
 
-interface PreviewConfig {
-    Name: string;
-    LabelsUp: string[];
-    LabelsRight: string[];
-    DescriptionDown: string;
-    DescriptionLeft: string;
-    Rows: number;
-    Cols: number;
-    CellColor: string;
-    BorderColor: string;
-    BorderColors: string[];
-}
 
-// --- ZMIENNE REAKTYWNE Z TYPOWANIEM ---
+// --- ZMIENNE REAKTYWNE ---
 const selectedBoardId = ref<number | undefined>(undefined);
 const activeView = ref<'add' | 'edit'>('add');
 const toast = useToast();
 
-const data = reactive<{ boards: Board[] }>({
+const data = reactive<{ boards: ApiBoard[] }>({
   boards: []
 });
 
-const getDefaultFormData = (): FormData => ({
-  BoardId: 0,
-  Name: 'Nowa plansza',
-  LabelsUp: ['Etykieta 1', 'Etykieta 2', 'Etykieta 3', 'Etykieta 4'],
-  LabelsRight: ['Etykieta A', 'Etykieta B', 'Etykieta C', 'Etykieta D'],
-  DescriptionDown: 'Opis dolny',
-  DescriptionLeft: 'Opis lewy',
-  Rows: 8,
-  Cols: 8,
-  CellColor: '#ffffff',
-  BorderColor: '#000000',
-  BorderColors: ['#008000', '#FFFF00', '#FFA500', '#FF0000']
+// Funkcja zwracająca domyślny, czysty obiekt BoardConfig
+const getDefaultFormData = (): BoardConfig => ({
+  boardId: 0,
+  name: 'Nowa plansza',
+  labelsUp: ['Etykieta 1', 'Etykieta 2', 'Etykieta 3', 'Etykieta 4'],
+  labelsRight: ['Etykieta A', 'Etykieta B', 'Etykieta C', 'Etykieta D'],
+  descriptionDown: 'Opis dolny',
+  descriptionLeft: 'Opis lewy',
+  rows: 8,
+  cols: 8,
+  cellColor: '#ffffff',
+  borderColor: '#000000',
+  borderColors: ['#008000', '#FFFF00', '#FFA500', '#FF0000']
 });
 
-const formData = reactive<FormData>(getDefaultFormData());
+const formData = reactive<BoardConfig>(getDefaultFormData());
 
 // --- WŁAŚCIWOŚCI OBLICZENIOWE ---
-// POPRAWKA: Tworzy nową tablicę z poprawną nazwą klucza 'boardId' dla komponentu boardSelector
 const boardsForSelector = computed(() => {
   return data.boards.map(board => ({
     boardId: board.boards_Id,
@@ -177,19 +165,25 @@ const boardsForSelector = computed(() => {
 });
 
 // --- WATCHERY ---
-watch(() => formData.LabelsUp, (newLabels) => {
+watch(() => formData.labelsUp, (newLabels) => {
   if (Array.isArray(newLabels)) {
-    formData.Cols = newLabels.length * 2;
+    formData.cols = newLabels.length * 2;
   }
 }, { deep: true });
 
-watch(() => formData.LabelsRight, (newLabels) => {
+watch(() => formData.labelsRight, (newLabels) => {
   if (Array.isArray(newLabels)) {
-    formData.Rows = newLabels.length * 2;
+    formData.rows = newLabels.length * 2;
   }
 }, { deep: true });
 
-watch(selectedBoardId, () => loadSelectedBoard());
+watch(selectedBoardId, (id) => {
+  if (id) {
+    loadSelectedBoard(id);
+  } else {
+    resetForm();
+  }
+});
 
 watch(activeView, (newView) => {
   resetForm();
@@ -213,7 +207,7 @@ const arrayToString = (arr: string[]): string => {
 // --- LOGIKA BIZNESOWA ---
 const fetchBoardsFromAPI = async () => {
   try {
-    const response = await apiService.get<Board[]>(apiConfig.boards.getAll);
+    const response = await apiService.get<ApiBoard[]>(apiConfig.boards.getAll);
     data.boards = response.data;
     if (data.boards.length === 0 && activeView.value === 'edit') {
       toast.info("Brak plansz do edycji, przełączam na dodawanie.");
@@ -230,59 +224,57 @@ const resetForm = () => {
   selectedBoardId.value = undefined;
 };
 
-const loadSelectedBoard = () => {
-  if (!selectedBoardId.value) {
+// Mapowanie danych z ApiBoard na wewnętrzny BoardConfig
+const loadSelectedBoard = (boardId: number) => {
+  const selectedBoard = data.boards.find(board => board.boards_Id === boardId);
+  if (!selectedBoard) {
+    toast.error('Nie znaleziono wybranej planszy.');
     resetForm();
     return;
   }
-  
-  const selectedBoard = data.boards.find(board => board.boards_Id === selectedBoardId.value);
-  if (!selectedBoard) {
-    toast.error('Nie znaleziono wybranej planszy.');
-    return;
-  }
 
-  formData.BoardId = selectedBoard.boards_Id;
-  formData.Name = selectedBoard.name;
-  formData.LabelsUp = stringToArray(selectedBoard.labels_Up);
-  formData.LabelsRight = stringToArray(selectedBoard.labels_Right);
-  formData.DescriptionDown = selectedBoard.description_Down;
-  formData.DescriptionLeft = selectedBoard.description_Left;
-  formData.Rows = selectedBoard.rows;
-  formData.Cols = selectedBoard.cols;
-  formData.CellColor = selectedBoard.cell_Color;
-  formData.BorderColor = selectedBoard.border_Color;
-  formData.BorderColors = stringToArray(selectedBoard.borders_Colors);
+  formData.boardId = selectedBoard.boards_Id;
+  formData.name = selectedBoard.name;
+  formData.labelsUp = stringToArray(selectedBoard.labels_Up);
+  formData.labelsRight = stringToArray(selectedBoard.labels_Right);
+  formData.descriptionDown = selectedBoard.description_Down;
+  formData.descriptionLeft = selectedBoard.description_Left;
+  formData.rows = selectedBoard.rows;
+  formData.cols = selectedBoard.cols;
+  formData.cellColor = selectedBoard.cell_Color;
+  formData.borderColor = selectedBoard.border_Color;
+  formData.borderColors = stringToArray(selectedBoard.borders_Colors);
 
-  toast.success(`Załadowano planszę: ${formData.Name}`);
+  toast.success(`Załadowano planszę: ${formData.name}`);
 };
 
 const saveBoard = async () => {
   try {
-    if (!formData.Name.trim()) {
+    if (!formData.name.trim()) {
       toast.error('Nazwa planszy jest wymagana!');
       return;
     }
-    if (formData.LabelsUp.some(label => !label.trim()) || formData.LabelsRight.some(label => !label.trim())) {
+    if (formData.labelsUp.some(label => !label.trim()) || formData.labelsRight.some(label => !label.trim())) {
       toast.error('Wszystkie etykiety muszą być wypełnione!');
       return;
     }
     
+    // Mapowanie danych z BoardConfig na format oczekiwany przez API
     const payload = {
-      Name: formData.Name,
-      Labels_Up: arrayToString(formData.LabelsUp),
-      Labels_Right: arrayToString(formData.LabelsRight),
-      Description_Down: formData.DescriptionDown,
-      Description_Left: formData.DescriptionLeft,
-      Rows: formData.Rows,
-      Cols: formData.Cols,
-      Cell_Color: formData.CellColor,
-      Border_Color: formData.BorderColor,
-      Borders_Colors: arrayToString(formData.BorderColors)
+      Name: formData.name,
+      Labels_Up: arrayToString(formData.labelsUp),
+      Labels_Right: arrayToString(formData.labelsRight),
+      Description_Down: formData.descriptionDown,
+      Description_Left: formData.descriptionLeft,
+      Rows: formData.rows,
+      Cols: formData.cols,
+      Cell_Color: formData.cellColor,
+      Border_Color: formData.borderColor,
+      Borders_Colors: arrayToString(formData.borderColors)
     };
 
     if (activeView.value === 'add') {
-      const response = await apiService.post<Board>(apiConfig.boards.create, payload);
+      const response = await apiService.post<ApiBoard>(apiConfig.boards.create, payload);
       toast.success(`Plansza "${response.data.name}" dodana pomyślnie!`);
       await fetchBoardsFromAPI();
       resetForm();
@@ -291,7 +283,7 @@ const saveBoard = async () => {
         toast.warning('Wybierz planszę do edycji!');
         return;
       }
-      const response = await apiService.put<Board>(apiConfig.boards.update(selectedBoardId.value), payload);
+      const response = await apiService.put<ApiBoard>(apiConfig.boards.update(selectedBoardId.value), payload);
       toast.success(`Plansza "${response.data.name}" zaktualizowana pomyślnie!`);
       await fetchBoardsFromAPI();
     }
@@ -330,32 +322,21 @@ const deleteBoard = async () => {
 };
 
 const validateDescriptions = () => {
-  if (!formData.DescriptionDown?.trim()) {
-    formData.DescriptionDown = 'Opis dolny';
+  if (!formData.descriptionDown?.trim()) {
+    formData.descriptionDown = 'Opis dolny';
     toast.warning("Opis dolny nie może być pusty. Ustawiono wartość domyślną.");
   }
-  if (!formData.DescriptionLeft?.trim()) {
-    formData.DescriptionLeft = 'Opis lewy';
+  if (!formData.descriptionLeft?.trim()) {
+    formData.descriptionLeft = 'Opis lewy';
     toast.warning("Opis lewy nie może być pusty. Ustawiono wartość domyślną.");
   }
 };
 
 // --- COMPUTED & LIFECYCLE ---
-const previewConfig = computed<PreviewConfig>(() => {
-  return {
-    Name: formData.Name,
-    LabelsUp: formData.LabelsUp,
-    LabelsRight: formData.LabelsRight,
-    DescriptionDown: formData.DescriptionDown,
-    DescriptionLeft: formData.DescriptionLeft,
-    Rows: formData.Rows,
-    Cols: formData.Cols,
-    CellColor: formData.CellColor,
-    BorderColor: formData.BorderColor,
-    BorderColors: formData.BorderColors
-  };
+const previewConfig = computed<BoardConfig>(() => {
+    // Bezpośrednie użycie formData, ponieważ ma już poprawny kształt
+    return { ...formData };
 });
 
 onMounted(fetchBoardsFromAPI);
 </script>
-

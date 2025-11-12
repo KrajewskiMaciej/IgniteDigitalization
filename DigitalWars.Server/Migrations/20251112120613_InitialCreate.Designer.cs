@@ -12,7 +12,7 @@ using backend.Data;
 namespace DigitalWars.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250907190205_InitialCreate")]
+    [Migration("20251112120613_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -439,6 +439,12 @@ namespace DigitalWars.Server.Migrations
 
                     b.Property<int?>("Boards_Id")
                         .HasColumnType("int");
+
+                    b.Property<double?>("Booster_X")
+                        .HasColumnType("double");
+
+                    b.Property<double?>("Booster_Y")
+                        .HasColumnType("double");
 
                     b.Property<int?>("Cards_Id")
                         .HasColumnType("int");

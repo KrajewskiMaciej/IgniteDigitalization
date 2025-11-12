@@ -1,5 +1,5 @@
 using backend.Data;
-using backend.DTOs;
+using backend.Dtos;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

@@ -511,7 +511,9 @@ namespace DigitalWars.Server.Migrations
                     Feedbacks_Id = table.Column<int>(type: "int", nullable: true),
                     Costs = table.Column<double>(type: "double", nullable: true),
                     Status = table.Column<bool>(type: "tinyint(1)", nullable: true),
-                    Is_Approved = table.Column<bool>(type: "tinyint(1)", nullable: true)
+                    Is_Approved = table.Column<bool>(type: "tinyint(1)", nullable: true),
+                    Booster_X = table.Column<double>(type: "double", nullable: true),
+                    Booster_Y = table.Column<double>(type: "double", nullable: true)
                 },
                 constraints: table =>
                 {

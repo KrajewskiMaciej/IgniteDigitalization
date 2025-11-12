@@ -1,5 +1,5 @@
 using backend.Data;
-using backend.DTOs;
+using backend.Dtos;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ namespace backend.Services
             var playedCardInternalIds = await _context.GameLogs
                 .AsNoTracking()
                 .Where(gl => gl.Games_Id == gameId && gl.Teams_Id == teamId && gl.Status == true && gl.Cards_Id.HasValue)
-                .Select(gl => gl.Cards_Id.Value)
+                .Select(gl => gl.Cards_Id!.Value)
                 .Distinct()
                 .ToHashSetAsync();
 
@@ -50,12 +50,13 @@ namespace backend.Services
                 .AsNoTracking()
                 .Where(ce => ce.Games_Id == null && ce.Enablers_Id.HasValue)
                 .Include(ce => ce.Enablers)
-                .Where(ce => !playedCardInternalIds.Contains(ce.Enablers_Id.Value))
+                .Where(ce => ce.Enablers != null)
+                .Where(ce => !playedCardInternalIds.Contains(ce.Enablers_Id!.Value))
                 .GroupBy(ce => ce.Cards_Id)
                 .Select(g => new
                 {
                     CardId = g.Key,
-                    RequiredPublicCardIds = g.Select(ce => ce.Enablers.Card_Id).ToList()
+                    RequiredPublicCardIds = g.Select(ce => ce.Enablers!.Card_Id).ToList()
                 })
                 .ToDictionaryAsync(x => x.CardId, x => x.RequiredPublicCardIds);
 
@@ -146,7 +147,7 @@ namespace backend.Services
                 .Include(t => t.Games).ThenInclude(g => g.Rivals_Boards)
                 .FirstOrDefaultAsync(t => t.Teams_Token == teamToken);
 
-            if (team.Games.Teams_Boards == null) throw new Exception("Błąd konfiguracji gry: Brak danych planszy.");
+            if (team!.Games.Teams_Boards == null) throw new Exception("Błąd konfiguracji gry: Brak danych planszy.");
 
             // Reszta kodu pozostaje bez zmian
             return new
@@ -195,14 +196,20 @@ namespace backend.Services
         {
             return await _context.GameBoards
                 .AsNoTracking()
-                .Where(gb => gb.Games_Id == gameId && gb.Teams_Id == teamId && gb.Boards_Id == boardId && gb.Games_Processes_Id != null)
+                .Where(gb =>
+                    gb.Games_Id == gameId &&
+                    gb.Teams_Id == teamId &&
+                    gb.Boards_Id == boardId &&
+                    gb.Games_Processes_Id != null &&
+                    gb.Games_Processes != null &&
+                    gb.Games_Processes.Processes != null)
                 .Select(gb => new
                 {
                     GPId = gb.Games_Processes_Id,
                     PosX = gb.Poz_X,
                     PosY = gb.Poz_Y,
-                    Color = gb.Games_Processes.Processes.Processes_Color,
-                    Name = gb.Games_Processes.Processes.Processes_Desc
+                    Color = gb.Games_Processes!.Processes!.Processes_Color,
+                    Name = gb.Games_Processes!.Processes!.Processes_Desc
                 })
                 .ToListAsync();
         }

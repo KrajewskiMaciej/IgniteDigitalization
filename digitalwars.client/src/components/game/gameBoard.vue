@@ -13,27 +13,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import * as d3 from 'd3';
 import { useToast } from 'vue-toastification';
 import type { PropType, Ref } from 'vue';
-
-// --- DEFINICJE INTERFEJSÓW ---
-interface BoardConfig {
-  cols: number;
-  rows: number;
-  cellColor?: string;
-  borderColor?: string;
-  labelsUp?: string[];
-  labelsRight?: string[];
-  descriptionLeft?: string;
-  descriptionDown?: string;
-  borderColors?: string[];
-}
-
-interface Pawn {
-  id: number;
-  x: number;
-  y: number;
-  color: string;
-  name?: string;
-}
+import type { BoardConfig, Pawn } from '@/interfaces/types';
 
 // --- PROPSY ---
 const props = defineProps({
@@ -116,7 +96,7 @@ const drawBoard = () => {
   svg.append("text").attr("x", marginLeft.value + boardSizeX.value / 2).attr("y", boardSizeY.value + marginTop.value + 40).attr("text-anchor", "middle").attr("font-size", cellSize.value * 0.3).attr("font-weight", "bold").attr("fill", "white").text(descDown);
 
   // --- KLUCZOWA POPRAWKA ---
-  const borderColors = (props.config as any).Borders_Colors || props.config.borderColors || ['#008000', '#FFFF00', '#FFA500', '#FF0000'];
+  const borderColors = (props.config as any).Borders_Colors || props.config.borderColors;
   // --- KONIEC POPRAWKI ---
 
   for (let i = 0; i < props.config.cols; i += 2) { svg.append("line").attr("x1", marginLeft.value + i * cellSize.value).attr("y1", marginTop.value).attr("x2", marginLeft.value + (i + 2) * cellSize.value).attr("y2", marginTop.value).attr("stroke", borderColors[(i / 2) % borderColors.length]).attr("stroke-width", 3); }

@@ -13,6 +13,7 @@ dist
 dist-ssr
 coverage
 *.local
+obj
 
 /cypress/videos/
 /cypress/screenshots/

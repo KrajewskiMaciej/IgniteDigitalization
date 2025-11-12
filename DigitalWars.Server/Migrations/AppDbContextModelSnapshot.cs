@@ -437,6 +437,12 @@ namespace DigitalWars.Server.Migrations
                     b.Property<int?>("Boards_Id")
                         .HasColumnType("int");
 
+                    b.Property<double?>("Booster_X")
+                        .HasColumnType("double");
+
+                    b.Property<double?>("Booster_Y")
+                        .HasColumnType("double");
+
                     b.Property<int?>("Cards_Id")
                         .HasColumnType("int");
 

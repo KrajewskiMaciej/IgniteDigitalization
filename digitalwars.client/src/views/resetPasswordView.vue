@@ -144,43 +144,51 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue';
-  import { useToast } from 'vue-toastification';
+  import { useToast, POSITION } from 'vue-toastification'; // <-- KROK 1: Import POSITION
   import passwordStrength from '@/components/auth/passwordStrength.vue';
   import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
   import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
   import { useRouter } from 'vue-router';
   import apiConfig from '@/services/apiConfig.js';
   import apiService from '@/services/apiServices.js';
+
+  // --- KROK 2: Definicje interfejsów dla odpowiedzi API ---
+  interface ValidateTokenResponse {
+    valid: boolean;
+  }
+  interface ResetPasswordResponse {
+    success: boolean;
+  }
+  
   const toast = useToast();
-
   const router = useRouter();
-
-
-
-
   const token = ref('');
 
   onMounted(async () => {
-    token.value = router.currentRoute.value.params.token;
+    // --- KROK 3: Poprawne przypisanie tokenu ---
+    const tokenParam = router.currentRoute.value.params.token;
+    token.value = Array.isArray(tokenParam) ? tokenParam[0] : tokenParam;
+
+    if (!token.value) {
+      isTokenValid.value = false;
+      return;
+    }
 
     try {
-      const res = await apiService.get(apiConfig.auth.validateResetToken(token.value));
+      // --- KROK 4: Otypowanie odpowiedzi API ---
+      const res = await apiService.get<ValidateTokenResponse>(apiConfig.auth.validateResetToken(token.value));
       isTokenValid.value = res.data.valid;
     } catch (err) {
       isTokenValid.value = false;
       toast.error('Token wygasł lub jest nieprawidłowy.', {
-        position: 'top-center',
+        position: POSITION.TOP_CENTER, // <-- KROK 5: Użycie POSITION
       });
     }
   });
 
-
-  //Ta zmienna przechowuję czy token jest poprawny (nie istnieje albo wygasł) domyślnie false
   const isTokenValid = ref(false);
-
   const showPassword = ref(false);
   const showConfirmPassword = ref(false);
-
   const isLoading = ref(false);
 
   const changePasswordData = ref({
@@ -188,15 +196,13 @@
     confirmPassword: ''
   });
 
-  const passwordRequirements = computed(() => {
-    return {
-      length: changePasswordData.value.password.length >= 8,
-      uppercase: /[A-Z]/.test(changePasswordData.value.password),
-      lowercase: /[a-z]/.test(changePasswordData.value.password),
-      digit: /[0-9]/.test(changePasswordData.value.password),
-      special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(changePasswordData.value.password)
-    };
-  });
+  const passwordRequirements = computed(() => ({
+    length: changePasswordData.value.password.length >= 8,
+    uppercase: /[A-Z]/.test(changePasswordData.value.password),
+    lowercase: /[a-z]/.test(changePasswordData.value.password),
+    digit: /[0-9]/.test(changePasswordData.value.password),
+    special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(changePasswordData.value.password)
+  }));
 
   const allPasswordRequirementsMet = computed(() => {
     const req = passwordRequirements.value;
@@ -207,48 +213,38 @@
 
   const handleReturnToLogin = () => {
     sessionStorage.setItem('showLoginAfterRedirect', 'true');
-    router.push('/')
+    router.push('/');
   }
 
   const handleChangePassword = async () => {
-
-    toast.clear(); // Czyszczenie toastów przed nową zmianą hasła, żeby uniknąć zalania komunikatami
-
-    const errorPasswordsNotMatch = changePasswordData.value.password !== changePasswordData.value.confirmPassword;
-
-    if (errorPasswordsNotMatch) {
+    toast.clear();
+    if (changePasswordData.value.password !== changePasswordData.value.confirmPassword) {
       toast.error("Hasła się nie zgadzają!", {
-        position: "top-center",
+        position: POSITION.TOP_CENTER, // <-- KROK 5: Użycie POSITION
       });
       return;
     }
 
     try {
       isLoading.value = true;
-      const response = await apiService.post(apiConfig.auth.resetPassword, {
+      const response = await apiService.post<ResetPasswordResponse>(apiConfig.auth.resetPassword, {
         token: token.value,
         newPassword: changePasswordData.value.password
       });
 
       if (response.data.success) {
-        console.log('✅ Hasło zmienione pomyślnie!');
         toast.success("Pomyślnie zmieniono hasło!", {
-          position: 'top-center',
+          position: POSITION.TOP_CENTER, // <-- KROK 5: Użycie POSITION
         });
         router.push('/');
       }
-    } catch (error) {
+    } catch (error: any) { // <-- KROK 6: Otypowanie błędu
       console.error('❌ Wystąpił błąd:', error.response?.data || error.message);
       toast.error("Wystąpił błąd! Spróbuj ponownie", {
-        position: "top-center",
+        position: POSITION.TOP_CENTER, // <-- KROK 5: Użycie POSITION
       });
-    }
-
-    finally {
+    } finally {
       isLoading.value = false;
     }
-
-
   };
-
 </script>

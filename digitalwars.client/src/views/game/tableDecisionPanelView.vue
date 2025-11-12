@@ -180,7 +180,7 @@
   interface DecisionLog { isEventNotification: boolean; timestamp: string; feedbackDescription: string; cardId?: number; cardTitle?: string; tableId?: number; tableName?: string; result?: 'Pozytywny' | 'Negatywny'; eventAppliedId?: number | null; }
   interface PendingDecision { logId: number; cardId: number; cardTitle: string; tableId: number; tableName: string; timestamp: string; }
   interface Pawn { id: number; x: number; y: number; color: string; name: string; }
-  interface BoardConfig { name: string; labelsUp: string[]; labelsRight: string[]; descriptionDown: string; descriptionLeft: string; rows: number; cols: number; cellColor: string; borderColor: string; borderColors: string[]; }
+  interface BoardConfig {boardId: number, name: string; labelsUp: string[]; labelsRight: string[]; descriptionDown: string; descriptionLeft: string; rows: number; cols: number; cellColor: string; borderColor: string; borderColors: string[]; }
   interface RawHistoryLog { isEventNotification: boolean; eventDescription: string; timestamp: string; cardId: number; cardTitle: string; teamId: number; teamName: string; feedbackDescription: string; status: boolean; gameEventId: number | null; }
   interface RawPendingLog { logId: number; cardId: number; cardTitle: string; teamId: number; teamName: string; timestamp: string; }
   interface RawPawn { gpId: number; posX: string; posY: string; color: string; name: string; }
@@ -191,7 +191,7 @@
   });
 
 const toast = useToast();
-const formData = reactive<BoardConfig>({name: '', labelsUp: [], labelsRight: [], descriptionDown: '', descriptionLeft: '', rows: 8, cols: 8, cellColor: '#ffffff', borderColor: '#000000', borderColors: [] });
+const formData = reactive<BoardConfig>({boardId: 0, name: '', labelsUp: [], labelsRight: [], descriptionDown: '', descriptionLeft: '', rows: 8, cols: 8, cellColor: '#ffffff', borderColor: '#000000', borderColors: [] });
 
   const loading = reactive({ teamData: true, cards: true, items: true, history: true, pending: true });
   const teamData = ref<TeamData | null>(null);

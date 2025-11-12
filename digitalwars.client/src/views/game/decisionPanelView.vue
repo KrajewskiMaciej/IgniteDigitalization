@@ -551,16 +551,12 @@
   };
   
   async function applySelectedEvent() {
-    if (!selectedTableId.value) {
-      toast("Proszę najpierw wybrać stół.");
-      return;
-    }
     if (!selectedPendingEventIndex.value) {
         toast("Proszę wybrać zdarzenie do aktywacji.");
         return;
     }
     try {
-      await apiServices.post(apiConfig.player.applyEvent(gameId), { eventId: selectedPendingEventIndex.value, teamId: selectedTableId.value });
+      await apiServices.post(apiConfig.player.applyEvent(gameId), { eventId: selectedPendingEventIndex.value});
       toast.success("Zdarzenie zostało aktywowane!");
     } catch (error: any) {
       toast.error("Błąd podczas aktywacji zdarzenia.");

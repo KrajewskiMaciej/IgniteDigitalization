@@ -1,4 +1,4 @@
-namespace backend.DTOs
+namespace backend.Dtos
 {
     public class ErrorResponseDto
     {

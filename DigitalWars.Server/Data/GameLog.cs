@@ -18,8 +18,10 @@ namespace backend.Data
         public Feedback? Feedbacks { get; set; }
         public double? Costs { get; set; }
         public bool? Status { get; set; }
-
         public bool? Is_Approved { get; set; }
+        public double? Booster_X { get; set; }
+        public double? Booster_Y { get; set; }
+
 
         public virtual ICollection<GameLogSpec> GameLogSpecs { get; set; } = new HashSet<GameLogSpec>();
     }

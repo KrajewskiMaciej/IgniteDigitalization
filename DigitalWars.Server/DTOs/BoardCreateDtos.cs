@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace backend.DTOs
+namespace backend.Dtos
 {
     public class BoardCreateDto
     {

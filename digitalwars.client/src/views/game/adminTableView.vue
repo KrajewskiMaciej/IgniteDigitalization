@@ -28,21 +28,21 @@
   const toast = useToast();
 
   const loadingTables = ref(false);
-  const fetchError = ref(null);
+  const fetchError = ref<string | null>(null); // Ulepszone typowanie dla błędu
 
-  //Logika koloru stołu po ID
-  const getTableColor = (tableId) => {
-
+  // --- POPRAWKA: Dodano typ 'number' do parametru 'tableId' ---
+  const getTableColor = (tableId: number) => {
+    // Tutaj twoja logika
   };
 
   // Pobieranie stołów
   const fetchTables = async () => {
-
+    // Tutaj twoja logika
   };
 
-  // Aktualizacja statusu stołu
-  const handleUpdateTableStatus = async ({ tableId, newStatus }) => {
-
+  // --- POPRAWKA: Otypowano cały obiekt przekazywany do funkcji ---
+  const handleUpdateTableStatus = async ({ tableId, newStatus }: { tableId: number; newStatus: string }) => {
+    // Tutaj twoja logika
   };
 
   onMounted(() => {

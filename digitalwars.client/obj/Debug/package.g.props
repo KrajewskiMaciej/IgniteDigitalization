@@ -33,6 +33,8 @@
     <PackageJsonDevdependenciesTypesNode Condition="$(PackageJsonDevdependenciesTypesNode) == ''">^20.12.12</PackageJsonDevdependenciesTypesNode>
     <PackageJsonDevdependenciesVitejsPluginBasicSsl Condition="$(PackageJsonDevdependenciesVitejsPluginBasicSsl) == ''">^1.2.0</PackageJsonDevdependenciesVitejsPluginBasicSsl>
     <PackageJsonDevdependenciesVitejsPluginVue Condition="$(PackageJsonDevdependenciesVitejsPluginVue) == ''">^5.0.4</PackageJsonDevdependenciesVitejsPluginVue>
+    <PackageJsonDevdependenciesVueEslintConfigPrettier Condition="$(PackageJsonDevdependenciesVueEslintConfigPrettier) == ''">^10.2.0</PackageJsonDevdependenciesVueEslintConfigPrettier>
+    <PackageJsonDevdependenciesVueEslintConfigTypescript Condition="$(PackageJsonDevdependenciesVueEslintConfigTypescript) == ''">^14.6.0</PackageJsonDevdependenciesVueEslintConfigTypescript>
     <PackageJsonDevdependenciesVueTsconfig Condition="$(PackageJsonDevdependenciesVueTsconfig) == ''">^0.5.1</PackageJsonDevdependenciesVueTsconfig>
     <PackageJsonDevdependenciesAutoprefixer Condition="$(PackageJsonDevdependenciesAutoprefixer) == ''">^10.4.19</PackageJsonDevdependenciesAutoprefixer>
     <PackageJsonDevdependenciesEslint Condition="$(PackageJsonDevdependenciesEslint) == ''">^9.3.0</PackageJsonDevdependenciesEslint>
@@ -42,7 +44,7 @@
     <PackageJsonDevdependenciesPostcss Condition="$(PackageJsonDevdependenciesPostcss) == ''">^8.4.38</PackageJsonDevdependenciesPostcss>
     <PackageJsonDevdependenciesTailwindcss Condition="$(PackageJsonDevdependenciesTailwindcss) == ''">^3.4.3</PackageJsonDevdependenciesTailwindcss>
     <PackageJsonDevdependenciesTailwindcssAnimated Condition="$(PackageJsonDevdependenciesTailwindcssAnimated) == ''">^1.1.2</PackageJsonDevdependenciesTailwindcssAnimated>
-    <PackageJsonDevdependenciesTypescript Condition="$(PackageJsonDevdependenciesTypescript) == ''">~5.4.5</PackageJsonDevdependenciesTypescript>
+    <PackageJsonDevdependenciesTypescript Condition="$(PackageJsonDevdependenciesTypescript) == ''">^5.9.3</PackageJsonDevdependenciesTypescript>
     <PackageJsonDevdependenciesTypescriptEslint Condition="$(PackageJsonDevdependenciesTypescriptEslint) == ''">^8.7.0</PackageJsonDevdependenciesTypescriptEslint>
     <PackageJsonDevdependenciesVite Condition="$(PackageJsonDevdependenciesVite) == ''">^5.2.11</PackageJsonDevdependenciesVite>
     <PackageJsonDevdependenciesVitePluginVueDevtools Condition="$(PackageJsonDevdependenciesVitePluginVueDevtools) == ''">^7.2.1</PackageJsonDevdependenciesVitePluginVueDevtools>

@@ -67,15 +67,11 @@ namespace backend.Services
                 context.Decks.Add(newDeck);
                 await context.SaveChangesAsync();
 
-                // Krok 1: Wczytaj karty i stwórz niezawodną mapę ID
                 var cardIdMap = await LoadAndMapCardsAsync(context, workbook, newDeck.Decks_Id);
-
-                // Krok 2: Wczytaj procesy i stwórz ich mapę ID
                 var processIdMap = await LoadAndMapEntitiesAsync<Process, int>(context, workbook, "Processes", newDeck.Decks_Id, "Processes_Id", "Processes_Id");
 
-                // Krok 2a: Wczytaj wydarzenia w grze (GameEvents) powiązane z talią
-                await LoadAndMapEntitiesAsync<GameEvent, int>(context, workbook, "GameEvents", newDeck.Decks_Id, "GameEvents_Id", "GameEvents_Id");
-                // Krok 3: Wczytaj wszystkie encje powiązane, używając poprawnych map
+                await LoadEntitiesWithoutIdMappingAsync<GameEvent>(context, workbook, "GamesEvents", newDeck.Decks_Id);
+
                 LoadRelatedEntities<Decision>(context, workbook, "Decisions", cardIdMap);
                 LoadRelatedEntities<Hardware>(context, workbook, "Hardwares", cardIdMap);
                 LoadRelatedEntities<Software>(context, workbook, "Softwares", cardIdMap);
@@ -83,7 +79,6 @@ namespace backend.Services
                 LoadRelatedEntities<CardWeight>(context, workbook, "CardsWeights", cardIdMap, processIdMap);
                 LoadRelatedEntities<CardEnabler>(context, workbook, "CardsEnablers", cardIdMap);
 
-                // Krok 4: Zapisz wszystkie dodane encje powiązane w jednej transakcji
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
@@ -128,69 +123,27 @@ namespace backend.Services
             }
         }
 
-        // =========================================================================================
-        // === GŁÓWNA POPRAWKA: CAŁKOWICIE PRZEPISANA METODA DLA NIEZAWODNOŚCI I WYDAJNOŚCI ===
-        // =========================================================================================
-        private async Task<Dictionary<int, int>> LoadAndMapCardsAsync(AppDbContext context, XLWorkbook workbook, int deckId)
+        private async Task LoadEntitiesWithoutIdMappingAsync<TEntity>(AppDbContext context, XLWorkbook workbook, string sheetName, int deckId) where TEntity : class, new()
         {
-            var sheet = workbook.Worksheet("Cards");
+            var sheet = workbook.Worksheet(sheetName);
             if (sheet == null)
             {
-                _logger.LogWarning("Nie znaleziono arkusza 'Cards' w pliku Excel.");
-                return new Dictionary<int, int>();
+                _logger.LogWarning("Arkusz '{SheetName}' nie został znaleziony, pomijanie.", sheetName);
+                return;
             }
 
-            // Krok 1: Odczytaj wszystkie karty z Excela i przygotuj je do wstawienia
-            var cardsToAdd = new List<Card>();
-            foreach (var row in sheet.RowsUsed().Skip(1))
-            {
-                if (row.Cell(1).TryGetValue(out int cardIdFromExcel))
-                {
-                    cardsToAdd.Add(new Card
-                    {
-                        Decks_Id = deckId,
-                        Card_Id = cardIdFromExcel, // Zapisz oryginalne ID z Excela
-                    });
-                }
-            }
-
-            if (!cardsToAdd.Any())
-            {
-                _logger.LogWarning("Arkusz 'Cards' jest pusty lub nie zawiera prawidłowych ID kart.");
-                return new Dictionary<int, int>();
-            }
-
-            // Krok 2: Dodaj wszystkie karty do bazy w jednej operacji i zapisz
-            context.Cards.AddRange(cardsToAdd);
-            await context.SaveChangesAsync();
-
-            // Krok 3: Stwórz mapę. Teraz `cardsToAdd` zawiera obiekty z nowymi,
-            // wygenerowanymi przez bazę kluczami głównymi `Cards_Id`.
-            // Mapa tłumaczy stary ID z Excela (`card.Card_Id`) na nowy ID z bazy (`card.Cards_Id`)
-            var idMap = cardsToAdd.ToDictionary(
-                card => card.Card_Id,      // Klucz: stary ID z Excela
-                card => card.Cards_Id      // Wartość: nowy, auto-inkrementowany ID z bazy danych
-            );
-
-            return idMap;
-        }
-
-        private async Task<Dictionary<TKey, TKey>> LoadAndMapEntitiesAsync<TEntity, TKey>(AppDbContext context, XLWorkbook workbook, string sheetName, int deckId, string excelIdColumn, string dbIdColumn) where TEntity : class, new() where TKey : notnull
-        {
-            var idMap = new Dictionary<TKey, TKey>();
-            var sheet = workbook.Worksheet(sheetName);
-            if (sheet == null) return idMap;
             var properties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
+            var headers = sheet.Row(1).CellsUsed().ToDictionary(cell => cell.Address.ColumnNumber, cell => cell.GetString());
             var entitiesToAdd = new List<TEntity>();
 
             foreach (var row in sheet.RowsUsed().Skip(1))
             {
                 var entity = new TEntity();
                 properties.GetValueOrDefault("Decks_Id")?.SetValue(entity, deckId);
+
                 foreach (var cell in row.CellsUsed())
                 {
-                    var propName = sheet.Cell(1, cell.Address.ColumnNumber).GetString();
-                    if (properties.TryGetValue(propName, out var prop))
+                    if (headers.TryGetValue(cell.Address.ColumnNumber, out var propName) && properties.TryGetValue(propName, out var prop))
                     {
                         prop.SetValue(entity, ConvertValue(cell.GetString(), prop.PropertyType, cell.DataType));
                     }
@@ -201,13 +154,111 @@ namespace backend.Services
             if (entitiesToAdd.Any())
             {
                 await context.Set<TEntity>().AddRangeAsync(entitiesToAdd);
+                _logger.LogInformation("Przygotowano {Count} encji typu '{EntityType}' z arkusza '{SheetName}' do dodania.", entitiesToAdd.Count, typeof(TEntity).Name, sheetName);
+            }
+        }
+
+        private async Task<Dictionary<int, int>> LoadAndMapCardsAsync(AppDbContext context, XLWorkbook workbook, int deckId)
+        {
+            var sheet = workbook.Worksheet("Cards");
+            if (sheet == null)
+            {
+                _logger.LogWarning("Nie znaleziono arkusza 'Cards' w pliku Excel.");
+                return new Dictionary<int, int>();
+            }
+
+            var cardsToAdd = new List<Card>();
+            foreach (var row in sheet.RowsUsed().Skip(1))
+            {
+                if (row.Cell(1).TryGetValue(out int cardIdFromExcel))
+                {
+                    cardsToAdd.Add(new Card
+                    {
+                        Decks_Id = deckId,
+                        Card_Id = cardIdFromExcel,
+                    });
+                }
+            }
+
+            if (!cardsToAdd.Any())
+            {
+                _logger.LogWarning("Arkusz 'Cards' jest pusty lub nie zawiera prawidłowych ID kart.");
+                return new Dictionary<int, int>();
+            }
+
+            context.Cards.AddRange(cardsToAdd);
+            await context.SaveChangesAsync();
+
+            var idMap = cardsToAdd.ToDictionary(
+                card => card.Card_Id,
+                card => card.Cards_Id
+            );
+
+            return idMap;
+        }
+
+        private async Task<Dictionary<TKey, TKey>> LoadAndMapEntitiesAsync<TEntity, TKey>(AppDbContext context, XLWorkbook workbook, string sheetName, int deckId, string excelIdColumn, string dbIdColumn) where TEntity : class, new() where TKey : notnull
+        {
+            var sheet = workbook.Worksheet(sheetName);
+            if (sheet == null)
+            {
+                _logger.LogWarning("Arkusz '{SheetName}' nie został znaleziony, pomijanie.", sheetName);
+                return new Dictionary<TKey, TKey>();
+            }
+
+            var properties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
+            var headers = sheet.Row(1).CellsUsed().ToDictionary(cell => cell.Address.ColumnNumber, cell => cell.GetString());
+            var entitiesWithExcelId = new List<(TEntity entity, TKey excelId)>();
+
+            foreach (var row in sheet.RowsUsed().Skip(1))
+            {
+                var entity = new TEntity();
+                properties.GetValueOrDefault("Decks_Id")?.SetValue(entity, deckId);
+                TKey? excelIdValue = default;
+
+                var excelIdCell = row.CellsUsed().FirstOrDefault(c => headers.ContainsKey(c.Address.ColumnNumber) && headers[c.Address.ColumnNumber].Equals(excelIdColumn, StringComparison.OrdinalIgnoreCase));
+                if (excelIdCell != null)
+                {
+                    var convertedId = ConvertValue(excelIdCell.GetString(), properties[excelIdColumn].PropertyType, excelIdCell.DataType);
+                    if (convertedId is TKey id)
+                    {
+                        excelIdValue = id;
+                    }
+                }
+
+                if (excelIdValue == null || excelIdValue.Equals(default(TKey)))
+                {
+                    throw new InvalidDataException($"Brak lub nieprawidłowa wartość w kolumnie ID '{excelIdColumn}' w arkuszu '{sheetName}' w wierszu {row.RowNumber()}.");
+                }
+
+                foreach (var cell in row.CellsUsed())
+                {
+                    if (headers.TryGetValue(cell.Address.ColumnNumber, out var propName) && properties.TryGetValue(propName, out var prop))
+                    {
+                        if (prop.Name.Equals(dbIdColumn, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+                        var convertedValue = ConvertValue(cell.GetString(), prop.PropertyType, cell.DataType);
+                        prop.SetValue(entity, convertedValue);
+                    }
+                }
+                entitiesWithExcelId.Add((entity, excelIdValue));
+            }
+
+            if (entitiesWithExcelId.Any())
+            {
+                await context.Set<TEntity>().AddRangeAsync(entitiesWithExcelId.Select(t => t.entity));
                 await context.SaveChangesAsync();
-                idMap = entitiesToAdd.ToDictionary(
-                    entity => (TKey)properties[excelIdColumn].GetValue(entity)!,
-                    entity => (TKey)properties[dbIdColumn].GetValue(entity)!
+
+                var dbIdProperty = properties[dbIdColumn];
+                return entitiesWithExcelId.ToDictionary(
+                    t => t.excelId,
+                    t => (TKey)dbIdProperty.GetValue(t.entity)!
                 );
             }
-            return idMap;
+
+            return new Dictionary<TKey, TKey>();
         }
 
         private void LoadRelatedEntities<TEntity>(AppDbContext context, XLWorkbook workbook, string sheetName, Dictionary<int, int> cardIdMap, Dictionary<int, int>? processIdMap = null) where TEntity : class, new()
@@ -215,8 +266,13 @@ namespace backend.Services
             var sheet = workbook.Worksheet(sheetName);
             if (sheet == null) return;
             var properties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
-            var cardForeignKeyPropertyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Cards_Id", "Enabler_Cards_Id" };
+
+            var cardForeignKeyPropertyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Cards_Id", "Enablers_Id" };
+
             var headers = sheet.Row(1).CellsUsed().ToDictionary(cell => cell.Address.ColumnNumber, cell => cell.GetString());
+
+            var primaryKeyColumnName = sheetName.TrimEnd('s') + "_Id";
+            var primaryKeyColumnNamePlural = sheetName + "_Id";
 
             foreach (var row in sheet.RowsUsed().Skip(1))
             {
@@ -225,9 +281,27 @@ namespace backend.Services
                 foreach (var cell in row.CellsUsed())
                 {
                     if (!headers.TryGetValue(cell.Address.ColumnNumber, out var headerName) || string.IsNullOrWhiteSpace(headerName)) continue;
+
+                    if (string.Equals(headerName, primaryKeyColumnName, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(headerName, primaryKeyColumnNamePlural, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
                     string propertyName = headerName;
-                    if (string.Equals(headerName, "Card_Id", StringComparison.OrdinalIgnoreCase) || string.Equals(headerName, "CardId", StringComparison.OrdinalIgnoreCase)) propertyName = "Cards_Id";
-                    else if (string.Equals(headerName, "ProcessId", StringComparison.OrdinalIgnoreCase)) propertyName = "Processes_Id";
+
+                    if (string.Equals(headerName, "Card_Id", StringComparison.OrdinalIgnoreCase) || string.Equals(headerName, "CardId", StringComparison.OrdinalIgnoreCase))
+                    {
+                        propertyName = "Cards_Id";
+                    }
+                    else if (string.Equals(headerName, "Enablers_Id", StringComparison.OrdinalIgnoreCase) || string.Equals(headerName, "Enabler_Id", StringComparison.OrdinalIgnoreCase) || string.Equals(headerName, "Enabler_Card_Id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        propertyName = "Enablers_Id";
+                    }
+                    else if (string.Equals(headerName, "ProcessId", StringComparison.OrdinalIgnoreCase) || string.Equals(headerName, "Processes_Id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        propertyName = "Processes_Id";
+                    }
 
                     if (!properties.TryGetValue(propertyName, out var prop)) continue;
 
@@ -257,14 +331,44 @@ namespace backend.Services
             }
         }
 
+        /// <summary>
+        /// Poprawiona metoda, która poprawnie konwertuje liczby ujemne i zmiennoprzecinkowe.
+        /// </summary>
         private object? ConvertValue(string val, Type targetType, XLDataType dataType)
         {
             if (string.IsNullOrWhiteSpace(val)) return null;
+
             targetType = Nullable.GetUnderlyingType(targetType) ?? targetType;
-            if (targetType == typeof(bool)) return bool.Parse(val);
-            if (targetType == typeof(int)) return int.TryParse(val, CultureInfo.InvariantCulture, out int result) ? result : null;
-            if (targetType == typeof(double)) return double.TryParse(val, CultureInfo.InvariantCulture, out double result) ? result : null;
-            if (targetType == typeof(DateTime)) return DateTime.TryParse(val, CultureInfo.InvariantCulture, out DateTime result) ? result : null;
+
+            // Normalizujemy string, zamieniając przecinek na kropkę, aby zapewnić spójne parsowanie liczb.
+            string normalizedVal = val.Replace(',', '.');
+
+            if (targetType == typeof(bool))
+            {
+                if (val == "1") return true;
+                if (val == "0") return false;
+                return bool.TryParse(val, out var result) ? result : null;
+            }
+
+            if (targetType == typeof(int))
+            {
+                // NumberStyles.Integer pozwala na znak wiodący (np. "-"), co zapewnia obsługę liczb ujemnych.
+                return int.TryParse(normalizedVal, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result) ? result : null;
+            }
+
+            if (targetType == typeof(double))
+            {
+                // NumberStyles.Float pozwala na znak wiodący i separator dziesiętny.
+                // Dzięki normalizacji, CultureInfo.InvariantCulture poprawnie zinterpretuje kropkę.
+                return double.TryParse(normalizedVal, NumberStyles.Float, CultureInfo.InvariantCulture, out var result) ? result : null;
+            }
+
+            if (targetType == typeof(DateTime))
+            {
+                // Próbujemy sparsować datę, obsługując kilka popularnych formatów
+                return DateTime.TryParse(val, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result) ? result : null;
+            }
+
             return val;
         }
     }
