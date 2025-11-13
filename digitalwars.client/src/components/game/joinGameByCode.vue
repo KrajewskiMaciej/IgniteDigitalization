@@ -1,89 +1,109 @@
 <template>
-  <div v-if="props.isVisible" class="fixed inset-0 flex items-center justify-center z-50">
-    <div class="absolute inset-0 bg-black/70" @click="closeModal"></div>
+  <div
+    v-if="props.isVisible"
+    class="fixed inset-0 flex items-center justify-center z-50 md:p-4 lg:p-6 xl:p-8"
+  >
+    <div
+      class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 md:block hidden"
+      @click="closeModal"
+    ></div>
 
     <div
-      class="flex flex-col justify-start items-center bg-primary text-white rounded-lg w-96 relative z-10 border-2 border-accent p-6 sm:p-8 md:p-10 lg:p-12 animate-jump-in"
+      class="bg-gradient-to-br from-surface-850 to-surface-900 text-surface-0 relative z-50 transition-all duration-300 w-full h-full md:h-auto md:max-w-md lg:max-w-lg md:max-h-[95vh] overflow-y-auto custom-scrollbar md:rounded-2xl md:border md:border-primary-500/30 md:shadow-2xl md:shadow-primary-500/20"
+      :class="
+        props.isVisible
+          ? 'md:scale-100 md:translate-y-0 opacity-100'
+          : 'md:scale-95 md:translate-y-4 opacity-0'
+      "
     >
       <button
         @click="closeModal"
-        class="absolute top-2 right-2 w-8 h-8 flex items-center justify-center"
+        class="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full text-surface-0 hover:text-primary-400 hover:bg-surface-700 backdrop-blur-sm transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30"
       >
-        <font-awesome-icon
-          :icon="faXmark"
-          class="h-5 text-white hover:text-accent transition-all duration-100"
-        />
+        <font-awesome-icon :icon="faXmark" class="text-xl" />
       </button>
 
-      <!-- Widok formularza -->
-      <div v-if="!isScanning" class="animate-fade w-full">
-        <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
-          Dołącz do gry
-        </h2>
-        <div class="w-full h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
-        <form @submit.prevent="validateAndJoin">
-          <div class="mb-4">
-            <input
-              type="text"
-              v-model="code"
-              placeholder="Wprowadź kod gry..."
-              class="w-full px-3 py-3 bg-tertiary border border-lgray-accent rounded-md text-white focus:outline-none focus:border-accent"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            :disabled="isProcessing"
-            class="bg-tertiary hover:bg-accent/80 text-white w-full py-4 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {{ isProcessing ? 'Sprawdzanie...' : 'Dołącz do gry' }}
-          </button>
-        </form>
-        <div class="flex items-center gap-2 my-6">
-          <div class="flex-1 h-px bg-lgray-accent"></div>
-          <span class="text-gray-500 px-2">lub</span>
-          <div class="flex-1 h-px bg-lgray-accent"></div>
-        </div>
-        <button
-          type="button"
-          @click="startScanning"
-          class="bg-tertiary hover:bg-accent text-white w-full py-4 rounded-lg font-medium transition-all duration-300"
-        >
-          <font-awesome-icon :icon="faQrcode" class="mr-2" />
-          Zeskanuj kod QR
-        </button>
-      </div>
+      <div class="px-4 sm:px-6 md:px-8 pt-16 pb-6 sm:pb-8">
+        <div v-if="!isScanning" class="animate-fade w-full">
+          <h1 class="text-3xl sm:text-4xl font-bold mb-6 text-center text-surface-0 font-nasalization bg-clip-text">
+            {{ t('joinTheGame') }}
+          </h1>
+          <div class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-6"></div>
+          
+          <form @submit.prevent="validateAndJoin">
+            <div class="mb-6">
+              <input
+                type="text"
+                v-model="code"
+                :placeholder="t('enterGameCodePlaceholder')"
+                class="w-full px-4 py-4 bg-surface-800 border border-primary-500/30 rounded-xl text-surface-0 placeholder:text-surface-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              :disabled="isProcessing"
+              class="relative w-full py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50"
+            >
+              <span class="relative z-10">{{ isProcessing ? t('checking') : t('joinTheGame') }}</span>
+              <div class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+            </button>
+          </form>
 
-      <!-- Widok skanera -->
-      <div v-else class="w-full">
-        <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-4 text-center">
-          Skanuj kod QR
-        </h2>
-        <div class="mb-4 relative">
-          <qrcode-stream
-            :formats="['qr_code']"
-            @detect="onDetect"
-            @error="onScannerError"
-            @camera-on="onCameraOn"
-            class="rounded-lg overflow-hidden"
+          <div class="flex items-center gap-3 my-6">
+            <div class="flex-1 h-px bg-gradient-to-r from-transparent via-primary-500/30 to-primary-500/30"></div>
+            <span class="text-surface-400 text-sm">lub</span>
+            <div class="flex-1 h-px bg-gradient-to-r from-primary-500/30 to-transparent"></div>
+          </div>
+
+          <button
+            type="button"
+            @click="startScanning"
+            class="relative w-full py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden group bg-surface-800 hover:bg-gradient-to-r hover:from-primary-600/20 hover:to-primary-700/20 border border-primary-500/30 hover:border-primary-500/50 hover:shadow-md hover:shadow-primary-500/20"
           >
-            <div v-if="scanError" class="text-center p-4 bg-red-500/20">
-              <p class="text-red-400">{{ scanError }}</p>
-            </div>
-            <div v-if="!scanError && !cameraReady" class="text-center p-4">
-              <p>Inicjalizacja kamery...</p>
-            </div>
-            <div class="absolute inset-0 pointer-events-none">
-              <!-- ... stylizacja ramki ... -->
-            </div>
-          </qrcode-stream>
+            <span class="relative z-10 flex items-center justify-center gap-2">
+              <font-awesome-icon :icon="faQrcode" />
+              {{ t('scanQRCode') }}
+            </span>
+            <div class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+          </button>
         </div>
-        <button
-          @click="isScanning = false"
-          class="bg-tertiary hover:bg-accent/80 text-white w-full py-3 rounded-lg font-medium transition-all duration-300"
-        >
-          Anuluj
-        </button>
+
+        <div v-else class="w-full animate-fade">
+          <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
+            {{ t('scanQRCode') }}
+          </h2>
+          
+          <div class="mb-6 relative rounded-xl overflow-hidden border-2 border-primary-500/30 shadow-2xl shadow-primary-500/20">
+            <qrcode-stream
+              :formats="['qr_code']"
+              @detect="onDetect"
+              @error="onScannerError"
+              @camera-on="onCameraOn"
+            >
+              <div v-if="scanError" class="text-center p-6 bg-red-500/20 backdrop-blur-sm">
+                <p class="text-red-400">{{ scanError }}</p>
+              </div>
+              <div v-if="!scanError && !cameraReady" class="text-center p-6 bg-surface-800/80 backdrop-blur-sm">
+                <p class="text-surface-300">{{ t('initializingCamera') }}</p>
+              </div>
+              <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-primary-400"></div>
+                <div class="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-primary-400"></div>
+                <div class="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-primary-400"></div>
+                <div class="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-primary-400"></div>
+              </div>
+            </qrcode-stream>
+          </div>
+
+          <button
+            @click="isScanning = false"
+            class="relative w-full py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden group bg-surface-800 hover:bg-gradient-to-r hover:from-primary-600/20 hover:to-primary-700/20 border border-primary-500/30 hover:border-primary-500/50"
+          >
+            <span class="relative z-10">{{ t('cancel') }}</span>
+            <div class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -97,6 +117,9 @@ import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import apiServices from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 interface DetectedBarcode {
   rawValue: string
@@ -159,10 +182,6 @@ const onDetect = (detectedCodes: DetectedBarcode[]) => {
     code.value = decodedText
     validateAndJoin() // Użyj tej samej logiki walidacji
   }
-}
-
-const processScanResult = (decodedText: string) => {
-  // Ta funkcja nie jest już potrzebna, bo onDetect bezpośrednio wywołuje validateAndJoin
 }
 
 const onCameraOn = () => {

@@ -1,3 +1,5 @@
+import JoinGameByCode from "@/components/game/joinGameByCode.vue";
+
 export const en = {
   gameMaster: 'Game Master',
   player: 'Player',
@@ -47,6 +49,16 @@ export const en = {
   passwordChangedSuccessfully: 'Password changed successfully!',
   oldPasswordPlaceholder: 'Old password...',
   newPasswordPlaceholder: 'New password...',
+
+
+  //Scan QR
+  scanQRCode: 'Scan QR Code',
+  scanning: 'Scanning...',
+  joinTheGame: 'Join the game',
+  enterGameCodePlaceholder: 'Enter game code...',
+  checking: 'Checking...',
+  initializingCamera: 'Initializing camera...',
+  cancel: 'Cancel',
 
   //Auth password requirements
   passwordRequirementLength: 'At least 8 characters',

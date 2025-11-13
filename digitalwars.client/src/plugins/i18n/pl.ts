@@ -50,6 +50,10 @@ export const pl = {
   newPasswordPlaceholder: 'Nowe hasło...',
   confirmPasswordPlaceholder: 'Potwierdź hasło...',
 
+
+  //Scan QR
+  
+
   //Auth password requirements
   passwordRequirementLength: 'Co najmniej 8 znaków',
   passwordRequirementUppercase: 'Co najmniej jedna wielka litera',

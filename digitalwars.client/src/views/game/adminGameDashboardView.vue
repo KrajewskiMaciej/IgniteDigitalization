@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-primary">
+  <div class="flex flex-col min-h-screen bg-surface-800">
     <AdminNavbar />
 
     <div class="flex flex-1 mt-2">
