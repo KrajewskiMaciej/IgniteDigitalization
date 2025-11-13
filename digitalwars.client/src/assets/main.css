@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@font-face {
+  font-family: 'Mulish';
+  src: url('/fonts/Mulish-VariableFont.ttf') format('truetype');
+}

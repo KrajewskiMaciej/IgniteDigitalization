@@ -17,6 +17,8 @@ export default {
       },
       fontFamily:  {
         'nasalization': ['Nasalization', 'sans-serif'],
+          mulish: 'Mulish, sans-serif',
+          sans: ['Mulish', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       }
       
     },
