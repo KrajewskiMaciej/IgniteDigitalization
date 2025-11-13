@@ -1,12 +1,14 @@
 <template>
   <div class="px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-3">
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
-      Zaloguj się do konta
+      {{ t('signInToYourAccount') }}
     </h2>
 
     <form @submit.prevent="handleLogin" class="space-y-3 sm:space-y-4">
       <div class="space-y-1">
-        <label for="email" class="block font-bold text-xs sm:text-sm text-left"> E-mail </label>
+        <label for="email" class="block font-bold text-xs sm:text-sm text-left">
+          {{ t('email') }}</label
+        >
         <input
           type="email"
           id="email"
@@ -17,7 +19,9 @@
       </div>
 
       <div class="space-y-1">
-        <label for="password" class="block font-bold text-xs sm:text-sm text-left"> Hasło </label>
+        <label for="password" class="block font-bold text-xs sm:text-sm text-left">
+          {{ t('password') }}
+        </label>
         <div
           class="flex items-center gap-2 bg-tertiary border border-gray-600 rounded-md transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent"
         >
@@ -43,7 +47,7 @@
           class="text-accent hover:text-purple-300 transition-colors cursor-pointer"
           @click="emit('forgotPassword')"
         >
-          Zapomniałem hasła
+          {{ t('forgotPassword') }}
         </span>
       </div>
 
@@ -57,7 +61,7 @@
         "
         :disabled="!isLoginFormValid || isLoading"
       >
-        {{ isLoading ? 'Logowanie...' : 'Zaloguj się' }}
+        {{ isLoading ? t('loggingIn') : t('login') }}
       </button>
     </form>
   </div>
@@ -70,10 +74,11 @@ import { useToast, POSITION } from 'vue-toastification'
 import router from '@/router'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { useAuthStore } from '@/stores/auth'
-
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 // --- KROK 2: Definicja typu dla błędu API ---
 interface ApiError {
   response?: { data?: string }
@@ -116,8 +121,7 @@ const handleLogin = async () => {
   toast.clear()
 
   if (!isLoginFormValid.value) {
-    // --- KROK 4: Użycie enumu POSITION ---
-    toast.error('Proszę wprowadzić poprawny e-mail i hasło.', {
+    toast.error(t('pleaseEnterValidEmailAndPassword'), {
       position: POSITION.TOP_CENTER,
     })
     return
@@ -146,23 +150,20 @@ const handleLogin = async () => {
 
     if (apiError.response?.data) {
       if (apiError.response.data === 'Invalid credentials') {
-        toast.error('Nieprawidłowy e-mail lub hasło. Spróbuj ponownie!', {
+        toast.error(t('invalidEmailOrPassword'), {
           position: POSITION.TOP_CENTER,
         })
       } else if (apiError.response.data.includes('E-mail nie został potwierdzony')) {
-        toast.warning(
-          'E-mail nie został potwierdzony. Wysłano ponownie link aktywacyjny. Sprawdź skrzynkę pocztową!',
-          {
-            position: POSITION.TOP_CENTER,
-          },
-        )
+        toast.warning(t('emailNotConfirmed'), {
+          position: POSITION.TOP_CENTER,
+        })
       } else {
-        toast.error('Wystąpił błąd podczas logowania. Spróbuj ponownie!', {
+        toast.error(t('loginError'), {
           position: POSITION.TOP_CENTER,
         })
       }
     } else {
-      toast.error('Brak połączenia z serwerem. Sprawdź połączenie internetowe.', {
+      toast.error(t('errorServerUnavailable'), {
         position: POSITION.TOP_CENTER,
       })
     }

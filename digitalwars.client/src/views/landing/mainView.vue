@@ -1,7 +1,9 @@
 <template>
   <!--Jest to główny widok, który użytkownik widzi po przejsciu na stronę gry-->
 
-  <div class="bg-surface-850 flex flex-col h-screen w-screen">
+  <div
+    class="bg-gradient-to-br from-surface-800 via-surface-850 to-surface-900 flex flex-col h-screen w-screen"
+  >
     <!--navbar-->
     <Navbar />
 

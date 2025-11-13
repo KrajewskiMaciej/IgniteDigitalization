@@ -2,26 +2,28 @@
   <!--Informacja o potwierdzeniu adresu email-->
   <div class="animate-fade-right">
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
-      Rejestracja zakończona pomyślnie
+      {{ t('registrationSuccessful') }}
     </h2>
 
-    <font-awesome-icon :icon="faEnvelopeOpen" class="mb-3 h-20 text-accent" />
+    <font-awesome-icon :icon="faEnvelopeOpen" class="mb-3 text-6xl text-accent" />
 
-    <div class="w-100 h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
+    <div
+      class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-6 sm:mb-8"
+    ></div>
 
     <div class="text-sm text-gray-300 mb-3">
-      <p>Pozostał już tylko jeden krok</p>
+      <p>{{ t('oneMoreStepLeft') }}</p>
       <p>
-        Na twój adres email: <b>{{ email }}</b>
+        {{ t('toYourEmailAddress') }} <b>{{ email }}</b>
       </p>
-      <p>wysłaliśmy link w celu zweryfikowania adresu e-mail</p>
-      <p>Jeśli nie widzisz wiadomości, sprawdź folder spam.</p>
+      <p>{{ t('weHaveSentVerificationLink') }}</p>
+      <p>{{ t('checkSpamFolder') }}</p>
     </div>
     <span
       class="text-accent hover:text-purple-300 transition-colors cursor-pointer"
       @click="emit('backToLogin')"
     >
-      Przejdź do logowania
+      {{ t('goToLogin') }}
     </span>
   </div>
 </template>
@@ -29,6 +31,9 @@
 <script setup lang="ts">
 import { faEnvelopeOpen } from '@fortawesome/free-regular-svg-icons'
 import { defineProps, defineEmits } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const emit = defineEmits(['backToLogin'])
 

@@ -2,13 +2,13 @@
   <!--Formularz rejestracji użytkownika-->
   <div class="px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-3">
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
-      Utwórz nowe konto
+      {{ t('createNewAccount') }}
     </h2>
 
     <form @submit.prevent="handleRegister" class="space-y-3 sm:space-y-4">
       <div class="space-y-1">
         <label for="register-username" class="block font-bold text-xs sm:text-sm text-left">
-          Nazwa użytkownika
+          {{ t('username') }}
         </label>
         <input
           type="text"
@@ -21,7 +21,7 @@
 
       <div class="space-y-1">
         <label for="register-email" class="block font-bold text-xs sm:text-sm text-left">
-          E-mail
+          {{ t('email') }}
         </label>
         <input
           type="email"
@@ -35,7 +35,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <div class="space-y-1">
           <label for="register-password" class="block font-bold text-xs sm:text-sm text-left">
-            Hasło
+            {{ t('password') }}
           </label>
           <div
             class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-md transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent"
@@ -62,7 +62,7 @@
             for="register-confirm-password"
             class="block font-bold text-xs sm:text-sm text-left"
           >
-            Potwierdź hasło
+            {{ t('confirmPassword') }}
           </label>
           <div
             class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-md transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent"
@@ -96,45 +96,45 @@
               'text-green-500': passwordRequirements.length,
               'text-gray-500': !passwordRequirements.length,
             }"
-            class="text-xs transition-colors duration-300"
+            class="text-sm transition-colors duration-300"
           >
-            Co najmniej 8 znaków
+            {{ t('passwordRequirementLength') }}
           </li>
           <li
             :class="{
               'text-green-500': passwordRequirements.uppercase,
               'text-gray-500': !passwordRequirements.uppercase,
             }"
-            class="text-xs transition-colors duration-300"
+            class="text-sm transition-colors duration-300"
           >
-            Co najmniej jedna duża litera
+            {{ t('passwordRequirementUppercase') }}
           </li>
           <li
             :class="{
               'text-green-500': passwordRequirements.lowercase,
               'text-gray-500': !passwordRequirements.lowercase,
             }"
-            class="text-xs transition-colors duration-300"
+            class="text-sm transition-colors duration-300"
           >
-            Co najmniej jedna mała litera
+            {{ t('passwordRequirementLowercase') }}
           </li>
           <li
             :class="{
               'text-green-500': passwordRequirements.special,
               'text-gray-500': !passwordRequirements.special,
             }"
-            class="text-xs transition-colors duration-300"
+            class="text-sm transition-colors duration-300"
           >
-            Co najmniej jeden znak specjalny
+            {{ t('passwordRequirementSpecialChar') }}
           </li>
           <li
             :class="{
               'text-green-500': passwordRequirements.digit,
               'text-gray-500': !passwordRequirements.digit,
             }"
-            class="text-xs transition-colors duration-300"
+            class="text-sm transition-colors duration-300"
           >
-            Co najmniej jedna cyfra
+            {{ t('passwordRequirementNumber') }}
           </li>
         </ul>
       </div>
@@ -149,7 +149,7 @@
             : 'bg-tertiary'
         "
       >
-        {{ isLoading ? 'Rejestracja...' : 'Zarejestruj się' }}
+        {{ isLoading ? t('creatingAccount') : t('createAccount') }}
       </button>
     </form>
   </div>
@@ -161,6 +161,8 @@ import { ref, computed, defineEmits } from 'vue'
 import { useToast, POSITION } from 'vue-toastification'
 import passwordStrength from './passwordStrength.vue'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 // Poprawiono ścieżki importu
 import apiConfig from '@/services/apiConfig'
@@ -229,7 +231,7 @@ const handleRegister = async () => {
 
   if (registerData.value.password !== registerData.value.confirmPassword) {
     // --- KROK 4: Użycie enumu POSITION ---
-    toast.error('Podane hasła się nie zgadzają!', {
+    toast.error(t('passwordsDoNotMatch'), {
       position: POSITION.TOP_CENTER,
     })
     return
@@ -244,7 +246,7 @@ const handleRegister = async () => {
 
     if (response.data.success) {
       console.log('✅ Zarejestrowano pomyślnie!')
-      toast.success('Pomyślnie zarejestrowano!', {
+      toast.success(t('registrationSuccessful'), {
         position: POSITION.TOP_CENTER,
       })
       emit('switchToConfirmEmail', registerData.value.email)
@@ -256,17 +258,17 @@ const handleRegister = async () => {
 
     if (apiError.response?.data) {
       if (apiError.response.data === 'Email already exist.') {
-        toast.error('Ten e-mail jest już zarejestrowany!', {
+        toast.error(t('emailAlreadyRegistered'), {
           position: POSITION.TOP_CENTER,
         })
       } else {
-        toast.error('Wystąpił błąd podczas rejestracji. Spróbuj ponownie.', {
+        toast.error(t('registrationError'), {
           position: POSITION.TOP_CENTER,
         })
       }
     } else {
       // Ogólny błąd, jeśli struktura jest inna
-      toast.error('Wystąpił nieoczekiwany błąd.', {
+      toast.error(t('errorServerUnavailable'), {
         position: POSITION.TOP_CENTER,
       })
     }

@@ -1,13 +1,13 @@
 <template>
   <div>
-    <h2 class="text-2xl font-nasalization mb-6 text-center">Zmień hasło</h2>
+    <h2 class="text-2xl font-nasalization mb-6 text-center">{{ t('changePassword') }}</h2>
 
     <div class="text-red-500 mt-2 mb-2 text-center" v-show="errorPasswordsNotMatch">
-      <p>Podane hasła się nie zgadzają ❗</p>
+      <p>{{ t('passwordsDoNotMatch') }}</p>
     </div>
 
     <div class="text-red-500 mt-2 mb-2 text-center" v-show="!passwordValid">
-      <p>Hasło nie spełnia wymagań ❗</p>
+      <p>{{ t('passwordDoesntMeetRequirements') }}</p>
     </div>
 
     <form @submit.prevent="handleChangePassword">
@@ -16,7 +16,7 @@
         <input
           :type="showOldPassword ? 'text' : 'password'"
           v-model="changePasswordData.oldPassword"
-          placeholder="Stare hasło..."
+          :placeholder="t('oldPasswordPlaceholder')"
           class="w-full px-3 py-3 bg-tertiary border border-gray-700 rounded-md text-white focus:outline-none focus:border-accent"
           required
         />
@@ -37,7 +37,7 @@
         <input
           :type="showPassword ? 'text' : 'password'"
           v-model="changePasswordData.password"
-          placeholder="Nowe hasło..."
+          :placeholder="t('newPasswordPlaceholder')"
           class="w-full px-3 py-3 bg-tertiary border border-gray-700 rounded-md text-white focus:outline-none focus:border-accent"
           required
         />
@@ -62,7 +62,7 @@
         <input
           :type="showConfirmPassword ? 'text' : 'password'"
           v-model="changePasswordData.confirmPassword"
-          placeholder="Potwierdź hasło..."
+          :placeholder="t('confirmPasswordPlaceholder')"
           class="w-full px-3 py-3 bg-tertiary border border-gray-700 rounded-md text-white focus:outline-none focus:border-accent"
           required
         />
@@ -87,7 +87,7 @@
               'text-gray-500': !passwordRequirements.length,
             }"
           >
-            Co najmniej 8 znaków
+            {{ t('passwordRequirementLength') }}
           </li>
           <li
             :class="{
@@ -95,7 +95,7 @@
               'text-gray-500': !passwordRequirements.uppercase,
             }"
           >
-            Co najmniej jedna duża litera
+            {{ t('passwordRequirementUppercase') }}
           </li>
           <li
             :class="{
@@ -103,7 +103,7 @@
               'text-gray-500': !passwordRequirements.lowercase,
             }"
           >
-            Co najmniej jedna mała litera
+            {{ t('passwordRequirementLowercase') }}
           </li>
           <li
             :class="{
@@ -111,7 +111,7 @@
               'text-gray-500': !passwordRequirements.special,
             }"
           >
-            Co najmniej jeden znak specjalny
+            {{ t('passwordRequirementSpecialChar') }}
           </li>
           <li
             :class="{
@@ -119,7 +119,7 @@
               'text-gray-500': !passwordRequirements.digit,
             }"
           >
-            Co najmniej jedna cyfra
+            {{ t('passwordRequirementNumber') }}
           </li>
         </ul>
       </div>
@@ -128,7 +128,7 @@
         type="submit"
         class="bg-tertiary hover:bg-accent text-white w-full py-4 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60 mb-5"
       >
-        Zmień hasło
+        {{ t('changePassword') }}
       </button>
     </form>
   </div>
@@ -140,6 +140,9 @@ import { ref, computed } from 'vue'
 import { useToast, POSITION } from 'vue-toastification'
 import passwordStrength from './passwordStrength.vue'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // Zakładając istnienie tych plików
 // import apiService from '@/services/apiServices';
@@ -194,7 +197,7 @@ const handleChangePassword = async () => {
   if (!isPasswordCompliant) {
     passwordValid.value = false
     // --- KROK 3: Użycie enumu POSITION ---
-    toast.error('Podane hasło nie spełnia wymagań!', {
+    toast.error(t('passwordDoesntMeetRequirements'), {
       position: POSITION.TOP_CENTER,
     })
     return
@@ -211,7 +214,7 @@ const handleChangePassword = async () => {
     if (response && response.data.success) {
       // Sprawdzenie, czy response nie jest null
       console.log('✅ Hasło zmienione pomyślnie!')
-      toast.success('Pomyślnie zmieniono hasło!', {
+      toast.success(t('passwordChangedSuccessfully'), {
         position: POSITION.TOP_CENTER,
       })
     }
@@ -220,7 +223,7 @@ const handleChangePassword = async () => {
     // --- KROK 5: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
     console.error('❌ Wystąpił błąd:', apiError.response?.data || apiError.message)
-    toast.error('Wystąpił błąd! Spróbuj ponownie', {
+    toast.error(t('errorServerUnavailable'), {
       position: POSITION.TOP_CENTER,
     })
   }

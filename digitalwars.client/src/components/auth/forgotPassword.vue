@@ -1,21 +1,25 @@
 <template>
   <div class="animate-fade" v-if="!isEmailSent">
-    <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
-      Zapomniałeś hasła?
+    <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-4 sm:mb-8 text-center">
+      {{ t('forgotPasswordQuestion') }}
     </h2>
 
-    <font-awesome-icon :icon="faUserLock" class="h-20 mb-3 text-accent" />
+    <font-awesome-icon :icon="faUserLock" class="text-6xl mb-3 text-accent" />
 
-    <div class="w-100 h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
+    <div
+      class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-6 sm:mb-8"
+    ></div>
 
     <form @submit.prevent="handleSendEmail">
-      <div class="text-sm text-gray-300 mt-2 mb-2 text-center">
-        <p>Wprowadź swój adres e-mail.</p>
-        <p>Wyślemy na niego link z instrukcjami do zmiany hasła.</p>
+      <div class="text-gray-300 mt-2 mb-2 text-center">
+        <p>{{ t('enterYourEmail') }}</p>
+        <p>{{ t('weWillSendPasswordResetLink') }}</p>
       </div>
 
       <div class="space-y-1 mb-5">
-        <label for="email" class="block font-bold text-xs sm:text-sm text-left"> E-mail </label>
+        <label for="email" class="block font-bold text-xs sm:text-sm text-left">
+          {{ t('email') }}
+        </label>
         <input
           type="email"
           id="email"
@@ -29,21 +33,21 @@
         type="submit"
         class="bg-tertiary hover:bg-accent text-white w-full rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg mb-5"
       >
-        Zresetuj hasło
+        {{ t('resetPassword') }}
       </button>
 
       <span
         class="text-accent hover:text-purple-300 transition-colors cursor-pointer"
         @click="emit('backToLogin')"
       >
-        Powrót do logowania
+        {{ t('backToLogin') }}
       </span>
     </form>
   </div>
 
   <div v-else class="animate-fade-right">
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
-      Sprawdź swój adres e-mail
+      {{ t('checkYourEmail') }}
     </h2>
 
     <font-awesome-icon :icon="faEnvelopeCircleCheck" class="mb-3 h-20 text-accent" />
@@ -51,11 +55,11 @@
     <div class="w-100 h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
 
     <div class="text-sm text-gray-300 text-center">
-      <p>Wysłaliśmy instrukcje resetowania hasła</p>
+      <p>{{ t('weHaveSentPasswordResetInstructions') }}</p>
       <p>
-        na adres: <b>{{ email }}</b>
+        {{ t('toAddress') }} <b>{{ email }}</b>
       </p>
-      <p>Jeśli nie widzisz wiadomości, sprawdź folder spam.</p>
+      <p>{{ t('checkSpamFolder') }}</p>
     </div>
 
     <button
@@ -68,7 +72,7 @@
       "
       :disabled="!canResend"
     >
-      {{ canResend ? 'Wyślij ponownie' : `Wyślij ponownie za ${countdown}s` }}
+      {{ canResend ? t('resendAgain') : `${t('resendAgainIn')} ${countdown}s` }}
     </button>
   </div>
 </template>
@@ -81,6 +85,8 @@ import { useToast, POSITION } from 'vue-toastification'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
 import { faEnvelopeCircleCheck, faUserLock } from '@fortawesome/free-solid-svg-icons'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 // --- KROK 3: Definicja typu dla błędu API ---
 interface ApiError {
@@ -115,7 +121,7 @@ const handleSendEmail = async () => {
     // --- KROK 4: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
 
-    toast.error('Nieprawidłowy e-mail lub nie istnieje. Spróbuj ponownie!', {
+    toast.error(t('invalidEmailOrEmailDoesntExist'), {
       // --- KROK 5: Użycie enumu POSITION ---
       position: POSITION.TOP_CENTER,
     })

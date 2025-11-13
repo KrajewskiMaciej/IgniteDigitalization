@@ -18,6 +18,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const props = defineProps({
   password: {
@@ -88,13 +90,13 @@ const passwordStrengthText = computed(() => {
   if (props.password.length === 0) {
     return ''
   } else if (passwordStrength.value < 40) {
-    return 'Słabe hasło'
+    return t('weakPassword')
   } else if (passwordStrength.value < 60) {
-    return 'Średnie hasło'
+    return t('moderatePassword')
   } else if (passwordStrength.value < 80) {
-    return 'Dobre hasło'
+    return t('goodPassword')
   } else {
-    return 'Silne hasło'
+    return t('strongPassword')
   }
 })
 
