@@ -14,11 +14,11 @@ export default {
       // Color
       'bg-surface-0 dark:bg-surface-800',
       'text-surface-500 dark:text-white/60',
-      'border-surface-200 dark:border-surface-700'
-    ]
+      'border-surface-200 dark:border-surface-700',
+    ],
   },
   paginatorwrapper: {
-    class: 'mt-[-1px]'
+    class: 'mt-[-1px]',
   },
   firstpagebutton: ({ context }) => ({
     class: [
@@ -43,7 +43,7 @@ export default {
       {
         'hover:border-surface-300 dark:hover:border-surface-200/30': !context.disabled,
         'focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring-2 focus-visible:ring-primary-500 dark:focus-visible:ring-primary-400':
-          !context.disabled
+          !context.disabled,
       },
 
       // Transition
@@ -51,8 +51,8 @@ export default {
 
       // Misc
       'user-none overflow-hidden',
-      { 'cursor-default pointer-events-none opacity-60': context.disabled }
-    ]
+      { 'cursor-default pointer-events-none opacity-60': context.disabled },
+    ],
   }),
   previouspagebutton: ({ context }) => ({
     class: [
@@ -77,7 +77,7 @@ export default {
       {
         'hover:border-surface-300 dark:hover:border-surface-200/30': !context.disabled,
         'focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring-2 focus-visible:ring-primary-500 dark:focus-visible:ring-primary-400':
-          !context.disabled
+          !context.disabled,
       },
 
       // Transition
@@ -85,8 +85,8 @@ export default {
 
       // Misc
       'user-none overflow-hidden',
-      { 'cursor-default pointer-events-none opacity-60': context.disabled }
-    ]
+      { 'cursor-default pointer-events-none opacity-60': context.disabled },
+    ],
   }),
   nextpagebutton: ({ context }) => ({
     class: [
@@ -111,7 +111,7 @@ export default {
       {
         'hover:border-surface-300 dark:hover:border-surface-200/30': !context.disabled,
         'focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring-2 focus-visible:ring-primary-500 dark:focus-visible:ring-primary-400':
-          !context.disabled
+          !context.disabled,
       },
 
       // Transition
@@ -119,8 +119,8 @@ export default {
 
       // Misc
       'user-none overflow-hidden',
-      { 'cursor-default pointer-events-none opacity-60': context.disabled }
-    ]
+      { 'cursor-default pointer-events-none opacity-60': context.disabled },
+    ],
   }),
   lastpagebutton: ({ context }) => ({
     class: [
@@ -145,7 +145,7 @@ export default {
       {
         'hover:border-surface-300 dark:hover:border-surface-200/30': !context.disabled,
         'focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring-2 focus-visible:ring-primary-500 dark:focus-visible:ring-primary-400':
-          !context.disabled
+          !context.disabled,
       },
 
       // Transition
@@ -153,8 +153,8 @@ export default {
 
       // Misc
       'user-none overflow-hidden',
-      { 'cursor-default pointer-events-none opacity-60': context.disabled }
-    ]
+      { 'cursor-default pointer-events-none opacity-60': context.disabled },
+    ],
   }),
   pagebutton: ({ context }) => ({
     class: [
@@ -176,7 +176,7 @@ export default {
       {
         'text-surface-500 dark:text-white/60 border-transparent': !context.active,
         'border-primary-500 dark:border-primary-400 text-primary-500 dark:text-surface-0':
-          context.active
+          context.active,
       },
 
       // State
@@ -184,7 +184,7 @@ export default {
         'hover:border-surface-300 dark:hover:border-surface-200/30':
           !context.disabled && !context.active,
         'focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring-2 focus-visible:ring-primary-500 dark:focus-visible:ring-primary-400':
-          !context.disabled
+          !context.disabled,
       },
 
       // Transition
@@ -192,8 +192,8 @@ export default {
 
       // Misc
       'user-none overflow-hidden',
-      { 'cursor-default pointer-events-none opacity-60': context.disabled }
-    ]
+      { 'cursor-default pointer-events-none opacity-60': context.disabled },
+    ],
   }),
   rowperpagedropdown: {
     root: ({ props, state }) => ({
@@ -221,7 +221,7 @@ export default {
         // States
         {
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 dark:focus-visible:ring-primary-500':
-            !state.focused
+            !state.focused,
         },
 
         // Misc
@@ -230,9 +230,9 @@ export default {
         {
           'opacity-60': props.disabled,
           'pointer-events-none': props.disabled,
-          'cursor-default': props.disabled
-        }
-      ]
+          'cursor-default': props.disabled,
+        },
+      ],
     }),
     input: {
       class: [
@@ -270,8 +270,8 @@ export default {
         'cursor-pointer',
         'overflow-hidden overflow-ellipsis',
         'whitespace-nowrap',
-        'appearance-none'
-      ]
+        'appearance-none',
+      ],
     },
     trigger: {
       class: [
@@ -292,11 +292,11 @@ export default {
 
         // Shape
         'rounded-tr-md',
-        'rounded-br-md'
-      ]
+        'rounded-br-md',
+      ],
     },
     dropdownicon: {
-      class: ''
+      class: '',
     },
     panel: {
       class: [
@@ -312,8 +312,8 @@ export default {
         // Color
         'bg-surface-0 dark:bg-surface-800',
         'text-surface-800 dark:text-white/80',
-        'ring-1 ring-inset ring-surface-300 dark:ring-surface-700'
-      ]
+        'ring-1 ring-inset ring-surface-300 dark:ring-surface-700',
+      ],
     },
     wrapper: {
       class: [
@@ -321,11 +321,11 @@ export default {
         'max-h-[15rem]',
 
         // Misc
-        'overflow-auto'
-      ]
+        'overflow-auto',
+      ],
     },
     list: {
-      class: 'py-1 list-none m-0'
+      class: 'py-1 list-none m-0',
     },
     item: ({ context }) => ({
       class: [
@@ -349,10 +349,11 @@ export default {
         { 'text-surface-700 dark:text-white/80': !context.focused && !context.selected },
         {
           'bg-primary-500 dark:bg-primary-400 text-white dark:text-surface-700':
-            context.focused && context.selected
+            context.focused && context.selected,
         },
         {
-          'bg-transparent text-surface-700 dark:text-white/80': !context.focused && context.selected
+          'bg-transparent text-surface-700 dark:text-white/80':
+            !context.focused && context.selected,
         },
 
         //States
@@ -361,13 +362,13 @@ export default {
         // Misc
         'cursor-pointer',
         'overflow-hidden',
-        'whitespace-nowrap'
-      ]
-    })
+        'whitespace-nowrap',
+      ],
+    }),
   },
   jumptopageinput: {
     root: {
-      class: 'inline-flex mx-2'
+      class: 'inline-flex mx-2',
     },
     input: {
       root: {
@@ -406,10 +407,10 @@ export default {
           'cursor-pointer',
           'overflow-hidden overflow-ellipsis',
           'whitespace-nowrap',
-          'appearance-none'
-        ]
-      }
-    }
+          'appearance-none',
+        ],
+      },
+    },
   },
   jumptopagedropdown: {
     root: ({ props, state }) => ({
@@ -435,7 +436,7 @@ export default {
         // States
         {
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 dark:focus-visible:ring-primary-500':
-            !state.focused
+            !state.focused,
         },
 
         // Misc
@@ -444,9 +445,9 @@ export default {
         {
           'opacity-60': props.disabled,
           'pointer-events-none': props.disabled,
-          'cursor-default': props.disabled
-        }
-      ]
+          'cursor-default': props.disabled,
+        },
+      ],
     }),
     input: {
       class: [
@@ -484,8 +485,8 @@ export default {
         'cursor-pointer',
         'overflow-hidden overflow-ellipsis',
         'whitespace-nowrap',
-        'appearance-none'
-      ]
+        'appearance-none',
+      ],
     },
     trigger: {
       class: [
@@ -506,8 +507,8 @@ export default {
 
         // Shape
         'rounded-tr-md',
-        'rounded-br-md'
-      ]
+        'rounded-br-md',
+      ],
     },
     panel: {
       class: [
@@ -523,8 +524,8 @@ export default {
         // Color
         'bg-surface-0 dark:bg-surface-800',
         'text-surface-800 dark:text-white/80',
-        'ring-1 ring-inset ring-surface-300 dark:ring-surface-700'
-      ]
+        'ring-1 ring-inset ring-surface-300 dark:ring-surface-700',
+      ],
     },
     wrapper: {
       class: [
@@ -532,11 +533,11 @@ export default {
         'max-h-[15rem]',
 
         // Misc
-        'overflow-auto'
-      ]
+        'overflow-auto',
+      ],
     },
     list: {
-      class: 'py-1 list-none m-0'
+      class: 'py-1 list-none m-0',
     },
     item: ({ context }) => ({
       class: [
@@ -560,10 +561,11 @@ export default {
         { 'text-surface-700 dark:text-white/80': !context.focused && !context.selected },
         {
           'bg-primary-500 dark:bg-primary-400 text-white dark:text-surface-700':
-            context.focused && context.selected
+            context.focused && context.selected,
         },
         {
-          'bg-transparent text-surface-700 dark:text-white/80': !context.focused && context.selected
+          'bg-transparent text-surface-700 dark:text-white/80':
+            !context.focused && context.selected,
         },
 
         //States
@@ -572,8 +574,8 @@ export default {
         // Misc
         'cursor-pointer',
         'overflow-hidden',
-        'whitespace-nowrap'
-      ]
-    })
-  }
-};
+        'whitespace-nowrap',
+      ],
+    }),
+  },
+}

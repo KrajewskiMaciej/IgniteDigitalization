@@ -27,30 +27,40 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 
 defineProps({
   title: {
     type: String,
-    required: true
+    required: true,
   },
   message: {
     type: String,
-    required: true
-  }
-});
+    required: true,
+  },
+})
 
-const router = useRouter();
+const router = useRouter()
 const goHome = () => {
-  router.push('/');
-};
+  router.push('/')
+}
 </script>
 
 <style scoped>
 /* Możesz skopiować tutaj style animacji 'glow' z mainView.vue */
 @keyframes glow {
-  0%, 100% { color: white; text-shadow: none; }
-  50% { color: #a78bfa; text-shadow: 0 0 5px #a78bfa, 0 0 10px #a78bfa, 0 0 15px #a78bfa; }
+  0%,
+  100% {
+    color: white;
+    text-shadow: none;
+  }
+  50% {
+    color: #a78bfa;
+    text-shadow:
+      0 0 5px #a78bfa,
+      0 0 10px #a78bfa,
+      0 0 15px #a78bfa;
+  }
 }
 .animate-glow {
   animation: glow 4s infinite;

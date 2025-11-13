@@ -9,17 +9,17 @@ export default {
       // Colors
       'bg-surface-0 dark:bg-surface-700',
       'text-surface-700 dark:text-white/80',
-      'ring-1 ring-surface-200 dark:ring-surface-700'
-    ]
+      'ring-1 ring-surface-200 dark:ring-surface-700',
+    ],
   },
   wrapper: {
     class: [
       // Overflow
-      'overflow-auto'
-    ]
+      'overflow-auto',
+    ],
   },
   list: {
-    class: 'py-1 list-none m-0'
+    class: 'py-1 list-none m-0',
   },
   item: ({ context }) => ({
     class: [
@@ -43,15 +43,15 @@ export default {
       { 'text-surface-700 dark:text-white/80': !context.focused && !context.selected },
       {
         'bg-surface-200 dark:bg-surface-600/60 text-surface-700 dark:text-white/80':
-          context.focused && !context.selected
+          context.focused && !context.selected,
       },
       {
         'bg-primary-500 dark:bg-primary-400 text-white dark:text-surface-700':
-          context.focused && context.selected
+          context.focused && context.selected,
       },
       {
         'bg-surface-100 dark:bg-surface-300/10 text-primary-500 dark:text-primary-400':
-          !context.focused && context.selected
+          !context.focused && context.selected,
       },
 
       //States
@@ -61,8 +61,8 @@ export default {
       // Misc
       'cursor-pointer',
       'overflow-hidden',
-      'whitespace-nowrap'
-    ]
+      'whitespace-nowrap',
+    ],
   }),
   itemgroup: {
     class: [
@@ -79,8 +79,8 @@ export default {
       'bg-surface-0 dark:bg-surface-600/80',
 
       // Misc
-      'cursor-auto'
-    ]
+      'cursor-auto',
+    ],
   },
   header: {
     class: [
@@ -95,11 +95,11 @@ export default {
 
       // Color
       'text-surface-700 dark:text-white/80',
-      'bg-surface-100 dark:bg-surface-800'
-    ]
+      'bg-surface-100 dark:bg-surface-800',
+    ],
   },
   filtercontainer: {
-    class: 'relative'
+    class: 'relative',
   },
   filterinput: {
     class: [
@@ -130,11 +130,11 @@ export default {
       'focus:ring-primary-600 dark:focus:ring-primary-500',
 
       // Misc
-      'appearance-none'
-    ]
+      'appearance-none',
+    ],
   },
   filtericon: {
-    class: ['absolute', 'top-1/2 right-3', '-mt-2']
+    class: ['absolute', 'top-1/2 right-3', '-mt-2'],
   },
   emptymessage: {
     class: [
@@ -147,7 +147,7 @@ export default {
 
       // Color
       'text-surface-800 dark:text-white/80',
-      'bg-transparent'
-    ]
-  }
-};
+      'bg-transparent',
+    ],
+  },
+}

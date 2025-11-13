@@ -5,8 +5,8 @@ export default {
       'inline-block',
 
       // Misc
-      { 'opacity-60 select-none pointer-events-none cursor-default': props.disabled }
-    ]
+      { 'opacity-60 select-none pointer-events-none cursor-default': props.disabled },
+    ],
   }),
   input: {
     class: [
@@ -34,15 +34,15 @@ export default {
 
       // Misc
       'cursor-default',
-      'select-none'
-    ]
+      'select-none',
+    ],
   },
   panel: ({ props }) => ({
     class: [
       // Position & Size
       {
         'relative h-48 w-52': props.inline,
-        'absolute h-48 w-52': !props.inline
+        'absolute h-48 w-52': !props.inline,
       },
 
       // Shape
@@ -52,8 +52,8 @@ export default {
 
       // Colors
       'bg-surface-800',
-      'ring-1 ring-inset ring-surface-900 dark:ring-surface-600'
-    ]
+      'ring-1 ring-inset ring-surface-900 dark:ring-surface-600',
+    ],
   }),
   selector: {
     class: [
@@ -61,16 +61,16 @@ export default {
       'absolute top-2 left-2',
 
       // Size
-      'h-44 w-40'
-    ]
+      'h-44 w-40',
+    ],
   },
   color: {
     class: [
       // Size
-      'h-44 w-40'
+      'h-44 w-40',
     ],
     style:
-      'background: linear-gradient(to top, #000 0%, rgb(0 0 0 / 0) 100%), linear-gradient(to right, #fff 0%, rgb(255 255 255 / 0) 100%)'
+      'background: linear-gradient(to top, #000 0%, rgb(0 0 0 / 0) 100%), linear-gradient(to right, #fff 0%, rgb(255 255 255 / 0) 100%)',
   },
   colorhandle: {
     class: [
@@ -86,8 +86,8 @@ export default {
       'border-white',
 
       // Misc
-      'cursor-pointer  opacity-85'
-    ]
+      'cursor-pointer  opacity-85',
+    ],
   },
   hue: {
     class: [
@@ -98,10 +98,10 @@ export default {
       'h-44 w-6',
 
       // Opacity
-      'opacity-85'
+      'opacity-85',
     ],
     style:
-      'background: linear-gradient(0deg, red 0, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, red)'
+      'background: linear-gradient(0deg, red 0, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, red)',
   },
   huehandle: {
     class: [
@@ -118,14 +118,14 @@ export default {
       'border-white',
 
       // Misc
-      'opacity-85'
-    ]
+      'opacity-85',
+    ],
   },
   transition: {
     enterFromClass: 'opacity-0 scale-y-[0.8]',
     enterActiveClass:
       'transition-[transform,opacity] duration-[120ms] ease-[cubic-bezier(0,0,0.2,1)]',
     leaveActiveClass: 'transition-opacity duration-100 ease-linear',
-    leaveToClass: 'opacity-0'
-  }
-};
+    leaveToClass: 'opacity-0',
+  },
+}

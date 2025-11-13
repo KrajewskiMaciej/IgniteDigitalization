@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col md:flex-row bg-secondary p-4 rounded-md text-white w-full max-w-7xl mx-auto space-y-6 md:space-y-0 md:space-x-6">
+  <div
+    class="flex flex-col md:flex-row bg-secondary p-4 rounded-md text-white w-full max-w-7xl mx-auto space-y-6 md:space-y-0 md:space-x-6"
+  >
     <!-- Lewa kolumna: Akcje Stołu -->
     <div class="flex-1 p-4 bg-secondary rounded-md min-h-[500px]">
       <h2 class="text-xl font-bold mb-4 text-center">
@@ -10,14 +12,22 @@
       <div class="flex justify-center gap-4 mb-4">
         <button
           @click="actionMode = 'cards'"
-          :class="actionMode === 'cards' ? 'bg-accent text-black shadow' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
+          :class="
+            actionMode === 'cards'
+              ? 'bg-accent text-black shadow'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          "
           class="px-4 py-1 rounded font-semibold transition"
         >
           Decyzje
         </button>
         <button
           @click="actionMode = 'items'"
-          :class="actionMode === 'items' ? 'bg-accent text-black shadow' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
+          :class="
+            actionMode === 'items'
+              ? 'bg-accent text-black shadow'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          "
           class="px-4 py-1 rounded font-semibold transition"
         >
           Przedmioty
@@ -31,7 +41,9 @@
         class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-2"
       >
         <option :value="null">-- Wybierz kartę --</option>
-        <option v-for="card in cards" :key="card.id" :value="card.id">{{ card.id }} - {{ card.title }}</option>
+        <option v-for="card in cards" :key="card.id" :value="card.id">
+          {{ card.id }} - {{ card.title }}
+        </option>
       </select>
       <select
         v-else
@@ -39,14 +51,22 @@
         class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-2"
       >
         <option :value="null">-- Wybierz przedmiot --</option>
-        <option v-for="item in items" :key="item.id" :value="item.id">{{ item.id }} - {{ item.title }}</option>
+        <option v-for="item in items" :key="item.id" :value="item.id">
+          {{ item.id }} - {{ item.title }}
+        </option>
       </select>
 
       <!-- Opisy i koszty -->
-      <p v-if="actionMode === 'cards' && selectedCard" class="text-sm text-center text-gray-300 mt-2 italic">
+      <p
+        v-if="actionMode === 'cards' && selectedCard"
+        class="text-sm text-center text-gray-300 mt-2 italic"
+      >
         {{ selectedCard.description }}
       </p>
-      <p v-if="actionMode === 'items' && selectedItem" class="text-sm text-center text-gray-300 mt-2 italic">
+      <p
+        v-if="actionMode === 'items' && selectedItem"
+        class="text-sm text-center text-gray-300 mt-2 italic"
+      >
         {{ selectedItem.description }}
       </p>
       <p v-if="actionMode === 'cards' && selectedCard" class="text-center text-sm mt-2">
@@ -63,7 +83,7 @@
       <div class="flex justify-center mt-4">
         <button
           v-if="actionMode === 'cards'"
-          :disabled="!selectedCardId" 
+          :disabled="!selectedCardId"
           @click="playCard"
           class="px-4 py-2 bg-lime-500 text-black font-bold rounded hover:bg-lime-600 disabled:opacity-50"
         >
@@ -78,328 +98,501 @@
           Użyj przedmiot
         </button>
       </div>
-      
-       <div v-if="showOwnBoard" class="w-full flex justify-center mt-6">
-        <GameBoard
-          :config="formData"
-          :game-mode="true"
-          :pawns="pawns"
-        />
+
+      <div v-if="showOwnBoard" class="w-full flex justify-center mt-6">
+        <GameBoard :config="formData" :game-mode="true" :pawns="pawns" />
       </div>
     </div>
 
     <!-- Prawa kolumna: Panel Decyzji -->
     <div class="flex-1 p-4 bg-secondary rounded-md min-h-[500px]">
-       <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-center">🕒 Panel decyzji</h2>
         <div class="flex justify-center gap-2">
           <button
             @click="decisionMode = 'pending'"
-            :class="['px-4 py-2 rounded font-semibold transition', decisionMode === 'pending' ? 'bg-accent text-black shadow' : 'bg-gray-700 text-gray-300 hover:bg-gray-600']"
+            :class="[
+              'px-4 py-2 rounded font-semibold transition',
+              decisionMode === 'pending'
+                ? 'bg-accent text-black shadow'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600',
+            ]"
           >
             Do zatwierdzenia
           </button>
           <button
             @click="decisionMode = 'history'"
-            :class="['px-4 py-2 rounded font-semibold transition', decisionMode === 'history' ? 'bg-accent text-black shadow' : 'bg-gray-700 text-gray-300 hover:bg-gray-600']"
+            :class="[
+              'px-4 py-2 rounded font-semibold transition',
+              decisionMode === 'history'
+                ? 'bg-accent text-black shadow'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600',
+            ]"
           >
             Historia decyzji
           </button>
         </div>
       </div>
 
-     <div v-if="decisionMode === 'pending'" class="overflow-y-auto scroll-smooth max-h-[650px] pr-2 space-y-3 border border-lgray-accent rounded-md shadow-inner bg-secondary-dark p-2">
+      <div
+        v-if="decisionMode === 'pending'"
+        class="overflow-y-auto scroll-smooth max-h-[650px] pr-2 space-y-3 border border-lgray-accent rounded-md shadow-inner bg-secondary-dark p-2"
+      >
         <div v-if="loading.pending" class="text-center text-gray-400">Ładowanie sugestii...</div>
         <div v-else-if="pendingDecisions.length === 0" class="text-center text-gray-400 p-4">
           Brak decyzji do zatwierdzenia.
         </div>
-        <div v-for="entry in pendingDecisions" :key="entry.logId" class="p-2 rounded border border-yellow-500 bg-secondary relative">
-          <p><strong>{{ entry.tableName }}</strong> sugeruje:</p>
+        <div
+          v-for="entry in pendingDecisions"
+          :key="entry.logId"
+          class="p-2 rounded border border-yellow-500 bg-secondary relative"
+        >
+          <p>
+            <strong>{{ entry.tableName }}</strong> sugeruje:
+          </p>
           <p class="font-semibold text-lg">{{ entry.cardTitle }}</p>
           <p class="text-xs text-gray-400 mt-1">Zasugerowano: {{ formatDate(entry.timestamp) }}</p>
           <div class="flex justify-end space-x-2 mt-2">
-            <button @click="approveDecision(entry.logId)" class="px-2 py-1 bg-green-500 text-sm text-black rounded hover:bg-green-600">Zatwierdź</button>
-            <button @click="rejectDecision(entry.logId)" class="px-2 py-1 bg-red-500 text-sm text-white rounded hover:bg-red-600">Odrzuć</button>
+            <button
+              @click="approveDecision(entry.logId)"
+              class="px-2 py-1 bg-green-500 text-sm text-black rounded hover:bg-green-600"
+            >
+              Zatwierdź
+            </button>
+            <button
+              @click="rejectDecision(entry.logId)"
+              class="px-2 py-1 bg-red-500 text-sm text-white rounded hover:bg-red-600"
+            >
+              Odrzuć
+            </button>
           </div>
         </div>
-     </div>
+      </div>
       <div v-else class="space-y-4 max-h-[650px] overflow-y-auto scroll-smooth">
         <div v-if="loading.history" class="text-center text-gray-400">Ładowanie historii...</div>
-        <div v-else-if="decisions.length === 0" class="text-center text-gray-400 p-4">Brak decyzji w historii dla tej gry.</div>
+        <div v-else-if="decisions.length === 0" class="text-center text-gray-400 p-4">
+          Brak decyzji w historii dla tej gry.
+        </div>
         <div v-for="(entry, index) in decisions" :key="index" class="mb-2">
-          <div v-if="entry.isEventNotification" class="border border-blue-500 rounded p-3 bg-blue-900/50 text-center">
+          <div
+            v-if="entry.isEventNotification"
+            class="border border-blue-500 rounded p-3 bg-blue-900/50 text-center"
+          >
             <h3 class="font-bold text-lg text-blue-300">Nowe Wydarzenie</h3>
             <p class="text-white mt-1">{{ entry.feedbackDescription }}</p>
             <p class="text-xs text-gray-400 mt-2">Aktywowano: {{ formatDate(entry.timestamp) }}</p>
           </div>
           <div v-else class="border border-gray-600 rounded p-3 bg-secondary relative">
-            <div v-if="entry.eventAppliedId" class="absolute top-1 right-2 px-2 py-0.5 bg-purple-600 text-white text-xs font-bold rounded-full">EVENT</div>
-            <p><strong>{{ entry.tableName }}</strong> – Karta ID: {{ entry.cardId }}</p>
+            <div
+              v-if="entry.eventAppliedId"
+              class="absolute top-1 right-2 px-2 py-0.5 bg-purple-600 text-white text-xs font-bold rounded-full"
+            >
+              EVENT
+            </div>
+            <p>
+              <strong>{{ entry.tableName }}</strong> – Karta ID: {{ entry.cardId }}
+            </p>
             <p :class="entry.result === 'Pozytywny' ? 'text-green-400' : 'text-red-400'">
               <strong>Wynik:</strong> {{ entry.result }}
             </p>
-            <p class="text-sm mt-1">Zagrano kartę: <span class="font-semibold">{{ entry.cardTitle }}</span></p>
+            <p class="text-sm mt-1">
+              Zagrano kartę: <span class="font-semibold">{{ entry.cardTitle }}</span>
+            </p>
             <p class="text-sm mt-1">{{ entry.feedbackDescription || 'Brak opisu feedbacku.' }}</p>
             <p class="text-xs text-gray-400 mt-1">Zagrano: {{ formatDate(entry.timestamp) }}</p>
           </div>
-        </div> 
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue';
-  import { useToast } from 'vue-toastification';
-  import GameBoard from '@/components/game/gameBoard.vue';
-  import apiConfig from '@/services/apiConfig';
-  import apiServices from '@/services/apiServices';
-  import signalService from '@/services/signalService';
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useToast } from 'vue-toastification'
+import GameBoard from '@/components/game/gameBoard.vue'
+import apiConfig from '@/services/apiConfig'
+import apiServices from '@/services/apiServices'
+import signalService from '@/services/signalService'
 
-  // --- INTERFEJSY ---
-  interface SessionData {
-    teamId: number;
-    teamName: string;
-    teamBud: number;
-    deckId: number;
-    boardConfig: BoardConfig & { boardId: number };
-  }
-  interface AvailableCardsResponse {
-    decisionCards: Card[];
-    itemCards: Item[];
-  }
-  interface TeamData {
-    teamId: number;
-    teamName: string;
-    teamBud: number;
-    deckId: number;
-    boardId: number;
-  }
-  interface Card { id: number; title: string; description: string; cost?: number; enablers?: unknown[]; }
-  interface Item { id: number; title: string; description: string; cost?: number; }
-  interface DecisionLog { isEventNotification: boolean; timestamp: string; feedbackDescription: string; cardId?: number; cardTitle?: string; tableId?: number; tableName?: string; result?: 'Pozytywny' | 'Negatywny'; eventAppliedId?: number | null; }
-  interface PendingDecision { logId: number; cardId: number; cardTitle: string; tableId: number; tableName: string; timestamp: string; }
-  interface Pawn { id: number; x: number; y: number; color: string; name: string; }
-  interface BoardConfig {boardId: number, name: string; labelsUp: string[]; labelsRight: string[]; descriptionDown: string; descriptionLeft: string; rows: number; cols: number; cellColor: string; borderColor: string; borderColors: string[]; }
-  interface RawHistoryLog { isEventNotification: boolean; eventDescription: string; timestamp: string; cardId: number; cardTitle: string; teamId: number; teamName: string; feedbackDescription: string; status: boolean; gameEventId: number | null; }
-  interface RawPendingLog { logId: number; cardId: number; cardTitle: string; teamId: number; teamName: string; timestamp: string; }
-  interface RawPawn { gpId: number; posX: string; posY: string; color: string; name: string; }
+// --- INTERFEJSY ---
+interface SessionData {
+  teamId: number
+  teamName: string
+  teamBud: number
+  deckId: number
+  boardConfig: BoardConfig & { boardId: number }
+}
+interface AvailableCardsResponse {
+  decisionCards: Card[]
+  itemCards: Item[]
+}
+interface TeamData {
+  teamId: number
+  teamName: string
+  teamBud: number
+  deckId: number
+  boardId: number
+}
+interface Card {
+  id: number
+  title: string
+  description: string
+  cost?: number
+  enablers?: unknown[]
+}
+interface Item {
+  id: number
+  title: string
+  description: string
+  cost?: number
+}
+interface DecisionLog {
+  isEventNotification: boolean
+  timestamp: string
+  feedbackDescription: string
+  cardId?: number
+  cardTitle?: string
+  tableId?: number
+  tableName?: string
+  result?: 'Pozytywny' | 'Negatywny'
+  eventAppliedId?: number | null
+}
+interface PendingDecision {
+  logId: number
+  cardId: number
+  cardTitle: string
+  tableId: number
+  tableName: string
+  timestamp: string
+}
+interface Pawn {
+  id: number
+  x: number
+  y: number
+  color: string
+  name: string
+}
+interface BoardConfig {
+  boardId: number
+  name: string
+  labelsUp: string[]
+  labelsRight: string[]
+  descriptionDown: string
+  descriptionLeft: string
+  rows: number
+  cols: number
+  cellColor: string
+  borderColor: string
+  borderColors: string[]
+}
+interface RawHistoryLog {
+  isEventNotification: boolean
+  eventDescription: string
+  timestamp: string
+  cardId: number
+  cardTitle: string
+  teamId: number
+  teamName: string
+  feedbackDescription: string
+  status: boolean
+  gameEventId: number | null
+}
+interface RawPendingLog {
+  logId: number
+  cardId: number
+  cardTitle: string
+  teamId: number
+  teamName: string
+  timestamp: string
+}
+interface RawPawn {
+  gpId: number
+  posX: string
+  posY: string
+  color: string
+  name: string
+}
 
-  const props = defineProps({
-    gameId: { type: [Number, String], required: true },
-    teamId: { type: [Number, String], required: true }
-  });
+const props = defineProps({
+  gameId: { type: [Number, String], required: true },
+  teamId: { type: [Number, String], required: true },
+})
 
-const toast = useToast();
-const formData = reactive<BoardConfig>({boardId: 0, name: '', labelsUp: [], labelsRight: [], descriptionDown: '', descriptionLeft: '', rows: 8, cols: 8, cellColor: '#ffffff', borderColor: '#000000', borderColors: [] });
+const toast = useToast()
+const formData = reactive<BoardConfig>({
+  boardId: 0,
+  name: '',
+  labelsUp: [],
+  labelsRight: [],
+  descriptionDown: '',
+  descriptionLeft: '',
+  rows: 8,
+  cols: 8,
+  cellColor: '#ffffff',
+  borderColor: '#000000',
+  borderColors: [],
+})
 
-  const loading = reactive({ teamData: true, cards: true, items: true, history: true, pending: true });
-  const teamData = ref<TeamData | null>(null);
-  const cards = ref<Card[]>([]);
-  const items = ref<Item[]>([]);
-  const decisions = ref<DecisionLog[]>([]);
-  const pendingDecisions = ref<PendingDecision[]>([]);
-  const pawns = ref<Pawn[]>([]);
-  
-  const actionMode = ref<'cards' | 'items'>('cards');
-  const decisionMode = ref<'pending' | 'history'>('history');
-  const selectedCardId = ref<number | null>(null);
-  const selectedItemId = ref<number | null>(null);
-  const showOwnBoard = ref(true);
+const loading = reactive({ teamData: true, cards: true, items: true, history: true, pending: true })
+const teamData = ref<TeamData | null>(null)
+const cards = ref<Card[]>([])
+const items = ref<Item[]>([])
+const decisions = ref<DecisionLog[]>([])
+const pendingDecisions = ref<PendingDecision[]>([])
+const pawns = ref<Pawn[]>([])
 
-  const selectedCard = computed<Card | undefined>(() => cards.value.find(c => c.id === selectedCardId.value));
-  const selectedItem = computed<Item | undefined>(() => items.value.find(i => i.id === selectedItemId.value));
+const actionMode = ref<'cards' | 'items'>('cards')
+const decisionMode = ref<'pending' | 'history'>('history')
+const selectedCardId = ref<number | null>(null)
+const selectedItemId = ref<number | null>(null)
+const showOwnBoard = ref(true)
 
-  // --- POBIERANIE DANYCH ---
-  const fetchAllDataForTeam = async () => {
-    const gameIdNum = Number(props.gameId);
-    const teamIdNum = Number(props.teamId);
-    if (isNaN(gameIdNum) || isNaN(teamIdNum)) return;
+const selectedCard = computed<Card | undefined>(() =>
+  cards.value.find((c) => c.id === selectedCardId.value),
+)
+const selectedItem = computed<Item | undefined>(() =>
+  items.value.find((i) => i.id === selectedItemId.value),
+)
 
-    Object.keys(loading).forEach(k => loading[k as keyof typeof loading] = true);
+// --- POBIERANIE DANYCH ---
+const fetchAllDataForTeam = async () => {
+  const gameIdNum = Number(props.gameId)
+  const teamIdNum = Number(props.teamId)
+  if (isNaN(gameIdNum) || isNaN(teamIdNum)) return
 
-    try {
-      const response = await apiServices.get<SessionData>(apiConfig.player.getTeamInfo(gameIdNum, teamIdNum));
-      const sessionData = response.data;
+  Object.keys(loading).forEach((k) => (loading[k as keyof typeof loading] = true))
 
-      if (sessionData.boardConfig) {
-        Object.assign(formData, sessionData.boardConfig);
-      }
-      
-      teamData.value = {
-        teamId: sessionData.teamId,
-        teamName: sessionData.teamName,
-        teamBud: sessionData.teamBud,
-        deckId: sessionData.deckId,
-        boardId: sessionData.boardConfig?.boardId,
-      };
+  try {
+    const response = await apiServices.get<SessionData>(
+      apiConfig.player.getTeamInfo(gameIdNum, teamIdNum),
+    )
+    const sessionData = response.data
 
-      await Promise.all([
-        fetchAvailableCardsAndItems(),
-        fetchPawns(),
-        fetchDecisionHistory(),
-        fetchPendingDecisions()
-      ]);
-
-    } catch (error) {
-      toast.error("Wystąpił błąd podczas ładowania kluczowych danych drużyny.");
-      console.error("Błąd w fetchAllDataForTeam:", error);
-    } finally {
-      Object.keys(loading).forEach(k => loading[k as keyof typeof loading] = false);
+    if (sessionData.boardConfig) {
+      Object.assign(formData, sessionData.boardConfig)
     }
-  };
-  
-  const fetchAvailableCardsAndItems = async () => {
-  if (!teamData.value?.deckId || !props.gameId || !props.teamId) return;
+
+    teamData.value = {
+      teamId: sessionData.teamId,
+      teamName: sessionData.teamName,
+      teamBud: sessionData.teamBud,
+      deckId: sessionData.deckId,
+      boardId: sessionData.boardConfig?.boardId,
+    }
+
+    await Promise.all([
+      fetchAvailableCardsAndItems(),
+      fetchPawns(),
+      fetchDecisionHistory(),
+      fetchPendingDecisions(),
+    ])
+  } catch (error) {
+    toast.error('Wystąpił błąd podczas ładowania kluczowych danych drużyny.')
+    console.error('Błąd w fetchAllDataForTeam:', error)
+  } finally {
+    Object.keys(loading).forEach((k) => (loading[k as keyof typeof loading] = false))
+  }
+}
+
+const fetchAvailableCardsAndItems = async () => {
+  if (!teamData.value?.deckId || !props.gameId || !props.teamId) return
   try {
     const url = apiConfig.player.getCards(
       teamData.value.deckId,
       Number(props.gameId),
-      Number(props.teamId)
-    );
-    
-    const response = await apiServices.get<AvailableCardsResponse>(url);
-    
-    cards.value = response.data.decisionCards || [];
-    items.value = response.data.itemCards || [];
-  } catch (error) {
-    toast.error("Błąd pobierania kart i przedmiotów.");
-    console.error("Błąd pobierania kart:", error);
-  }
-};
-  
-  const fetchDecisionHistory = async () => {
-    try {
-      const response = await apiServices.post<RawHistoryLog[]>(apiConfig.player.getPlayerHistory, { gameId: props.gameId, teamId: props.teamId });
-      const logs = response.data;
-      if (Array.isArray(logs)) {
-        decisions.value = logs.map(log => log.isEventNotification
-          ? { isEventNotification: true, feedbackDescription: log.eventDescription || "Aktywowano nowe wydarzenie.", timestamp: log.timestamp }
-          : { isEventNotification: false, cardId: log.cardId, cardTitle: log.cardTitle, tableId: log.teamId, tableName: log.teamName, timestamp: log.timestamp, feedbackDescription: log.feedbackDescription, result: log.status ? 'Pozytywny' : 'Negatywny', eventAppliedId: log.gameEventId }
-        );
-      }
-    } catch (error) { toast.error("Błąd ładowania historii decyzji."); }
-  };
+      Number(props.teamId),
+    )
 
-  const fetchPendingDecisions = async () => {
-    try {
-      const response = await apiServices.get<RawPendingLog[]>(apiConfig.player.getPendingLogs(Number(props.gameId)));
-      pendingDecisions.value = (response.data)
-        .filter(log => log.teamId === Number(props.teamId))
-        .map(log => ({
-          logId: log.logId,
-          cardId: log.cardId,
-          cardTitle: log.cardTitle,
-          tableId: log.teamId,
-          tableName: log.teamName,
-          timestamp: log.timestamp
-        }));
-    } catch (error) { toast.error("Błąd pobierania sugestii."); }
-  };
+    const response = await apiServices.get<AvailableCardsResponse>(url)
+
+    cards.value = response.data.decisionCards || []
+    items.value = response.data.itemCards || []
+  } catch (error) {
+    toast.error('Błąd pobierania kart i przedmiotów.')
+    console.error('Błąd pobierania kart:', error)
+  }
+}
+
+const fetchDecisionHistory = async () => {
+  try {
+    const response = await apiServices.post<RawHistoryLog[]>(apiConfig.player.getPlayerHistory, {
+      gameId: props.gameId,
+      teamId: props.teamId,
+    })
+    const logs = response.data
+    if (Array.isArray(logs)) {
+      decisions.value = logs.map((log) =>
+        log.isEventNotification
+          ? {
+              isEventNotification: true,
+              feedbackDescription: log.eventDescription || 'Aktywowano nowe wydarzenie.',
+              timestamp: log.timestamp,
+            }
+          : {
+              isEventNotification: false,
+              cardId: log.cardId,
+              cardTitle: log.cardTitle,
+              tableId: log.teamId,
+              tableName: log.teamName,
+              timestamp: log.timestamp,
+              feedbackDescription: log.feedbackDescription,
+              result: log.status ? 'Pozytywny' : 'Negatywny',
+              eventAppliedId: log.gameEventId,
+            },
+      )
+    }
+  } catch (error) {
+    toast.error('Błąd ładowania historii decyzji.')
+  }
+}
+
+const fetchPendingDecisions = async () => {
+  try {
+    const response = await apiServices.get<RawPendingLog[]>(
+      apiConfig.player.getPendingLogs(Number(props.gameId)),
+    )
+    pendingDecisions.value = response.data
+      .filter((log) => log.teamId === Number(props.teamId))
+      .map((log) => ({
+        logId: log.logId,
+        cardId: log.cardId,
+        cardTitle: log.cardTitle,
+        tableId: log.teamId,
+        tableName: log.teamName,
+        timestamp: log.timestamp,
+      }))
+  } catch (error) {
+    toast.error('Błąd pobierania sugestii.')
+  }
+}
 
 const fetchPawns = async () => {
-  if (!teamData.value?.boardId || !props.gameId || !props.teamId) return;
+  if (!teamData.value?.boardId || !props.gameId || !props.teamId) return
   try {
     const url = apiConfig.player.getPawns(
       Number(props.gameId),
       Number(props.teamId),
-      teamData.value.boardId
-    );
-    
-    const response = await apiServices.get<RawPawn[]>(url);
-    
-    pawns.value = (response.data).map(p => ({ id: p.gpId, x: Number(p.posX), y: Number(p.posY), color: p.color, name: p.name }));
+      teamData.value.boardId,
+    )
+
+    const response = await apiServices.get<RawPawn[]>(url)
+
+    pawns.value = response.data.map((p) => ({
+      id: p.gpId,
+      x: Number(p.posX),
+      y: Number(p.posY),
+      color: p.color,
+      name: p.name,
+    }))
   } catch (err) {
-    console.error("Błąd pobierania pionków:", err);
-    toast.error("Błąd pobierania pionków.");
+    console.error('Błąd pobierania pionków:', err)
+    toast.error('Błąd pobierania pionków.')
   }
-};
+}
 
-  // --- AKCJE UŻYTKOWNIKA ---
-  const executeCardOrItemAction = async (isCard: boolean) => {
-    const entity = isCard ? selectedCard.value : selectedItem.value;
-    const team = teamData.value;
+// --- AKCJE UŻYTKOWNIKA ---
+const executeCardOrItemAction = async (isCard: boolean) => {
+  const entity = isCard ? selectedCard.value : selectedItem.value
+  const team = teamData.value
 
-    if (!entity || !team) {
-      return;
-    }
-    if (team.teamBud < (entity.cost || 0)) {
-      toast.error(`Brak wystarczającej liczby bitów!`);
-      return;
-    }
+  if (!entity || !team) {
+    return
+  }
+  if (team.teamBud < (entity.cost || 0)) {
+    toast.error(`Brak wystarczającej liczby bitów!`)
+    return
+  }
 
-    let wasSuccess = true;
-    if (isCard) {
-      const cardEntity = entity as Card;
-      wasSuccess = !(cardEntity.enablers && cardEntity.enablers.length > 0);
-    }
-    
-    const endpoint = wasSuccess ? apiConfig.player.playCardSuccess(entity.id) : apiConfig.player.playCardFailure(entity.id);
-    const payload = { gameId: Number(props.gameId), teamId: team.teamId, deckId: team.deckId, boardId: team.boardId, cost: entity.cost || 0, ForceExecution: false };
+  let wasSuccess = true
+  if (isCard) {
+    const cardEntity = entity as Card
+    wasSuccess = !(cardEntity.enablers && cardEntity.enablers.length > 0)
+  }
 
-    try {
-      const response = await apiServices.post<{ message: string }>(endpoint, payload);
-      toast.success(response.data.message || 'Akcja przetworzona pomyślnie.');
-      await fetchAllDataForTeam();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || `Wystąpił błąd podczas akcji.`);
-      console.error(error);
-    }
-  };
+  const endpoint = wasSuccess
+    ? apiConfig.player.playCardSuccess(entity.id)
+    : apiConfig.player.playCardFailure(entity.id)
+  const payload = {
+    gameId: Number(props.gameId),
+    teamId: team.teamId,
+    deckId: team.deckId,
+    boardId: team.boardId,
+    cost: entity.cost || 0,
+    ForceExecution: false,
+  }
 
-  const playCard = () => executeCardOrItemAction(true);
-  const giveItem = () => executeCardOrItemAction(false);
+  try {
+    const response = await apiServices.post<{ message: string }>(endpoint, payload)
+    toast.success(response.data.message || 'Akcja przetworzona pomyślnie.')
+    await fetchAllDataForTeam()
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || `Wystąpił błąd podczas akcji.`)
+    console.error(error)
+  }
+}
 
-  const approveDecision = async (logId: number) => {
-    try {
-      await apiServices.post(apiConfig.player.approveLog(logId), {});
-      toast.success("Sugestia została zatwierdzona!");
-      await Promise.all([fetchPendingDecisions(), fetchDecisionHistory()]);
-    } catch (error) { toast.error("Wystąpił błąd podczas zatwierdzania sugestii."); }
-  };
+const playCard = () => executeCardOrItemAction(true)
+const giveItem = () => executeCardOrItemAction(false)
 
-  const rejectDecision = async (logId: number) => {
-    try {
-      await apiServices.delete(apiConfig.player.rejectLog(logId));
-      toast.info("Sugestia została odrzucona.");
-      await fetchPendingDecisions();
-    } catch (error) { toast.error("Wystąpił błąd podczas odrzucania sugestii."); }
-  };
+const approveDecision = async (logId: number) => {
+  try {
+    await apiServices.post(apiConfig.player.approveLog(logId), {})
+    toast.success('Sugestia została zatwierdzona!')
+    await Promise.all([fetchPendingDecisions(), fetchDecisionHistory()])
+  } catch (error) {
+    toast.error('Wystąpił błąd podczas zatwierdzania sugestii.')
+  }
+}
 
-  const formatDate = (timestamp: string) => new Date(timestamp).toLocaleString('pl-PL');
-  
-  watch(() => props.teamId, (newId) => {
+const rejectDecision = async (logId: number) => {
+  try {
+    await apiServices.delete(apiConfig.player.rejectLog(logId))
+    toast.info('Sugestia została odrzucona.')
+    await fetchPendingDecisions()
+  } catch (error) {
+    toast.error('Wystąpił błąd podczas odrzucania sugestii.')
+  }
+}
+
+const formatDate = (timestamp: string) => new Date(timestamp).toLocaleString('pl-PL')
+
+watch(
+  () => props.teamId,
+  (newId) => {
     if (newId) {
-      fetchAllDataForTeam();
-      selectedCardId.value = null;
-      selectedItemId.value = null;
+      fetchAllDataForTeam()
+      selectedCardId.value = null
+      selectedItemId.value = null
     }
-  }, { immediate: true });
+  },
+  { immediate: true },
+)
 
-  onMounted(async () => {
-    const gameIdNum = Number(props.gameId);
-    if (isNaN(gameIdNum)) {
-      toast.error("Błąd krytyczny: Brak lub nieprawidłowe ID gry!");
-      return;
-    }
+onMounted(async () => {
+  const gameIdNum = Number(props.gameId)
+  if (isNaN(gameIdNum)) {
+    toast.error('Błąd krytyczny: Brak lub nieprawidłowe ID gry!')
+    return
+  }
 
-    signalService.connection.on("HistoryUpdated", () => fetchAllDataForTeam());
-    signalService.connection.on("PendingUpdated", () => fetchPendingDecisions());
-    signalService.connection.on("BoardUpdated", () => fetchPawns());
+  signalService.connection.on('HistoryUpdated', () => fetchAllDataForTeam())
+  signalService.connection.on('PendingUpdated', () => fetchPendingDecisions())
+  signalService.connection.on('BoardUpdated', () => fetchPawns())
 
-    try {
-      await signalService.start();
-      await signalService.joinGameRoom(String(gameIdNum));
-      console.log(`Pomyślnie dołączono do pokoju SignalR dla gry: ${gameIdNum}`);
-    } catch (err) {
-      console.error("Błąd połączenia SignalR: ", err);
-      toast.error("Nie udało się połączyć z serwerem czasu rzeczywistego.");
-    }
-  });
+  try {
+    await signalService.start()
+    await signalService.joinGameRoom(String(gameIdNum))
+    console.log(`Pomyślnie dołączono do pokoju SignalR dla gry: ${gameIdNum}`)
+  } catch (err) {
+    console.error('Błąd połączenia SignalR: ', err)
+    toast.error('Nie udało się połączyć z serwerem czasu rzeczywistego.')
+  }
+})
 
-  onUnmounted(() => {
-    if (props.gameId) {
-      signalService.leaveGameRoom(String(props.gameId));
-    }
-  });
+onUnmounted(() => {
+  if (props.gameId) {
+    signalService.leaveGameRoom(String(props.gameId))
+  }
+})
 </script>

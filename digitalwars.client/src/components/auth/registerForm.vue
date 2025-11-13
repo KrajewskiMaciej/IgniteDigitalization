@@ -4,16 +4,16 @@
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
       Utwórz nowe konto
     </h2>
-    
+
     <form @submit.prevent="handleRegister" class="space-y-3 sm:space-y-4">
       <div class="space-y-1">
         <label for="register-username" class="block font-bold text-xs sm:text-sm text-left">
           Nazwa użytkownika
         </label>
-        <input 
-          type="text" 
-          id="register-username" 
-          v-model="registerData.username" 
+        <input
+          type="text"
+          id="register-username"
+          v-model="registerData.username"
           class="w-full px-3 py-2 bg-tertiary border border-lgray-accent rounded-md text-white focus:outline-none focus:border-accent text-sm sm:text-base"
           required
         />
@@ -23,10 +23,10 @@
         <label for="register-email" class="block font-bold text-xs sm:text-sm text-left">
           E-mail
         </label>
-        <input 
-          type="email" 
-          id="register-email" 
-          v-model="registerData.email" 
+        <input
+          type="email"
+          id="register-email"
+          v-model="registerData.email"
           class="w-full px-3 py-2 bg-tertiary border border-lgray-accent rounded-md text-white focus:outline-none focus:border-accent text-sm sm:text-base"
           required
         />
@@ -37,21 +37,18 @@
           <label for="register-password" class="block font-bold text-xs sm:text-sm text-left">
             Hasło
           </label>
-          <div class="
-            flex items-center gap-2
-            bg-tertiary border border-lgray-accent rounded-md 
-            transition-all duration-200
-            focus-within:border-accent focus-within:ring-1 focus-within:ring-accent
-          ">
-            <input 
-              :type="showPassword ? 'text' : 'password'" 
-              id="register-password" 
-              v-model="registerData.password" 
+          <div
+            class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-md transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent"
+          >
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              id="register-password"
+              v-model="registerData.password"
               class="w-full px-3 py-2 bg-transparent focus:outline-none focus:ring-0 text-white flex-grow"
               required
             />
-            <button 
-              @click="showPassword = !showPassword" 
+            <button
+              @click="showPassword = !showPassword"
               class="h-8 w-8 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200"
               type="button"
             >
@@ -61,24 +58,24 @@
         </div>
 
         <div class="space-y-1">
-          <label for="register-confirm-password" class="block font-bold text-xs sm:text-sm text-left">
+          <label
+            for="register-confirm-password"
+            class="block font-bold text-xs sm:text-sm text-left"
+          >
             Potwierdź hasło
           </label>
-          <div class="
-            flex items-center gap-2
-            bg-tertiary border border-lgray-accent rounded-md 
-            transition-all duration-200
-            focus-within:border-accent focus-within:ring-1 focus-within:ring-accent
-          ">
-            <input 
-              :type="showConfirmPassword ? 'text' : 'password'" 
-              id="register-confirm-password" 
-              v-model="registerData.confirmPassword" 
+          <div
+            class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-md transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent"
+          >
+            <input
+              :type="showConfirmPassword ? 'text' : 'password'"
+              id="register-confirm-password"
+              v-model="registerData.confirmPassword"
               class="w-full px-3 py-2 bg-transparent focus:outline-none focus:ring-0 text-white flex-grow"
               required
             />
-            <button 
-              @click="showConfirmPassword = !showConfirmPassword" 
+            <button
+              @click="showConfirmPassword = !showConfirmPassword"
               class="h-8 w-8 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200"
               type="button"
             >
@@ -94,29 +91,63 @@
 
       <div class="bg-tertiary rounded-md px-3 py-2">
         <ul class="list-disc text-left text-white pl-4">
-          <li :class="{ 'text-green-500': passwordRequirements.length, 'text-gray-500': !passwordRequirements.length }" class="text-xs transition-colors duration-300">
+          <li
+            :class="{
+              'text-green-500': passwordRequirements.length,
+              'text-gray-500': !passwordRequirements.length,
+            }"
+            class="text-xs transition-colors duration-300"
+          >
             Co najmniej 8 znaków
           </li>
-          <li :class="{ 'text-green-500': passwordRequirements.uppercase, 'text-gray-500': !passwordRequirements.uppercase }" class="text-xs transition-colors duration-300">
+          <li
+            :class="{
+              'text-green-500': passwordRequirements.uppercase,
+              'text-gray-500': !passwordRequirements.uppercase,
+            }"
+            class="text-xs transition-colors duration-300"
+          >
             Co najmniej jedna duża litera
           </li>
-          <li :class="{ 'text-green-500': passwordRequirements.lowercase, 'text-gray-500': !passwordRequirements.lowercase }" class="text-xs transition-colors duration-300">
+          <li
+            :class="{
+              'text-green-500': passwordRequirements.lowercase,
+              'text-gray-500': !passwordRequirements.lowercase,
+            }"
+            class="text-xs transition-colors duration-300"
+          >
             Co najmniej jedna mała litera
           </li>
-          <li :class="{ 'text-green-500': passwordRequirements.special, 'text-gray-500': !passwordRequirements.special }" class="text-xs transition-colors duration-300">
+          <li
+            :class="{
+              'text-green-500': passwordRequirements.special,
+              'text-gray-500': !passwordRequirements.special,
+            }"
+            class="text-xs transition-colors duration-300"
+          >
             Co najmniej jeden znak specjalny
           </li>
-          <li :class="{ 'text-green-500': passwordRequirements.digit, 'text-gray-500': !passwordRequirements.digit }" class="text-xs transition-colors duration-300">
+          <li
+            :class="{
+              'text-green-500': passwordRequirements.digit,
+              'text-gray-500': !passwordRequirements.digit,
+            }"
+            class="text-xs transition-colors duration-300"
+          >
             Co najmniej jedna cyfra
           </li>
         </ul>
       </div>
-      
-      <button 
-        type="submit" 
-        class=" text-white w-full rounded-lg font-medium transition-all duration-300 shadow-sm  shadow-accent/40 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg"
+
+      <button
+        type="submit"
+        class="text-white w-full rounded-lg font-medium transition-all duration-300 shadow-sm shadow-accent/40 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg"
         :disabled="!isRegisterFormValid || isLoading"
-        :class="isRegisterFormValid ? 'bg-accent/50 hover:shadow-lg hover:shadow-accent/60 hover:bg-accent' : 'bg-tertiary' "
+        :class="
+          isRegisterFormValid
+            ? 'bg-accent/50 hover:shadow-lg hover:shadow-accent/60 hover:bg-accent'
+            : 'bg-tertiary'
+        "
       >
         {{ isLoading ? 'Rejestracja...' : 'Zarejestruj się' }}
       </button>
@@ -125,112 +156,122 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, defineEmits } from 'vue';
-  // --- KROK 1: Import enumu POSITION ---
-  import { useToast, POSITION } from 'vue-toastification';
-  import passwordStrength from './passwordStrength.vue';
-  import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { ref, computed, defineEmits } from 'vue'
+// --- KROK 1: Import enumu POSITION ---
+import { useToast, POSITION } from 'vue-toastification'
+import passwordStrength from './passwordStrength.vue'
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 
-  // Poprawiono ścieżki importu
-  import apiConfig from '@/services/apiConfig';
-  import apiService from '@/services/apiServices';
+// Poprawiono ścieżki importu
+import apiConfig from '@/services/apiConfig'
+import apiService from '@/services/apiServices'
 
-  // --- KROK 2: Definicja typu dla błędu API ---
-  interface ApiError {
-    response?: {
-      data?: string;
-    }
+// --- KROK 2: Definicja typu dla błędu API ---
+interface ApiError {
+  response?: {
+    data?: string
+  }
+}
+
+const toast = useToast()
+const emit = defineEmits(['register', 'close', 'switchToConfirmEmail'])
+
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+const isLoading = ref(false)
+
+// --- KROK 3: Jawne otypowanie parametru 'email' ---
+const validateEmail = (email: string) => {
+  if (!email) return false
+  return String(email)
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    )
+}
+
+const isRegisterFormValid = computed(() => {
+  const req = passwordRequirements.value
+  const data = registerData.value
+
+  return (
+    data.username.trim() !== '' &&
+    validateEmail(data.email) &&
+    req.length &&
+    req.uppercase &&
+    req.lowercase &&
+    req.digit &&
+    req.special &&
+    data.password === data.confirmPassword
+  )
+})
+
+const registerData = ref({
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+})
+
+const passwordRequirements = computed(() => {
+  const password = registerData.value.password
+  return {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    digit: /[0-9]/.test(password),
+    special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
+  }
+})
+
+const handleRegister = async () => {
+  toast.clear()
+
+  if (registerData.value.password !== registerData.value.confirmPassword) {
+    // --- KROK 4: Użycie enumu POSITION ---
+    toast.error('Podane hasła się nie zgadzają!', {
+      position: POSITION.TOP_CENTER,
+    })
+    return
   }
 
-  const toast = useToast();
-  const emit = defineEmits(['register', 'close', 'switchToConfirmEmail']);
+  try {
+    isLoading.value = true
+    const response = await apiService.post<{ success: boolean }>(
+      apiConfig.auth.register,
+      registerData.value,
+    )
 
-  const showPassword = ref(false);
-  const showConfirmPassword = ref(false);
-  const isLoading = ref(false);
-
-  // --- KROK 3: Jawne otypowanie parametru 'email' ---
-  const validateEmail = (email: string) => {
-    if (!email) return false;
-    return String(email)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
-  };
-
-  const isRegisterFormValid = computed(() => {
-    const req = passwordRequirements.value;
-    const data = registerData.value;
-
-    return data.username.trim() !== '' &&
-      validateEmail(data.email) &&
-      req.length && req.uppercase && req.lowercase && req.digit && req.special &&
-      data.password === data.confirmPassword;
-  });
-
-  const registerData = ref({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-
-  const passwordRequirements = computed(() => {
-    const password = registerData.value.password;
-    return {
-      length: password.length >= 8,
-      uppercase: /[A-Z]/.test(password),
-      lowercase: /[a-z]/.test(password),
-      digit: /[0-9]/.test(password),
-      special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)
-    };
-  });
-
-  const handleRegister = async () => {
-    toast.clear();
-
-    if (registerData.value.password !== registerData.value.confirmPassword) {
-      // --- KROK 4: Użycie enumu POSITION ---
-      toast.error("Podane hasła się nie zgadzają!", {
+    if (response.data.success) {
+      console.log('✅ Zarejestrowano pomyślnie!')
+      toast.success('Pomyślnie zarejestrowano!', {
         position: POSITION.TOP_CENTER,
-      });
-      return;
+      })
+      emit('switchToConfirmEmail', registerData.value.email)
     }
+  } catch (error: unknown) {
+    // Jawne otypowanie błędu jako 'unknown'
+    // --- KROK 5: Bezpieczne rzutowanie typu błędu ---
+    const apiError = error as ApiError
 
-    try {
-      isLoading.value = true;
-      const response = await apiService.post<{ success: boolean }>(apiConfig.auth.register, registerData.value);
-
-      if (response.data.success) {
-        console.log('✅ Zarejestrowano pomyślnie!');
-        toast.success("Pomyślnie zarejestrowano!", {
+    if (apiError.response?.data) {
+      if (apiError.response.data === 'Email already exist.') {
+        toast.error('Ten e-mail jest już zarejestrowany!', {
           position: POSITION.TOP_CENTER,
-        });
-        emit('switchToConfirmEmail', registerData.value.email);
-      }
-    } catch (error: unknown) { // Jawne otypowanie błędu jako 'unknown'
-      // --- KROK 5: Bezpieczne rzutowanie typu błędu ---
-      const apiError = error as ApiError;
-
-      if (apiError.response?.data) {
-        if (apiError.response.data === 'Email already exist.') {
-          toast.error("Ten e-mail jest już zarejestrowany!", {
-            position: POSITION.TOP_CENTER,
-          });
-        } else {
-          toast.error("Wystąpił błąd podczas rejestracji. Spróbuj ponownie.", {
-            position: POSITION.TOP_CENTER,
-          });
-        }
+        })
       } else {
-        // Ogólny błąd, jeśli struktura jest inna
-        toast.error("Wystąpił nieoczekiwany błąd.", {
+        toast.error('Wystąpił błąd podczas rejestracji. Spróbuj ponownie.', {
           position: POSITION.TOP_CENTER,
-        });
+        })
       }
-    } finally {
-      isLoading.value = false;
+    } else {
+      // Ogólny błąd, jeśli struktura jest inna
+      toast.error('Wystąpił nieoczekiwany błąd.', {
+        position: POSITION.TOP_CENTER,
+      })
     }
-  };
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>

@@ -10,18 +10,16 @@ const route = useRoute()
 
 const selectedStat = computed(() => route.query.stat || 'positions')
 
-
 const avgBitsUsageByTeam = [
   { team: 'Gra 1', avgBits: 18.5 },
   { team: 'Gra 2', avgBits: 22 },
-  { team: 'Gra 3', avgBits: 19.1 }
+  { team: 'Gra 3', avgBits: 19.1 },
 ]
-
 
 const decisionSuccessByTeam = [
   { team: 'Gra 1', success: 110, failure: 40 },
   { team: 'Gra 2', success: 85, failure: 65 },
-  { team: 'Gra 3', success: 90, failure: 60 }
+  { team: 'Gra 3', success: 90, failure: 60 },
 ]
 
 const stddevData = [
@@ -29,9 +27,8 @@ const stddevData = [
   { game: 2, positions: 2.6, bits: 3.8 },
   { game: 3, positions: 1.9, bits: 3.2 },
   { game: 4, positions: 2.1, bits: 2.5 },
-  { game: 5, positions: 1.7, bits: 2.1 }
+  { game: 5, positions: 1.7, bits: 2.1 },
 ]
-
 </script>
 
 <template>

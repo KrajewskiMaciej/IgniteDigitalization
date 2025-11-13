@@ -5,8 +5,8 @@ export default {
       'flex items-center flex-nowrap gap-x-1.5',
 
       // Spacing
-      'm-0 p-0 list-none leading-none'
-    ]
+      'm-0 p-0 list-none leading-none',
+    ],
   },
   action: {
     class: [
@@ -27,11 +27,11 @@ export default {
       'focus-visible:ring-2 focus-visible:ring-primary-500 dark:focus-visible:ring-primary-400',
 
       // Transitions
-      'transition-shadow duration-200'
-    ]
+      'transition-shadow duration-200',
+    ],
   },
   icon: {
-    class: 'text-surface-500 dark:text-white/70'
+    class: 'text-surface-500 dark:text-white/70',
   },
   separator: {
     class: [
@@ -39,7 +39,7 @@ export default {
       'flex items-center shrink-0',
 
       // Color
-      'text-surface-500 dark:text-white/70'
-    ]
-  }
-};
+      'text-surface-500 dark:text-white/70',
+    ],
+  },
+}

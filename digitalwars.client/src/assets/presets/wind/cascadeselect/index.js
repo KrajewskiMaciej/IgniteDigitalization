@@ -16,14 +16,14 @@ export default {
       // States
       {
         'ring-1 ring-inset ring-surface-300 dark:ring-surface-700': !state.focused,
-        'ring-2 ring-inset ring-primary-500 dark:ring-primary-400': state.focused
+        'ring-2 ring-inset ring-primary-500 dark:ring-primary-400': state.focused,
       },
 
       // Misc
       'cursor-default',
       'select-none',
-      { 'opacity-60': props.disabled, 'pointer-events-none': props.disabled }
-    ]
+      { 'opacity-60': props.disabled, 'pointer-events-none': props.disabled },
+    ],
   }),
   label: ({ props }) => ({
     class: [
@@ -47,7 +47,7 @@ export default {
       'border-0',
       {
         'text-surface-800 dark:text-white/80': props.modelValue,
-        'text-surface-400 dark:text-surface-500': !props.modelValue
+        'text-surface-400 dark:text-surface-500': !props.modelValue,
       },
       'placeholder:text-surface-400 dark:placeholder:text-surface-500',
 
@@ -63,8 +63,8 @@ export default {
       'cursor-pointer',
       'overflow-hidden overflow-ellipsis',
       'whitespace-nowrap',
-      'appearance-none'
-    ]
+      'appearance-none',
+    ],
   }),
   dropdownbutton: {
     class: [
@@ -84,8 +84,8 @@ export default {
 
       // Shape
       'rounded-tr-md',
-      'rounded-br-md'
-    ]
+      'rounded-br-md',
+    ],
   },
   panel: {
     class: [
@@ -101,8 +101,8 @@ export default {
       // Color
       'bg-surface-0 dark:bg-surface-700',
       'text-surface-800 dark:text-white/80',
-      'ring-1 ring-inset ring-surface-300 dark:ring-surface-700'
-    ]
+      'ring-1 ring-inset ring-surface-300 dark:ring-surface-700',
+    ],
   },
   wrapper: {
     class: [
@@ -110,11 +110,11 @@ export default {
       'max-h-[200px]',
 
       // Misc
-      'overflow-auto'
-    ]
+      'overflow-auto',
+    ],
   },
   list: {
-    class: 'py-1 list-none mx-1.5'
+    class: 'py-1 list-none mx-1.5',
   },
   item: {
     class: [
@@ -142,8 +142,8 @@ export default {
       // Misc
       'cursor-pointer',
       'overflow-hidden',
-      'whitespace-nowrap'
-    ]
+      'whitespace-nowrap',
+    ],
   },
   content: {
     class: [
@@ -160,14 +160,14 @@ export default {
       'no-underline',
       'overflow-hidden',
       'cursor-pointer',
-      'select-none'
-    ]
+      'select-none',
+    ],
   },
   groupicon: {
     class: [
       // Alignment
-      'ml-auto'
-    ]
+      'ml-auto',
+    ],
   },
   sublist: {
     class: [
@@ -188,17 +188,17 @@ export default {
       'z-10',
 
       // Color
-      'bg-surface-0 dark:bg-surface-700'
-    ]
+      'bg-surface-0 dark:bg-surface-700',
+    ],
   },
   separator: {
-    class: 'border-t border-surface-200 dark:border-surface-600 my-1'
+    class: 'border-t border-surface-200 dark:border-surface-600 my-1',
   },
   transition: {
     enterFromClass: 'opacity-0 scale-y-[0.8]',
     enterActiveClass:
       'transition-[transform,opacity] duration-[120ms] ease-[cubic-bezier(0,0,0.2,1)]',
     leaveActiveClass: 'transition-opacity duration-100 ease-linear',
-    leaveToClass: 'opacity-0'
-  }
-};
+    leaveToClass: 'opacity-0',
+  },
+}

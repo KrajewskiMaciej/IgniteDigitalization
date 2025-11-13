@@ -1,6 +1,7 @@
 <template>
-  <div class="w-full max-w-md mx-auto bg-yellow rounded-xl shadow p-4 space-y-4 border border-white">
-
+  <div
+    class="w-full max-w-md mx-auto bg-yellow rounded-xl shadow p-4 space-y-4 border border-white"
+  >
     <div class="p-2 rounded relative">
       <h2 class="text-xl font-semibold">📝 Dodaj decyzję</h2>
     </div>
@@ -32,7 +33,9 @@
           class="bg-primary border-t text-white text-left p-2 rounded shadow-sm space-y-2"
         >
           <div class="text-sm italic text-gray-200">{{ decision.team }}</div>
-          <div><strong>{{ decision.player }}</strong> → {{ decision.idchoice }} {{ decision.choice }}</div>
+          <div>
+            <strong>{{ decision.player }}</strong> → {{ decision.idchoice }} {{ decision.choice }}
+          </div>
           <div class="border-t border-gray-300 w-full"></div>
           <div>
             Wynik:
@@ -40,7 +43,7 @@
               class="font-semibold"
               :class="{
                 'text-green-400': decision.result === 'Pozytywny',
-                'text-red-400': decision.result === 'Negatywny'
+                'text-red-400': decision.result === 'Negatywny',
               }"
             >
               {{ decision.result }}
@@ -52,47 +55,46 @@
           <button class="text-xs bg-red-600 text-white px-2 py-1 rounded">Usuń</button>
         </li>
       </ul>
-      
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
+import { ref, computed } from 'vue'
 
-  const selectedTeam = ref('Wszystkie drużyny')
+const selectedTeam = ref('Wszystkie drużyny')
 
-  const decisions = ref([
-    {
-      team: 'Drużyna 1',
-      player: 'Gracz 1',
-      idchoice: '1',
-      choice: 'Kupno karty',
-      result: 'Pozytywny',
-      description: 'Lorem ipsum dolor sit amet.'
-    },
-    {
-      team: 'Drużyna 2',
-      player: 'Gracz 2',
-      idchoice: '2',
-      choice: 'Pas',
-      result: 'Negatywny',
-      description: 'Consectetur adipiscing elit.'
-    },
-    {
-      team: 'Drużyna 1',
-      player: 'Gracz 3',
-      idchoice: '3',
-      choice: 'Sprzedaż zasobów',
-      result: 'Pozytywny',
-      description: 'Sed do eiusmod tempor.'
-    }
-  ])
+const decisions = ref([
+  {
+    team: 'Drużyna 1',
+    player: 'Gracz 1',
+    idchoice: '1',
+    choice: 'Kupno karty',
+    result: 'Pozytywny',
+    description: 'Lorem ipsum dolor sit amet.',
+  },
+  {
+    team: 'Drużyna 2',
+    player: 'Gracz 2',
+    idchoice: '2',
+    choice: 'Pas',
+    result: 'Negatywny',
+    description: 'Consectetur adipiscing elit.',
+  },
+  {
+    team: 'Drużyna 1',
+    player: 'Gracz 3',
+    idchoice: '3',
+    choice: 'Sprzedaż zasobów',
+    result: 'Pozytywny',
+    description: 'Sed do eiusmod tempor.',
+  },
+])
 
-  const filteredDecisions = computed(() => {
-    if (selectedTeam.value === 'Wszystkie drużyny') {
-      return decisions.value
-    }
-    return decisions.value.filter(d => d.team === selectedTeam.value)
-  })
+const filteredDecisions = computed(() => {
+  if (selectedTeam.value === 'Wszystkie drużyny') {
+    return decisions.value
+  }
+  return decisions.value.filter((d) => d.team === selectedTeam.value)
+})
 </script>

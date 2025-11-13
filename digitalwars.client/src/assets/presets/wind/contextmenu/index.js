@@ -12,8 +12,8 @@ export default {
       // Colors
       'bg-surface-0 dark:bg-surface-700',
       'text-surface-700 dark:text-white/80',
-      'dark:border dark:border-surface-700'
-    ]
+      'dark:border dark:border-surface-700',
+    ],
   },
   menu: {
     class: [
@@ -21,11 +21,11 @@ export default {
       'list-none',
       'm-0',
       'p-0',
-      'outline-none'
-    ]
+      'outline-none',
+    ],
   },
   menuitem: {
-    class: 'relative'
+    class: 'relative',
   },
   content: ({ context }) => ({
     class: [
@@ -40,20 +40,20 @@ export default {
         'text-surface-900 dark:text-surface-0/80 bg-surface-50 dark:bg-black/70':
           context.focused && context.active,
         'text-surface-900 dark:text-surface-0/80 bg-surface-50 dark:bg-black/70':
-          !context.focused && context.active
+          !context.focused && context.active,
       },
 
       // Hover States
       {
         'hover:bg-surface-50 dark:hover:bg-surface-800': !context.active,
         'hover:bg-surface-100 dark:hover:bg-black/40 text-surface-900 dark:text-surface-0/80':
-          context.active
+          context.active,
       },
 
       // Transitions
       'transition-shadow',
-      'duration-200'
-    ]
+      'duration-200',
+    ],
   }),
   action: {
     class: [
@@ -74,19 +74,19 @@ export default {
       'no-underline',
       'overflow-hidden',
       'cursor-pointer',
-      'select-none'
-    ]
+      'select-none',
+    ],
   },
   icon: {
     class: [
       // Spacing
       'mr-2',
       'leading-6',
-      'text-sm'
-    ]
+      'text-sm',
+    ],
   },
   label: {
-    class: ['leading-6', 'text-sm']
+    class: ['leading-6', 'text-sm'],
   },
   submenu: ({ props }) => ({
     class: [
@@ -108,17 +108,17 @@ export default {
       { 'sm:absolute sm:left-full sm:top-0': props.level > 1 },
 
       // Color
-      'bg-surface-0 dark:bg-surface-700'
-    ]
+      'bg-surface-0 dark:bg-surface-700',
+    ],
   }),
   submenuicon: {
-    class: ['ml-auto']
+    class: ['ml-auto'],
   },
   separator: {
-    class: 'border-t border-surface-200 dark:border-surface-600 my-1'
+    class: 'border-t border-surface-200 dark:border-surface-600 my-1',
   },
   transition: {
     enterFromClass: 'opacity-0',
-    enterActiveClass: 'transition-opacity duration-250'
-  }
-};
+    enterActiveClass: 'transition-opacity duration-250',
+  },
+}

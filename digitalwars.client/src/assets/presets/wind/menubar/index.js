@@ -18,8 +18,8 @@ export default {
 
       // Color
       'bg-surface-0 dark:bg-surface-800/20',
-      'ring-1 ring-inset ring-surface-100 dark:ring-surface-800 ring-offset-0'
-    ]
+      'ring-1 ring-inset ring-surface-100 dark:ring-surface-800 ring-offset-0',
+    ],
   },
   menu: ({ props }) => ({
     class: [
@@ -52,11 +52,11 @@ export default {
       'bg-surface-0 dark:bg-surface-900 sm:bg-transparent dark:sm:bg-transparent',
 
       // Misc
-      'outline-none'
-    ]
+      'outline-none',
+    ],
   }),
   menuitem: {
-    class: 'sm:relative sm:w-auto w-full static'
+    class: 'sm:relative sm:w-auto w-full static',
   },
   content: ({ props, context }) => ({
     class: [
@@ -71,20 +71,20 @@ export default {
         'text-surface-900 dark:text-surface-0/80 bg-surface-50 dark:bg-black/70':
           context.focused && context.active,
         'text-surface-900 dark:text-surface-0/80 bg-surface-50 dark:bg-black/70':
-          !context.focused && context.active
+          !context.focused && context.active,
       },
 
       // Hover States
       {
         'hover:bg-surface-50 dark:hover:bg-surface-800': !context.active,
         'hover:bg-surface-100 dark:hover:bg-black/40 text-surface-900 dark:text-surface-0/80':
-          context.active
+          context.active,
       },
 
       // Transitions
       'transition-all',
-      'duration-200'
-    ]
+      'duration-200',
+    ],
   }),
   action: ({ context }) => ({
     class: [
@@ -105,26 +105,26 @@ export default {
       // Size
       {
         'pl-5 sm:pl-3': context.level === 1,
-        'pl-7 sm:pl-3': context.level === 2
+        'pl-7 sm:pl-3': context.level === 2,
       },
 
       // Misc
       'select-none',
       'cursor-pointer',
       'no-underline ',
-      'overflow-hidden'
-    ]
+      'overflow-hidden',
+    ],
   }),
   icon: {
-    class: 'mr-2'
+    class: 'mr-2',
   },
   submenuicon: ({ props, context }) => ({
     class: [
       {
         'ml-auto sm:ml-2': props.root,
-        'ml-auto': !props.root
-      }
-    ]
+        'ml-auto': !props.root,
+      },
+    ],
   }),
   submenu: ({ props }) => ({
     class: [
@@ -146,11 +146,11 @@ export default {
       { 'sm:absolute sm:left-full sm:top-0': props.level > 1 },
 
       // Color
-      'bg-surface-0 dark:bg-surface-900'
-    ]
+      'bg-surface-0 dark:bg-surface-900',
+    ],
   }),
   separator: {
-    class: 'border-t border-surface-200 dark:border-surface-600 my-1'
+    class: 'border-t border-surface-200 dark:border-surface-600 my-1',
   },
   button: {
     class: [
@@ -178,10 +178,10 @@ export default {
 
       // Misc
       'cursor-pointer',
-      'no-underline'
-    ]
+      'no-underline',
+    ],
   },
   end: {
-    class: 'ml-auto self-center'
-  }
-};
+    class: 'ml-auto self-center',
+  },
+}

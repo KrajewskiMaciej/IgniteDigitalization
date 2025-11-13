@@ -1,5 +1,7 @@
 <template>
-  <div class="w-full h-full flex-1 flex flex-col justify-center items-center text-center text-white">
+  <div
+    class="w-full h-full flex-1 flex flex-col justify-center items-center text-center text-white"
+  >
     <h1 class="m-8 font-nasalization text-7xl">Drzewo decyzji</h1>
 
     <!-- Obrazek drzewa decyzji -->
@@ -18,11 +20,7 @@
         v-model="selectedPDF"
         class="px-4 py-2 bg-white text-black rounded-md border border-gray-300"
       >
-        <option
-          v-for="(pdf, index) in availablePDFs"
-          :key="index"
-          :value="pdf.path"
-        >
+        <option v-for="(pdf, index) in availablePDFs" :key="index" :value="pdf.path">
           {{ pdf.name }}
         </option>
       </select>
@@ -56,10 +54,7 @@
       >
         &times;
       </button>
-      <iframe
-        :src="window.path"
-        class="w-full h-full rounded-md"
-      ></iframe>
+      <iframe :src="window.path" class="w-full h-full rounded-md"></iframe>
     </div>
   </div>
 </template>
@@ -71,12 +66,12 @@ import drzewko from '@/assets/viewPNGs/DrzewoDecyzji.png'
 
 // --- DEFINICJE TYPÓW ---
 interface PdfInfo {
-  name: string;
-  path: string;
+  name: string
+  path: string
 }
 
 interface PdfWindow {
-  path: string;
+  path: string
 }
 
 // Lista dostępnych PDF-ów z jawnym typowaniem
@@ -92,7 +87,7 @@ const availablePDFs: PdfInfo[] = [
   {
     name: 'Dodatek 2',
     path: new URL('@/assets/documents/dodatek2.pdf', import.meta.url).href,
-  }
+  },
 ]
 
 const selectedPDF = ref<string>(availablePDFs[0].path)
@@ -111,7 +106,7 @@ function toggleImageSize(): void {
 // Obsługa PDF
 function openPDF(): void {
   // POPRAWKA: Dodajemy obiekt zgodny z interfejsem `PdfWindow`
-  pdfWindows.value.push({ path: selectedPDF.value });
+  pdfWindows.value.push({ path: selectedPDF.value })
 }
 
 // POPRAWKA: Dodano typ `number` do parametru `index`

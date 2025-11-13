@@ -12,8 +12,8 @@ export default {
       // Color
       'bg-surface-0 dark:bg-surface-900',
       'text-surface-700 dark:text-surface-0/80',
-      'ring-1 ring-inset ring-surface-300 dark:ring-surface-700 ring-offset-0'
-    ]
+      'ring-1 ring-inset ring-surface-300 dark:ring-surface-700 ring-offset-0',
+    ],
   },
   legend: ({ props }) => ({
     class: [
@@ -39,9 +39,9 @@ export default {
       { '': props.toggleable },
       {
         'focus:outline-none focus:outline-offset-0 focus:ring-2 focus:ring-primary-600 ring-inset dark:focus:ring-primary-500':
-          props.toggleable
-      }
-    ]
+          props.toggleable,
+      },
+    ],
   }),
   toggler: ({ props }) => ({
     class: [
@@ -58,30 +58,30 @@ export default {
       // Color
       {
         'text-surface-700 dark:text-surface-200 hover:text-surface-900 hover:text-surface-900':
-          props.toggleable
+          props.toggleable,
       },
 
       // States
       { 'hover:text-surface-900 dark:hover:text-surface-100': props.toggleable },
       {
         'focus:outline-none focus:outline-offset-0 focus:ring-2 focus:ring-inset focus:ring-primary-600 dark:focus:ring-primary-500':
-          props.toggleable
+          props.toggleable,
       },
 
       // Misc
       {
-        'transition-none cursor-pointer overflow-hidden select-none': props.toggleable
-      }
-    ]
+        'transition-none cursor-pointer overflow-hidden select-none': props.toggleable,
+      },
+    ],
   }),
   togglerIcon: {
-    class: 'mr-2 inline-block'
+    class: 'mr-2 inline-block',
   },
   legendTitle: {
-    class: 'flex items-center justify-center leading-none'
+    class: 'flex items-center justify-center leading-none',
   },
   content: {
-    class: 'p-0'
+    class: 'p-0',
   },
   transition: {
     enterFromClass: 'max-h-0',
@@ -91,6 +91,6 @@ export default {
     leaveFromClass: 'max-h-[1000px]',
     leaveActiveClass:
       'overflow-hidden transition-[max-height] duration-[450ms] ease-[cubic-bezier(0,1,0,1)]',
-    leaveToClass: 'max-h-0'
-  }
-};
+    leaveToClass: 'max-h-0',
+  },
+}

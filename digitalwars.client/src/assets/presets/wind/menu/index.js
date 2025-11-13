@@ -9,8 +9,8 @@ export default {
       // Colors
       'bg-surface-0 dark:bg-surface-700',
       'text-surface-700 dark:text-white/80',
-      'ring-1 ring-surface-200 dark:ring-surface-600'
-    ]
+      'ring-1 ring-surface-200 dark:ring-surface-600',
+    ],
   },
   menu: {
     class: [
@@ -18,14 +18,14 @@ export default {
       'list-none',
       'm-0',
       'p-0',
-      'outline-none'
-    ]
+      'outline-none',
+    ],
   },
   menuitem: {
     class: [
       // Space
-      'first:mt-0 mt-1'
-    ]
+      'first:mt-0 mt-1',
+    ],
   },
   content: ({ context }) => ({
     class: [
@@ -36,7 +36,7 @@ export default {
       {
         'text-surface-700 dark:text-surface-0': !context.focused,
         'bg-surface-100 text-primary-500 dark:bg-surface-300/10 dark:text-primary-400':
-          context.focused
+          context.focused,
       },
 
       // Transitions
@@ -45,8 +45,8 @@ export default {
 
       // States
       'hover:text-primary-600 dark:hover:text-primary-400',
-      'hover:bg-surface-100 dark:hover:bg-surface-400/10'
-    ]
+      'hover:bg-surface-100 dark:hover:bg-surface-400/10',
+    ],
   }),
   action: {
     class: [
@@ -67,19 +67,19 @@ export default {
       'no-underline',
       'overflow-hidden',
       'cursor-pointer',
-      'select-none'
-    ]
+      'select-none',
+    ],
   },
   icon: {
     class: [
       // Spacing
       'mr-2',
       'leading-6',
-      'text-sm'
-    ]
+      'text-sm',
+    ],
   },
   label: {
-    class: ['leading-6', 'text-sm']
+    class: ['leading-6', 'text-sm'],
   },
   submenuheader: {
     class: [
@@ -98,14 +98,14 @@ export default {
 
       // Colors
       'bg-surface-0 dark:bg-surface-700',
-      'text-surface-600 dark:text-surface-0/60'
-    ]
+      'text-surface-600 dark:text-surface-0/60',
+    ],
   },
   transition: {
     enterFromClass: 'opacity-0 scale-y-[0.8]',
     enterActiveClass:
       'transition-[transform,opacity] duration-[120ms] ease-[cubic-bezier(0,0,0.2,1)]',
     leaveActiveClass: 'transition-opacity duration-100 ease-linear',
-    leaveToClass: 'opacity-0'
-  }
-};
+    leaveToClass: 'opacity-0',
+  },
+}

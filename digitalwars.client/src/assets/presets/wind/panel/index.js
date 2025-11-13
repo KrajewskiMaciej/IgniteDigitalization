@@ -1,6 +1,6 @@
 export default {
   root: {
-    class: 'shadow-md rounded-lg'
+    class: 'shadow-md rounded-lg',
   },
   header: ({ props }) => ({
     class: [
@@ -16,11 +16,11 @@ export default {
       'rounded-tl-lg rounded-tr-lg',
 
       // Conditional Spacing
-      { 'px-5 md:px-6 py-5': !props.toggleable, 'py-3 px-5 md:px-6': props.toggleable }
-    ]
+      { 'px-5 md:px-6 py-5': !props.toggleable, 'py-3 px-5 md:px-6': props.toggleable },
+    ],
   }),
   title: {
-    class: 'leading-none font-medium'
+    class: 'leading-none font-medium',
   },
   toggler: {
     class: [
@@ -46,11 +46,11 @@ export default {
       'transition duration-200 ease-in-out',
 
       // Misc
-      'overflow-hidden relative no-underline'
-    ]
+      'overflow-hidden relative no-underline',
+    ],
   },
   togglerIcon: {
-    class: 'inline-block'
+    class: 'inline-block',
   },
   content: {
     class: [
@@ -62,8 +62,8 @@ export default {
 
       //Color
       'bg-surface-0 dark:bg-surface-900',
-      'text-surface-700 dark:text-surface-0/80'
-    ]
+      'text-surface-700 dark:text-surface-0/80',
+    ],
   },
   footer: {
     class: [
@@ -76,8 +76,8 @@ export default {
       // Color
       'bg-surface-0 dark:bg-surface-900',
       'text-surface-600 dark:text-surface-0/70',
-      'border-t border-surface-200 dark:border-surface-800'
-    ]
+      'border-t border-surface-200 dark:border-surface-800',
+    ],
   },
   transition: {
     enterFromClass: 'max-h-0',
@@ -87,6 +87,6 @@ export default {
     leaveFromClass: 'max-h-[1000px]',
     leaveActiveClass:
       'overflow-hidden transition-[max-height] duration-[450ms] ease-[cubic-bezier(0,1,0,1)]',
-    leaveToClass: 'max-h-0'
-  }
-};
+    leaveToClass: 'max-h-0',
+  },
+}

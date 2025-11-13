@@ -4,9 +4,9 @@ export default {
       'flex grow',
       {
         'flex-col': props.layout === 'vertical',
-        'flex-row flex-1': props.layout === 'horizontal'
-      }
-    ]
+        'flex-row flex-1': props.layout === 'horizontal',
+      },
+    ],
   }),
   event: ({ props, context }) => ({
     class: [
@@ -18,9 +18,9 @@ export default {
         'flex-col flex-1': props.layout === 'horizontal',
         'flex-col-reverse ':
           props.align === 'bottom' ||
-          (props.layout === 'horizontal' && props.align === 'alternate' && context.index % 2 === 1)
-      }
-    ]
+          (props.layout === 'horizontal' && props.align === 'alternate' && context.index % 2 === 1),
+      },
+    ],
   }),
   // opposite: ({ props, context }) => ({
   //   class: [
@@ -44,9 +44,9 @@ export default {
       'flex items-center flex-initial',
       {
         'flex-col': props.layout === 'vertical',
-        'flex-row': props.layout === 'horizontal'
-      }
-    ]
+        'flex-row': props.layout === 'horizontal',
+      },
+    ],
   }),
   marker: {
     class: [
@@ -57,24 +57,24 @@ export default {
       'w-4 h-4',
 
       // Appearance
-      'rounded-full border-2 border-primary-500 bg-surface-0 dark:border-primary-300 dark:bg-surface-900/40'
-    ]
+      'rounded-full border-2 border-primary-500 bg-surface-0 dark:border-primary-300 dark:bg-surface-900/40',
+    ],
   },
   connector: ({ props }) => ({
     class: [
       'grow bg-surface-300 dark:bg-surface-700',
       {
         'w-[2px]': props.layout === 'vertical',
-        'w-full h-[2px]': props.layout === 'horizontal'
-      }
-    ]
+        'w-full h-[2px]': props.layout === 'horizontal',
+      },
+    ],
   }),
   content: ({ props, context }) => ({
     class: [
       'flex-1',
       {
         'px-4': props.layout === 'vertical',
-        'py-4': props.layout === 'horizontal'
+        'py-4': props.layout === 'horizontal',
       },
       {
         'text-left':
@@ -82,12 +82,12 @@ export default {
           (props.layout === 'vertical' && props.align === 'alternate' && context.index % 2 === 0),
         'text-right':
           props.align === 'right' ||
-          (props.layout === 'vertical' && props.align === 'alternate' && context.index % 2 === 1)
+          (props.layout === 'vertical' && props.align === 'alternate' && context.index % 2 === 1),
       },
       {
         'min-h-0': props.layout === 'vertical' && context.index === context.count - 1,
-        'grow-0': props.layout === 'horizontal' && context.index === context.count - 1
-      }
-    ]
-  })
-};
+        'grow-0': props.layout === 'horizontal' && context.index === context.count - 1,
+      },
+    ],
+  }),
+}

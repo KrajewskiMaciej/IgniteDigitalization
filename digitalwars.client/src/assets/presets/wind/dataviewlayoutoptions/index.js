@@ -27,8 +27,8 @@ export default {
       'transition duration-200',
 
       // Misc
-      'cursor-pointer select-none overflow-hidden'
-    ]
+      'cursor-pointer select-none overflow-hidden',
+    ],
   }),
   gridbutton: ({ props }) => ({
     class: [
@@ -58,7 +58,7 @@ export default {
       'transition duration-200',
 
       // Misc
-      'cursor-pointer select-none overflow-hidden'
-    ]
-  })
-};
+      'cursor-pointer select-none overflow-hidden',
+    ],
+  }),
+}

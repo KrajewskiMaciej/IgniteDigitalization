@@ -1,4 +1,1 @@
-export const pl = {
-
-    
-}
+export const pl = {}

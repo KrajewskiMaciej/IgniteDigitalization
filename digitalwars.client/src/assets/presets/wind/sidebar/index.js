@@ -8,13 +8,13 @@ export default {
       'relative',
       {
         '!transition-none !transform-none !w-screen !h-screen !max-h-full !top-0 !left-0':
-          props.position == 'full'
+          props.position == 'full',
       },
 
       // Size
       {
         'h-full w-full max-w-[28rem]': props.position == 'left' || props.position == 'right',
-        'h-auto w-full': props.position == 'top' || props.position == 'bottom'
+        'h-auto w-full': props.position == 'top' || props.position == 'bottom',
       },
 
       // Shape
@@ -31,8 +31,8 @@ export default {
       'duration-300',
 
       // Misc
-      'pointer-events-auto'
-    ]
+      'pointer-events-auto',
+    ],
   }),
   header: {
     class: [
@@ -45,14 +45,14 @@ export default {
 
       // Colors
       'bg-surface-0 dark:bg-surface-800',
-      'text-surface-700 dark:text-surface-0/80'
-    ]
+      'text-surface-700 dark:text-surface-0/80',
+    ],
   },
   title: {
-    class: ['font-semibold leading-6 text-base m-0']
+    class: ['font-semibold leading-6 text-base m-0'],
   },
   icons: {
-    class: ['flex items-center']
+    class: ['flex items-center'],
   },
   closeButton: {
     class: [
@@ -84,8 +84,8 @@ export default {
       'focus:ring-primary-500 dark:focus:ring-primary-400',
 
       // Misc
-      'overflow-hidden'
-    ]
+      'overflow-hidden',
+    ],
   },
   closeicon: {
     class: [
@@ -94,8 +94,8 @@ export default {
 
       // Size
       'w-3',
-      'h-3'
-    ]
+      'h-3',
+    ],
   },
   content: {
     class: [
@@ -107,8 +107,8 @@ export default {
 
       // Growth and Overflow
       'grow',
-      'overflow-y-auto'
-    ]
+      'overflow-y-auto',
+    ],
   },
   mask: ({ props }) => ({
     class: [
@@ -118,35 +118,35 @@ export default {
       { 'p-5': !props.position == 'full' },
 
       // Background and Effects
-      { 'bg-surface-500/70 dark:bg-surface-700/70': props.modal, 'backdrop-blur-sm': props.modal }
-    ]
+      { 'bg-surface-500/70 dark:bg-surface-700/70': props.modal, 'backdrop-blur-sm': props.modal },
+    ],
   }),
   transition: ({ props }) => {
     return props.position === 'top'
       ? {
           enterFromClass: 'translate-x-0 -translate-y-full translate-z-0',
-          leaveToClass: 'translate-x-0 -translate-y-full translate-z-0'
+          leaveToClass: 'translate-x-0 -translate-y-full translate-z-0',
         }
       : props.position === 'bottom'
         ? {
             enterFromClass: 'translate-x-0 translate-y-full translate-z-0',
-            leaveToClass: 'translate-x-0 translate-y-full translate-z-0'
+            leaveToClass: 'translate-x-0 translate-y-full translate-z-0',
           }
         : props.position === 'left'
           ? {
               enterFromClass: '-translate-x-full translate-y-0 translate-z-0',
-              leaveToClass: '-translate-x-full translate-y-0 translate-z-0'
+              leaveToClass: '-translate-x-full translate-y-0 translate-z-0',
             }
           : props.position === 'right'
             ? {
                 enterFromClass: 'translate-x-full translate-y-0 translate-z-0',
-                leaveToClass: 'translate-x-full translate-y-0 translate-z-0'
+                leaveToClass: 'translate-x-full translate-y-0 translate-z-0',
               }
             : {
                 enterFromClass: 'opacity-0',
                 enterActiveClass: 'transition-opacity duration-400 ease-in',
                 leaveActiveClass: 'transition-opacity duration-400 ease-in',
-                leaveToClass: 'opacity-0'
-              };
-  }
-};
+                leaveToClass: 'opacity-0',
+              }
+  },
+}

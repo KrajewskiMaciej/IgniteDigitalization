@@ -1,9 +1,9 @@
-import PrimeVue from 'primevue/config';
-import Ripple from 'primevue/ripple';
-import Tooltip from 'primevue/tooltip';
-import type { Plugin } from 'vue';
+import PrimeVue from 'primevue/config'
+import Ripple from 'primevue/ripple'
+import Tooltip from 'primevue/tooltip'
+import type { Plugin } from 'vue'
 // @ts-ignore
-import Wind from '@/assets/presets/wind';
+import Wind from '@/assets/presets/wind'
 
 export const primevue: Plugin = {
   install(app) {
@@ -11,10 +11,9 @@ export const primevue: Plugin = {
       unstyled: true,
       ripple: true,
       pt: Wind,
-    });
+    })
 
-
-    app.directive('ripple', Ripple);
-    app.directive('tooltip', Tooltip);
-  }
-};
+    app.directive('ripple', Ripple)
+    app.directive('tooltip', Tooltip)
+  },
+}

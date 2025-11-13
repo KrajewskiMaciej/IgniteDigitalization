@@ -3,9 +3,9 @@ export default {
     class: [
       'flex',
       {
-        'opacity-60 select-none pointer-events-none cursor-default': props.disabled
-      }
-    ]
+        'opacity-60 select-none pointer-events-none cursor-default': props.disabled,
+      },
+    ],
   }),
   container: ({ state }) => ({
     class: [
@@ -34,7 +34,7 @@ export default {
       // States
       {
         'ring-1 ring-inset ring-surface-300 dark:ring-surface-700 ring-offset-0': !state.focused,
-        'ring-2 ring-primary-500 dark:ring-primary-400': state.focused
+        'ring-2 ring-primary-500 dark:ring-primary-400': state.focused,
       },
 
       // Transition
@@ -42,12 +42,12 @@ export default {
 
       // Misc
       'cursor-text overflow-hidden',
-      'appearance-none'
-    ]
+      'appearance-none',
+    ],
   }),
 
   inputtoken: {
-    class: ['py-0.5 px-0', 'inline-flex flex-auto']
+    class: ['py-0.5 px-0', 'inline-flex flex-auto'],
   },
   input: {
     class: [
@@ -67,8 +67,8 @@ export default {
       // Color
       'text-surface-700 dark:text-white/80',
       'bg-transparent',
-      'placeholder:text-surface-400 dark:placeholder:text-surface-500'
-    ]
+      'placeholder:text-surface-400 dark:placeholder:text-surface-500',
+    ],
   },
   token: {
     class: [
@@ -83,11 +83,11 @@ export default {
 
       // Colors
       'text-surface-700 dark:text-white/70',
-      'bg-surface-200 dark:bg-surface-700'
-    ]
+      'bg-surface-200 dark:bg-surface-700',
+    ],
   },
   label: {
-    class: 'leading-5'
+    class: 'leading-5',
   },
   removeTokenIcon: {
     class: [
@@ -104,7 +104,7 @@ export default {
       'transition duration-200 ease-in-out',
 
       // Misc
-      'cursor-pointer'
-    ]
-  }
-};
+      'cursor-pointer',
+    ],
+  },
+}

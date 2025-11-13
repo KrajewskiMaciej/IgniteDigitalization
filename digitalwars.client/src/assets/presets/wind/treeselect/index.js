@@ -16,17 +16,17 @@ export default {
       // States
       {
         'ring-1 ring-inset ring-surface-300 dark:ring-surface-700': !state.focused,
-        'ring-2 ring-inset ring-primary-500 dark:ring-primary-400': state.focused
+        'ring-2 ring-inset ring-primary-500 dark:ring-primary-400': state.focused,
       },
 
       // Misc
       'cursor-default',
       'select-none',
-      { 'opacity-60': props.disabled, 'pointer-events-none': props.disabled }
-    ]
+      { 'opacity-60': props.disabled, 'pointer-events-none': props.disabled },
+    ],
   }),
   labelContainer: {
-    class: ['overflow-hidden flex flex-auto cursor-pointer']
+    class: ['overflow-hidden flex flex-auto cursor-pointer'],
   },
   label: {
     class: [
@@ -42,8 +42,8 @@ export default {
       'transition duration-200',
 
       // Misc
-      'overflow-hidden whitespace-nowrap cursor-pointer overflow-ellipsis'
-    ]
+      'overflow-hidden whitespace-nowrap cursor-pointer overflow-ellipsis',
+    ],
   },
   trigger: {
     class: [
@@ -63,8 +63,8 @@ export default {
 
       // Shape
       'rounded-tr-md',
-      'rounded-br-md'
-    ]
+      'rounded-br-md',
+    ],
   },
   panel: {
     class: [
@@ -80,8 +80,8 @@ export default {
       // Color
       'bg-surface-0 dark:bg-surface-800',
       'text-surface-800 dark:text-white/80',
-      'ring-1 ring-inset ring-surface-300 dark:ring-surface-700'
-    ]
+      'ring-1 ring-inset ring-surface-300 dark:ring-surface-700',
+    ],
   },
   wrapper: {
     class: [
@@ -89,8 +89,8 @@ export default {
       'max-h-[200px]',
 
       // Misc
-      'overflow-auto'
-    ]
+      'overflow-auto',
+    ],
   },
   tree: {
     root: {
@@ -98,11 +98,11 @@ export default {
         'relative',
 
         // Space
-        'p-1.5'
-      ]
+        'p-1.5',
+      ],
     },
     wrapper: {
-      class: ['overflow-auto']
+      class: ['overflow-auto'],
     },
     container: {
       class: [
@@ -110,15 +110,15 @@ export default {
         'm-0 p-0',
 
         // Misc
-        'list-none overflow-auto'
-      ]
+        'list-none overflow-auto',
+      ],
     },
     node: {
       class: [
         'p-[2px]',
         'rounded-md',
-        'focus:outline-none focus:outline-offset-0 focus:ring-2 focus:ring-inset focus:ring-primary-500 dark:focus:ring-primary-400'
-      ]
+        'focus:outline-none focus:outline-offset-0 focus:ring-2 focus:ring-inset focus:ring-primary-500 dark:focus:ring-primary-400',
+      ],
     },
     content: ({ context, props }) => ({
       class: [
@@ -135,13 +135,13 @@ export default {
         'text-surface-700 dark:text-surface-0',
         {
           'bg-surface-100 text-primary-500 dark:bg-surface-300/10 dark:text-primary-400':
-            context.selected
+            context.selected,
         },
 
         // States
         {
           'hover:bg-surface-200 dark:hover:bg-surface-400/10':
-            props.selectionMode == 'single' || props.selectionMode == 'multiple'
+            props.selectionMode == 'single' || props.selectionMode == 'multiple',
         },
 
         // Transition
@@ -149,9 +149,9 @@ export default {
 
         {
           'cursor-pointer select-none':
-            props.selectionMode == 'single' || props.selectionMode == 'multiple'
-        }
-      ]
+            props.selectionMode == 'single' || props.selectionMode == 'multiple',
+        },
+      ],
     }),
     toggler: ({ context }) => ({
       class: [
@@ -172,7 +172,7 @@ export default {
         'text-surface-500',
         'bg-transparent',
         {
-          invisible: context.leaf
+          invisible: context.leaf,
         },
 
         // States
@@ -185,8 +185,8 @@ export default {
         'transition duration-200',
 
         // Misc
-        'cursor-pointer select-none'
-      ]
+        'cursor-pointer select-none',
+      ],
     }),
     togglericon: {
       class: [
@@ -194,11 +194,11 @@ export default {
         'w-4 h-4',
 
         // Color
-        'text-surface-500 dark:text-white/70'
-      ]
+        'text-surface-500 dark:text-white/70',
+      ],
     },
     checkboxcontainer: {
-      class: 'mr-2'
+      class: 'mr-2',
     },
     checkbox: ({ context, props }) => ({
       class: [
@@ -222,20 +222,20 @@ export default {
           'border-surface-300 bg-surface-0 dark:border-surface-700 dark:bg-surface-900':
             !context.checked,
           'border-primary-500 bg-primary-500 dark:border-primary-400 dark:bg-primary-400':
-            context.checked
+            context.checked,
         },
 
         // States
         'focus:outline-none focus:outline-offset-0',
         {
           'ring-2 ring-primary-500 dark:ring-primary-400': !props.disabled && context.focused,
-          'cursor-default opacity-60': props.disabled
+          'cursor-default opacity-60': props.disabled,
         },
 
         // Transitions
         'transition-colors',
-        'duration-200'
-      ]
+        'duration-200',
+      ],
     }),
     checkboxicon: {
       class: [
@@ -251,8 +251,8 @@ export default {
 
         // Transitions
         'transition-all',
-        'duration-200'
-      ]
+        'duration-200',
+      ],
     },
     nodeicon: {
       class: [
@@ -260,11 +260,11 @@ export default {
         'mr-2',
 
         // Color
-        'text-surface-600 dark:text-white/70'
-      ]
+        'text-surface-600 dark:text-white/70',
+      ],
     },
     subgroup: {
-      class: ['m-0 list-none p-0 pl-2 mt-1']
+      class: ['m-0 list-none p-0 pl-2 mt-1'],
     },
     filtercontainer: {
       class: [
@@ -274,8 +274,8 @@ export default {
         'mb-2',
 
         // Size
-        'w-full'
-      ]
+        'w-full',
+      ],
     },
     input: {
       class: [
@@ -307,14 +307,14 @@ export default {
 
         // Transition & Misc
         'appearance-none',
-        'transition-colors duration-200'
-      ]
+        'transition-colors duration-200',
+      ],
     },
     loadingicon: {
       class: [
         'text-surface-500 dark:text-surface-0/70',
-        'absolute top-[50%] right-[50%] -mt-2 -mr-2 animate-spin'
-      ]
+        'absolute top-[50%] right-[50%] -mt-2 -mr-2 animate-spin',
+      ],
     },
     searchicon: {
       class: [
@@ -322,15 +322,15 @@ export default {
         'absolute top-1/2 -mt-2 right-3',
 
         // Color
-        'text-surface-600 dark:hover:text-white/70'
-      ]
-    }
+        'text-surface-600 dark:hover:text-white/70',
+      ],
+    },
   },
   transition: {
     enterFromClass: 'opacity-0 scale-y-[0.8]',
     enterActiveClass:
       'transition-[transform,opacity] duration-[120ms] ease-[cubic-bezier(0,0,0.2,1)]',
     leaveActiveClass: 'transition-opacity duration-100 ease-linear',
-    leaveToClass: 'opacity-0'
-  }
-};
+    leaveToClass: 'opacity-0',
+  },
+}

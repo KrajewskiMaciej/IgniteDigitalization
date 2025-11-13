@@ -23,12 +23,12 @@ export default {
       // States
       {
         'outline-none focus:ring-primary-500 dark:focus:ring-primary-400': !context.disabled,
-        'opacity-60 select-none pointer-events-none cursor-default': context.disabled
+        'opacity-60 select-none pointer-events-none cursor-default': context.disabled,
       },
 
       // Misc
       'appearance-none',
-      'transition-colors duration-200'
-    ]
-  })
-};
+      'transition-colors duration-200',
+    ],
+  }),
+}

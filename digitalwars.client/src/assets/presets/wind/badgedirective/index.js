@@ -18,13 +18,13 @@ export default {
         'p-0': context.nogutter || context.dot,
         'p-1': !context.nogutter && !context.dot,
         'min-w-[0.5rem] h-2': context.dot,
-        'min-w-[1rem] h-4': !context.dot
+        'min-w-[1rem] h-4': !context.dot,
       },
 
       // Shape
       {
         'rounded-full': context.nogutter || context.dot,
-        'rounded-[10px]': !context.nogutter && !context.dot
+        'rounded-[10px]': !context.nogutter && !context.dot,
       },
 
       // Color
@@ -43,8 +43,8 @@ export default {
         'bg-blue-500 dark:bg-blue-400': context.info,
         'bg-orange-500 dark:bg-orange-400': context.warning,
         'bg-purple-500 dark:bg-purple-400': context.help,
-        'bg-red-500 dark:bg-red-400': context.danger
-      }
-    ]
-  })
-};
+        'bg-red-500 dark:bg-red-400': context.danger,
+      },
+    ],
+  }),
+}

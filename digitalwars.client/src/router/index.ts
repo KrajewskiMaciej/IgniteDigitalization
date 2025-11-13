@@ -8,7 +8,7 @@ import cheatSheetView from '@/views/admin/cheatSheetView.vue'
 import editCardsView from '@/views/admin/editCardsView.vue'
 import adminGameDashboardView from '@/views/game/adminGameDashboardView.vue'
 // FIX: Poprawiono literówkę w nazwie zmiennej, aby pasowała do importu
-import playerView from '@/views/player/playerView.vue' 
+import playerView from '@/views/player/playerView.vue'
 import gameStatistics from '@/views/game/gameStatistics.vue'
 import editItems from '@/views/admin/editItems.vue'
 import decisionHistoryView from '@/views/game/gameDecisionHistoryView.vue'
@@ -87,15 +87,15 @@ const router = createRouter({
           path: 'exportToPDF',
           name: 'export-PDF',
           component: exportToPdfView,
-        }
-      ]
+        },
+      ],
     },
     {
       path: '/admin/game',
       component: adminGameDashboardView,
       meta: { requiresAuth: true },
       // FIX: Dodano przekierowanie, aby uniknąć pustej strony pod adresem /admin/game
-      redirect: { name: 'admin-home' }, 
+      redirect: { name: 'admin-home' },
       children: [
         // FIX: Kolejność tras została zmieniona. Najbardziej szczegółowe trasy muszą być zdefiniowane jako pierwsze.
         {
@@ -137,7 +137,7 @@ const router = createRouter({
           component: gameView,
           props: true,
         },
-      ]
+      ],
     },
     {
       path: '/player',
@@ -147,33 +147,33 @@ const router = createRouter({
       path: '/player/:teamToken',
       name: 'player-dashboard',
       component: playerView,
-      props: true
+      props: true,
     },
     {
       path: '/tempdecisions',
       name: 'decision-history',
       component: decisionHistoryView,
     },
-  ]
+  ],
 })
 
 // Strażnik nawigacji jest poprawny, wprowadzono drobną poprawkę w logowaniu błędu.
 router.beforeEach(async (to, from, next) => {
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
 
   if (!requiresAuth) {
-    return next();
+    return next()
   }
 
   try {
-    await apiServices.get(apiConfig.auth.me);
-    next();
+    await apiServices.get(apiConfig.auth.me)
+    next()
   } catch (err) {
-    sessionStorage.setItem('showLoginAfterRedirect', 'true');
-    next('/');
+    sessionStorage.setItem('showLoginAfterRedirect', 'true')
+    next('/')
     // FIX: Zmieniono na console.error dla lepszej semantyki błędu
-    console.error('Błąd autoryzacji:', err); 
+    console.error('Błąd autoryzacji:', err)
   }
-});
+})
 
-export default router;
+export default router

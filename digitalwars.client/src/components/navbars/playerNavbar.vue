@@ -1,7 +1,8 @@
 <template>
-  <nav :style="{ backgroundColor: navBgColor }"
-       class="w-full py-3 px-6 flex items-center relative border-b-2 border-lgray-accent">
-
+  <nav
+    :style="{ backgroundColor: navBgColor }"
+    class="w-full py-3 px-6 flex items-center relative border-b-2 border-lgray-accent"
+  >
     <!-- Logo -->
     <div>
       <RouterLink to="/">
@@ -16,7 +17,9 @@
 
     <!-- Przycisk AI w prawym górnym rogu -->
     <div class="absolute top-3 right-6">
-      <button class="w-10 h-10 rounded-full bg-white text-blue-900 font-bold shadow-md hover:bg-gray-200 transition">
+      <button
+        class="w-10 h-10 rounded-full bg-white text-blue-900 font-bold shadow-md hover:bg-gray-200 transition"
+      >
         AI
       </button>
     </div>
@@ -24,21 +27,21 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
-  import { RouterLink } from 'vue-router'
-  import logo from '@/assets/logos/ITM_poziom_biale.png'
+import { computed } from 'vue'
+import { RouterLink } from 'vue-router'
+import logo from '@/assets/logos/ITM_poziom_biale.png'
 
-  const props = defineProps({
-    teamName: {
-      type: String,
-      default: 'Test'
-    },
-    navBgColor: {
-      type: String,
-      default: '#1E3A8A'
-    }
-  })
+const props = defineProps({
+  teamName: {
+    type: String,
+    default: 'Test',
+  },
+  navBgColor: {
+    type: String,
+    default: '#1E3A8A',
+  },
+})
 
-  const navBgColor = computed(() => props.navBgColor)
-  const teamName = computed(() => props.teamName)
+const navBgColor = computed(() => props.navBgColor)
+const teamName = computed(() => props.teamName)
 </script>

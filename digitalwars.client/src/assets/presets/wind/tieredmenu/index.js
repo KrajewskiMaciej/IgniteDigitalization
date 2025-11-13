@@ -10,8 +10,8 @@ export default {
 
       // Colors
       'bg-surface-0 dark:bg-surface-700',
-      'ring-1 ring-surface-200 dark:ring-surface-700'
-    ]
+      'ring-1 ring-surface-200 dark:ring-surface-700',
+    ],
   },
   menu: {
     class: [
@@ -19,11 +19,11 @@ export default {
       'list-none',
       'm-0',
       'p-0',
-      'outline-none'
-    ]
+      'outline-none',
+    ],
   },
   menuitem: {
-    class: ['relative first:mt-0 mt-1']
+    class: ['relative first:mt-0 mt-1'],
   },
   content: ({ context }) => ({
     class: [
@@ -34,7 +34,7 @@ export default {
       {
         'text-surface-700 dark:text-surface-0': !context.focused,
         'bg-surface-100 text-primary-500 dark:bg-surface-300/10 dark:text-primary-400':
-          context.focused
+          context.focused,
       },
 
       // Transitions
@@ -43,8 +43,8 @@ export default {
 
       // States
       'hover:text-primary-600 dark:hover:text-primary-400 ',
-      'hover:bg-surface-100 dark:hover:bg-surface-400/10'
-    ]
+      'hover:bg-surface-100 dark:hover:bg-surface-400/10',
+    ],
   }),
   action: {
     class: [
@@ -65,25 +65,25 @@ export default {
       'no-underline',
       'overflow-hidden',
       'cursor-pointer',
-      'select-none'
-    ]
+      'select-none',
+    ],
   },
   icon: {
     class: [
       // Spacing
       'mr-2',
       'leading-6',
-      'text-sm'
-    ]
+      'text-sm',
+    ],
   },
   label: {
-    class: ['leading-none', 'text-sm']
+    class: ['leading-none', 'text-sm'],
   },
   submenuicon: {
     class: [
       // Position
-      'ml-auto'
-    ]
+      'ml-auto',
+    ],
   },
   submenu: {
     class: [
@@ -104,10 +104,10 @@ export default {
       'z-10',
 
       // Color
-      'bg-surface-0 dark:bg-surface-700'
-    ]
+      'bg-surface-0 dark:bg-surface-700',
+    ],
   },
   separator: {
-    class: 'border-t border-surface-200 dark:border-surface-600 my-1'
-  }
-};
+    class: 'border-t border-surface-200 dark:border-surface-600 my-1',
+  },
+}

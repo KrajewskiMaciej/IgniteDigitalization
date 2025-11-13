@@ -28,43 +28,44 @@
     </div>
     <hr class="border-lgray-accent mb-6" />
 
-    <button 
-      class="bg-tertiary hover:bg-accent text-white w-full py-4 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60 mb-5">
+    <button
+      class="bg-tertiary hover:bg-accent text-white w-full py-4 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60 mb-5"
+    >
       Dokup więcej licencji
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue';
-  import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
+import { ref, onMounted } from 'vue'
+import { faCircleUser } from '@fortawesome/free-solid-svg-icons'
 
-  import apiConfig from '@/services/apiConfig.js';
-  import apiService from '@/services/apiServices.js';
+import apiConfig from '@/services/apiConfig.js'
+import apiService from '@/services/apiServices.js'
 
 interface LicencesData {
-    gamesInSession: number;
-    gamesInTotal:number;
-    licensesLeft: number;
-  }
+  gamesInSession: number
+  gamesInTotal: number
+  licensesLeft: number
+}
 
-  const licencesData = ref<LicencesData>({
-    gamesInSession: 0,
-    gamesInTotal: 0,
-    licensesLeft: 0,
-  });
+const licencesData = ref<LicencesData>({
+  gamesInSession: 0,
+  gamesInTotal: 0,
+  licensesLeft: 0,
+})
 
- onMounted(async () => {
-    try {
-      const response = await apiService.get<LicencesData>(apiConfig.admin.settings.licenses)
+onMounted(async () => {
+  try {
+    const response = await apiService.get<LicencesData>(apiConfig.admin.settings.licenses)
 
-      licencesData.value = {
-        gamesInSession: response.data.gamesInSession,
-        gamesInTotal: response.data.gamesInTotal,
-        licensesLeft: response.data.licensesLeft
-      };
-    } catch (error) {
-      console.error("Błąd podczas pobierania danych o licencjach:", error);
+    licencesData.value = {
+      gamesInSession: response.data.gamesInSession,
+      gamesInTotal: response.data.gamesInTotal,
+      licensesLeft: response.data.licensesLeft,
     }
-  });
+  } catch (error) {
+    console.error('Błąd podczas pobierania danych o licencjach:', error)
+  }
+})
 </script>

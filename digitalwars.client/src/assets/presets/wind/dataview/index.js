@@ -9,8 +9,8 @@ export default {
 
       // Color
       'text-surface-700 dark:text-white/80',
-      'bg-surface-0 dark:bg-surface-800'
-    ]
+      'bg-surface-0 dark:bg-surface-800',
+    ],
   },
   grid: {
     class: [
@@ -21,8 +21,8 @@ export default {
       'ml-0 mr-0 mt-0',
 
       // Color
-      'bg-surface-0 dark:bg-surface-800'
-    ]
+      'bg-surface-0 dark:bg-surface-800',
+    ],
   },
   header: {
     class: [
@@ -34,7 +34,7 @@ export default {
       // Color
       'text-surface-800 dark:text-white/80',
       'bg-surface-0 dark:bg-surface-800',
-      'border-surface-200 dark:border-surface-700 border-b'
-    ]
-  }
-};
+      'border-surface-200 dark:border-surface-700 border-b',
+    ],
+  },
+}

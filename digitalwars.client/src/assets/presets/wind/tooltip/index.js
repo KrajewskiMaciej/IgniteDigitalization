@@ -9,12 +9,12 @@ export default {
           context?.right ||
           context?.left ||
           (!context?.right && !context?.left && !context?.top && !context?.bottom),
-        'py-1.5': context?.top || context?.bottom
-      }
-    ]
+        'py-1.5': context?.top || context?.bottom,
+      },
+    ],
   }),
   arrow: {
-    class: 'hidden'
+    class: 'hidden',
   },
   text: {
     class: [
@@ -34,7 +34,7 @@ export default {
 
       // Misc
       'whitespace-pre-line',
-      'break-words'
-    ]
-  }
-};
+      'break-words',
+    ],
+  },
+}

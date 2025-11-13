@@ -9,9 +9,9 @@ export default {
 
       // Misc
       {
-        'opacity-60 select-none pointer-events-none cursor-default': props.disabled
-      }
-    ]
+        'opacity-60 select-none pointer-events-none cursor-default': props.disabled,
+      },
+    ],
   }),
   cancelitem: ({ context }) => ({
     class: [
@@ -20,12 +20,12 @@ export default {
 
       //State
       {
-        'outline-none ring-2 ring-primary-500 dark:ring-primary-400': context.focused
+        'outline-none ring-2 ring-primary-500 dark:ring-primary-400': context.focused,
       },
 
       // Misc
-      'cursor-pointer'
-    ]
+      'cursor-pointer',
+    ],
   }),
   cancelicon: {
     class: [
@@ -33,8 +33,8 @@ export default {
       'w-5 h-5',
 
       // Color
-      'text-red-500 dark:text-red-400'
-    ]
+      'text-red-500 dark:text-red-400',
+    ],
   },
   item: ({ props, context }) => ({
     class: [
@@ -43,15 +43,15 @@ export default {
 
       // State
       {
-        'outline-none ring-2 ring-primary-500 dark:ring-primary-400': context.focused
+        'outline-none ring-2 ring-primary-500 dark:ring-primary-400': context.focused,
       },
 
       // Misc
       {
         'cursor-pointer': !props.readonly,
-        'cursor-default': props.readonly
-      }
-    ]
+        'cursor-default': props.readonly,
+      },
+    ],
   }),
   officon: ({ props }) => ({
     class: [
@@ -65,8 +65,8 @@ export default {
       { 'hover:text-primary-500 dark:hover:text-primary-400': !props.readonly },
 
       // Transition
-      'transition duration-200 ease-in'
-    ]
+      'transition duration-200 ease-in',
+    ],
   }),
   onicon: ({ props }) => ({
     class: [
@@ -77,7 +77,7 @@ export default {
       'text-primary-500 dark:text-primary-400',
 
       // Transition
-      'transition duration-200 ease-in'
-    ]
-  })
-};
+      'transition duration-200 ease-in',
+    ],
+  }),
+}

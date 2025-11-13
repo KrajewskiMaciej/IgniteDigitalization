@@ -12,17 +12,17 @@ export default {
 
       // Colors
       'text-surface-700 dark:text-surface-0/70',
-      'bg-surface-200 dark:bg-surface-700'
-    ]
+      'bg-surface-200 dark:bg-surface-700',
+    ],
   },
   label: {
-    class: 'text-xs leading-6 mx-0'
+    class: 'text-xs leading-6 mx-0',
   },
   icon: {
-    class: 'leading-6 mr-2'
+    class: 'leading-6 mr-2',
   },
   image: {
-    class: ['w-6 h-6 mr-2', 'rounded-full']
+    class: ['w-6 h-6 mr-2', 'rounded-full'],
   },
   removeIcon: {
     class: [
@@ -39,7 +39,7 @@ export default {
       'transition duration-200 ease-in-out',
 
       // Misc
-      'cursor-pointer'
-    ]
-  }
-};
+      'cursor-pointer',
+    ],
+  },
+}

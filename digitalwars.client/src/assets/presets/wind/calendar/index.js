@@ -8,8 +8,8 @@ export default {
       'shadow-sm',
       'rounded-md',
       // Misc
-      { 'opacity-40 select-none pointer-events-none cursor-default': props.disabled }
-    ]
+      { 'opacity-40 select-none pointer-events-none cursor-default': props.disabled },
+    ],
   }),
   input: ({ props }) => ({
     class: [
@@ -40,16 +40,16 @@ export default {
       'duration-200',
 
       // States
-      'outline-none focus:ring-primary-500 dark:focus:ring-primary-400'
-    ]
+      'outline-none focus:ring-primary-500 dark:focus:ring-primary-400',
+    ],
   }),
   inputicon: {
     class: [
       'sm:text-sm',
       'absolute top-[50%] -mt-2',
       'text-surface-600 dark:text-surface-500',
-      'right-4'
-    ]
+      'right-4',
+    ],
   },
   dropdownbutton: {
     root: {
@@ -73,16 +73,16 @@ export default {
         // States
         'hover:bg-surface-200 dark:hover:bg-surface-700',
         'focus:outline-none focus:outline-offset-0 focus:ring-1',
-        'focus:ring-primary-500 dark:focus:ring-primary-400'
-      ]
-    }
+        'focus:ring-primary-500 dark:focus:ring-primary-400',
+      ],
+    },
   },
   panel: ({ props }) => ({
     class: [
       // Display & Position
       {
         absolute: !props.inline,
-        'inline-block': props.inline
+        'inline-block': props.inline,
       },
 
       // Size
@@ -93,7 +93,7 @@ export default {
       // Shape
       'rounded-lg',
       {
-        'shadow-md ring-1': !props.inline
+        'shadow-md ring-1': !props.inline,
       },
 
       // Colors
@@ -101,15 +101,15 @@ export default {
       'ring-surface-200 dark:ring-surface-700',
 
       //misc
-      { 'overflow-x-auto': props.inline }
-    ]
+      { 'overflow-x-auto': props.inline },
+    ],
   }),
   datepickerMask: {
     class: [
       'fixed top-0 left-0 w-full h-full',
       'flex items-center justify-center',
-      'bg-black bg-opacity-90'
-    ]
+      'bg-black bg-opacity-90',
+    ],
   },
   header: ({ props }) => ({
     class: [
@@ -128,8 +128,8 @@ export default {
 
       // Colors
       'text-surface-700 dark:text-white/80',
-      'bg-surface-0 dark:bg-surface-800'
-    ]
+      'bg-surface-0 dark:bg-surface-800',
+    ],
   }),
   previousbutton: ({ props }) => ({
     class: [
@@ -150,8 +150,8 @@ export default {
       'hover:text-surface-700 dark:hover:text-white/80',
 
       // Misc
-      'cursor-pointer overflow-hidden'
-    ]
+      'cursor-pointer overflow-hidden',
+    ],
   }),
   title: ({ props }) => ({
     class: [
@@ -159,8 +159,8 @@ export default {
       'leading-6',
       'my-0',
       'order-1',
-      { 'mr-auto': !(props.numberOfMonths > 1), ' mx-auto': props.numberOfMonths > 1 }
-    ]
+      { 'mr-auto': !(props.numberOfMonths > 1), ' mx-auto': props.numberOfMonths > 1 },
+    ],
   }),
   monthTitle: {
     class: [
@@ -181,8 +181,8 @@ export default {
       'hover:text-primary-500 dark:hover:text-primary-400',
 
       // Misc
-      'cursor-pointer'
-    ]
+      'cursor-pointer',
+    ],
   },
   yearTitle: {
     class: [
@@ -203,8 +203,8 @@ export default {
       'hover:text-primary-500 dark:hover:text-primary-400',
 
       // Misc
-      'cursor-pointer'
-    ]
+      'cursor-pointer',
+    ],
   },
   nextbutton: ({ props }) => ({
     class: [
@@ -226,8 +226,8 @@ export default {
       'hover:text-surface-700 dark:hover:text-white/80',
 
       // Misc
-      'cursor-pointer overflow-hidden'
-    ]
+      'cursor-pointer overflow-hidden',
+    ],
   }),
   table: {
     class: [
@@ -235,40 +235,40 @@ export default {
       'w-full',
 
       // Spacing
-      'm-0'
-    ]
+      'm-0',
+    ],
   },
   tableheadercell: {
     class: [
       // Spacing
-      'p-1'
-    ]
+      'p-1',
+    ],
   },
   tablebodyrow: {
-    class: ['border-b border-surface-200 dark:border-surface-700 last:border-b-0']
+    class: ['border-b border-surface-200 dark:border-surface-700 last:border-b-0'],
   },
   weekheader: {
     class: [
       'leading-6 text-sm font-normal',
       'text-surface-600 dark:text-white/70',
       'opacity-40 cursor-default',
-      'mb-2'
-    ]
+      'mb-2',
+    ],
   },
   weeknumber: {
-    class: ['text-surface-600 dark:text-white/70 font-normal', 'opacity-40 cursor-default']
+    class: ['text-surface-600 dark:text-white/70 font-normal', 'opacity-40 cursor-default'],
   },
   weekday: {
     class: [
       // Colors
-      'text-surface-500 dark:text-white/60 font-normal'
-    ]
+      'text-surface-500 dark:text-white/60 font-normal',
+    ],
   },
   day: {
     class: [
       // Spacing
-      'p-1'
-    ]
+      'p-1',
+    ],
   },
   weeklabelcontainer: ({ context }) => ({
     class: [
@@ -285,19 +285,19 @@ export default {
       {
         'text-surface-600 dark:text-white/70 bg-transparent':
           !context.selected && !context.disabled,
-        'text-primary-500  dark:text-primary-400': context.selected && !context.disabled
+        'text-primary-500  dark:text-primary-400': context.selected && !context.disabled,
       },
 
       // States
       'focus:outline-none focus:outline-offset-0 focus:ring focus:ring-primary-400/50 dark:focus:ring-primary-300/50',
       {
-        'hover:bg-surface-100 dark:hover:bg-surface-800/80': !context.disabled
+        'hover:bg-surface-100 dark:hover:bg-surface-800/80': !context.disabled,
       },
       {
         'opacity-40 cursor-default': context.disabled,
-        'cursor-pointer': !context.disabled
-      }
-    ]
+        'cursor-pointer': !context.disabled,
+      },
+    ],
   }),
   daylabel: ({ context }) => ({
     class: [
@@ -315,27 +315,27 @@ export default {
           context.date.today && !context.selected && !context.disabled,
         'text-surface-600 dark:text-white/70 bg-transparent':
           !context.selected && !context.disabled && !context.date.today,
-        'text-primary-500 dark:text-primary-400': context.selected && !context.disabled
+        'text-primary-500 dark:text-primary-400': context.selected && !context.disabled,
       },
 
       // States
       'focus:outline-none focus:outline-offset-0 focus:ring-1 focus:ring-primary-500 dark:focus:ring-primary-400',
       {
         'hover:bg-surface-100 dark:hover:bg-surface-600/80': !context.disabled,
-        'hover:bg-surface-700 dark:hover:bg-surface-200': !context.disabled && context.date.today
+        'hover:bg-surface-700 dark:hover:bg-surface-200': !context.disabled && context.date.today,
       },
 
       {
         'dark:text-surface-600 cursor-default': context.disabled,
-        'cursor-pointer': !context.disabled
-      }
-    ]
+        'cursor-pointer': !context.disabled,
+      },
+    ],
   }),
   monthpicker: {
     class: [
       // Spacing
-      'my-2'
-    ]
+      'my-2',
+    ],
   },
   month: ({ context }) => ({
     class: [
@@ -355,7 +355,7 @@ export default {
       {
         'text-surface-600 dark:text-white/70 bg-transparent':
           !context.selected && !context.disabled,
-        'text-primary-500 dark:text-primary-400': context.selected && !context.disabled
+        'text-primary-500 dark:text-primary-400': context.selected && !context.disabled,
       },
 
       // States
@@ -363,14 +363,14 @@ export default {
       'hover:bg-surface-100 dark:hover:bg-surface-600/80',
 
       // Misc
-      'cursor-pointer'
-    ]
+      'cursor-pointer',
+    ],
   }),
   yearpicker: {
     class: [
       // Spacing
-      'my-2'
-    ]
+      'my-2',
+    ],
   },
   year: ({ context }) => ({
     class: [
@@ -390,7 +390,7 @@ export default {
       {
         'text-surface-600 dark:text-white/70 bg-transparent':
           !context.selected && !context.disabled,
-        'text-primary-500 dark:text-primary-400': context.selected && !context.disabled
+        'text-primary-500 dark:text-primary-400': context.selected && !context.disabled,
       },
 
       // States
@@ -398,16 +398,16 @@ export default {
       'hover:bg-surface-100 dark:hover:bg-surface-600/80',
 
       // Misc
-      'cursor-pointer'
-    ]
+      'cursor-pointer',
+    ],
   }),
   timepicker: {
     class: [
       // Flexbox
       'flex mt-3',
       'justify-center items-center',
-      'text-sm dark:text-white/70'
-    ]
+      'text-sm dark:text-white/70',
+    ],
   },
   separatorcontainer: {
     class: [
@@ -417,14 +417,14 @@ export default {
       'flex-col',
 
       // Spacing
-      'px-2'
-    ]
+      'px-2',
+    ],
   },
   separator: {
     class: [
       // Text
-      'text-xl'
-    ]
+      'text-xl',
+    ],
   },
   hourpicker: {
     class: [
@@ -434,8 +434,8 @@ export default {
       'flex-col',
 
       // Spacing
-      'px-2'
-    ]
+      'px-2',
+    ],
   },
   minutepicker: {
     class: [
@@ -445,8 +445,8 @@ export default {
       'flex-col',
 
       // Spacing
-      'px-2'
-    ]
+      'px-2',
+    ],
   },
   secondPicker: {
     class: [
@@ -456,8 +456,8 @@ export default {
       'flex-col',
 
       // Spacing
-      'px-2'
-    ]
+      'px-2',
+    ],
   },
   ampmpicker: {
     class: [
@@ -467,8 +467,8 @@ export default {
       'flex-col',
 
       // Spacing
-      'px-2'
-    ]
+      'px-2',
+    ],
   },
   incrementbutton: {
     class: [
@@ -489,8 +489,8 @@ export default {
       'hover:text-surface-700 dark:hover:text-white/80',
 
       // Misc
-      'cursor-pointer overflow-hidden'
-    ]
+      'cursor-pointer overflow-hidden',
+    ],
   },
   decrementbutton: {
     class: [
@@ -511,14 +511,14 @@ export default {
       'hover:text-surface-700 dark:hover:text-white/80',
 
       // Misc
-      'cursor-pointer overflow-hidden'
-    ]
+      'cursor-pointer overflow-hidden',
+    ],
   },
   groupcontainer: {
     class: [
       // Flexbox
-      'flex'
-    ]
+      'flex',
+    ],
   },
   group: {
     class: [
@@ -537,8 +537,8 @@ export default {
 
       // Pseudo-Classes
       'first:pl-0',
-      'first:border-l-0'
-    ]
+      'first:border-l-0',
+    ],
   },
   buttonbar: {
     class: [
@@ -549,8 +549,8 @@ export default {
       'pt-2.5 pb-1.5 px-0',
 
       // Shape
-      'border-t border-surface-200 dark:border-surface-700'
-    ]
+      'border-t border-surface-200 dark:border-surface-700',
+    ],
   },
   todaybutton: {
     root: {
@@ -577,9 +577,9 @@ export default {
         'hover:bg-primary-300/20',
 
         // Misc
-        'cursor-pointer'
-      ]
-    }
+        'cursor-pointer',
+      ],
+    },
   },
   clearbutton: {
     root: {
@@ -606,15 +606,15 @@ export default {
         'hover:bg-primary-300/20',
 
         // Misc
-        'cursor-pointer'
-      ]
-    }
+        'cursor-pointer',
+      ],
+    },
   },
   transition: {
     enterFromClass: 'opacity-0 scale-y-[0.8]',
     enterActiveClass:
       'transition-[transform,opacity] duration-[120ms] ease-[cubic-bezier(0,0,0.2,1)]',
     leaveActiveClass: 'transition-opacity duration-100 ease-linear',
-    leaveToClass: 'opacity-0'
-  }
-};
+    leaveToClass: 'opacity-0',
+  },
+}
