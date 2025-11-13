@@ -12,19 +12,23 @@
     <PackageJsonScriptsBuildOnly Condition="$(PackageJsonScriptsBuildOnly) == ''">vite build</PackageJsonScriptsBuildOnly>
     <PackageJsonScriptsTypeCheck Condition="$(PackageJsonScriptsTypeCheck) == ''">vue-tsc --build</PackageJsonScriptsTypeCheck>
     <PackageJsonScriptsLint Condition="$(PackageJsonScriptsLint) == ''">eslint . --fix</PackageJsonScriptsLint>
+    <PackageJsonScriptsFormat Condition="$(PackageJsonScriptsFormat) == ''">prettier --write src/</PackageJsonScriptsFormat>
+    <PackageJsonDependenciesFortawesomeFontawesomeSvgCore Condition="$(PackageJsonDependenciesFortawesomeFontawesomeSvgCore) == ''">^7.1.0</PackageJsonDependenciesFortawesomeFontawesomeSvgCore>
     <PackageJsonDependenciesFortawesomeFreeBrandsSvgIcons Condition="$(PackageJsonDependenciesFortawesomeFreeBrandsSvgIcons) == ''">^6.5.2</PackageJsonDependenciesFortawesomeFreeBrandsSvgIcons>
     <PackageJsonDependenciesFortawesomeFreeRegularSvgIcons Condition="$(PackageJsonDependenciesFortawesomeFreeRegularSvgIcons) == ''">^6.5.2</PackageJsonDependenciesFortawesomeFreeRegularSvgIcons>
     <PackageJsonDependenciesFortawesomeFreeSolidSvgIcons Condition="$(PackageJsonDependenciesFortawesomeFreeSolidSvgIcons) == ''">^6.5.2</PackageJsonDependenciesFortawesomeFreeSolidSvgIcons>
     <PackageJsonDependenciesFortawesomeVueFontawesome Condition="$(PackageJsonDependenciesFortawesomeVueFontawesome) == ''">^3.0.8</PackageJsonDependenciesFortawesomeVueFontawesome>
     <PackageJsonDependenciesMicrosoftSignalr Condition="$(PackageJsonDependenciesMicrosoftSignalr) == ''">^8.0.0</PackageJsonDependenciesMicrosoftSignalr>
     <PackageJsonDependenciesTypesD3 Condition="$(PackageJsonDependenciesTypesD3) == ''">^7.4.3</PackageJsonDependenciesTypesD3>
+    <PackageJsonDependenciesVueuseCore Condition="$(PackageJsonDependenciesVueuseCore) == ''">^14.0.0</PackageJsonDependenciesVueuseCore>
     <PackageJsonDependenciesAxios Condition="$(PackageJsonDependenciesAxios) == ''">^1.7.2</PackageJsonDependenciesAxios>
     <PackageJsonDependenciesD3 Condition="$(PackageJsonDependenciesD3) == ''">^7.9.0</PackageJsonDependenciesD3>
     <PackageJsonDependenciesPinia Condition="$(PackageJsonDependenciesPinia) == ''">^2.1.7</PackageJsonDependenciesPinia>
-    <PackageJsonDependenciesPrimevue Condition="$(PackageJsonDependenciesPrimevue) == ''">^4.3.9</PackageJsonDependenciesPrimevue>
+    <PackageJsonDependenciesPrimevue Condition="$(PackageJsonDependenciesPrimevue) == ''">^3.53.1</PackageJsonDependenciesPrimevue>
     <PackageJsonDependenciesQrcodeVue Condition="$(PackageJsonDependenciesQrcodeVue) == ''">^3.4.1</PackageJsonDependenciesQrcodeVue>
     <PackageJsonDependenciesUnpluginIcons Condition="$(PackageJsonDependenciesUnpluginIcons) == ''">^0.19.0</PackageJsonDependenciesUnpluginIcons>
     <PackageJsonDependenciesVue Condition="$(PackageJsonDependenciesVue) == ''">^3.4.27</PackageJsonDependenciesVue>
+    <PackageJsonDependenciesVueI18n Condition="$(PackageJsonDependenciesVueI18n) == ''">^11.1.12</PackageJsonDependenciesVueI18n>
     <PackageJsonDependenciesVueQrcodeReader Condition="$(PackageJsonDependenciesVueQrcodeReader) == ''">^5.5.5</PackageJsonDependenciesVueQrcodeReader>
     <PackageJsonDependenciesVueRouter Condition="$(PackageJsonDependenciesVueRouter) == ''">^4.3.2</PackageJsonDependenciesVueRouter>
     <PackageJsonDependenciesVueToastification Condition="$(PackageJsonDependenciesVueToastification) == ''">^2.0.0-rc.5</PackageJsonDependenciesVueToastification>
@@ -42,11 +46,12 @@
     <PackageJsonDevdependenciesJiti Condition="$(PackageJsonDevdependenciesJiti) == ''">^1.21.0</PackageJsonDevdependenciesJiti>
     <PackageJsonDevdependenciesNpmRunAll2 Condition="$(PackageJsonDevdependenciesNpmRunAll2) == ''">^6.2.0</PackageJsonDevdependenciesNpmRunAll2>
     <PackageJsonDevdependenciesPostcss Condition="$(PackageJsonDevdependenciesPostcss) == ''">^8.4.38</PackageJsonDevdependenciesPostcss>
+    <PackageJsonDevdependenciesPrettier Condition="$(PackageJsonDevdependenciesPrettier) == ''">^3.6.2</PackageJsonDevdependenciesPrettier>
     <PackageJsonDevdependenciesTailwindcss Condition="$(PackageJsonDevdependenciesTailwindcss) == ''">^3.4.3</PackageJsonDevdependenciesTailwindcss>
     <PackageJsonDevdependenciesTailwindcssAnimated Condition="$(PackageJsonDevdependenciesTailwindcssAnimated) == ''">^1.1.2</PackageJsonDevdependenciesTailwindcssAnimated>
     <PackageJsonDevdependenciesTypescript Condition="$(PackageJsonDevdependenciesTypescript) == ''">^5.9.3</PackageJsonDevdependenciesTypescript>
     <PackageJsonDevdependenciesTypescriptEslint Condition="$(PackageJsonDevdependenciesTypescriptEslint) == ''">^8.7.0</PackageJsonDevdependenciesTypescriptEslint>
-    <PackageJsonDevdependenciesVite Condition="$(PackageJsonDevdependenciesVite) == ''">^5.2.11</PackageJsonDevdependenciesVite>
+    <PackageJsonDevdependenciesVite Condition="$(PackageJsonDevdependenciesVite) == ''">^7.2.2</PackageJsonDevdependenciesVite>
     <PackageJsonDevdependenciesVitePluginVueDevtools Condition="$(PackageJsonDevdependenciesVitePluginVueDevtools) == ''">^7.2.1</PackageJsonDevdependenciesVitePluginVueDevtools>
     <PackageJsonDevdependenciesVueTsc Condition="$(PackageJsonDevdependenciesVueTsc) == ''">^2.0.19</PackageJsonDevdependenciesVueTsc>
   </PropertyGroup>

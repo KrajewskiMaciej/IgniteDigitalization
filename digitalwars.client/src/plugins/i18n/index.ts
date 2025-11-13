@@ -8,9 +8,19 @@ const messages = {
   pl,
 }
 
+function getInitialLocale(): string {
+  const saved = localStorage.getItem('language')
+  if (saved && saved in messages) return saved
+
+  const browser = navigator.language.split('-')[0]
+  if (browser in messages) return browser
+
+  return 'pl'
+}
+
 export const i18n = createI18n({
   legacy: false,
-  locale: 'pl',
+  locale: getInitialLocale(),
   fallbackLocale: 'en',
   messages,
 })
