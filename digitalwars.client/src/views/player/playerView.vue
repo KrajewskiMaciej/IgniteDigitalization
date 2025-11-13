@@ -1,134 +1,287 @@
 <template>
-  <div class="flex flex-col h-screen bg-primary relative overflow-hidden">
-    <PlayerNavbar
-      :team-name="gameData?.teamName || 'Błąd ładowania'"
-      :nav-bg-color="gameData?.teamColor || 'bg-secondary'"
-    />
+  <div class="flex flex-col h-screen bg-gradient-to-br from-surface-850 via-surface-900 to-surface-950 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_var(--tw-gradient-stops))] from-primary-900/15 via-transparent to-transparent pointer-events-none"></div>
+    
+    <div class="relative z-10 flex flex-col h-full">
+      <PlayerNavbar
+        :team-name="gameData?.teamName || 'Błąd ładowania'"
+        :nav-bg-color="gameData?.teamColor || 'bg-secondary'"
+      />
 
-    <!-- --- GŁÓWNA ZMIANA --- -->
-    <!-- Widok błędu lub informacji o stanie gry -->
-    <div v-if="gameStatusError" class="flex-1">
-      <GameStatusDisplay :title="gameStatusError.title" :message="gameStatusError.message" />
-    </div>
+      <div v-if="gameStatusError" class="flex-1">
+        <GameStatusDisplay :title="gameStatusError.title" :message="gameStatusError.message" />
+      </div>
 
-    <!-- Widok normalnej rozgrywki (jeśli nie ma błędu) -->
-    <div v-else-if="gameData" class="flex flex-1 flex-row relative overflow-hidden">
-      <!-- Lewy panel -->
-      <Transition name="fade-slide" appear>
-        <div
-          v-if="leftOpen"
-          class="absolute left-0 top-0 w-1/2 h-full bg-secondary border-r border-gray-400 shadow-lg z-40 overflow-auto p-4 transition-all duration-500 ease-in-out"
-        >
-          <RouterView />
-          <QuestionBox />
-
-          <!-- Przyciski przełączające -->
-          <div class="flex justify-center space-x-2 my-4">
+      <div v-else-if="gameData" class="flex-1 flex flex-col overflow-hidden">
+        <div v-if="isMobile" class="flex flex-col h-full">
+          <div class="flex gap-2 p-1 bg-surface-850 backdrop-blur-sm border-b border-surface-700 shadow-md">
             <button
-              @click="showingDecisionCards = true"
-              :class="showingDecisionCards ? 'bg-blue-600 text-white' : 'bg-white text-black'"
-              class="px-5 py-2 rounded-md border font-semibold"
+              @click="mobileView = 'cards'"
+              class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 relative overflow-hidden group"
+              :class="
+                mobileView === 'cards'
+                  ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                  : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
+              "
             >
-              Decyzje
+              <span class="relative z-10">Karty</span>
+              <div v-if="mobileView !== 'cards'" class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
             </button>
+
             <button
-              @click="showingDecisionCards = false"
-              :class="!showingDecisionCards ? 'bg-blue-600 text-white' : 'bg-white text-black'"
-              class="px-5 py-2 rounded-md border font-semibold"
+              @click="mobileView = 'board'"
+              class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 relative overflow-hidden group"
+              :class="
+                mobileView === 'board'
+                  ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                  : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
+              "
             >
-              Przedmioty
+              <span class="relative z-10">Plansza</span>
+              <div v-if="mobileView !== 'board'" class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+            </button>
+
+            <button
+              @click="mobileView = 'market'"
+              class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 relative overflow-hidden group"
+              :class="
+                mobileView === 'market'
+                  ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                  : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
+              "
+            >
+              <span class="relative z-10">Rynek</span>
+              <div v-if="mobileView !== 'market'" class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+            </button>
+
+            <button
+              @click="mobileView = 'menu'"
+              class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 relative overflow-hidden group"
+              :class="
+                mobileView === 'menu'
+                  ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                  : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
+              "
+            >
+              <span class="relative z-10">Menu</span>
+              <div v-if="mobileView !== 'menu'" class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
             </button>
           </div>
 
-          <Suspense>
-            <template #default>
-              <CardCarousel
-                v-if="gameData && gameData.deckId"
-                :deck-id="gameData.deckId"
-                :team-id="gameData.teamId"
-                :game-id="gameData.gameId"
-                :board-id="gameData.boardConfig?.boardId"
-                :current-budget="currentGlobalBudget"
-                :showing-decision-cards="showingDecisionCards"
-                :is-online-game="gameData.IsOnline"
-                :is-independent-team="gameData.IsIndependent"
-                @card-action-completed="handleCardActionCompleted"
+          <div class="flex-1 overflow-auto p-4">
+            <div v-if="mobileView === 'cards'" class="h-full">
+              <RouterView />
+              <QuestionBox />
+
+              <div class="flex gap-2 my-4">
+                <button
+                  @click="showingDecisionCards = true"
+                  class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
+                  :class="
+                    showingDecisionCards
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                      : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                  "
+                >
+                  Decyzje
+                </button>
+                <button
+                  @click="showingDecisionCards = false"
+                  class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
+                  :class="
+                    !showingDecisionCards
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                      : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                  "
+                >
+                  Przedmioty
+                </button>
+              </div>
+
+              <Suspense>
+                <template #default>
+                  <CardCarousel
+                    v-show="gameData && gameData.deckId"
+                    :deck-id="gameData.deckId"
+                    :team-id="gameData.teamId"
+                    :game-id="gameData.gameId"
+                    :board-id="gameData.boardConfig?.boardId"
+                    :current-budget="currentGlobalBudget"
+                    :showing-decision-cards="showingDecisionCards"
+                    :is-online-game="gameData.IsOnline"
+                    :is-independent-team="gameData.IsIndependent"
+                    @card-action-completed="handleCardActionCompleted"
+                  />
+                </template>
+                <template #fallback>
+                  <div class="text-center text-surface-300">Ładowanie karuzeli kart...</div>
+                </template>
+              </Suspense>
+            </div>
+
+            <div v-else-if="mobileView === 'board'" class="h-full">
+              <GameBoard
+                v-if="gameData?.boardConfig"
+                :config="formData"
+                :gameMode="true"
+                :pawns="pawns"
               />
-            </template>
-            <template #fallback>
-              <div class="text-center text-white">Ładowanie karuzeli kart...</div>
-            </template>
-          </Suspense>
-        </div>
-      </Transition>
+            </div>
 
-      <!-- Plansza -->
-      <div
-        class="transition-all duration-300 h-full bg-secondary border-2 border-lgray-accent rounded-md shadow-sm text-center p-4 pb-10 z-30"
-        :class="[
-          leftOpen ? 'w-1/2 ml-auto' : '',
-          rightOpen ? 'w-1/2 mr-auto' : '',
-          !leftOpen && !rightOpen ? 'w-1/2 mx-auto' : '',
-        ]"
-      >
-        <div class="flex justify-center">
-          <button
-            @click="currentBoard = 'player'"
-            :class="currentBoard === 'player' ? 'bg-black text-white' : 'bg-white text-black'"
-            class="px-4 py-1 rounded-md border"
+            <div v-else-if="mobileView === 'market'" class="h-full">
+              <GameBoard
+                v-if="gameData?.rivalBoardConfig"
+                :config="enemyformData"
+                :gameMode="true"
+                :pawns="enemypawns"
+              />
+            </div>
+
+            <div v-else-if="mobileView === 'menu'" class="h-full">
+              <PlayerMenu
+                ref="playerMenuRef"
+                v-if="gameData"
+                :game-id="gameData.gameId"
+                :team-id="gameData.teamId"
+                @budget-changed-in-menu="handleBudgetChangeFromMenu"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="flex h-full relative">
+          <div
+            v-if="leftOpen"
+            class="w-1/4 bg-surface-850 backdrop-blur-sm border-r border-surface-700 shadow-2xl overflow-auto p-4 transition-all duration-300"
           >
-            Twoja plansza
-          </button>
-          <button
-            @click="currentBoard = 'market'"
-            :class="currentBoard === 'market' ? 'bg-black text-white' : 'bg-white text-black'"
-            class="px-4 py-1 rounded-md border"
+            <RouterView />
+            <QuestionBox />
+
+            <div class="flex gap-2 my-4">
+              <button
+                @click="showingDecisionCards = true"
+                class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
+                :class="
+                  showingDecisionCards
+                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                    : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                "
+              >
+                Decyzje
+              </button>
+              <button
+                @click="showingDecisionCards = false"
+                class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
+                :class="
+                  !showingDecisionCards
+                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                    : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                "
+              >
+                Przedmioty
+              </button>
+            </div>
+
+            <Suspense>
+              <template #default>
+                <CardCarousel
+                  v-if="gameData && gameData.deckId"
+                  :deck-id="gameData.deckId"
+                  :team-id="gameData.teamId"
+                  :game-id="gameData.gameId"
+                  :board-id="gameData.boardConfig?.boardId"
+                  :current-budget="currentGlobalBudget"
+                  :showing-decision-cards="showingDecisionCards"
+                  :is-online-game="gameData.IsOnline"
+                  :is-independent-team="gameData.IsIndependent"
+                  @card-action-completed="handleCardActionCompleted"
+                />
+              </template>
+              <template #fallback>
+                <div class="text-center text-surface-300">Ładowanie karuzeli kart...</div>
+              </template>
+            </Suspense>
+          </div>
+
+          <div
+            class="flex-1 flex flex-col bg-surface-850 backdrop-blur-sm shadow-xl p-4 transition-all duration-300"
           >
-            Plansza rynku
-          </button>
-        </div>
+            <div class="flex justify-between items-center mb-6">
+              <div class="flex gap-2">
+                <button
+                  @click="currentBoard = 'player'"
+                  class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+                  :class="
+                    currentBoard === 'player'
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                      : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                  "
+                >
+                  Twoja plansza
+                </button>
+                <button
+                  @click="currentBoard = 'market'"
+                  class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+                  :class="
+                    currentBoard === 'market'
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                      : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                  "
+                >
+                  Plansza rynku
+                </button>
+              </div>
 
-        <div class="flex justify-between items-center">
-          <button @click="showLeftPanel" class="bg-gray-800 text-white px-4 py-2 rounded-md">
-            Panel kart
-          </button>
-          <button @click="showRightPanel" class="bg-gray-800 text-white px-4 py-2 rounded-md">
-            Panel decyzji
-          </button>
-        </div>
+              <div class="flex gap-2">
+                <button
+                  @click="leftOpen = !leftOpen"
+                  class="px-6 py-3 rounded-xl font-semibold bg-surface-800 text-surface-0 border border-primary-500/30 hover:border-primary-500/50 transition-all duration-300"
+                >
+                  {{ leftOpen ? 'Ukryj' : 'Pokaż' }} karty
+                </button>
+                <button
+                  @click="rightOpen = !rightOpen"
+                  class="px-6 py-3 rounded-xl font-semibold bg-surface-800 text-surface-0 border border-primary-500/30 hover:border-primary-500/50 transition-all duration-300"
+                >
+                  {{ rightOpen ? 'Ukryj' : 'Pokaż' }} menu
+                </button>
+              </div>
+            </div>
 
-        <GameBoard
-          v-if="currentBoard === 'player' && gameData?.boardConfig"
-          :config="formData"
-          :gameMode="true"
-          :pawns="pawns"
-        />
-        <GameBoard
-          v-if="currentBoard === 'market' && gameData?.rivalBoardConfig"
-          :config="enemyformData"
-          :gameMode="true"
-          :pawns="enemypawns"
-        />
+            <div class="flex-1 overflow-auto">
+              <GameBoard
+                v-show="currentBoard === 'player' && gameData?.boardConfig"
+                :config="formData"
+                :gameMode="true"
+                :pawns="pawns"
+              />
+              <GameBoard
+                v-show="currentBoard === 'market' && gameData?.rivalBoardConfig"
+                :config="enemyformData"
+                :gameMode="true"
+                :pawns="enemypawns"
+              />
+            </div>
+          </div>
+
+          <div
+            v-if="rightOpen"
+            class="w-1/4 bg-surface-850 backdrop-blur-sm border-l border-surface-700 shadow-2xl overflow-auto p-6 transition-all duration-300"
+          >
+            <PlayerMenu
+              ref="playerMenuRef"
+              v-show="currentPanel === 'menu' && gameData"
+              :game-id="gameData.gameId"
+              :team-id="gameData.teamId"
+              @budget-changed-in-menu="handleBudgetChangeFromMenu"
+            />
+          </div>
+        </div>
       </div>
 
-      <!-- Prawy panel -->
-      <div
-        v-if="rightOpen"
-        class="absolute right-0 top-0 w-1/2 h-full bg-secondary border-l border-gray-400 shadow-lg z-40 overflow-auto p-4"
-      >
-        <PlayerMenu
-          ref="playerMenuRef"
-          v-if="currentPanel === 'menu' && gameData"
-          :game-id="gameData.gameId"
-          :team-id="gameData.teamId"
-          @budget-changed-in-menu="handleBudgetChangeFromMenu"
-        />
+      <div class="mt-auto relative z-10">
+        <Footer />
       </div>
-    </div>
-
-    <!-- Stopka -->
-    <div class="mt-auto">
-      <Footer />
     </div>
   </div>
 </template>
@@ -147,6 +300,13 @@ import apiServices from '@/services/apiServices'
 import signalrService from '@/services/signalService'
 import GameStatusDisplay from '@/components/playerComponents/gameStatusDisplay.vue'
 import type { BoardConfig, GameData, Pawn, RawPawnData, GameStatusError } from '@/interfaces/types'
+import { useBreakpoints } from '@vueuse/core'
+
+const breakpoints = useBreakpoints({
+  mobile: 768,
+})
+
+const isMobile = breakpoints.smaller('mobile')
 
 // --- PROPSY ---
 const props = defineProps({
@@ -154,6 +314,7 @@ const props = defineProps({
 })
 
 // --- ZMIENNE STANU ---
+const mobileView = ref('board')
 const showingDecisionCards = ref(true)
 const currentPanel = ref('menu')
 const leftOpen = ref(false)

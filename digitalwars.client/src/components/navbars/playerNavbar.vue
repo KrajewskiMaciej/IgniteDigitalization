@@ -1,7 +1,7 @@
 <template>
   <nav
     :style="{ backgroundColor: navBgColor }"
-    class="w-full py-3 px-6 flex items-center relative border-b-2 border-lgray-accent"
+    class="w-full py-3 px-6 flex items-center relative"
   >
     <!-- Logo -->
     <div>
