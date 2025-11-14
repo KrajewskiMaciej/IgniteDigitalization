@@ -11,7 +11,7 @@
       <Navbar />
 
       <div class="flex-1 flex flex-col justify-center items-center text-center">
-        <div class="mb-3 md:mb-4 lg:mb-6 xl:mb-8">
+        <div ref="targetLogo" class="mb-3 md:mb-4 lg:mb-6 xl:mb-8">
           <h1
             class="text-white font-bold tracking-wider font-nasalization animate-glow text-5xl lg:text-6xl xl:text-7xl mb-1 sm:mb-2 md:mb-3 lg:mb-5 xl:mb-7"
           >
@@ -107,6 +107,23 @@ import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
 import { faUser, faUserGear } from '@fortawesome/free-solid-svg-icons'
 import { useI18n } from 'vue-i18n'
+import { onLongPress } from '@vueuse/core'
+
+
+const targetLogo = ref<HTMLElement | null>(null);
+
+const onLongPressCallback = () => {
+  window.open('https://www.youtube.com/watch?v=Jq44BhTo7OQ&list=RDJq44BhTo7OQ&start_radio=1')
+}
+
+onLongPress(
+  targetLogo,
+  onLongPressCallback,
+  {
+    delay: 3000,
+  }
+);  
+
 
 const { t } = useI18n()
 const authStore = useAuthStore()
