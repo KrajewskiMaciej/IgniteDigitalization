@@ -50,7 +50,6 @@ export const pl = {
   newPasswordPlaceholder: 'Nowe hasło...',
   confirmPasswordPlaceholder: 'Potwierdź hasło...',
 
-
   //Scan QR
   scanQRCode: 'Skanuj kod QR',
   scanning: 'Skanowanie...',
@@ -59,7 +58,6 @@ export const pl = {
   checking: 'Sprawdzanie...',
   initializingCamera: 'Inicjalizacja kamery...',
   cancel: 'Anuluj',
-  
 
   //Auth password requirements
   passwordRequirementLength: 'Co najmniej 8 znaków',

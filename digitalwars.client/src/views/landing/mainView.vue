@@ -109,21 +109,15 @@ import { faUser, faUserGear } from '@fortawesome/free-solid-svg-icons'
 import { useI18n } from 'vue-i18n'
 import { onLongPress } from '@vueuse/core'
 
-
-const targetLogo = ref<HTMLElement | null>(null);
+const targetLogo = ref<HTMLElement | null>(null)
 
 const onLongPressCallback = () => {
   window.open('https://www.youtube.com/watch?v=Jq44BhTo7OQ&list=RDJq44BhTo7OQ&start_radio=1')
 }
 
-onLongPress(
-  targetLogo,
-  onLongPressCallback,
-  {
-    delay: 3000,
-  }
-);  
-
+onLongPress(targetLogo, onLongPressCallback, {
+  delay: 3000,
+})
 
 const { t } = useI18n()
 const authStore = useAuthStore()

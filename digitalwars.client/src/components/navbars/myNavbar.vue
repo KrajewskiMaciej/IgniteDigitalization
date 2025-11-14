@@ -4,7 +4,12 @@
   >
     <div class="flex items-center w-full" :class="isMdOrLarger ? 'gap-2' : 'justify-between'">
       <img :src="logo" class="h-16" alt="ITM logo" />
-      <img @click="onClickDigitalWarsLogo" src="/DigitalWars-logo-circle.png" class="h-16" alt="Digital Wars logo" />
+      <img
+        @click="onClickDigitalWarsLogo"
+        src="/DigitalWars-logo-circle.png"
+        class="h-16"
+        alt="Digital Wars logo"
+      />
     </div>
 
     <!--Odnośniki do social medi-->
@@ -51,21 +56,20 @@ import logo from '@/assets/logos/ITM_poziom_biale.png'
 import { useBreakpoints } from '@vueuse/core'
 import { ref } from 'vue'
 
-const clickCount = ref<number>(0);
+const clickCount = ref<number>(0)
 
 const onClickDigitalWarsLogo = () => {
-  clickCount.value += 1;
+  clickCount.value += 1
 
   if (clickCount.value === 10) {
-    window.open('https://www.youtube.com/watch?v=Jq44BhTo7OQ&list=RDJq44BhTo7OQ&start_radio=1');
-    clickCount.value = 0;
+    window.open('https://www.youtube.com/watch?v=Jq44BhTo7OQ&list=RDJq44BhTo7OQ&start_radio=1')
+    clickCount.value = 0
   }
 
   setTimeout(() => {
-    clickCount.value = 0;
-  }, 5000);
+    clickCount.value = 0
+  }, 5000)
 }
-
 
 const breakpoints = useBreakpoints({
   sm: 640,

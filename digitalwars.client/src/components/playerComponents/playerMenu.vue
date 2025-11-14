@@ -1,54 +1,59 @@
 <template>
-  <div class="h-full w-full max-w-md mx-auto bg-yellow rounded-xl shadow p-4 flex flex-col">
+  <div class="h-full w-full max-w-md mx-auto flex flex-col">
     <!-- Góra: bity + etap -->
     <div class="flex justify-between items-center mb-2">
       <div class="text-xl font-bold text-green-600">Bity: {{ currentBudget }}</div>
-      <div class="text-md font-semibold text-gray-700">Etap:</div>
+      <div class="text-md font-semibold text-primary-400">Etap:</div>
     </div>
 
+    <div
+          class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-4 mt-4 sm:mb-8"
+    ></div>
+
     <!-- Tabela decyzji -->
-    <div class="flex flex-col flex-grow border-t pt-3 overflow-hidden">
+    <div class="flex flex-col flex-grow pt-3 overflow-hidden">
       <h2 class="text-lg font-semibold mb-2 text-white">Decyzje</h2>
 
       <!-- Lista -->
       <div class="overflow-y-auto pr-2 flex-grow">
-        <div v-if="isLoading" class="text-center text-gray-500">Ładowanie historii...</div>
-        <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
-        <div v-else-if="gameLogEntries.length === 0" class="text-center text-gray-400">
-          Brak historii decyzji.
-        </div>
-        <ul v-else class="space-y-2 text-sm">
-          <li v-for="(decision, index) in gameLogEntries" :key="index">
-            <!-- Widok dla powiadomienia o evencie -->
+      <div v-if="isLoading" class="text-center text-gray-500">Ładowanie historii...</div>
+      <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
+      <div v-else-if="gameLogEntries.length === 0" class="text-center text-gray-400">
+        Brak historii decyzji.
+      </div>
+      <ul v-else class="space-y-3 text-sm">
+        <li v-for="(decision, index) in gameLogEntries" :key="index">
+          <div
+            v-if="decision.isEventNotification"
+            class="border-2 border-blue-400 rounded-lg p-3 bg-blue-900/60 text-center"
+          >
+            <h4 class="font-bold text-blue-300 text-sm mb-1">Nowe Wydarzenie</h4>
+            <p class="text-white text-xs leading-relaxed">{{ decision.description }}</p>
+          </div>
+
+          <div
+            v-else
+            class="border-2 bg-gray-800 text-white text-left p-3 rounded-lg shadow-md space-y-2 relative"
+            :class="decision.eventApplied ? 'border-purple-400 bg-purple-900/20' : 'border-gray-600'"
+          >
             <div
-              v-if="decision.isEventNotification"
-              class="border border-blue-500 rounded p-2 bg-blue-900/50 text-center text-xs"
+              v-if="decision.eventApplied"
+              class="absolute -top-2 -right-2 px-3 py-1 bg-purple-600 text-white text-xs font-bold rounded-full shadow-lg"
             >
-              <h4 class="font-bold text-blue-300">Nowe Wydarzenie</h4>
-              <p class="text-white mt-1">{{ decision.description }}</p>
+              EVENT
             </div>
 
-            <!-- Widok dla normalnego logu zagrania karty -->
-            <div
-              v-else
-              class="border bg-primary text-white text-left p-2 rounded shadow-sm space-y-1 text-xs leading-tight relative"
-              :class="{ 'border-purple-500': decision.eventApplied }"
-            >
-              <div
-                v-if="decision.eventApplied"
-                class="absolute top-1 right-1 px-2 py-0.5 bg-purple-600 text-white text-xs font-bold rounded-full"
-              >
-                EVENT
-              </div>
+            <div class="font-semibold text-sm">
+              <span class="text-gray-400">Karta {{ decision.cardId }}</span>
+              <span class="mx-1">→</span>
+              <span class="text-white">{{ decision.choice }}</span>
+            </div>
 
-              <div>
-                <strong>Karta {{ decision.cardId }}</strong> → {{ decision.choice }}
-              </div>
-              <div class="border-t border-gray-500 w-full my-1"></div>
-              <div>
-                Wynik:
+            <div class="border-t border-gray-600 pt-2">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-gray-400 text-xs">Wynik:</span>
                 <span
-                  class="font-semibold"
+                  class="font-bold text-sm"
                   :class="{
                     'text-green-400': decision.result === 'Pozytywny',
                     'text-red-400': decision.result === 'Negatywny',
@@ -57,13 +62,14 @@
                   {{ decision.result }}
                 </span>
               </div>
-              <p class="text-xs text-white">
+              <p class="text-xs text-gray-300 leading-relaxed">
                 {{ decision.description }}
               </p>
             </div>
-          </li>
-        </ul>
-      </div>
+          </div>
+        </li>
+      </ul>
+    </div>
     </div>
   </div>
 </template>
@@ -123,23 +129,23 @@ async function fetchData() {
   error.value = null
 
   try {
-    // POPRAWKA: Dodano typy generyczne do wywołań API
     const [historyResponse, budgetResponse] = await Promise.all([
       apiServices.post<ApiLogEntry[]>(apiConfig.player.getPlayerHistory, {
         gameId: props.gameId,
         teamId: props.teamId,
       }),
-      apiServices.get<{ teamBud: number }>(apiConfig.player.getCurrency, { teamId: props.teamId }),
+      apiServices.get<{ budget: number }>(apiConfig.player.getCurrency, { teamId: props.teamId }),
     ])
 
+    console.log('Otrzymane logi historii:', historyResponse.data);
+    console.log('Otrzymany budżet:', budgetResponse.data);
+
     if (Array.isArray(historyResponse.data)) {
-      // POPRAWKA: Dodano typ do parametru `log`
       gameLogEntries.value = historyResponse.data.map((log: ApiLogEntry): ProcessedLogEntry => {
         if (log.isEventNotification) {
           return {
             isEventNotification: true,
             description: log.eventDescription || 'Aktywowano nowe wydarzenie.',
-            // Wypełniamy pozostałe pola, aby pasowały do interfejsu
             choice: '',
             cardId: 0,
             result: 'Pozytywny',
@@ -151,16 +157,15 @@ async function fetchData() {
           choice: log.cardTitle || `Karta ID: ${log.cardId}`,
           cardId: log.cardId,
           result: log.status ? 'Pozytywny' : 'Negatywny',
-          description: log.feedbackDescription || `Koszt: ${log.cost}`,
+          description: log.feedbackDescription || (log.cost !== undefined ? `Koszt: ${log.cost}` : 'Brak opisu'),
           eventApplied: log.gameEventId != null,
         }
       })
     }
-
-    currentBudget.value = budgetResponse.data.teamBud
+    console.log('Przetworzone logi historii:', gameLogEntries.value);
+    currentBudget.value = budgetResponse.data.budget;
     emit('budget-changed-in-menu', currentBudget.value)
   } catch (err: any) {
-    // POPRAWKA: Dodano typ `any` do błędu
     console.error('Błąd podczas pobierania danych panelu gracza:', err)
     error.value = 'Nie udało się załadować danych.'
   } finally {

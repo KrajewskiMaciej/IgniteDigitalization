@@ -1,4 +1,3 @@
-
 export const en = {
   gameMaster: 'Game Master',
   player: 'Player',

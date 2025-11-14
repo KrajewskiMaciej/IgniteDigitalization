@@ -1,5 +1,8 @@
 <template>
-  <nav :style="{ backgroundColor: navBgColor }" class="w-full py-3 px-6 flex items-center relative">
+  <nav
+    :style="{ backgroundColor: navBgColor }"
+    class="w-full py-2 px-4 flex justify-between items-center"
+  >
     <!-- Logo -->
     <div>
       <RouterLink to="/">
@@ -8,17 +11,12 @@
     </div>
 
     <!-- Nazwa drużyny na środku -->
-    <div class="absolute left-1/2 transform -translate-x-1/2">
-      <h1 class="text-lg font-semibold text-white">{{ teamName }}</h1>
+    <div>
+      <h1 class="text-lg font-semibold text-surface-0">{{ teamName }}</h1>
     </div>
 
-    <!-- Przycisk AI w prawym górnym rogu -->
-    <div class="absolute top-3 right-6">
-      <button
-        class="w-10 h-10 rounded-full bg-white text-blue-900 font-bold shadow-md hover:bg-gray-200 transition"
-      >
-        AI
-      </button>
+    <div>
+      <!-- Placeholder dla wyrównania -->
     </div>
   </nav>
 </template>
