@@ -31,9 +31,12 @@
 
       <button
         type="submit"
-        class="bg-tertiary hover:bg-accent text-white w-full rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg mb-5"
+        class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base md:text-lg transition-all duration-300 overflow-hidden group text-white mb-5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50"
       >
-        {{ t('resetPassword') }}
+        <span class="relative z-10">{{ t('resetPassword') }}</span>
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+        ></div>
       </button>
 
       <span
@@ -64,15 +67,21 @@
 
     <button
       @click="handleSendEmail"
-      class="text-white w-full rounded-lg font-medium transition-all duration-300 shadow-sm shadow-accent/40 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg mt-5"
+      :disabled="!canResend"
+      class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base md:text-lg transition-all duration-300 overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed text-white mt-5"
       :class="
         canResend
-          ? 'bg-accent/50 hover:shadow-lg hover:shadow-accent/60 hover:bg-accent'
-          : 'bg-tertiary'
+          ? 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50'
+          : 'bg-tertiary shadow-sm'
       "
-      :disabled="!canResend"
     >
-      {{ canResend ? t('resendAgain') : `${t('resendAgainIn')} ${countdown}s` }}
+      <span class="relative z-10">{{
+        canResend ? t('resendAgain') : `${t('resendAgainIn')} ${countdown}s`
+      }}</span>
+      <div
+        v-if="canResend"
+        class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+      ></div>
     </button>
   </div>
 </template>

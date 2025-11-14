@@ -1,4 +1,3 @@
-import JoinGameByCode from "@/components/game/joinGameByCode.vue";
 
 export const en = {
   gameMaster: 'Game Master',
@@ -49,7 +48,6 @@ export const en = {
   passwordChangedSuccessfully: 'Password changed successfully!',
   oldPasswordPlaceholder: 'Old password...',
   newPasswordPlaceholder: 'New password...',
-
 
   //Scan QR
   scanQRCode: 'Scan QR Code',

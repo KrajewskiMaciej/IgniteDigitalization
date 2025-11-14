@@ -25,11 +25,15 @@
 
       <div class="px-4 sm:px-6 md:px-8 pt-16 pb-6 sm:pb-8">
         <div v-if="!isScanning" class="animate-fade w-full">
-          <h1 class="text-3xl sm:text-4xl font-bold mb-6 text-center text-surface-0 font-nasalization bg-clip-text">
+          <h1
+            class="text-3xl sm:text-4xl font-bold mb-6 text-center text-surface-0 font-nasalization bg-clip-text"
+          >
             {{ t('joinTheGame') }}
           </h1>
-          <div class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-6"></div>
-          
+          <div
+            class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-6"
+          ></div>
+
           <form @submit.prevent="validateAndJoin">
             <div class="mb-6">
               <input
@@ -45,13 +49,19 @@
               :disabled="isProcessing"
               class="relative w-full py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50"
             >
-              <span class="relative z-10">{{ isProcessing ? t('checking') : t('joinTheGame') }}</span>
-              <div class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <span class="relative z-10">{{
+                isProcessing ? t('checking') : t('joinTheGame')
+              }}</span>
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+              ></div>
             </button>
           </form>
 
           <div class="flex items-center gap-3 my-6">
-            <div class="flex-1 h-px bg-gradient-to-r from-transparent via-primary-500/30 to-primary-500/30"></div>
+            <div
+              class="flex-1 h-px bg-gradient-to-r from-transparent via-primary-500/30 to-primary-500/30"
+            ></div>
             <span class="text-surface-400 text-sm">lub</span>
             <div class="flex-1 h-px bg-gradient-to-r from-primary-500/30 to-transparent"></div>
           </div>
@@ -65,16 +75,22 @@
               <font-awesome-icon :icon="faQrcode" />
               {{ t('scanQRCode') }}
             </span>
-            <div class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+            ></div>
           </button>
         </div>
 
         <div v-else class="w-full animate-fade">
-          <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
+          <h2
+            class="text-2xl sm:text-3xl font-bold mb-6 text-center bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent"
+          >
             {{ t('scanQRCode') }}
           </h2>
-          
-          <div class="mb-6 relative rounded-xl overflow-hidden border-2 border-primary-500/30 shadow-2xl shadow-primary-500/20">
+
+          <div
+            class="mb-6 relative rounded-xl overflow-hidden border-2 border-primary-500/30 shadow-2xl shadow-primary-500/20"
+          >
             <qrcode-stream
               :formats="['qr_code']"
               @detect="onDetect"
@@ -84,14 +100,25 @@
               <div v-if="scanError" class="text-center p-6 bg-red-500/20 backdrop-blur-sm">
                 <p class="text-red-400">{{ scanError }}</p>
               </div>
-              <div v-if="!scanError && !cameraReady" class="text-center p-6 bg-surface-800/80 backdrop-blur-sm">
+              <div
+                v-if="!scanError && !cameraReady"
+                class="text-center p-6 bg-surface-800/80 backdrop-blur-sm"
+              >
                 <p class="text-surface-300">{{ t('initializingCamera') }}</p>
               </div>
               <div class="absolute inset-0 pointer-events-none">
-                <div class="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-primary-400"></div>
-                <div class="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-primary-400"></div>
-                <div class="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-primary-400"></div>
-                <div class="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-primary-400"></div>
+                <div
+                  class="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-primary-400"
+                ></div>
+                <div
+                  class="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-primary-400"
+                ></div>
+                <div
+                  class="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-primary-400"
+                ></div>
+                <div
+                  class="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-primary-400"
+                ></div>
               </div>
             </qrcode-stream>
           </div>
@@ -101,7 +128,9 @@
             class="relative w-full py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden group bg-surface-800 hover:bg-gradient-to-r hover:from-primary-600/20 hover:to-primary-700/20 border border-primary-500/30 hover:border-primary-500/50"
           >
             <span class="relative z-10">{{ t('cancel') }}</span>
-            <div class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+            ></div>
           </button>
         </div>
       </div>
@@ -119,7 +148,7 @@ import apiServices from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
 import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 interface DetectedBarcode {
   rawValue: string

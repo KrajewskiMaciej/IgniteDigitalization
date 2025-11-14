@@ -52,6 +52,13 @@ export const pl = {
 
 
   //Scan QR
+  scanQRCode: 'Skanuj kod QR',
+  scanning: 'Skanowanie...',
+  joinTheGame: 'Dołącz do gry',
+  enterGameCodePlaceholder: 'Wprowadź kod gry...',
+  checking: 'Sprawdzanie...',
+  initializingCamera: 'Inicjalizacja kamery...',
+  cancel: 'Anuluj',
   
 
   //Auth password requirements

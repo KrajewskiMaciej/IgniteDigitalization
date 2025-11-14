@@ -1,7 +1,11 @@
 <template>
-  <div class="flex flex-col h-screen bg-gradient-to-br from-surface-850 via-surface-900 to-surface-950 relative overflow-hidden">
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_var(--tw-gradient-stops))] from-primary-900/15 via-transparent to-transparent pointer-events-none"></div>
-    
+  <div
+    class="flex flex-col h-screen bg-gradient-to-br from-surface-850 via-surface-900 to-surface-950 relative overflow-hidden"
+  >
+    <div
+      class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_var(--tw-gradient-stops))] from-primary-900/15 via-transparent to-transparent pointer-events-none"
+    ></div>
+
     <div class="relative z-10 flex flex-col h-full">
       <PlayerNavbar
         :team-name="gameData?.teamName || 'Błąd ładowania'"
@@ -14,7 +18,9 @@
 
       <div v-else-if="gameData" class="flex-1 flex flex-col overflow-hidden">
         <div v-if="isMobile" class="flex flex-col h-full">
-          <div class="flex gap-2 p-1 bg-surface-850 backdrop-blur-sm border-b border-surface-700 shadow-md">
+          <div
+            class="flex gap-2 p-1 bg-surface-850 backdrop-blur-sm border-b border-surface-700 shadow-md"
+          >
             <button
               @click="mobileView = 'cards'"
               class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 relative overflow-hidden group"
@@ -25,7 +31,10 @@
               "
             >
               <span class="relative z-10">Karty</span>
-              <div v-if="mobileView !== 'cards'" class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <div
+                v-if="mobileView !== 'cards'"
+                class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+              ></div>
             </button>
 
             <button
@@ -38,7 +47,10 @@
               "
             >
               <span class="relative z-10">Plansza</span>
-              <div v-if="mobileView !== 'board'" class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <div
+                v-if="mobileView !== 'board'"
+                class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+              ></div>
             </button>
 
             <button
@@ -51,7 +63,10 @@
               "
             >
               <span class="relative z-10">Rynek</span>
-              <div v-if="mobileView !== 'market'" class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <div
+                v-if="mobileView !== 'market'"
+                class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+              ></div>
             </button>
 
             <button
@@ -64,7 +79,10 @@
               "
             >
               <span class="relative z-10">Menu</span>
-              <div v-if="mobileView !== 'menu'" class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <div
+                v-if="mobileView !== 'menu'"
+                class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+              ></div>
             </button>
           </div>
 

@@ -1,8 +1,5 @@
 <template>
-  <nav
-    :style="{ backgroundColor: navBgColor }"
-    class="w-full py-3 px-6 flex items-center relative"
-  >
+  <nav :style="{ backgroundColor: navBgColor }" class="w-full py-3 px-6 flex items-center relative">
     <!-- Logo -->
     <div>
       <RouterLink to="/">

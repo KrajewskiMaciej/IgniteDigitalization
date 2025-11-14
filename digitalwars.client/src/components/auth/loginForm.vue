@@ -53,15 +53,19 @@
 
       <button
         type="submit"
-        class="text-white w-full rounded-lg font-medium transition-all duration-300 shadow-sm shadow-accent/40 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg"
+        :disabled="!isLoginFormValid || isLoading"
+        class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base md:text-lg transition-all duration-300 overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed text-white"
         :class="
           isLoginFormValid
-            ? 'bg-accent/50 hover:shadow-lg hover:shadow-accent/60 hover:bg-accent'
-            : 'bg-tertiary'
+            ? 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50'
+            : 'bg-tertiary shadow-sm'
         "
-        :disabled="!isLoginFormValid || isLoading"
       >
-        {{ isLoading ? t('loggingIn') : t('login') }}
+        <span class="relative z-10">{{ isLoading ? t('loggingIn') : t('login') }}</span>
+        <div
+          v-if="isLoginFormValid"
+          class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+        ></div>
       </button>
     </form>
   </div>
