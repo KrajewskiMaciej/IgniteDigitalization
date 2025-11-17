@@ -257,7 +257,7 @@
                   @mouseleave="showTip = false"
                 />
                 <div
-                  class="absolute border border-primary-400 rounded-md bottom-full left-1/2 -translate-x-1/2 mb-1 bg-surface-800 p-2 text-white text-sm z-20 w-96 flex items-center"
+                  class="absolute border border-surface-700 rounded-md bottom-full left-1/2 -translate-x-1/2 mb-1 bg-surface-800 p-2 text-white text-sm z-20 w-96 flex items-center"
                   v-show="showTip"
                 >
                   <div>
@@ -270,7 +270,7 @@
                         zakceptować
                       </span>
                     </div>
-                    <hr class="mt-2 border-primary-400" />
+                    <hr class="mt-2 border-surface-700" />
                     <div>
                       <h2 class="font-nasalization mb-1 mt-2 font-semibold text-green-500">
                         Samodzielne decyzje

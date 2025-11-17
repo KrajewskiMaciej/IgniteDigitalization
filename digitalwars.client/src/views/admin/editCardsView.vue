@@ -1,10 +1,10 @@
 <template>
-  <div class="w-full flex">
+  <div class="w-full flex gap-4 p-4">
     <!-- SEKCJA EDYCJI KART -->
     <div
-      class="flex flex-col flex-1 justify-center items-center m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary"
+      class="flex flex-col flex-1 items-center px-4 py-6 border border-surface-700 rounded-lg bg-tertiary"
     >
-      <h1 class="text-3xl font-nasalization text-white mt-5">Edycja kart</h1>
+      <h1 class="text-3xl font-nasalization text-white mb-6">Edycja kart</h1>
 
       <input
         type="file"
@@ -14,125 +14,171 @@
         style="display: none"
       />
 
-      <button
+      <Button
         @click="triggerFileInput"
-        class="bg-green-500 border-2 border-green-700 py-3 px-6 rounded-md mt-5 text-white"
+        severity="success"
+        class="mb-6"
+        size="large"
+        label="Wczytaj talię z pliku xls"
       >
-        <font-awesome-icon :icon="faFileExcel" class="h-4 mr-2" />
-        Wczytaj talię z pliku xls
-      </button>
+      <template #icon>
+        <font-awesome-icon :icon="faFileExcel" class="mr-2" />
+      </template>
+      </Button>
 
-      <form class="w-full max-w-lg mt-4 flex flex-col items-center">
-        <div class="w-full mb-4">
-          <label class="block text-white mb-1">Wybierz talię:</label>
-          <dropDown
-            :items="decksData"
+      <div class="w-full max-w-lg space-y-4">
+        <div class="flex flex-col">
+          <label for="deck-select" class="block text-white mb-2 font-medium">Wybierz talię:</label>
+          <Dropdown
+            id="deck-select"
             v-model="selectedDeckId"
-            :item-key="'id'"
-            :display-format="(deck: Deck) => `#${deck.id} ${deck.title}`"
+            :options="decksData"
+            optionLabel="title"
+            optionValue="id"
             placeholder="Wybierz talię..."
-          />
+            class="w-full"
+          >
+            <template #value="slotProps">
+              <span v-if="slotProps.value">
+                #{{ slotProps.value }} {{ decksData.find(d => d.id === slotProps.value)?.title }}
+              </span>
+              <span v-else>{{ slotProps.placeholder }}</span>
+            </template>
+            <template #option="slotProps">
+              <span>#{{ slotProps.option.id }} {{ slotProps.option.title }}</span>
+            </template>
+          </Dropdown>
         </div>
 
-        <div v-if="selectedDeckId" class="w-full">
-          <label class="block text-white mb-1">Wybierz kartę:</label>
-          <dropDown
-            :items="cardsData"
+        <div v-if="selectedDeckId" class="flex flex-col">
+          <label for="card-select" class="block text-white mb-2 font-medium">Wybierz kartę:</label>
+          <Dropdown
+            id="card-select"
             v-model="selectedCardId"
-            :item-key="'id'"
-            :display-format="(card: Card) => `#${card.id} ${card.title}`"
+            :options="cardsData"
+            optionLabel="title"
+            optionValue="id"
             placeholder="Wybierz kartę..."
-          />
+            class="w-full"
+          >
+            <template #value="slotProps">
+              <span v-if="slotProps.value">
+                #{{ slotProps.value }} {{ cardsData.find(c => c.id === slotProps.value)?.title }}
+              </span>
+              <span v-else>{{ slotProps.placeholder }}</span>
+            </template>
+            <template #option="slotProps">
+              <span>#{{ slotProps.option.id }} {{ slotProps.option.title }}</span>
+            </template>
+          </Dropdown>
         </div>
 
-        <div v-if="selectedCardId && currentCard" class="mt-6 space-y-4 text-white w-full">
+        <div v-if="selectedCardId && currentCard" class="mt-6 space-y-4">
           <div class="flex flex-col">
-            <label for="title" class="mb-1">Tytuł karty:</label>
-            <input
+            <label for="title" class="block text-white mb-2 font-medium">Tytuł karty:</label>
+            <InputText
               id="title"
               v-model="currentCard.title"
-              type="text"
-              class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 text-white w-full"
+              class="w-full"
             />
           </div>
 
           <div class="flex flex-col">
-            <label for="description" class="mb-1">Opis karty:</label>
-            <textarea
+            <label for="description" class="block text-white mb-2 font-medium">Opis karty:</label>
+            <Textarea
               id="description"
               v-model="currentCard.description"
-              rows="8"
-              class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 text-white resize-none w-full"
-            ></textarea>
+              rows="12"
+              class="w-full"
+            />
           </div>
+
           <div class="flex justify-center w-full">
-            <button
+            <Button
               @click="saveCard"
-              type="button"
-              class="bg-accent border-2 border-accent py-3 px-6 rounded-md mt-5"
+              class="mt-4"
+              label="Zapisz"
             >
-              <font-awesome-icon :icon="faSave" class="h-4 mr-2" />
-              Zapisz
-            </button>
+            <template #icon>
+              <font-awesome-icon :icon="faSave" class="mr-2" />
+            </template>
+            </Button>
           </div>
         </div>
-      </form>
+      </div>
     </div>
 
     <!-- SEKCJA EDYCJI FEEDBACKU -->
     <div
       v-if="currentCard && selectedCardId"
-      class="flex flex-col flex-1 items-center m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary"
+      class="flex flex-col flex-1 items-center px-4 py-6 border-2 border-surface-700 rounded-lg bg-tertiary"
     >
-      <h1 class="text-3xl font-nasalization text-white mt-5">Edycja feedbacku</h1>
+      <h1 class="text-3xl font-nasalization text-white mb-6">Edycja feedbacku</h1>
 
-      <form class="w-full max-w-lg mt-4 flex flex-col items-center">
-        <div class="w-full mb-4">
-          <label class="block text-white mb-1 mt-2">Wybierz feedback:</label>
-          <dropDown
-            :items="feedbackData"
+      <div class="w-full max-w-lg space-y-4">
+        <div class="flex flex-col">
+          <label for="feedback-select" class="block text-white mb-2 font-medium">Wybierz feedback:</label>
+          <Dropdown
+            id="feedback-select"
             v-model="selectedFeedbackId"
-            :item-key="'id'"
-            :display-format="
-              (feedback: Feedback) =>
-                `${feedback.status === 'P' ? '✅' : '❌'} ${feedback.longDescription.substring(0, 30)}...`
-            "
+            :options="feedbackData"
+            optionLabel="longDescription"
+            optionValue="id"
             placeholder="Wybierz feedback..."
-          />
+            class="w-full"
+          >
+            <template #value="slotProps">
+              <span v-if="slotProps.value">
+                {{ feedbackData.find(f => f.id === slotProps.value)?.status === 'P' ? '✅' : '❌' }}
+                {{ feedbackData.find(f => f.id === slotProps.value)?.longDescription.substring(0, 30) }}...
+              </span>
+              <span v-else>{{ slotProps.placeholder }}</span>
+            </template>
+            <template #option="slotProps">
+              <span>
+                {{ slotProps.option.status === 'P' ? '✅' : '❌' }}
+                {{ slotProps.option.longDescription.substring(0, 30) }}...
+              </span>
+            </template>
+          </Dropdown>
         </div>
 
-        <div v-if="selectedFeedbackId && currentFeedback" class="flex flex-col w-full">
-          <label for="feedbackDescription" class="block text-white mb-1">Opis feedbacku:</label>
-          <textarea
+        <div v-if="selectedFeedbackId && currentFeedback" class="flex flex-col">
+          <label for="feedbackDescription" class="block text-white mb-2 font-medium">Opis feedbacku:</label>
+          <Textarea
             id="feedbackDescription"
             v-model="currentFeedback.longDescription"
             rows="8"
-            class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 text-white resize-none w-full"
-          >
-          </textarea>
+            class="w-full"
+          />
+
           <div class="flex justify-center w-full">
-            <button
+            <Button
               @click="saveFeedback"
-              type="button"
-              class="bg-accent border-2 border-accent py-3 px-6 rounded-md mt-5 text-white"
+              class="mt-4"
+              label="Zapisz"
             >
-              <font-awesome-icon :icon="faSave" class="h-4 mr-2" />
-              Zapisz
-            </button>
+            <template #icon>
+              <font-awesome-icon :icon="faSave" class="mr-2" />
+            </template>
+            </Button>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { faSave, faFileExcel } from '@fortawesome/free-solid-svg-icons'
-import dropDown from '@/components/dropDown.vue'
 import { reactive, ref, watch, onMounted } from 'vue'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
 import { useToast } from 'vue-toastification'
+import Dropdown from 'primevue/dropdown'
+import InputText from 'primevue/inputtext'
+import Textarea from 'primevue/textarea'
+import Button from 'primevue/button'
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Deck {
@@ -234,7 +280,6 @@ watch(selectedDeckId, async (newDeckId) => {
   }
 
   try {
-    // Użyj poprawionego endpointu 'cards'
     const url = apiConfig.admin.deck.cards(newDeckId)
     const response = await apiService.get(url)
 
