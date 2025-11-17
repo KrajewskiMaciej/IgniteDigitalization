@@ -5,9 +5,7 @@
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
         Eksport gry do PDF
       </h1>
-      <p class="text-gray-400 text-sm md:text-base">
-        Generuj pliki PDF z kartami i planszami
-      </p>
+      <p class="text-gray-400 text-sm md:text-base">Generuj pliki PDF z kartami i planszami</p>
     </div>
 
     <div class="max-w-5xl mx-auto w-full space-y-6">
@@ -85,7 +83,10 @@
 
           <!-- Plansza konkurencji -->
           <div>
-            <label for="opponent-board-select" class="block mb-2 text-sm font-semibold text-gray-300">
+            <label
+              for="opponent-board-select"
+              class="block mb-2 text-sm font-semibold text-gray-300"
+            >
               Plansza konkurencji:
             </label>
             <Dropdown
@@ -102,29 +103,32 @@
           </div>
 
           <!-- Informacja o wybranych planszach -->
-          <div v-if="selectedBoard && selectedOpponentBoard" class="bg-surface-800 border border-surface-600 rounded-lg p-4">
+          <div
+            v-if="selectedBoard && selectedOpponentBoard"
+            class="bg-surface-800 border border-surface-600 rounded-lg p-4"
+          >
             <div class="flex items-start gap-3">
-           
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-1">
-                     <div class="bg-green-400/20 p-1 rounded">
-                        <font-awesome-icon :icon="faChessBoard" class="text-green-400" />
-                      </div>
-                      <div>
-                        <p class="text-sm text-gray-300 mb-2">Wybrano plansze:</p>
-                      </div>
-
+                  <div class="bg-green-400/20 p-1 rounded">
+                    <font-awesome-icon :icon="faChessBoard" class="text-green-400" />
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-300 mb-2">Wybrano plansze:</p>
+                  </div>
                 </div>
                 <ul class="space-y-1 text-sm">
                   <li class="flex items-center gap-2 text-white">
                     <span class="w-2 h-2 bg-green-400 rounded-full"></span>
                     <span class="font-medium">Stół:</span>
-                    <span>{{ boardsData.find(b => b.boards_Id === selectedBoard)?.name }}</span>
+                    <span>{{ boardsData.find((b) => b.boards_Id === selectedBoard)?.name }}</span>
                   </li>
                   <li class="flex items-center gap-2 text-white">
                     <span class="w-2 h-2 bg-green-400 rounded-full"></span>
                     <span class="font-medium">Konkurencja:</span>
-                    <span>{{ boardsData.find(b => b.boards_Id === selectedOpponentBoard)?.name }}</span>
+                    <span>{{
+                      boardsData.find((b) => b.boards_Id === selectedOpponentBoard)?.name
+                    }}</span>
                   </li>
                 </ul>
               </div>
@@ -143,7 +147,9 @@
               <template #icon>
                 <font-awesome-icon :icon="faFileExport" class="h-4" />
               </template>
-              <span class="ml-2">{{ isLoading ? 'Generowanie...' : 'Generuj PDF z planszami' }}</span>
+              <span class="ml-2">{{
+                isLoading ? 'Generowanie...' : 'Generuj PDF z planszami'
+              }}</span>
             </Button>
           </div>
         </div>
@@ -158,7 +164,6 @@ import { useToast } from 'vue-toastification'
 import { faFileExport, faChessBoard } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
-
 
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'

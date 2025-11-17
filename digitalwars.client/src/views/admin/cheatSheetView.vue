@@ -277,10 +277,10 @@ const availablePDFs: PdfInfo[] = [
   },
 ]
 
-const selectedPDF = ref<string>(availablePDFs[0].path);
-const pdfWindows = ref<PdfWindow[]>([]);
-const activePDFIndex = ref<number>(0);
-const isZoomed = ref<boolean>(false);
+const selectedPDF = ref<string>(availablePDFs[0].path)
+const pdfWindows = ref<PdfWindow[]>([])
+const activePDFIndex = ref<number>(0)
+const isZoomed = ref<boolean>(false)
 
 function toggleImageSize(): void {
   isZoomed.value = !isZoomed.value

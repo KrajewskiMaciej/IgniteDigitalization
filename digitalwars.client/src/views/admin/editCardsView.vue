@@ -2,9 +2,14 @@
   <div class="w-full flex gap-4 p-4">
     <!-- SEKCJA EDYCJI KART -->
     <div
-      class="flex flex-col flex-1 items-center px-4 py-6 border border-surface-700 rounded-lg bg-tertiary"
+      class="flex flex-col flex-1 items-center px-4 py-6"
+      :class="
+        currentCard && selectedCardId ? ' border border-surface-700 rounded-lg bg-tertiary' : ''
+      "
     >
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-6">Edycja kart</h1>
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-6">
+        Edycja kart
+      </h1>
 
       <input
         type="file"
