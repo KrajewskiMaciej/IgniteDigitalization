@@ -1,39 +1,49 @@
 <template>
-  <div class="w-full flex gap-4 p-4">
-    <!-- SEKCJA EDYCJI KART -->
-    <div
-      class="flex flex-col flex-1 items-center px-4 py-6"
-      :class="
-        currentCard && selectedCardId ? ' border border-surface-700 rounded-lg bg-tertiary' : ''
-      "
-    >
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-6">
-        Edycja kart
+  <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
+    <!-- Nagłówek -->
+    <div class="text-center">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+        Edycja Kart
       </h1>
+      <p class="text-gray-400 text-sm md:text-base">Zarządzaj kartami w talii</p>
+    </div>
 
-      <input
-        type="file"
-        accept=".xls,.xlsx"
-        ref="fileInput"
-        @change="handleFileChange"
-        style="display: none"
-      />
+    <div class="max-w-6xl mx-auto w-full space-y-6">
+      <!-- Przycisk importu pliku -->
+      <div class="text-center">
+        <input
+          type="file"
+          accept=".xls,.xlsx"
+          ref="fileInput"
+          @change="handleFileChange"
+          style="display: none"
+        />
 
-      <Button
-        @click="triggerFileInput"
-        severity="success"
-        class="mb-6"
-        size="large"
-        label="Wczytaj talię z pliku xls"
-      >
-        <template #icon>
-          <font-awesome-icon :icon="faFileExcel" class="mr-2" />
-        </template>
-      </Button>
+        <Button
+          @click="triggerFileInput"
+          severity="success"
+          size="large"
+          label="Wczytaj talię z pliku Excel"
+        >
+          <template #icon>
+            <font-awesome-icon :icon="faFileExcel" class="h-4" />
+          </template>
+        </Button>
+      </div>
 
-      <div class="w-full max-w-lg space-y-4">
-        <div class="flex flex-col">
-          <label for="deck-select" class="block text-white mb-2 font-medium">Wybierz talię:</label>
+      <!-- Sekcja wyboru talii -->
+      <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+          <div class="bg-primary-500/20 p-2.5 rounded-lg">
+            <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
+        </div>
+
+        <div>
+          <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
+            Wybierz talię kart:
+          </label>
           <Dropdown
             id="deck-select"
             v-model="selectedDeckId"
@@ -42,126 +52,282 @@
             optionValue="id"
             placeholder="Wybierz talię..."
             class="w-full"
+            :disabled="isLoadingDecks"
           >
             <template #value="slotProps">
-              <span v-if="slotProps.value">
-                #{{ slotProps.value }} {{ decksData.find((d) => d.id === slotProps.value)?.title }}
-              </span>
-              <span v-else>{{ slotProps.placeholder }}</span>
+              <div v-if="slotProps.value" class="flex items-center gap-2">
+                <span class="text-primary-400">#{{ slotProps.value }}</span>
+                <span>{{ decksData.find((d) => d.id === slotProps.value)?.title }}</span>
+              </div>
+              <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
             </template>
             <template #option="slotProps">
-              <span>#{{ slotProps.option.id }} {{ slotProps.option.title }}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-primary-400">#{{ slotProps.option.id }}</span>
+                <span>{{ slotProps.option.title }}</span>
+              </div>
             </template>
           </Dropdown>
         </div>
+      </div>
 
-        <div v-if="selectedDeckId" class="flex flex-col">
-          <label for="card-select" class="block text-white mb-2 font-medium">Wybierz kartę:</label>
-          <Dropdown
-            id="card-select"
-            v-model="selectedCardId"
-            :options="cardsData"
-            optionLabel="title"
-            optionValue="id"
-            placeholder="Wybierz kartę..."
-            class="w-full"
-          >
-            <template #value="slotProps">
-              <span v-if="slotProps.value">
-                #{{ slotProps.value }} {{ cardsData.find((c) => c.id === slotProps.value)?.title }}
-              </span>
-              <span v-else>{{ slotProps.placeholder }}</span>
-            </template>
-            <template #option="slotProps">
-              <span>#{{ slotProps.option.id }} {{ slotProps.option.title }}</span>
-            </template>
-          </Dropdown>
+      <!-- Grid z dwiema sekcjami -->
+      <div v-if="selectedDeckId" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Sekcja edycji karty -->
+        <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+          <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+            <div class="bg-blue-500/20 p-2.5 rounded-lg">
+              <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
+            </div>
+            <h2 class="text-xl md:text-2xl font-bold text-white">Edycja karty</h2>
+          </div>
+
+          <div v-if="isLoadingCards" class="text-center py-8">
+            <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
+            <p class="text-gray-400 mt-3">Ładowanie kart...</p>
+          </div>
+
+          <div v-else class="space-y-5">
+            <div>
+              <label for="card-select" class="block mb-2 text-sm font-semibold text-gray-300">
+                Wybierz kartę:
+              </label>
+              <Dropdown
+                id="card-select"
+                v-model="selectedCardId"
+                :options="cardsData"
+                optionLabel="title"
+                optionValue="id"
+                placeholder="Wybierz kartę..."
+                class="w-full"
+              >
+                <template #value="slotProps">
+                  <div v-if="slotProps.value" class="flex items-center gap-2">
+                    <span class="text-blue-400">#{{ slotProps.value }}</span>
+                    <span>{{ cardsData.find((c) => c.id === slotProps.value)?.title }}</span>
+                  </div>
+                  <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                </template>
+                <template #option="slotProps">
+                  <div class="flex items-center gap-2">
+                    <span class="text-blue-400">#{{ slotProps.option.id }}</span>
+                    <span>{{ slotProps.option.title }}</span>
+                  </div>
+                </template>
+              </Dropdown>
+            </div>
+
+            <form v-if="selectedCardId && currentCard" @submit.prevent="saveCard" class="space-y-5">
+              <!-- Tytuł karty -->
+              <div>
+                <label for="title" class="block mb-2 text-sm font-semibold text-gray-300">
+                  Tytuł karty:
+                </label>
+                <InputText
+                  id="title"
+                  v-model="currentCard.title"
+                  placeholder="Wprowadź tytuł karty..."
+                  class="w-full"
+                />
+              </div>
+
+              <!-- Opis karty -->
+              <div>
+                <label for="description" class="block mb-2 text-sm font-semibold text-gray-300">
+                  Opis karty:
+                </label>
+                <Textarea
+                  id="description"
+                  v-model="currentCard.description"
+                  rows="12"
+                  placeholder="Szczegółowy opis karty..."
+                  class="w-full"
+                />
+              </div>
+
+              <!-- Przycisk zapisu -->
+              <div class="flex justify-center">
+                <Button
+                  type="submit"
+                  :disabled="isSavingCard"
+                  :loading="isSavingCard"
+                  :label="isSavingCard ? 'Zapisywanie...' : 'Zapisz Kartę'"
+                  size="large"
+                  class="w-full"
+                />
+              </div>
+            </form>
+          </div>
         </div>
 
-        <div v-if="selectedCardId && currentCard" class="mt-6 space-y-4">
-          <div class="flex flex-col">
-            <label for="title" class="block text-white mb-2 font-medium">Tytuł karty:</label>
-            <InputText id="title" v-model="currentCard.title" class="w-full" />
+        <!-- Sekcja edycji feedbacku -->
+        <div
+          v-if="currentCard && selectedCardId"
+          class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
+        >
+          <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+            <div class="bg-purple-500/20 p-2.5 rounded-lg">
+              <font-awesome-icon :icon="faComment" class="h-6 text-purple-400" />
+            </div>
+            <h2 class="text-xl md:text-2xl font-bold text-white">Edycja feedbacku</h2>
           </div>
 
-          <div class="flex flex-col">
-            <label for="description" class="block text-white mb-2 font-medium">Opis karty:</label>
-            <Textarea id="description" v-model="currentCard.description" rows="12" class="w-full" />
-          </div>
+          <div class="space-y-5">
+            <div>
+              <label for="feedback-select" class="block mb-2 text-sm font-semibold text-gray-300">
+                Wybierz feedback:
+              </label>
+              <Dropdown
+                id="feedback-select"
+                v-model="selectedFeedbackId"
+                :options="feedbackData"
+                optionLabel="longDescription"
+                optionValue="id"
+                placeholder="Wybierz feedback..."
+                class="w-full"
+              >
+                <template #value="slotProps">
+                  <div v-if="slotProps.value" class="flex items-center gap-2">
+                    <span>
+                      {{
+                        feedbackData.find((f) => f.id === slotProps.value)?.status === 'P'
+                          ? '✅'
+                          : '❌'
+                      }}
+                    </span>
+                    <span class="truncate">
+                      {{
+                        feedbackData
+                          .find((f) => f.id === slotProps.value)
+                          ?.longDescription.substring(0, 40)
+                      }}...
+                    </span>
+                  </div>
+                  <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                </template>
+                <template #option="slotProps">
+                  <div class="flex items-center gap-2">
+                    <span>{{ slotProps.option.status === 'P' ? '✅' : '❌' }}</span>
+                    <span class="truncate">
+                      {{ slotProps.option.longDescription.substring(0, 40) }}...
+                    </span>
+                  </div>
+                </template>
+              </Dropdown>
+            </div>
 
-          <div class="flex justify-center w-full px-4">
-            <Button @click="saveCard" class="mt-4 w-full" label="Zapisz"> </Button>
+            <form
+              v-if="selectedFeedbackId && currentFeedback"
+              @submit.prevent="saveFeedback"
+              class="space-y-5"
+            >
+              <!-- Opis feedbacku -->
+              <div>
+                <label
+                  for="feedbackDescription"
+                  class="block mb-2 text-sm font-semibold text-gray-300"
+                >
+                  Opis feedbacku:
+                </label>
+                <Textarea
+                  id="feedbackDescription"
+                  v-model="currentFeedback.longDescription"
+                  rows="8"
+                  placeholder="Szczegółowy opis feedbacku..."
+                  class="w-full"
+                />
+              </div>
+
+              <!-- Status feedbacku -->
+              <div>
+                <label class="block mb-2 text-sm font-semibold text-gray-300">
+                  Status feedbacku:
+                </label>
+                <div class="flex gap-4">
+                  <div
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors cursor-pointer flex-1"
+                    :class="
+                      currentFeedback.status === 'P'
+                        ? 'border-green-400 bg-green-500/20'
+                        : 'border-surface-600 hover:border-surface-500'
+                    "
+                    @click="currentFeedback.status = 'P'"
+                  >
+                    <input
+                      type="radio"
+                      id="status-positive"
+                      v-model="currentFeedback.status"
+                      value="P"
+                      class="w-4 h-4"
+                    />
+                    <label for="status-positive" class="text-white cursor-pointer flex-1">
+                      ✅ Pozytywny
+                    </label>
+                  </div>
+                  <div
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors cursor-pointer flex-1"
+                    :class="
+                      currentFeedback.status === 'N'
+                        ? 'border-red-400 bg-red-500/20'
+                        : 'border-surface-600 hover:border-surface-500'
+                    "
+                    @click="currentFeedback.status = 'N'"
+                  >
+                    <input
+                      type="radio"
+                      id="status-negative"
+                      v-model="currentFeedback.status"
+                      value="N"
+                      class="w-4 h-4"
+                    />
+                    <label for="status-negative" class="text-white cursor-pointer flex-1">
+                      ❌ Negatywny
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Przycisk zapisu -->
+              <div class="flex justify-center">
+                <Button
+                  type="submit"
+                  :disabled="isSavingFeedback"
+                  :loading="isSavingFeedback"
+                  :label="isSavingFeedback ? 'Zapisywanie...' : 'Zapisz Feedback'"
+                  severity="secondary"
+                  size="large"
+                  class="w-full"
+                />
+              </div>
+            </form>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- SEKCJA EDYCJI FEEDBACKU -->
-    <div
-      v-if="currentCard && selectedCardId"
-      class="flex flex-col flex-1 items-center px-4 py-6 border-2 border-surface-700 rounded-lg bg-tertiary"
-    >
-      <h1 class="text-3xl font-nasalization text-white mb-6">Edycja feedbacku</h1>
-
-      <div class="w-full max-w-lg space-y-4">
-        <div class="flex flex-col">
-          <label for="feedback-select" class="block text-white mb-2 font-medium"
-            >Wybierz feedback:</label
-          >
-          <Dropdown
-            id="feedback-select"
-            v-model="selectedFeedbackId"
-            :options="feedbackData"
-            optionLabel="longDescription"
-            optionValue="id"
-            placeholder="Wybierz feedback..."
-            class="w-full"
-          >
-            <template #value="slotProps">
-              <span v-if="slotProps.value">
-                {{
-                  feedbackData.find((f) => f.id === slotProps.value)?.status === 'P' ? '✅' : '❌'
-                }}
-                {{
-                  feedbackData
-                    .find((f) => f.id === slotProps.value)
-                    ?.longDescription.substring(0, 30)
-                }}...
-              </span>
-              <span v-else>{{ slotProps.placeholder }}</span>
-            </template>
-            <template #option="slotProps">
-              <span>
-                {{ slotProps.option.status === 'P' ? '✅' : '❌' }}
-                {{ slotProps.option.longDescription.substring(0, 30) }}...
-              </span>
-            </template>
-          </Dropdown>
+      <!-- Placeholder gdy brak wybranej talii -->
+      <div
+        v-if="!selectedDeckId"
+        class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-surface-900/50"
+      >
+        <div
+          class="bg-surface-800/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-3"
+        >
+          <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
         </div>
-
-        <div v-if="selectedFeedbackId && currentFeedback" class="flex flex-col">
-          <label for="feedbackDescription" class="block text-white mb-2 font-medium"
-            >Opis feedbacku:</label
-          >
-          <Textarea
-            id="feedbackDescription"
-            v-model="currentFeedback.longDescription"
-            rows="8"
-            class="w-full"
-          />
-
-          <div class="flex justify-center w-full px-4">
-            <Button @click="saveFeedback" class="mt-4 w-full" label="Zapisz"> </Button>
-          </div>
-        </div>
+        <p class="text-gray-400 text-sm font-medium">Wybierz talię aby zarządzać kartami</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { faSave, faFileExcel } from '@fortawesome/free-solid-svg-icons'
-import { reactive, ref, watch, onMounted } from 'vue'
+import {
+  faPenToSquare,
+  faFileExcel,
+  faLayerGroup,
+  faComment,
+} from '@fortawesome/free-solid-svg-icons'
+import { ref, watch, onMounted } from 'vue'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
 import { useToast } from 'vue-toastification'
@@ -169,6 +335,7 @@ import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+import ProgressSpinner from 'primevue/progressspinner'
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Deck {
@@ -197,15 +364,20 @@ const selectedFeedbackId = ref<number | undefined>(undefined)
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
-const decksData = reactive<Deck[]>([])
-const cardsData = reactive<Card[]>([])
-const feedbackData = reactive<Feedback[]>([
+const decksData = ref<Deck[]>([])
+const cardsData = ref<Card[]>([])
+const feedbackData = ref<Feedback[]>([
   { id: 1, longDescription: 'Przykładowy feedback negatywny dla tej karty.', status: 'N' },
   { id: 2, longDescription: 'Przykładowy feedback pozytywny dla tej karty.', status: 'P' },
 ])
 
 const currentCard = ref<Card | null>(null)
 const currentFeedback = ref<Feedback | null>(null)
+
+const isLoadingDecks = ref(true)
+const isLoadingCards = ref(false)
+const isSavingCard = ref(false)
+const isSavingFeedback = ref(false)
 
 // --- FUNKCJE ---
 function triggerFileInput(): void {
@@ -236,26 +408,44 @@ async function handleFileChange(event: Event): Promise<void> {
 
 async function saveCard(): Promise<void> {
   if (!currentCard.value) return
-  // TODO: Implementacja logiki zapisu karty do API
-  console.log('Zapisywanie karty:', currentCard.value)
-  toast.success(`Zapisano kartę: ${currentCard.value.title}`)
+  isSavingCard.value = true
+  try {
+    // TODO: Implementacja logiki zapisu karty do API
+    console.log('Zapisywanie karty:', currentCard.value)
+    toast.success(`Zapisano kartę: ${currentCard.value.title}`)
+  } catch (error) {
+    toast.error('Nie udało się zapisać karty')
+    console.error('Błąd zapisu karty:', error)
+  } finally {
+    isSavingCard.value = false
+  }
 }
 
 async function saveFeedback(): Promise<void> {
   if (!currentFeedback.value) return
-  // TODO: Implementacja logiki zapisu feedbacku do API
-  console.log('Zapisywanie feedbacku:', currentFeedback.value)
-  toast.success(`Zapisano feedback: ${currentFeedback.value.longDescription.substring(0, 30)}...`)
+  isSavingFeedback.value = true
+  try {
+    // TODO: Implementacja logiki zapisu feedbacku do API
+    console.log('Zapisywanie feedbacku:', currentFeedback.value)
+    toast.success(`Zapisano feedback`)
+  } catch (error) {
+    toast.error('Nie udało się zapisać feedbacku')
+    console.error('Błąd zapisu feedbacku:', error)
+  } finally {
+    isSavingFeedback.value = false
+  }
 }
 
 async function fetchDecks(): Promise<void> {
+  isLoadingDecks.value = true
   try {
     const response = await apiService.get(apiConfig.admin.deck.getAll)
-    decksData.length = 0
-    decksData.push(...(response.data as Deck[]))
+    decksData.value = response.data as Deck[]
   } catch (error) {
     console.error('Błąd przy pobieraniu talii:', error)
     toast.error('Nie udało się pobrać dostępnych talii.')
+  } finally {
+    isLoadingDecks.value = false
   }
 }
 
@@ -265,20 +455,21 @@ watch(selectedDeckId, async (newDeckId) => {
   currentCard.value = null
 
   if (!newDeckId) {
-    cardsData.length = 0
+    cardsData.value = []
     return
   }
 
+  isLoadingCards.value = true
   try {
     const url = apiConfig.admin.deck.cards(newDeckId)
     const response = await apiService.get(url)
-
-    cardsData.length = 0
-    cardsData.push(...(response.data as Card[]))
+    cardsData.value = response.data as Card[]
   } catch (error) {
     console.error('Błąd przy pobieraniu kart z talii:', error)
     toast.error('Nie udało się pobrać kart dla wybranej talii.')
-    cardsData.length = 0
+    cardsData.value = []
+  } finally {
+    isLoadingCards.value = false
   }
 })
 
@@ -287,7 +478,7 @@ watch(selectedCardId, (newCardId) => {
   currentFeedback.value = null
 
   if (newCardId) {
-    const card = cardsData.find((c) => c.id === newCardId)
+    const card = cardsData.value.find((c) => c.id === newCardId)
     currentCard.value = card ? { ...card } : null
   } else {
     currentCard.value = null
@@ -296,7 +487,7 @@ watch(selectedCardId, (newCardId) => {
 
 watch(selectedFeedbackId, (newFeedbackId) => {
   if (newFeedbackId) {
-    const feedback = feedbackData.find((f) => f.id === newFeedbackId)
+    const feedback = feedbackData.value.find((f) => f.id === newFeedbackId)
     currentFeedback.value = feedback ? { ...feedback } : null
   } else {
     currentFeedback.value = null

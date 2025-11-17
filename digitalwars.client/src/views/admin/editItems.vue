@@ -1,15 +1,27 @@
 <template>
-  <div class="w-full flex">
-    <div class="flex flex-col flex-1 items-center m-4 px-4 py-6">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-6">
+  <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
+    <!-- Nagłówek -->
+    <div class="text-center">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
         Edycja Przedmiotów
       </h1>
+      <p class="text-gray-400 text-sm md:text-base">Zarządzaj przedmiotami w talii kart</p>
+    </div>
 
-      <div v-if="isLoadingDecks" class="text-center text-gray-400 mt-10">Ładowanie talii...</div>
+    <div class="max-w-4xl mx-auto w-full space-y-6">
+      <!-- Sekcja wyboru talii -->
+      <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+          <div class="bg-primary-500/20 p-2.5 rounded-lg">
+            <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
+        </div>
 
-      <form v-else class="w-full max-w-lg mt-4 flex flex-col items-center space-y-4">
-        <div class="w-full">
-          <label for="deck-select" class="block text-white mb-2 font-medium">Wybierz talię:</label>
+        <div>
+          <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
+            Wybierz talię kart:
+          </label>
           <Dropdown
             id="deck-select"
             v-model="selectedDeck"
@@ -18,27 +30,33 @@
             optionValue="id"
             placeholder="Wybierz talię..."
             class="w-full"
+            :disabled="isLoadingDecks"
           >
-            <template #value="slotProps">
-              <span v-if="slotProps.value">
-                #{{ slotProps.value }} {{ decksData.find((d) => d.id === slotProps.value)?.title }}
-              </span>
-              <span v-else>{{ slotProps.placeholder }}</span>
-            </template>
-            <template #option="slotProps">
-              <span>#{{ slotProps.option.id }} {{ slotProps.option.title }}</span>
-            </template>
           </Dropdown>
         </div>
+      </div>
 
-        <div v-if="isLoadingItems" class="text-center text-gray-400 mt-4">
-          Ładowanie przedmiotów...
+      <!-- Sekcja wyboru przedmiotu -->
+      <div
+        v-if="selectedDeck"
+        class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
+      >
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+          <div class="bg-green-500/20 p-2.5 rounded-lg">
+            <font-awesome-icon :icon="faMicrochip" class="h-6 text-green-400" />
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white">Przedmioty</h2>
         </div>
 
-        <div v-else-if="selectedDeck" class="w-full">
-          <label for="item-select" class="block text-white mb-2 font-medium"
-            >Wybierz przedmiot:</label
-          >
+        <div v-if="isLoadingItems" class="text-center py-8">
+          <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
+          <p class="text-gray-400 mt-3">Ładowanie przedmiotów...</p>
+        </div>
+
+        <div v-else>
+          <label for="item-select" class="block mb-2 text-sm font-semibold text-gray-300">
+            Wybierz przedmiot:
+          </label>
           <Dropdown
             id="item-select"
             v-model="selectedItem"
@@ -49,44 +67,89 @@
             class="w-full"
           >
             <template #value="slotProps">
-              <span v-if="slotProps.value">
-                #{{ slotProps.value }}
-                {{ itemsData.find((i) => i.id === slotProps.value)?.shortDesc }}
-              </span>
-              <span v-else>{{ slotProps.placeholder }}</span>
+              <div v-if="slotProps.value" class="flex items-center gap-2">
+                <span class="text-green-400">#{{ slotProps.value }}</span>
+                <span>{{ itemsData.find((i) => i.id === slotProps.value)?.shortDesc }}</span>
+              </div>
+              <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
             </template>
             <template #option="slotProps">
-              <span>#{{ slotProps.option.id }} {{ slotProps.option.shortDesc }}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-green-400">#{{ slotProps.option.id }}</span>
+                <span>{{ slotProps.option.shortDesc }}</span>
+              </div>
             </template>
           </Dropdown>
         </div>
+      </div>
 
-        <div v-if="selectedItem && currentItem" class="mt-6 space-y-4 w-full">
-          <div class="flex flex-col">
-            <label for="title" class="block text-white mb-2 font-medium">Tytuł przedmiotu:</label>
-            <InputText id="title" v-model="currentItem.shortDesc" class="w-full" />
+      <!-- Sekcja edycji przedmiotu -->
+      <div
+        v-if="selectedItem && currentItem"
+        class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
+      >
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+          <div class="bg-blue-500/20 p-2.5 rounded-lg">
+            <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white">Edycja przedmiotu</h2>
+        </div>
+
+        <form @submit.prevent="handleSave" class="space-y-5">
+          <!-- Tytuł przedmiotu -->
+          <div>
+            <label for="item-title" class="block mb-2 text-sm font-semibold text-gray-300">
+              Tytuł przedmiotu:
+            </label>
+            <InputText
+              id="item-title"
+              v-model="currentItem.shortDesc"
+              placeholder="Wprowadź tytuł przedmiotu..."
+              class="w-full"
+            />
           </div>
 
-          <div class="flex flex-col">
-            <label for="description" class="block text-white mb-2 font-medium"
-              >Opis przedmiotu:</label
-            >
-            <Textarea id="description" v-model="currentItem.longDesc" rows="8" class="w-full" />
+          <!-- Opis przedmiotu -->
+          <div>
+            <label for="item-description" class="block mb-2 text-sm font-semibold text-gray-300">
+              Opis przedmiotu:
+            </label>
+            <Textarea
+              id="item-description"
+              v-model="currentItem.longDesc"
+              rows="8"
+              placeholder="Szczegółowy opis przedmiotu..."
+              class="w-full"
+            />
           </div>
 
-          <div class="flex justify-center w-full px-4">
+          <!-- Przycisk zapisu -->
+          <div class="flex justify-center px-4">
             <Button
-              type="button"
-              @click="handleSave"
+              type="submit"
               :disabled="isSaving"
               :loading="isSaving"
-              :label="isSaving ? 'Zapisywanie...' : 'Zapisz'"
-              class="mt-5 w-full"
+              :label="isSaving ? 'Zapisywanie...' : 'Zapisz Zmiany'"
+              size="large"
+              class="w-full"
             >
             </Button>
           </div>
+        </form>
+      </div>
+
+      <!-- Placeholder gdy brak wybranej talii -->
+      <div
+        v-if="!selectedDeck"
+        class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-surface-900/50"
+      >
+        <div
+          class="bg-surface-800/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-3"
+        >
+          <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
         </div>
-      </form>
+        <p class="text-gray-400 text-sm font-medium">Wybierz talię aby zarządzać przedmiotami</p>
+      </div>
     </div>
   </div>
 </template>
@@ -94,11 +157,12 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
-import { faSave } from '@fortawesome/free-solid-svg-icons'
+import { faLayerGroup, faMicrochip, faPenToSquare } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+import ProgressSpinner from 'primevue/progressspinner'
 
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
