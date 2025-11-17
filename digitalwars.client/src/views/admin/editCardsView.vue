@@ -21,9 +21,9 @@
         size="large"
         label="Wczytaj talię z pliku xls"
       >
-      <template #icon>
-        <font-awesome-icon :icon="faFileExcel" class="mr-2" />
-      </template>
+        <template #icon>
+          <font-awesome-icon :icon="faFileExcel" class="mr-2" />
+        </template>
       </Button>
 
       <div class="w-full max-w-lg space-y-4">
@@ -40,7 +40,7 @@
           >
             <template #value="slotProps">
               <span v-if="slotProps.value">
-                #{{ slotProps.value }} {{ decksData.find(d => d.id === slotProps.value)?.title }}
+                #{{ slotProps.value }} {{ decksData.find((d) => d.id === slotProps.value)?.title }}
               </span>
               <span v-else>{{ slotProps.placeholder }}</span>
             </template>
@@ -63,7 +63,7 @@
           >
             <template #value="slotProps">
               <span v-if="slotProps.value">
-                #{{ slotProps.value }} {{ cardsData.find(c => c.id === slotProps.value)?.title }}
+                #{{ slotProps.value }} {{ cardsData.find((c) => c.id === slotProps.value)?.title }}
               </span>
               <span v-else>{{ slotProps.placeholder }}</span>
             </template>
@@ -76,30 +76,16 @@
         <div v-if="selectedCardId && currentCard" class="mt-6 space-y-4">
           <div class="flex flex-col">
             <label for="title" class="block text-white mb-2 font-medium">Tytuł karty:</label>
-            <InputText
-              id="title"
-              v-model="currentCard.title"
-              class="w-full"
-            />
+            <InputText id="title" v-model="currentCard.title" class="w-full" />
           </div>
 
           <div class="flex flex-col">
             <label for="description" class="block text-white mb-2 font-medium">Opis karty:</label>
-            <Textarea
-              id="description"
-              v-model="currentCard.description"
-              rows="12"
-              class="w-full"
-            />
+            <Textarea id="description" v-model="currentCard.description" rows="12" class="w-full" />
           </div>
 
           <div class="flex justify-center w-full px-4">
-            <Button
-              @click="saveCard"
-              class="mt-4 w-full"
-              label="Zapisz"
-            >
-            </Button>
+            <Button @click="saveCard" class="mt-4 w-full" label="Zapisz"> </Button>
           </div>
         </div>
       </div>
@@ -114,7 +100,9 @@
 
       <div class="w-full max-w-lg space-y-4">
         <div class="flex flex-col">
-          <label for="feedback-select" class="block text-white mb-2 font-medium">Wybierz feedback:</label>
+          <label for="feedback-select" class="block text-white mb-2 font-medium"
+            >Wybierz feedback:</label
+          >
           <Dropdown
             id="feedback-select"
             v-model="selectedFeedbackId"
@@ -126,8 +114,14 @@
           >
             <template #value="slotProps">
               <span v-if="slotProps.value">
-                {{ feedbackData.find(f => f.id === slotProps.value)?.status === 'P' ? '✅' : '❌' }}
-                {{ feedbackData.find(f => f.id === slotProps.value)?.longDescription.substring(0, 30) }}...
+                {{
+                  feedbackData.find((f) => f.id === slotProps.value)?.status === 'P' ? '✅' : '❌'
+                }}
+                {{
+                  feedbackData
+                    .find((f) => f.id === slotProps.value)
+                    ?.longDescription.substring(0, 30)
+                }}...
               </span>
               <span v-else>{{ slotProps.placeholder }}</span>
             </template>
@@ -141,7 +135,9 @@
         </div>
 
         <div v-if="selectedFeedbackId && currentFeedback" class="flex flex-col">
-          <label for="feedbackDescription" class="block text-white mb-2 font-medium">Opis feedbacku:</label>
+          <label for="feedbackDescription" class="block text-white mb-2 font-medium"
+            >Opis feedbacku:</label
+          >
           <Textarea
             id="feedbackDescription"
             v-model="currentFeedback.longDescription"
@@ -150,12 +146,7 @@
           />
 
           <div class="flex justify-center w-full px-4">
-            <Button
-              @click="saveFeedback"
-              class="mt-4 w-full"
-              label="Zapisz"
-            >
-            </Button>
+            <Button @click="saveFeedback" class="mt-4 w-full" label="Zapisz"> </Button>
           </div>
         </div>
       </div>

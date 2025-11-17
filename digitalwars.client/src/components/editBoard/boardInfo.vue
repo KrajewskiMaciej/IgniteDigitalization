@@ -2,34 +2,41 @@
   <div>
     <!-- Pole nazwy planszy -->
     <div class="mt-3 md:mt-5">
-      <label for="board-name" class="block mb-1 text-white">Nazwa planszy</label>
-      <input
+      <label for="board-name" class="block mb-2 text-sm font-medium text-white">
+        Nazwa planszy
+      </label>
+      <InputText
         id="board-name"
-        :value="name"
-        type="text"
-        class="w-full px-2 py-1.5 md:px-3 md:py-2 border-2 border-lgray-accent rounded-md bg-transparent text-sm md:text-base text-white"
+        :modelValue="name"
+        @update:modelValue="handleInput"
         placeholder="Wprowadź nazwę planszy"
-        @input="handleInput"
+        class="w-full"
       />
     </div>
 
     <!-- Informacje o wymiarach planszy -->
     <div class="flex flex-row w-full items-center justify-center gap-5 mt-8 mb-5">
       <div
-        class="border-2 border-lgray-accent px-2 py-1.5 md:px-3 md:py-2 rounded-md w-60 text-center text-white"
+        class="border border-surface-700 px-3 py-2 rounded-lg w-60 text-center text-white bg-surface-900"
       >
-        <span>Kolumny: {{ cols }}</span>
+        <span class="font-medium"
+          >Kolumny: <span class="text-primary-400">{{ cols }}</span></span
+        >
       </div>
       <div
-        class="border-2 border-lgray-accent px-2 py-1.5 md:px-3 md:py-2 rounded-md w-60 text-center text-sm md:text-base text-white"
+        class="border border-surface-700 px-3 py-2 rounded-lg w-60 text-center text-white bg-surface-900"
       >
-        <span>Rzędy: {{ rows }}</span>
+        <span class="font-medium"
+          >Rzędy: <span class="text-primary-400">{{ rows }}</span></span
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import InputText from 'primevue/inputtext'
+
 defineProps({
   name: {
     type: String,
@@ -47,16 +54,8 @@ defineProps({
 
 const emit = defineEmits(['update:name', 'update'])
 
-/**
- * Obsługuje zdarzenie input, aby bezpiecznie zaktualizować nazwę planszy.
- * @param event - Zdarzenie input pochodzące z elementu <input>.
- */
-const handleInput = (event: Event) => {
-  // Bezpieczne rzutowanie event.target na HTMLInputElement
-  const target = event.target as HTMLInputElement
-
-  // Emitowanie zdarzeń z nową wartością
-  emit('update:name', target.value)
+const handleInput = (value: string) => {
+  emit('update:name', value)
   emit('update')
 }
 </script>

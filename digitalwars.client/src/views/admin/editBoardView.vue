@@ -2,29 +2,37 @@
   <div class="w-full">
     <div class="grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-4">
       <div
-        class="order-2 md:order-1 flex flex-col justify-start border-2 border-lgray-accent py-6 px-4 m-4 rounded-md text-white bg-tertiary"
+        class="order-2 md:order-1 flex flex-col justify-start border-2 border-surface-700 py-6 px-4 m-4 rounded-lg text-white bg-tertiary"
       >
         <div class="flex flex-row w-full items-center justify-center gap-5 flex-shrink-0">
-          <button
-            class="border-2 border-lgray-accent py-2 px-2 rounded-md w-60 text-center hover:border-accent transition-colors duration-300"
-            :class="{ 'border-accent': activeView === 'add' }"
+          <Button
+            :class="{ 'border-primary-400': activeView === 'add' }"
             @click="activeView = 'add'"
+            outlined
+            label="Dodaj nową planszę"
+            class="w-60"
           >
-            <font-awesome-icon :icon="faPlus" class="h-4 text-accent" />
-            Dodaj nową planszę
-          </button>
-          <button
-            class="border-2 border-lgray-accent py-2 px-2 rounded-md w-60 text-center hover:border-accent transition-colors duration-300"
-            :class="{ 'border-accent': activeView === 'edit' }"
+            <template #icon>
+              <font-awesome-icon :icon="faPlus" />
+            </template>
+          </Button>
+          <Button
+            :class="{ 'border-primary-400': activeView === 'edit' }"
             @click="activeView = 'edit'"
+            outlined
+            label="Edytuj planszę"
+            class="w-60"
           >
-            <font-awesome-icon :icon="faPenToSquare" class="h-4 text-accent" />
-            Edytuj planszę
-          </button>
+            <template #icon>
+              <font-awesome-icon :icon="faPenToSquare" />
+            </template>
+          </Button>
         </div>
 
         <div class="w-full">
-          <h1 class="mt-8 font-nasalization text-lg md:text-xl lg-text-2xl xl:test-3xl">
+          <h1
+            class="mt-8 mb-2 font-nasalization text-lg md:text-xl lg-text-2xl xl:test-3xl text-center"
+          >
             {{ activeView === 'add' ? 'Dodaj nową planszę' : 'Edytuj planszę' }}
           </h1>
 
@@ -32,10 +40,10 @@
             :boards="boardsForSelector"
             v-model="selectedBoardId"
             :activeView="activeView"
-            @delete="deleteBoard"
+            @deleteBoard="handleDeleteBoard"
           />
 
-          <form class="mt-4">
+          <form class="mt-4 space-y-4">
             <boardInfo
               v-model:name="formData.name"
               :cols="formData.cols"
@@ -60,20 +68,21 @@
               @blur="validateDescriptions"
             />
 
-            <button
-              type="button"
-              class="bg-accent border-2 border-accent py-3 px-6 rounded-md mt-5 hover:bg-opacity-80 transition-all"
-              @click="saveBoard"
-            >
-              <font-awesome-icon :icon="faSave" class="h-4 mr-2" />
-              {{ activeView === 'add' ? 'Dodaj planszę' : 'Zapisz zmiany' }}
-            </button>
+            <div class="w-full px-4 flex items-center justify-center">
+              <Button
+                type="button"
+                @click="saveBoard"
+                class="mt-5 w-full"
+                :label="activeView === 'add' ? 'Dodaj planszę' : 'Zapisz zmiany'"
+              >
+              </Button>
+            </div>
           </form>
         </div>
       </div>
 
       <div
-        class="order-1 md:order-2 border-2 border-lgray-accent py-6 px-8 m-4 rounded-md text-white bg-tertiary flex flex-col md:sticky md:top-4 self-start md:max-h-[calc(100vh-2rem)]"
+        class="order-1 md:order-2 border-2 border-surface-700 py-6 px-8 m-4 rounded-lg text-white bg-tertiary flex flex-col md:sticky md:top-4 self-start md:max-h-[calc(100vh-2rem)]"
       >
         <h2 class="text-xl mb-4 text-center flex-shrink-0">Podgląd planszy</h2>
 
@@ -86,9 +95,11 @@
 </template>
 
 <script setup lang="ts">
-import { faPlus, faPenToSquare, faSave } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faPenToSquare } from '@fortawesome/free-solid-svg-icons'
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useToast } from 'vue-toastification'
+import { useConfirm } from 'primevue/useconfirm'
+import Button from 'primevue/button'
 import myBoard from '@/components/game/gameBoard.vue'
 import boardSelector from '@/components/editBoard/boardSelector.vue'
 import boardInfo from '@/components/editBoard/boardInfo.vue'
@@ -135,6 +146,7 @@ interface BoardConfig {
 const selectedBoardId = ref<number | undefined>(undefined)
 const activeView = ref<'add' | 'edit'>('add')
 const toast = useToast()
+const confirm = useConfirm()
 
 const data = reactive<{ boards: ApiBoard[] }>({
   boards: [],
@@ -312,7 +324,7 @@ const saveBoard = async () => {
   }
 }
 
-const deleteBoard = async () => {
+const handleDeleteBoard = () => {
   if (!selectedBoardId.value) {
     toast.warning('Nie wybrano planszy do usunięcia!')
     return
@@ -321,22 +333,27 @@ const deleteBoard = async () => {
   const boardToDelete = data.boards.find((b) => b.boards_Id === selectedBoardId.value)
   const boardName = boardToDelete ? boardToDelete.name : 'wybrana plansza'
 
-  if (confirm(`Czy na pewno chcesz usunąć planszę "${boardName}"?`)) {
-    try {
-      await apiService.delete(apiConfig.boards.delete(selectedBoardId.value))
-      toast.success('Plansza została usunięta pomyślnie!')
+  confirm.require({
+    header: 'Usuń planszę',
+    message: `Czy na pewno chcesz usunąć planszę "${boardName}"? Tej operacji nie można cofnąć.`,
+    accept: async () => {
+      try {
+        await apiService.delete(apiConfig.boards.delete(selectedBoardId.value!))
+        toast.success('Plansza została usunięta pomyślnie!')
 
-      await fetchBoardsFromAPI()
-      resetForm()
-      if (data.boards.length === 0) {
-        activeView.value = 'add'
+        await fetchBoardsFromAPI()
+        resetForm()
+        if (data.boards.length === 0) {
+          activeView.value = 'add'
+        }
+      } catch (error: any) {
+        console.error('Błąd podczas usuwania planszy:', error.response?.data || error.message)
+        const errorMessage = error.response?.data?.title || error.response?.data || error.message
+        toast.error(`Błąd usuwania: ${errorMessage}`)
       }
-    } catch (error: any) {
-      console.error('Błąd podczas usuwania planszy:', error.response?.data || error.message)
-      const errorMessage = error.response?.data?.title || error.response?.data || error.message
-      toast.error(`Błąd usuwania: ${errorMessage}`)
-    }
-  }
+    },
+    reject: () => {},
+  })
 }
 
 const validateDescriptions = () => {
@@ -352,7 +369,6 @@ const validateDescriptions = () => {
 
 // --- COMPUTED & LIFECYCLE ---
 const previewConfig = computed<BoardConfig>(() => {
-  // Bezpośrednie użycie formData, ponieważ ma już poprawny kształt
   return { ...formData }
 })
 

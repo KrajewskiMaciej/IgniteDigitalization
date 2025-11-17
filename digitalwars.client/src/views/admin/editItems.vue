@@ -21,7 +21,7 @@
           >
             <template #value="slotProps">
               <span v-if="slotProps.value">
-                #{{ slotProps.value }} {{ decksData.find(d => d.id === slotProps.value)?.title }}
+                #{{ slotProps.value }} {{ decksData.find((d) => d.id === slotProps.value)?.title }}
               </span>
               <span v-else>{{ slotProps.placeholder }}</span>
             </template>
@@ -36,7 +36,9 @@
         </div>
 
         <div v-else-if="selectedDeck" class="w-full">
-          <label for="item-select" class="block text-white mb-2 font-medium">Wybierz przedmiot:</label>
+          <label for="item-select" class="block text-white mb-2 font-medium"
+            >Wybierz przedmiot:</label
+          >
           <Dropdown
             id="item-select"
             v-model="selectedItem"
@@ -48,7 +50,8 @@
           >
             <template #value="slotProps">
               <span v-if="slotProps.value">
-                #{{ slotProps.value }} {{ itemsData.find(i => i.id === slotProps.value)?.shortDesc }}
+                #{{ slotProps.value }}
+                {{ itemsData.find((i) => i.id === slotProps.value)?.shortDesc }}
               </span>
               <span v-else>{{ slotProps.placeholder }}</span>
             </template>
@@ -61,21 +64,14 @@
         <div v-if="selectedItem && currentItem" class="mt-6 space-y-4 w-full">
           <div class="flex flex-col">
             <label for="title" class="block text-white mb-2 font-medium">Tytuł przedmiotu:</label>
-            <InputText
-              id="title"
-              v-model="currentItem.shortDesc"
-              class="w-full"
-            />
+            <InputText id="title" v-model="currentItem.shortDesc" class="w-full" />
           </div>
 
           <div class="flex flex-col">
-            <label for="description" class="block text-white mb-2 font-medium">Opis przedmiotu:</label>
-            <Textarea
-              id="description"
-              v-model="currentItem.longDesc"
-              rows="8"
-              class="w-full"
-            />
+            <label for="description" class="block text-white mb-2 font-medium"
+              >Opis przedmiotu:</label
+            >
+            <Textarea id="description" v-model="currentItem.longDesc" rows="8" class="w-full" />
           </div>
 
           <div class="flex justify-center w-full px-4">
