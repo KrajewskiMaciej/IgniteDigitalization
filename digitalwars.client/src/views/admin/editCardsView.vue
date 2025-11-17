@@ -93,15 +93,12 @@
             />
           </div>
 
-          <div class="flex justify-center w-full">
+          <div class="flex justify-center w-full px-4">
             <Button
               @click="saveCard"
-              class="mt-4"
+              class="mt-4 w-full"
               label="Zapisz"
             >
-            <template #icon>
-              <font-awesome-icon :icon="faSave" class="mr-2" />
-            </template>
             </Button>
           </div>
         </div>
@@ -152,15 +149,12 @@
             class="w-full"
           />
 
-          <div class="flex justify-center w-full">
+          <div class="flex justify-center w-full px-4">
             <Button
               @click="saveFeedback"
-              class="mt-4"
+              class="mt-4 w-full"
               label="Zapisz"
             >
-            <template #icon>
-              <font-awesome-icon :icon="faSave" class="mr-2" />
-            </template>
             </Button>
           </div>
         </div>

@@ -1,22 +1,34 @@
 <template>
   <div class="w-full flex">
     <div
-      class="flex flex-col flex-1 justify-center items-center m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary"
+      class="flex flex-col flex-1 items-center m-4 px-4 py-6 border-2 border-surface-700 rounded-lg bg-tertiary"
     >
-      <h1 class="text-3xl font-nasalization text-white mt-5">Edycja Przedmiotów</h1>
+      <h1 class="text-3xl font-nasalization text-white mb-6">Edycja Przedmiotów</h1>
 
       <div v-if="isLoadingDecks" class="text-center text-gray-400 mt-10">Ładowanie talii...</div>
 
-      <form v-else class="w-full max-w-lg mt-4 flex flex-col items-center">
-        <div class="w-full mb-4">
-          <label class="block text-white mb-1">Wybierz talię:</label>
-          <dropDown
-            :items="decksData"
+      <form v-else class="w-full max-w-lg mt-4 flex flex-col items-center space-y-4">
+        <div class="w-full">
+          <label for="deck-select" class="block text-white mb-2 font-medium">Wybierz talię:</label>
+          <Dropdown
+            id="deck-select"
             v-model="selectedDeck"
-            item-key="id"
-            :display-format="(deck: Deck) => `#${deck.id} ${deck.title}`"
+            :options="decksData"
+            optionLabel="title"
+            optionValue="id"
             placeholder="Wybierz talię..."
-          />
+            class="w-full"
+          >
+            <template #value="slotProps">
+              <span v-if="slotProps.value">
+                #{{ slotProps.value }} {{ decksData.find(d => d.id === slotProps.value)?.title }}
+              </span>
+              <span v-else>{{ slotProps.placeholder }}</span>
+            </template>
+            <template #option="slotProps">
+              <span>#{{ slotProps.option.id }} {{ slotProps.option.title }}</span>
+            </template>
+          </Dropdown>
         </div>
 
         <div v-if="isLoadingItems" class="text-center text-gray-400 mt-4">
@@ -24,46 +36,58 @@
         </div>
 
         <div v-else-if="selectedDeck" class="w-full">
-          <label class="block text-white mb-1">Wybierz przedmiot:</label>
-          <dropDown
-            :items="itemsData"
+          <label for="item-select" class="block text-white mb-2 font-medium">Wybierz przedmiot:</label>
+          <Dropdown
+            id="item-select"
             v-model="selectedItem"
-            item-key="id"
-            :display-format="(item: Item) => `#${item.id} ${item.shortDesc}`"
+            :options="itemsData"
+            optionLabel="shortDesc"
+            optionValue="id"
             placeholder="Wybierz przedmiot..."
-          />
+            class="w-full"
+          >
+            <template #value="slotProps">
+              <span v-if="slotProps.value">
+                #{{ slotProps.value }} {{ itemsData.find(i => i.id === slotProps.value)?.shortDesc }}
+              </span>
+              <span v-else>{{ slotProps.placeholder }}</span>
+            </template>
+            <template #option="slotProps">
+              <span>#{{ slotProps.option.id }} {{ slotProps.option.shortDesc }}</span>
+            </template>
+          </Dropdown>
         </div>
 
-        <div v-if="selectedItem && currentItem" class="mt-6 space-y-4 text-white w-full">
+        <div v-if="selectedItem && currentItem" class="mt-6 space-y-4 w-full">
           <div class="flex flex-col">
-            <label for="title" class="mb-1 font-semibold">Tytuł przedmiotu:</label>
-            <input
+            <label for="title" class="block text-white mb-2 font-medium">Tytuł przedmiotu:</label>
+            <InputText
               id="title"
               v-model="currentItem.shortDesc"
-              type="text"
-              class="bg-primary border-2 border-lgray-accent rounded-md px-3 py-2 text-white w-full focus:border-accent focus:ring-accent"
+              class="w-full"
             />
           </div>
 
           <div class="flex flex-col">
-            <label for="description" class="mb-1 font-semibold">Opis przedmiotu:</label>
-            <textarea
+            <label for="description" class="block text-white mb-2 font-medium">Opis przedmiotu:</label>
+            <Textarea
               id="description"
               v-model="currentItem.longDesc"
               rows="8"
-              class="bg-primary border-2 border-lgray-accent rounded-md px-3 py-2 text-white resize-y w-full focus:border-accent focus:ring-accent"
-            ></textarea>
+              class="w-full"
+            />
           </div>
-          <div class="flex justify-center w-full">
-            <button
+
+          <div class="flex justify-center w-full px-4">
+            <Button
               type="button"
               @click="handleSave"
               :disabled="isSaving"
-              class="bg-accent hover:bg-opacity-80 transition-colors duration-200 border-2 border-accent py-3 px-6 rounded-md mt-5 disabled:bg-gray-500 disabled:cursor-not-allowed"
+              :loading="isSaving"
+              :label="isSaving ? 'Zapisywanie...' : 'Zapisz'"
+              class="mt-5 w-full"
             >
-              <font-awesome-icon :icon="faSave" class="h-4 mr-2" />
-              {{ isSaving ? 'Zapisywanie...' : 'Zapisz' }}
-            </button>
+            </Button>
           </div>
         </div>
       </form>
@@ -75,7 +99,10 @@
 import { ref, watch, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 import { faSave } from '@fortawesome/free-solid-svg-icons'
-import dropDown from '@/components/dropDown.vue'
+import Dropdown from 'primevue/dropdown'
+import InputText from 'primevue/inputtext'
+import Textarea from 'primevue/textarea'
+import Button from 'primevue/button'
 
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
@@ -123,9 +150,8 @@ const fetchDecks = async () => {
 
 const fetchItemsForDeck = async (deckId: number) => {
   isLoadingItems.value = true
-  itemsData.value = [] // Wyczyść listę przed pobraniem nowych
+  itemsData.value = []
   try {
-    // WAŻNE: Upewnij się, że ten endpoint istnieje w Twoim pliku apiConfig
     const response = await apiService.get(apiConfig.admin.deck.items(deckId))
     itemsData.value = response.data as Item[]
   } catch (error) {
@@ -144,7 +170,6 @@ const handleSave = async () => {
   }
   isSaving.value = true
   try {
-    // WAŻNE: Upewnij się, że ten endpoint istnieje w Twoim pliku apiConfig
     await apiService.put(apiConfig.admin.deck.updateItem(currentItem.value.id), currentItem.value)
 
     const index = itemsData.value.findIndex((item) => item.id === currentItem.value!.id)
@@ -168,14 +193,13 @@ const handleSave = async () => {
 
 // --- Obserwatorzy zmian ---
 watch(selectedDeck, (newDeckId) => {
-  // Resetuj wybór przedmiotu przy zmianie talii
   selectedItem.value = undefined
   currentItem.value = null
 
   if (newDeckId !== undefined) {
     fetchItemsForDeck(newDeckId)
   } else {
-    itemsData.value = [] // Wyczyść listę, jeśli żadna talia nie jest wybrana
+    itemsData.value = []
   }
 })
 
