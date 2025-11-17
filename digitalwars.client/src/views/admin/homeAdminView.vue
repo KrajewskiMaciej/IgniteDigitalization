@@ -3,9 +3,9 @@
     <div
       class="m-4 px-2 py-2 border border-surface-700 rounded-md bg-tertiary flex-1 flex flex-col overflow-hidden"
     >
-      <h1 class="text-center text-white font-nasalization text-3xl mt-2 mb-4">Gry w sesji</h1>
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2 text-center mt-2">Gry w sesji</h1>
       <homeAdminButtons @open-create-game="showCreateGame = true" />
-      <hr class="my-4 border-lgray-accent" />
+      <hr class="mt-2 border-lgray-accent" />
 
       <div v-if="loadingGames" class="text-center py-4 text-gray-400">Ładowanie gier...</div>
       <div v-else-if="fetchError" class="text-center py-4 text-red-500">{{ fetchError }}</div>

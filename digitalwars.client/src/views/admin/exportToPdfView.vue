@@ -1,117 +1,173 @@
 <template>
-  <div class="w-full flex">
-    <div
-      class="flex relative flex-col flex-1 justify-center items-center m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary"
-    >
-      <h1 class="text-3xl font-nasalization text-white mt-5">Eksport gry do PDF</h1>
+  <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
+    <!-- Nagłówek -->
+    <div class="text-center">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+        Eksport gry do PDF
+      </h1>
+      <p class="text-gray-400 text-sm md:text-base">
+        Generuj pliki PDF z kartami i planszami
+      </p>
+    </div>
 
-      <form class="w-full max-w-lg mt-4 flex flex-col items-center">
-        <!--Wybór talii kart-->
-        <div class="w-full mb-4">
-          <label class="block text-white mb-1">Wybierz talię:</label>
-          <dropDown
-            :items="decksData"
-            v-model="selectedDeck"
-            :item-key="'id'"
-            :display-format="(deck: Deck) => `#${deck.id} ${deck.title}`"
-            item-label="title"
-            placeholder="Wybierz talię..."
-          />
-        </div>
-        <div class="flex justify-center w-full text-white">
-          <button
-            type="button"
-            @click="exportDeckToPDF"
-            :disabled="!isFormDeckValid || isLoading"
-            :class="
-              isFormDeckValid ? 'bg-accent/70 hover:bg-accent' : 'bg-gray-500 cursor-not-allowed'
-            "
-            class="py-3 px-6 rounded-md mt-5 mb-3 transition-all w-64 text-center"
-          >
-            <font-awesome-icon v-if="!isLoading" :icon="faFileExport" class="h-4 mr-2" />
-            {{ isLoading ? 'Generowanie...' : 'Generuj PDF z Kartami' }}
-          </button>
+    <div class="max-w-5xl mx-auto w-full space-y-6">
+      <!-- Sekcja 1: Eksport talii kart -->
+      <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-700">
+          <div class="bg-primary-500/20 p-2.5 rounded-lg">
+            <font-awesome-icon :icon="faFileExport" class="h-6 text-primary-400" />
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white">Eksport kart</h2>
         </div>
 
-        <!--Wybór plansz-->
-        <label class="block text-white mb-1 mt-6">Wybierz plansze:</label>
-        <div class="space-y-3 w-full border-2 border-lgray-accent rounded-md bg-primary p-4">
-          <!--Wybór Planszy Stołu-->
-          <div class="mb-1 sm-mb-2">
-            <label for="selectBoard" class="block font-bold text-left text-xs text-white mb-1"
-              >Wybierz planszę stołu</label
+        <div class="space-y-4">
+          <div>
+            <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
+              Wybierz talię kart:
+            </label>
+            <Dropdown
+              id="deck-select"
+              v-model="selectedDeck"
+              :options="decksData"
+              optionLabel="title"
+              optionValue="id"
+              placeholder="Wybierz talię..."
+              class="w-full"
+              :disabled="isLoading"
             >
-            <select
-              id="selectBoard"
-              required
-              class="text-white bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full"
-              :value="selectedBoard"
-              @change="selectedBoard = Number(($event.target as HTMLSelectElement).value)"
-            >
-              <option :value="null" disabled>Wybierz planszę stołu</option>
-              <option v-for="board in boardsData" :key="board.boards_Id" :value="board.boards_Id">
-                {{ board.name }}
-              </option>
-            </select>
+            </Dropdown>
           </div>
 
-          <!-- Wybór Planszy konkurencji -->
-          <div class="mb-1 sm:mb-2">
-            <label
-              for="selectOpponentBoard"
-              class="block font-bold text-left text-xs text-white mb-1"
-              >Wybierz planszę konkurencji</label
+          <div class="flex justify-center pt-2">
+            <Button
+              @click="exportDeckToPDF"
+              :disabled="!isFormDeckValid || isLoading"
+              :loading="isLoading"
+              class="w-full sm:w-auto"
+              size="large"
             >
-            <select
-              id="selectOpponentBoard"
-              required
-              class="text-white bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full"
-              :value="selectedOpponentBoard"
-              @change="selectedOpponentBoard = Number(($event.target as HTMLSelectElement).value)"
-            >
-              <option :value="null" disabled>Wybierz planszę konkurencji</option>
-              <option v-for="board in boardsData" :key="board.boards_Id" :value="board.boards_Id">
-                {{ board.name }}
-              </option>
-            </select>
+              <template #icon>
+                <font-awesome-icon :icon="faFileExport" class="h-4" />
+              </template>
+              <span class="ml-2">{{ isLoading ? 'Generowanie...' : 'Generuj PDF z kartami' }}</span>
+            </Button>
           </div>
         </div>
+      </div>
 
-        <div class="flex justify-center w-full text-white">
-          <button
-            type="button"
-            @click="exportBoardsToPDF"
-            :disabled="!isFormBoardsValid || isLoading"
-            :class="
-              isFormBoardsValid ? 'bg-accent/70 hover:bg-accent' : 'bg-gray-500 cursor-not-allowed'
-            "
-            class="py-3 px-6 rounded-md mt-5 mb-3 transition-all w-64 text-center"
-          >
-            <font-awesome-icon v-if="!isLoading" :icon="faFileExport" class="h-4 mr-2" />
-            {{ isLoading ? 'Generowanie...' : 'Generuj PDF z planszami' }}
-          </button>
+      <!-- Sekcja 2: Eksport plansz -->
+      <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-700">
+          <div class="bg-green-400/20 p-2.5 rounded-lg">
+            <font-awesome-icon :icon="faFileExport" class="h-6 text-green-400" />
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white">Eksport plansz</h2>
         </div>
-      </form>
 
-      <loadingSpinner v-if="isLoading" message="Generuję PDF..." />
+        <div class="space-y-4">
+          <!-- Plansza stołu -->
+          <div>
+            <label for="board-select" class="block mb-2 text-sm font-semibold text-gray-300">
+              Plansza stołu:
+            </label>
+            <Dropdown
+              id="board-select"
+              v-model="selectedBoard"
+              :options="boardsData"
+              optionLabel="name"
+              optionValue="boards_Id"
+              placeholder="Wybierz planszę stołu..."
+              class="w-full"
+              :disabled="isLoading"
+            >
+            </Dropdown>
+          </div>
+
+          <!-- Plansza konkurencji -->
+          <div>
+            <label for="opponent-board-select" class="block mb-2 text-sm font-semibold text-gray-300">
+              Plansza konkurencji:
+            </label>
+            <Dropdown
+              id="opponent-board-select"
+              v-model="selectedOpponentBoard"
+              :options="boardsData"
+              optionLabel="name"
+              optionValue="boards_Id"
+              placeholder="Wybierz planszę konkurencji..."
+              class="w-full"
+              :disabled="isLoading"
+            >
+            </Dropdown>
+          </div>
+
+          <!-- Informacja o wybranych planszach -->
+          <div v-if="selectedBoard && selectedOpponentBoard" class="bg-surface-800 border border-surface-600 rounded-lg p-4">
+            <div class="flex items-start gap-3">
+           
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                     <div class="bg-green-400/20 p-1 rounded">
+                        <font-awesome-icon :icon="faChessBoard" class="text-green-400" />
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-300 mb-2">Wybrano plansze:</p>
+                      </div>
+
+                </div>
+                <ul class="space-y-1 text-sm">
+                  <li class="flex items-center gap-2 text-white">
+                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                    <span class="font-medium">Stół:</span>
+                    <span>{{ boardsData.find(b => b.boards_Id === selectedBoard)?.name }}</span>
+                  </li>
+                  <li class="flex items-center gap-2 text-white">
+                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                    <span class="font-medium">Konkurencja:</span>
+                    <span>{{ boardsData.find(b => b.boards_Id === selectedOpponentBoard)?.name }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-center pt-2">
+            <Button
+              @click="exportBoardsToPDF"
+              :disabled="!isFormBoardsValid || isLoading"
+              :loading="isLoading"
+              severity="success"
+              class="w-full sm:w-auto"
+              size="large"
+            >
+              <template #icon>
+                <font-awesome-icon :icon="faFileExport" class="h-4" />
+              </template>
+              <span class="ml-2">{{ isLoading ? 'Generowanie...' : 'Generuj PDF z planszami' }}</span>
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useToast } from 'vue-toastification'
-import { faFileExport } from '@fortawesome/free-solid-svg-icons'
+import { faFileExport, faChessBoard } from '@fortawesome/free-solid-svg-icons'
+import Dropdown from 'primevue/dropdown'
+import Button from 'primevue/button'
+
 
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
-import dropDown from '@/components/dropDown.vue'
-import loadingSpinner from '@/components/loadingSpinner.vue'
 
 interface Deck {
   id: number
   title: string
 }
+
 interface Board {
   boards_Id: number
   name: string
@@ -135,7 +191,7 @@ const isFormDeckValid = computed(() => typeof selectedDeck.value === 'number')
 
 const downloadFileFromResponse = (response: any, defaultFileName: string) => {
   const header = response.headers['content-disposition']
-  let fileName = defaultFileName // Używamy przekazanej nazwy jako domyślnej
+  let fileName = defaultFileName
   if (header) {
     let match = header.match(/filename\*=UTF-8''([^;]+)/) || header.match(/filename="?([^"]+)"?/)
     if (match && match[1]) {
@@ -162,7 +218,6 @@ const exportDeckToPDF = async () => {
   try {
     const url = apiConfig.admin.export.cards(selectedDeck.value!)
     const response = await apiService.getFile(url)
-    // ZMIANA 2: Przekazano odpowiednią domyślną nazwę pliku
     downloadFileFromResponse(response, 'DigitalWars - Karty.pdf')
     toast.success('PDF z kartami został pomyślnie wygenerowany.')
   } catch (error: any) {
@@ -179,14 +234,10 @@ const exportBoardsToPDF = async () => {
     return
   }
 
-  console.log('Selected Board ID:', selectedBoard.value)
-  console.log('Selected Opponent Board ID:', selectedOpponentBoard.value)
-
   isLoading.value = true
   try {
     const url = apiConfig.admin.export.boards(selectedBoard.value!, selectedOpponentBoard.value!)
     const response = await apiService.getFile(url)
-    // ZMIANA 3: Przekazano odpowiednią domyślną nazwę pliku
     downloadFileFromResponse(response, 'DigitalWars - Plansze.pdf')
     toast.success('PDF z planszami został pomyślnie wygenerowany.')
   } catch (error: any) {
@@ -200,7 +251,6 @@ const exportBoardsToPDF = async () => {
 const fetchBoardsFromAPI = async () => {
   try {
     const response = await apiService.get(apiConfig.boards.getAll)
-    console.log('Dane plansz otrzymane z API:', response.data)
     boardsData.value = response.data as Board[]
   } catch (error: any) {
     toast.error(`Nie udało się pobrać plansz: ${error.message}`)
@@ -220,19 +270,3 @@ onMounted(async () => {
   await Promise.all([fetchDecksFromAPI(), fetchBoardsFromAPI()])
 })
 </script>
-
-<style scoped>
-.custom-scrollbar::-webkit-scrollbar {
-  width: 0.6rem;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-  margin: 0.5rem 0.3rem;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #a78bfa;
-  border-radius: 0.25rem;
-  border: 0.1rem solid transparent;
-  background-clip: content-box;
-}
-</style>

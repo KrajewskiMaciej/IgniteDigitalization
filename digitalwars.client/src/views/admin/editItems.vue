@@ -3,7 +3,7 @@
     <div
       class="flex flex-col flex-1 items-center m-4 px-4 py-6 border-2 border-surface-700 rounded-lg bg-tertiary"
     >
-      <h1 class="text-3xl font-nasalization text-white mb-6">Edycja Przedmiotów</h1>
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-6">Edycja Przedmiotów</h1>
 
       <div v-if="isLoadingDecks" class="text-center text-gray-400 mt-10">Ładowanie talii...</div>
 
