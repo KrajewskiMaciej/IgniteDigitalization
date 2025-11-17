@@ -2,7 +2,7 @@
   <div v-if="props.isVisible" class="fixed inset-0 flex items-center justify-center z-50">
     <div class="absolute inset-0 bg-black/70" @click="closeModal"></div>
     <div
-      class="bg-primary text-white rounded-lg w-[90%] max-w-5xl relative z-10 border-2 border-accent p-8 animate-jump-in"
+      class="bg-surface-800 text-white rounded-lg w-[90%] max-w-5xl relative z-10 border border-surface-700 p-8 animate-jump-in"
     >
       <button
         @click="closeModal"
