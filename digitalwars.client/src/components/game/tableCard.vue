@@ -1,98 +1,113 @@
 <template>
   <div
-    class="w-full border-2 rounded-md p-4 flex flex-col gap-4 text-white transition-all duration-300"
+    class="group relative w-full border rounded-lg bg-surface-850 p-3 flex flex-col gap-2 text-white shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
     :style="{ borderColor: props.color }"
-    @dblclick="router.push('/admin/game')"
+    @dblclick="router.push(`/admin/game/${props.gameId}/${table.id}`)"
   >
-    <!-- Nagłówek -->
-    <div class="flex flex-row items-center justify-between">
+    <!-- Header z nazwą i ID -->
+    <div
+      class="flex flex-row items-center justify-between pb-2 border-b"
+      :style="{ borderColor: props.color + '30' }"
+    >
       <div class="flex items-center min-w-0 flex-1 mr-2 overflow-hidden">
-        <font-awesome-icon
-          :icon="faGamepad"
-          class="h-5 mr-2 flex-shrink-0"
-          :style="{ color: props.color }"
-        />
-        <!-- POPRAWKA: Użyto stringa 'white' zamiast niezdefiniowanej zmiennej -->
-        <span class="text-lg font-semibold break-words" :style="{ color: 'white' }">
-          {{ table.name }}
-        </span>
+        <div class="min-w-0 flex-1">
+          <h3 class="text-base font-bold break-words truncate" :style="{ color: props.color }">
+            {{ table.name || 'Stół bez nazwy' }}
+          </h3>
+        </div>
       </div>
-      <span class="text-sm px-2 py-1 rounded-full" :style="{ backgroundColor: props.color }">
-        ID: {{ table.id }}
-      </span>
     </div>
 
-    <!-- Przycisk QR -->
-    <div class="flex flex-row gap-2">
+    <!-- Przyciski kontrolne -->
+    <div class="flex gap-2">
       <button
-        class="flex flex-auto items-center justify-center border-2 border-lgray-accent py-2 px-3 rounded-md hover:border-accent transition-colors duration-300"
-        @click="openQrForTeam"
-        @dblclick.stop
+        @click.stop="openQrForTeam"
+        class="flex-1 flex items-center justify-center gap-1.5 border bg-surface-800 py-1.5 px-2 rounded-md hover:scale-105 transition-all duration-300 text-xs font-medium"
+        :style="{ borderColor: props.color + '40' }"
       >
-        <font-awesome-icon :icon="faQrcode" class="h-4 mr-2 text-accent" />
-        Pokaż kod QR do gry
+        <font-awesome-icon :icon="faQrcode" class="h-3.5" :style="{ color: props.color }" />
+        <span>Pokaż QR</span>
       </button>
     </div>
 
-    <!-- Przycisk wejścia do stołu -->
+    <!-- Przycisk otwarcia stołu -->
     <RouterLink
       :to="`/admin/game/${props.gameId}/${table.id}`"
       @dblclick.stop
-      class="w-full flex items-center justify-center border-2 border-lgray-accent py-2 px-3 rounded-md hover:border-accent transition-colors duration-300"
+      class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-md font-semibold text-sm transition-all duration-300 hover:opacity-90 hover:scale-105"
+      :style="{ backgroundColor: props.color, color: '#000' }"
     >
-      <font-awesome-icon :icon="faMagnifyingGlass" class="h-4 mr-2 text-accent" />
-      Wejdź w stół
+      <font-awesome-icon :icon="faMagnifyingGlass" class="h-3.5" />
+      <span>Otwórz stół</span>
     </RouterLink>
+  </div>
 
-    <!-- Modal QR -->
-    <Transition
-      enter-active-class="transition-all duration-300 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition-all duration-300 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
+  <!-- Teleport Modal QR do body -->
+  <Teleport to="body">
+    <div
+      v-if="showQr"
+      class="fixed inset-0 flex items-center justify-center z-[9999] p-4"
+      @click="showQr = false"
     >
-      <div v-if="showQr" class="fixed inset-0 flex items-center justify-center z-50 p-4">
-        <div class="absolute inset-0 bg-black/70" @click="showQr = false"></div>
-        <div
-          class="bg-primary text-white rounded-lg relative z-10 border-2 border-accent p-4 sm:p-6 md:p-8 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+      <div
+        class="bg-surface-800 text-white rounded-xl relative z-10 border p-8 w-full max-w-md shadow-2xl"
+        :style="{ borderColor: props.color }"
+        @click.stop
+      >
+        <!-- Przycisk zamknięcia -->
+        <button
+          @click="showQr = false"
+          class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors group"
         >
-          <button
-            @click="showQr = false"
-            class="absolute top-2 right-2 sm:top-4 sm:right-4 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-          >
-            <font-awesome-icon
-              :icon="faXmark"
-              class="h-4 sm:h-5 text-white hover:text-accent transition-colors"
-            />
-          </button>
-          <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-center mb-4 sm:mb-6">
-            Kod QR do gry
+          <font-awesome-icon
+            :icon="faXmark"
+            class="h-5 text-white group-hover:text-primary-400 transition-colors"
+          />
+        </button>
+
+        <!-- Nazwa drużyny -->
+        <div class="mb-6">
+          <h2 class="text-3xl font-bold text-center mb-2" :style="{ color: props.color }">
+            {{ table.name || 'Stół' }}
           </h2>
-          <div class="bg-white p-3 sm:p-4 md:p-6 rounded-lg flex justify-center">
+          <div
+            class="h-1 w-24 mx-auto rounded-full"
+            :style="{ backgroundColor: props.color }"
+          ></div>
+        </div>
+
+        <!-- QR Code -->
+        <div class="bg-white p-6 rounded-xl shadow-inner mb-6">
+          <div class="flex justify-center">
             <qrcode-vue :value="props.gameUrl" :size="qrSize" />
           </div>
-          <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-center mt-4">
-            Token: {{ table.token }}
-          </h2>
+        </div>
+
+        <!-- Token -->
+        <div class="text-center space-y-3">
+          <div class="inline-block px-4 py-2 rounded-lg border border-surface-700">
+            <p class="text-xs text-gray-400 mb-1">Token drużyny</p>
+            <p class="text-6xl font-bold tracking-wider">
+              {{ table.token }}
+            </p>
+          </div>
+
+          <p class="text-xs text-gray-400 pt-2">Zeskanuj kod QR lub użyj tokenu aby dołączyć</p>
         </div>
       </div>
-    </Transition>
-  </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { faGamepad, faMagnifyingGlass, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons'
-// POPRAWKA: Zaimportowano `useRouter`
+import { faMagnifyingGlass, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { RouterLink, useRouter } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
-// ULEPSZENIE: Zaimportowano `PropType` do typowania obiektów w propsach
 import type { PropType } from 'vue'
 
 // --- DEFINICJE INTERFEJSÓW ---
-// ULEPSZENIE: Zdefiniowano interfejs dla obiektu `table`
 interface Table {
   id: number
   name?: string
@@ -106,7 +121,6 @@ const props = defineProps({
     required: true,
   },
   table: {
-    // ULEPSZENIE: Użyto `PropType` do jawnego otypowania propa
     type: Object as PropType<Table>,
     required: true,
   },
@@ -124,14 +138,12 @@ const props = defineProps({
   },
 })
 
-// POPRAWKA: Utworzono instancję routera
 const router = useRouter()
 
 // --- LOGIKA KODU QR ---
 const showQr = ref(false)
 
 const qrSize = computed(() => {
-  // Zabezpieczenie przed działaniem w środowisku bez `window` (np. SSR)
   if (typeof window === 'undefined') return 300
 
   const width = window.innerWidth
@@ -141,7 +153,6 @@ const qrSize = computed(() => {
   return 350
 })
 
-// POPRAWKA: Funkcja nie przyjmuje argumentów, zgodnie z jej implementacją
 function openQrForTeam() {
   showQr.value = true
 }

@@ -1,7 +1,11 @@
 <template>
   <div class="w-full text-white">
-    <div class="m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary">
-      <h1 class="text-center text-white font-nasalization text-3xl mt-2 mb-4">Stoły</h1>
+    <div class="m-4 px-2 py-2">
+      <h1
+        class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2 text-center mt-2"
+      >
+        Stoły
+      </h1>
       <tableButtons />
       <hr class="my-4 border-lgray-accent" />
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-6">

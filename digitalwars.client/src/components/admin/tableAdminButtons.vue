@@ -6,7 +6,7 @@
         <!-- This button only shows for games that are 'During' or 'Paused' -->
         <button
           v-if="game.status === 'During' || game.status === 'Paused'"
-          @click="updateGameStatus(gameId, game.status === 'During' ? 'Paused' : 'During')"
+          @click="handleTogglePause"
           class="flex flex-auto items-center justify-center border-2 border-lgray-accent py-2 px-3 rounded-md hover:border-accent transition-colors duration-300"
           @dblclick.stop
         >
@@ -20,7 +20,7 @@
         <!-- This button is always available for active/paused games to end them -->
         <button
           v-if="game.status !== 'End'"
-          @click="updateGameStatus(gameId, 'End')"
+          @click="handleEndGame"
           class="flex flex-auto items-center justify-center border-2 border-lgray-accent py-2 px-3 rounded-md hover:border-accent transition-colors duration-300"
           @dblclick.stop
         >
@@ -37,14 +37,16 @@ import { faCircleStop, faCirclePlay, faPowerOff } from '@fortawesome/free-solid-
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import { useConfirm } from 'primevue/useconfirm'
 import apiService from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
 
-// --- KROK 1: Definicja typów ---
+// --- DEFINICJA TYPÓW ---
 type GameStatus = 'During' | 'Paused' | 'End'
 
 interface Game {
-  status?: GameStatus // Status jest opcjonalny, bo może go nie być na starcie
+  status?: GameStatus
+  name?: string
 }
 
 interface ApiError {
@@ -55,16 +57,18 @@ interface ApiError {
   }
 }
 
+// --- HOOKS ---
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+const confirm = useConfirm()
 const emit = defineEmits(['update-status'])
 
+// --- ZMIENNE REAKTYWNE ---
 const gameId = Number(route.params.gameId)
-// --- KROK 2: Jawne otypowanie ref'a ---
 const game = ref<Game>({})
 
-// --- KROK 3: Jawne otypowanie parametrów funkcji ---
+// --- FUNKCJE ---
 const updateGameStatus = async (id: number, newStatus: GameStatus) => {
   try {
     const apiPayload = { status: newStatus }
@@ -86,14 +90,41 @@ const updateGameStatus = async (id: number, newStatus: GameStatus) => {
       }, 750)
     }
   } catch (error: unknown) {
-    // Jawne typowanie błędu
-    // --- KROK 4: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
     const errorMessage = apiError.response?.data?.message || 'Wystąpił nieznany błąd.'
 
     console.error(`Błąd aktualizacji statusu gry ${id}:`, error)
     toast.error(`Nie udało się zaktualizować statusu gry: ${errorMessage}`)
   }
+}
+
+const handleTogglePause = () => {
+  const newStatus = game.value.status === 'During' ? 'Paused' : 'During'
+  const action = newStatus === 'Paused' ? 'wstrzymać' : 'wznowić'
+
+  confirm.require({
+    message: `Czy na pewno chcesz ${action} grę ?`,
+    header: newStatus === 'Paused' ? 'Wstrzymaj grę' : 'Wznów grę',
+    rejectLabel: 'Anuluj',
+    acceptLabel: 'Potwierdź',
+    accept: () => {
+      updateGameStatus(gameId, newStatus)
+    },
+    reject: () => {},
+  })
+}
+
+const handleEndGame = () => {
+  confirm.require({
+    message: `Czy na pewno chcesz zakończyć grę? Tej operacji nie można cofnąć.`,
+    header: 'Zakończ grę',
+    rejectLabel: 'Anuluj',
+    acceptLabel: 'Zakończ',
+    accept: () => {
+      updateGameStatus(gameId, 'End')
+    },
+    reject: () => {},
+  })
 }
 
 const getGameDetails = async () => {
@@ -106,6 +137,7 @@ const getGameDetails = async () => {
   }
 }
 
+// --- LIFECYCLE ---
 onMounted(() => {
   getGameDetails()
 })
