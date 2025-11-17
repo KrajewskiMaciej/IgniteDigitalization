@@ -1,6 +1,8 @@
 <template>
-  <div class="w-full text-white">
-    <div class="m-4 px-2 py-2 border-2 border-lgray-accent rounded-md bg-tertiary">
+  <div class="w-full h-full text-white flex flex-col">
+    <div
+      class="m-4 px-2 py-2 border border-surface-700 rounded-md bg-tertiary flex-1 flex flex-col overflow-hidden"
+    >
       <h1 class="text-center text-white font-nasalization text-3xl mt-2 mb-4">Gry w sesji</h1>
       <homeAdminButtons @open-create-game="showCreateGame = true" />
       <hr class="my-4 border-lgray-accent" />
@@ -10,14 +12,16 @@
       <div v-else-if="activeGames.length === 0" class="text-center py-4 text-gray-400">
         Brak aktywnych gier. Utwórz nową, aby zacząć.
       </div>
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-6">
-        <gameCard
-          v-for="game in activeGames"
-          :key="game.id"
-          :game="game"
-          :color="getGameColor(game.id)"
-          @update-status="handleUpdateGameStatus"
-        />
+      <div v-else class="overflow-auto px-2 pb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-6 auto-rows-min">
+          <gameCard
+            v-for="game in activeGames"
+            :key="game.id"
+            :game="game"
+            :color="getGameColor(game.id)"
+            @update-status="handleUpdateGameStatus"
+          />
+        </div>
       </div>
     </div>
     <createGame

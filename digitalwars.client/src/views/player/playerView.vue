@@ -302,23 +302,22 @@
       </div>
     </div>
   </div>
-  <div 
+  <div
     class="bg-tertiary flex justify-center items-center px-2 py-2 fixed bottom-12 left-2 lg:left-6 h-14 w-14 z-50 rounded-full border cursor-pointer border-lgray-accent text-white transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-primary-400/60 hover:border-primary-400 hover:text-primary-400 hover:scale-110 hover:-translate-y-2"
     @click="showChat = true"
   >
-    <font-awesome-icon :icon="faCommentDots" class="h-10"/>
+    <font-awesome-icon :icon="faCommentDots" class="h-10" />
   </div>
-   <div v-if="showChat" class="fixed inset-0 z-50 bg-black bg-opacity-50 lg:flex lg:items-center lg:justify-start lg:pl-4">
-        <GameChat
-            ref="chatRef"
-            class="
-                h-screen w-screen
-                lg:h-3/4 lg:w-1/2 lg:max-w-2xl xl:w-1/5
-            "
-            @close-chat="showChat = false"
-        />
+  <div
+    v-if="showChat"
+    class="fixed inset-0 z-50 bg-black bg-opacity-50 lg:flex lg:items-center lg:justify-start lg:pl-4"
+  >
+    <GameChat
+      ref="chatRef"
+      class="h-screen w-screen lg:h-3/4 lg:w-1/2 lg:max-w-2xl xl:w-1/5"
+      @close-chat="showChat = false"
+    />
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -335,19 +334,16 @@ import apiServices from '@/services/apiServices'
 import signalrService from '@/services/signalService'
 import GameStatusDisplay from '@/components/playerComponents/gameStatusDisplay.vue'
 import GameChat from '@/components/game/gameChat.vue'
-import type { BoardConfig, GameData, Pawn, RawPawnData, GameStatusError, } from '@/interfaces/types'
+import type { BoardConfig, GameData, Pawn, RawPawnData, GameStatusError } from '@/interfaces/types'
 import { useBreakpoints } from '@vueuse/core'
-import {
-  faCommentDots,
-} from '@fortawesome/free-solid-svg-icons'
-import { onClickOutside } from '@vueuse/core';
+import { faCommentDots } from '@fortawesome/free-solid-svg-icons'
+import { onClickOutside } from '@vueuse/core'
 
-
-const chatRef = ref<HTMLElement | null>(null);
+const chatRef = ref<HTMLElement | null>(null)
 
 onClickOutside(chatRef, () => {
-    showChat.value = false;
-});
+  showChat.value = false
+})
 
 const breakpoints = useBreakpoints({
   mobile: 768,
@@ -367,7 +363,7 @@ const currentPanel = ref('menu')
 const leftOpen = ref(false)
 const rightOpen = ref(true)
 const currentBoard = ref('player')
-const showChat = ref(false);
+const showChat = ref(false)
 
 const gameData = ref<GameData | null>(null)
 const isLoading = ref(true)

@@ -185,7 +185,7 @@ export default {
       'sm:text-sm',
 
       // Spacing
-      'py-2 px-4',
+      'py-0 px-0',
 
       // Color
       'text-surface-800 dark:text-white/80',

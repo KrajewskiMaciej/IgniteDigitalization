@@ -7,7 +7,7 @@
     </div>
 
     <div
-          class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-4 mt-4 sm:mb-8"
+      class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-4 mt-4 sm:mb-8"
     ></div>
 
     <!-- Tabela decyzji -->
@@ -16,60 +16,62 @@
 
       <!-- Lista -->
       <div class="overflow-y-auto pr-2 flex-grow">
-      <div v-if="isLoading" class="text-center text-gray-500">Ładowanie historii...</div>
-      <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
-      <div v-else-if="gameLogEntries.length === 0" class="text-center text-gray-400">
-        Brak historii decyzji.
-      </div>
-      <ul v-else class="space-y-3 text-sm">
-        <li v-for="(decision, index) in gameLogEntries" :key="index">
-          <div
-            v-if="decision.isEventNotification"
-            class="border-2 border-blue-400 rounded-lg p-3 bg-blue-900/60 text-center"
-          >
-            <h4 class="font-bold text-blue-300 text-sm mb-1">Nowe Wydarzenie</h4>
-            <p class="text-white text-xs leading-relaxed">{{ decision.description }}</p>
-          </div>
-
-          <div
-            v-else
-            class="border-2 bg-gray-800 text-white text-left p-3 rounded-lg shadow-md space-y-2 relative"
-            :class="decision.eventApplied ? 'border-purple-400 bg-purple-900/20' : 'border-gray-600'"
-          >
+        <div v-if="isLoading" class="text-center text-gray-500">Ładowanie historii...</div>
+        <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
+        <div v-else-if="gameLogEntries.length === 0" class="text-center text-gray-400">
+          Brak historii decyzji.
+        </div>
+        <ul v-else class="space-y-3 text-sm">
+          <li v-for="(decision, index) in gameLogEntries" :key="index">
             <div
-              v-if="decision.eventApplied"
-              class="absolute -top-2 -right-2 px-3 py-1 bg-purple-600 text-white text-xs font-bold rounded-full shadow-lg"
+              v-if="decision.isEventNotification"
+              class="border-2 border-blue-400 rounded-lg p-3 bg-blue-900/60 text-center"
             >
-              EVENT
+              <h4 class="font-bold text-blue-300 text-sm mb-1">Nowe Wydarzenie</h4>
+              <p class="text-white text-xs leading-relaxed">{{ decision.description }}</p>
             </div>
 
-            <div class="font-semibold text-sm">
-              <span class="text-gray-400">Karta {{ decision.cardId }}</span>
-              <span class="mx-1">→</span>
-              <span class="text-white">{{ decision.choice }}</span>
-            </div>
-
-            <div class="border-t border-gray-600 pt-2">
-              <div class="flex items-center gap-2 mb-1">
-                <span class="text-gray-400 text-xs">Wynik:</span>
-                <span
-                  class="font-bold text-sm"
-                  :class="{
-                    'text-green-400': decision.result === 'Pozytywny',
-                    'text-red-400': decision.result === 'Negatywny',
-                  }"
-                >
-                  {{ decision.result }}
-                </span>
+            <div
+              v-else
+              class="border-2 bg-gray-800 text-white text-left p-3 rounded-lg shadow-md space-y-2 relative"
+              :class="
+                decision.eventApplied ? 'border-purple-400 bg-purple-900/20' : 'border-gray-600'
+              "
+            >
+              <div
+                v-if="decision.eventApplied"
+                class="absolute -top-2 -right-2 px-3 py-1 bg-purple-600 text-white text-xs font-bold rounded-full shadow-lg"
+              >
+                EVENT
               </div>
-              <p class="text-xs text-gray-300 leading-relaxed">
-                {{ decision.description }}
-              </p>
+
+              <div class="font-semibold text-sm">
+                <span class="text-gray-400">Karta {{ decision.cardId }}</span>
+                <span class="mx-1">→</span>
+                <span class="text-white">{{ decision.choice }}</span>
+              </div>
+
+              <div class="border-t border-gray-600 pt-2">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-gray-400 text-xs">Wynik:</span>
+                  <span
+                    class="font-bold text-sm"
+                    :class="{
+                      'text-green-400': decision.result === 'Pozytywny',
+                      'text-red-400': decision.result === 'Negatywny',
+                    }"
+                  >
+                    {{ decision.result }}
+                  </span>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                  {{ decision.description }}
+                </p>
+              </div>
             </div>
-          </div>
-        </li>
-      </ul>
-    </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -137,8 +139,8 @@ async function fetchData() {
       apiServices.get<{ budget: number }>(apiConfig.player.getCurrency, { teamId: props.teamId }),
     ])
 
-    console.log('Otrzymane logi historii:', historyResponse.data);
-    console.log('Otrzymany budżet:', budgetResponse.data);
+    console.log('Otrzymane logi historii:', historyResponse.data)
+    console.log('Otrzymany budżet:', budgetResponse.data)
 
     if (Array.isArray(historyResponse.data)) {
       gameLogEntries.value = historyResponse.data.map((log: ApiLogEntry): ProcessedLogEntry => {
@@ -157,13 +159,15 @@ async function fetchData() {
           choice: log.cardTitle || `Karta ID: ${log.cardId}`,
           cardId: log.cardId,
           result: log.status ? 'Pozytywny' : 'Negatywny',
-          description: log.feedbackDescription || (log.cost !== undefined ? `Koszt: ${log.cost}` : 'Brak opisu'),
+          description:
+            log.feedbackDescription ||
+            (log.cost !== undefined ? `Koszt: ${log.cost}` : 'Brak opisu'),
           eventApplied: log.gameEventId != null,
         }
       })
     }
-    console.log('Przetworzone logi historii:', gameLogEntries.value);
-    currentBudget.value = budgetResponse.data.budget;
+    console.log('Przetworzone logi historii:', gameLogEntries.value)
+    currentBudget.value = budgetResponse.data.budget
     emit('budget-changed-in-menu', currentBudget.value)
   } catch (err: any) {
     console.error('Błąd podczas pobierania danych panelu gracza:', err)

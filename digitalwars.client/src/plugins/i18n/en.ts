@@ -70,4 +70,5 @@ export const en = {
 
   //Erorr
   errorServerUnavailable: 'Server is unavailable. Please try again later.',
+  accept: 'Accept',
 }

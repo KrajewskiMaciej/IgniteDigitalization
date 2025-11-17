@@ -71,4 +71,5 @@ export const pl = {
   strongPassword: 'Silne hasło',
   //Erorr
   errorServerUnavailable: 'Serwer jest niedostępny. Spróbuj ponownie później.',
+  accept: 'Akceptuj',
 }

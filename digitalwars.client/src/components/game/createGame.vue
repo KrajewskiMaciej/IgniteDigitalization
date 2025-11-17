@@ -1,25 +1,31 @@
 <template>
-  <div v-if="props.isVisible" class="fixed inset-0 flex items-center justify-center z-50">
+  <div v-if="props.isVisible" class="fixed inset-0 flex items-center justify-center z-10">
     <div class="absolute inset-0 bg-black/70" @click="closeModal"></div>
 
     <div
-      class="bg-primary text-white relative z-10 border-2 border-accent animate-jump-in w-full h-full p-4 overflow-y-auto custom-scrollbar sm:w-full sm:max-w-lg sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-6 md:p-8 lg:p-10"
+      class="bg-surface-800 z-20 text-white relative border border-surface-700 animate-jump-in w-full h-full p-4 overflow-y-auto custom-scrollbar sm:w-[90vw] sm:max-w-4xl sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-6 md:p-8 lg:p-10"
     >
       <button @click="closeModal" class="absolute top-3 right-3 sm:top-2 sm:right-2 w-8 h-8 z-10">
         <font-awesome-icon
           :icon="faXmark"
-          class="h-5 text-white hover:text-accent transition-all duration-100"
+          class="h-5 text-white hover:text-primary-400 transition-all duration-100"
         />
       </button>
 
       <h1 class="text-center text-white font-nasalization text-lg sm:text-xl md:text-2xl mt-1 mb-3">
         Utwórz nową grę
       </h1>
-      <hr class="my-3 border-lgray-accent" />
+      <hr class="my-3 border-surface-700" />
       <div class="flex flex-row justify-center space-x-2">
-        <div class="rounded-full bg-accent h-3 w-3"></div>
-        <div class="rounded-full h-3 w-3" :class="step >= 2 ? 'bg-accent' : 'bg-tertiary'"></div>
-        <div class="rounded-full h-3 w-3" :class="step === 3 ? 'bg-accent' : 'bg-tertiary'"></div>
+        <div class="rounded-full bg-primary-400 h-3 w-3"></div>
+        <div
+          class="rounded-full h-3 w-3"
+          :class="step >= 2 ? 'bg-primary-400' : 'bg-surface-900'"
+        ></div>
+        <div
+          class="rounded-full h-3 w-3"
+          :class="step === 3 ? 'bg-primary-400' : 'bg-surface-900'"
+        ></div>
       </div>
 
       <form class="mt-3" @submit.prevent="handleSubmit">
@@ -29,68 +35,53 @@
             <label for="gameName" class="block font-bold text-left text-xs sm:text-sm"
               >Nazwa Gry</label
             >
-            <input
-              type="text"
-              maxlength="25"
-              v-model="gameName"
+            <InputText
               id="gameName"
-              class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-4"
+              v-model="gameName"
               placeholder="Wprowadź nazwę gry..."
+              maxlength="25"
               required
+              class="w-full"
             />
           </div>
           <div class="mb-1 sm:mb-2">
             <label for="selectBoard" class="block font-bold text-left text-xs mb-1"
               >Wybierz planszę</label
             >
-            <select
+            <Dropdown
               v-model="selectedBoardId"
-              id="selectBoard"
-              required
-              class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-4"
-            >
-              <option :value="null" disabled>Wybierz planszę</option>
-              <option v-for="board in data.boards" :key="board.boards_Id" :value="board.boards_Id">
-                {{ board.name }}
-              </option>
-            </select>
+              :options="data.boards"
+              optionLabel="name"
+              optionValue="boards_Id"
+              placeholder="Wybierz planszę"
+              class="w-full custom-dropdown"
+            />
           </div>
           <div class="mb-1 sm:mb-2">
             <label for="selectOpponentBoard" class="block font-bold text-left text-xs mb-1"
               >Wybierz planszę konkurencji</label
             >
-            <!-- POPRAWKA: Użycie filtrowanej listy plansz -->
-            <select
+            <Dropdown
               v-model="selectedOponentBoardId"
-              id="selectOpponentBoard"
-              required
-              class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-4"
-            >
-              <option :value="null" disabled>Wybierz planszę konkurencji</option>
-              <option
-                v-for="board in opponentBoardOptions"
-                :key="board.boards_Id"
-                :value="board.boards_Id"
-              >
-                {{ board.name }}
-              </option>
-            </select>
+              :options="opponentBoardOptions"
+              optionLabel="name"
+              optionValue="boards_Id"
+              placeholder="Wybierz planszę konkurencji"
+              class="w-full"
+            />
           </div>
           <div class="mb-1 sm:mb-2">
             <label for="selectDeck" class="block font-bold text-left text-xs mb-1"
               >Wybierz talię kart</label
             >
-            <select
+            <Dropdown
               v-model="selectedDeckId"
-              required
-              id="selectDeck"
-              class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-4"
-            >
-              <option :value="null" disabled>Wybierz talię kart</option>
-              <option v-for="deck in data.decks" :key="deck.id" :value="deck.id">
-                {{ deck.title }}
-              </option>
-            </select>
+              :options="data.decks"
+              optionLabel="title"
+              optionValue="id"
+              placeholder="Wybierz talię kart"
+              class="w-full custom-dropdown"
+            />
           </div>
           <p class="block font-bold text-left text-xs mb-2">Wybierz rodzaj rozgrywki</p>
           <div class="flex gap-2 w-full mb-5">
@@ -98,15 +89,15 @@
               class="flex flex-col items-center justify-center rounded-md w-full h-20 gap-2 cursor-pointer"
               :class="
                 selectedGameMode === 'remote'
-                  ? 'bg-accent shadow-md shadow-accent/60'
-                  : 'bg-tertiary transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-accent/70 border-2 border-lgray-accent'
+                  ? 'bg-primary-400 shadow-md shadow-primary-400/60'
+                  : 'bg-surface-850 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-primary-400/70 border-2 border-surface-700'
               "
               @click="selectedGameMode = 'remote'"
             >
               <font-awesome-icon
                 :icon="faGlobe"
                 class="h-6"
-                :class="selectedGameMode === 'remote' ? 'text-tertiary' : 'text-accent'"
+                :class="selectedGameMode === 'remote' ? 'text-tertiary' : 'text-primary-400'"
               />
               <h2 class="block font-nasalization font-semibold">Gra zdalna</h2>
             </div>
@@ -114,29 +105,23 @@
               class="flex flex-col items-center justify-center rounded-md w-full h-20 gap-2 cursor-pointer"
               :class="
                 selectedGameMode === 'stationary'
-                  ? 'bg-accent shadow-md shadow-accent/60'
-                  : 'bg-tertiary  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-accent/70 border-2 border-lgray-accent'
+                  ? 'bg-primary-400 shadow-md shadow-primary-400/60'
+                  : 'bg-surface-850  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-primary-400/70 border-2 border-surface-700'
               "
               @click="selectedGameMode = 'stationary'"
             >
               <font-awesome-icon
                 :icon="faBuilding"
                 class="h-6"
-                :class="selectedGameMode === 'stationary' ? 'text-primary' : 'text-accent'"
+                :class="selectedGameMode === 'stationary' ? 'text-primary' : 'text-primary-400'"
               />
               <h2 class="block font-nasalization font-semibold">Gra stacjonarna</h2>
             </div>
           </div>
-          <button
-            @click="handleNextStep"
-            type="button"
-            class="bg-tertiary hover:bg-accent text-white w-full py-2 xl:py-4 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60 mb-5"
-          >
-            <div class="flex items-center justify-center gap-2">
-              <p class="mr-2">Dalej</p>
-              <font-awesome-icon :icon="faArrowRight" class="h-4 text-center" />
-            </div>
-          </button>
+          <Button @click="handleNextStep" type="button" class="w-full">
+            <span>Dalej</span>
+            <font-awesome-icon :icon="faArrowRight" class="ml-2" />
+          </Button>
         </div>
 
         <!--Krok 2-->
@@ -147,70 +132,72 @@
           <div class="flex flex-row gap-2">
             <div class="flex-1">
               <label for="numberOfTeams" class="block font-bold text-left text-xs sm:text-sm mb-1"
-                >Wybierz liczbę drużyn:</label
+                >Liczba drużyn:</label
               >
-              <input
+              <InputNumber
                 id="numberOfTeams"
-                class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 text-white w-full mb-4"
-                type="number"
                 v-model="numberOfTeams"
-                min="2"
-                max="15"
-                step="1"
+                :min="2"
+                :max="15"
+                showButtons
+                class="w-full"
               />
             </div>
-            <div>
+            <div class="flex-1">
               <label for="numberOfBits" class="block font-bold text-left text-xs sm:text-sm mb-1"
-                >Wybierz liczbę bitów na start</label
+                >Liczba bitów na start</label
               >
-              <input
-                type="number"
+              <InputNumber
                 id="numberOfBits"
-                class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 text-white w-full mb-4 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 v-model="numberOfBits"
-                min="20"
-                max="1000"
+                :min="20"
+                :max="1000"
+                showButtons
+                class="w-full"
               />
             </div>
           </div>
-          <div class="mb-6">
+          <div class="mb-6 mt-4">
             <label class="block text-left text-xs sm:text-sm font-bold text-white mb-2"
               >Wybierz drużynę do edycji:</label
             >
-            <DropDown
-              :items="teams"
+            <Dropdown
               v-model="currentlyEditingTeamId"
-              item-key="id"
-              item-label="name"
+              :options="teams"
+              optionLabel="name"
+              optionValue="id"
               placeholder="Wybierz drużynę"
+              class="w-full custom-dropdown"
             >
-              <template #selected-display="{ selected }">
-                <div v-if="selected" class="flex items-center gap-3">
+              <template #value="slotProps">
+                <div v-if="slotProps.value != null" class="flex items-center gap-3">
                   <div
                     class="w-4 h-4 rounded-full"
-                    :style="{ backgroundColor: (selected as Team).colour }"
+                    :style="{
+                      backgroundColor: teams.find((t) => t.id === slotProps.value)?.colour,
+                    }"
                   ></div>
-                  <span>{{ (selected as Team).name }}</span>
+                  <span>{{ teams.find((t) => t.id === slotProps.value)?.name }}</span>
                 </div>
-                <span v-else>Wybierz drużynę</span>
+                <span v-else>{{ slotProps.placeholder }}</span>
               </template>
-              <template #item-display="{ item }">
+              <template #option="slotProps">
                 <div class="flex items-center gap-3">
                   <div
                     class="w-4 h-4 rounded-full"
-                    :style="{ backgroundColor: (item as Team).colour }"
+                    :style="{ backgroundColor: slotProps.option.colour }"
                   ></div>
-                  <span>{{ (item as Team).name }}</span>
+                  <span>{{ slotProps.option.name }}</span>
                 </div>
               </template>
-            </DropDown>
+            </Dropdown>
           </div>
           <div
             v-if="selectedTeam"
-            class="p-4 rounded-lg bg-tertiary border border-lgray-accent mb-4"
+            class="p-4 rounded-lg bg-surface-850 border border-surface-700 mb-4"
           >
-            <h3 class="font-bold text-lg mb-4 text-white">
-              Edytujesz: <span class="text-accent">{{ selectedTeam.name }}</span>
+            <h3 class="font-bold text-center text-lg mb-4 text-white">
+              Edytujesz: <span class="text-primary-400">{{ selectedTeam.name }}</span>
             </h3>
             <div class="space-y-4">
               <div>
@@ -219,32 +206,24 @@
                   class="block text-sm font-medium text-gray-300 mb-1"
                   >Nazwa drużyny</label
                 >
-                <input
+                <InputText
                   :id="'editTeamName-' + selectedTeam.id"
-                  type="text"
                   v-model="selectedTeam.name"
-                  class="w-full bg-primary border-2 border-lgray-accent rounded-md px-3 py-2 text-white"
+                  class="w-full"
                 />
               </div>
-              <div>
+              <div class="flex flex-col items-center">
                 <label
                   :for="'editTeamColor-' + selectedTeam.id"
                   class="block text-sm font-medium text-gray-300 mb-1"
                   >Kolor drużyny</label
                 >
-                <div class="flex items-center gap-2">
-                  <input
-                    :id="'editTeamColor-' + selectedTeam.id"
-                    type="color"
-                    v-model="selectedTeam.colour"
-                    class="w-20 h-12 p-0 bg-transparent rounded-md cursor-pointer"
-                  />
-                  <div
-                    class="w-full text-left px-3 py-2 rounded-md bg-primary border border-lgray-accent"
-                  >
-                    {{ selectedTeam.colour }}
-                  </div>
-                </div>
+                <input
+                  type="color"
+                  :id="'editTeamColor-' + selectedTeam.id"
+                  v-model="selectedTeam.colour"
+                  class="w-20 h-20 rounded-lg cursor-pointer bg-transparent"
+                />
               </div>
             </div>
             <label
@@ -253,22 +232,18 @@
               >Czy drużyna może podejmować samodzielne decyzje?</label
             >
             <div class="flex items-center gap-2">
-              <label
-                :for="'decision-' + selectedTeam.id"
-                :class="[
-                  'relative w-16 h-8 rounded-full cursor-pointer block transition-colors duration-300',
-                  selectedTeam.isAbleToMakeDecisions ? 'bg-accent' : 'bg-primary',
-                ]"
-              >
+              <label class="relative inline-block w-11 h-6">
                 <input
                   type="checkbox"
                   :id="'decision-' + selectedTeam.id"
-                  class="sr-only"
                   v-model="selectedTeam.isAbleToMakeDecisions"
+                  class="sr-only peer"
                 />
                 <span
-                  class="w-6 h-6 bg-white absolute left-1 top-1 rounded-full transition-transform duration-300"
-                  :class="{ 'translate-x-8': selectedTeam.isAbleToMakeDecisions }"
+                  class="absolute cursor-pointer inset-0 bg-tertiary rounded-full transition-all duration-300 peer-checked:bg-primary-400 peer-focus:ring-2 peer-focus:ring-primary-400"
+                ></span>
+                <span
+                  class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-5"
                 ></span>
               </label>
               <span class="text-sm">{{
@@ -277,12 +252,12 @@
               <div class="relative">
                 <font-awesome-icon
                   :icon="faCircleQuestion"
-                  class="text-accent h-4 cursor-pointer"
+                  class="text-primary-400 h-4 cursor-pointer"
                   @mouseover="showTip = true"
                   @mouseleave="showTip = false"
                 />
                 <div
-                  class="absolute border border-accent rounded-md bottom-full left-1/2 -translate-x-1/2 mb-2 bg-primary p-3 text-white text-xs z-50 w-72 flex items-center"
+                  class="absolute border border-primary-400 rounded-md bottom-full left-1/2 -translate-x-1/2 mb-1 bg-surface-800 p-2 text-white text-sm z-20 w-96 flex items-center"
                   v-show="showTip"
                 >
                   <div>
@@ -295,14 +270,14 @@
                         zakceptować
                       </span>
                     </div>
-                    <hr class="mt-2 border-accent" />
+                    <hr class="mt-2 border-primary-400" />
                     <div>
                       <h2 class="font-nasalization mb-1 mt-2 font-semibold text-green-500">
-                        Samodziene dezyje
+                        Samodzielne decyzje
                       </h2>
                       <span
-                        >Drużyna podejmuje decyzje bezpośrednio z urządzenie i nie potrzebuję
-                        akcpetacji decyzji przez Game Mastera</span
+                        >Drużyna podejmuje decyzje bezpośrednio z urządzenia i nie potrzebuje
+                        akceptacji decyzji przez Game Mastera</span
                       >
                     </div>
                   </div>
@@ -311,26 +286,14 @@
             </div>
           </div>
           <div class="flex gap-2">
-            <button
-              @click="handlePreviousStep"
-              type="button"
-              class="bg-tertiary hover:bg-accent text-white w-full py-2 xl:py-4 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60"
-            >
-              <div class="flex items-center justify-center gap-2">
-                <font-awesome-icon :icon="faArrowLeft" class="h-4 text-center" />
-                <p class="ml-2">Wstecz</p>
-              </div>
-            </button>
-            <button
-              @click="handleNextStep"
-              type="button"
-              class="bg-tertiary hover:bg-accent text-white w-full py-2 xl:py-4 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60"
-            >
-              <div class="flex items-center justify-center gap-2">
-                <p class="mr-2">Dalej</p>
-                <font-awesome-icon :icon="faArrowRight" class="h-4 text-center" />
-              </div>
-            </button>
+            <Button @click="handlePreviousStep" type="button" severity="secondary" class="w-full">
+              <font-awesome-icon :icon="faArrowLeft" class="mr-2" />
+              <span>Wstecz</span>
+            </Button>
+            <Button @click="handleNextStep" type="button" class="w-full">
+              <span>Dalej</span>
+              <font-awesome-icon :icon="faArrowRight" class="ml-2" />
+            </Button>
           </div>
         </div>
         <!-- Krok 3 -->
@@ -338,9 +301,17 @@
           v-if="step === 3"
           :class="direction === 'forwards' ? 'animate-fade-right' : 'animate-fade-left'"
         >
-          <h2 class="block text-left text-sm sm:text-base font-bold text-white mb-3">
-            Wybierz procesy, które będą używane w grze:
-          </h2>
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="block text-left text-sm sm:text-base font-bold text-white">
+              Wybierz procesy:
+            </h2>
+            <Button
+              @click="toggleAllProcesses"
+              :label="allProcessesSelected ? 'Odznacz wszystkie' : 'Zaznacz wszystkie'"
+              size="small"
+              outlined
+            />
+          </div>
           <div v-if="isLoadingProcesses" class="text-center text-gray-400">
             <p>Ładowanie procesów...</p>
           </div>
@@ -351,21 +322,16 @@
             <label
               v-for="process in availableProcesses"
               :key="process.processId"
-              class="flex items-center p-3 bg-tertiary rounded-md cursor-pointer hover:bg-accent/30 transition-colors duration-200"
+              class="flex items-center p-3 bg-tertiary rounded-md cursor-pointer hover:bg-primary-400/30 transition-colors duration-200"
             >
-              <input
-                type="checkbox"
-                :value="process.processId"
-                v-model="selectedProcessIds"
-                class="w-5 h-5 rounded bg-primary border-lgray-accent text-accent focus:ring-accent"
-              />
-              <div class="ml-3 flex items-center gap-2">
-                <div>
+              <Checkbox :value="process.processId" v-model="selectedProcessIds" :binary="false" />
+              <div class="ml-3 flex items-center gap-2 flex-1">
+                <div class="flex-1">
                   <span class="font-bold text-white">{{ process.processDesc }}</span>
                   <span class="text-sm text-gray-400 ml-2"> - {{ process.processLongDesc }}</span>
                 </div>
                 <span
-                  class="w-6 h-6 rounded-full inline-block ml-2 border-2 border-tertiary"
+                  class="w-6 h-6 rounded-full inline-block border-2 border-tertiary flex-shrink-0"
                   :style="{ backgroundColor: process.processColor }"
                 ></span>
               </div>
@@ -373,22 +339,11 @@
           </div>
         </div>
         <div v-if="step === 3" class="flex gap-2 mt-4">
-          <button
-            @click="handlePreviousStep"
-            type="button"
-            class="bg-tertiary hover:bg-accent text-white w-full py-2 xl:py-4 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60"
-          >
-            <div class="flex items-center justify-center gap-2">
-              <font-awesome-icon :icon="faArrowLeft" class="h-4 text-center" />
-              <p class="ml-2">Wstecz</p>
-            </div>
-          </button>
-          <button
-            type="submit"
-            class="bg-tertiary hover:bg-accent text-white w-full py-2 xl:py-4 rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60"
-          >
-            <div class="flex items-center justify-center gap-2"><p>Utwórz nową grę</p></div>
-          </button>
+          <Button @click="handlePreviousStep" type="button" severity="secondary" class="w-full">
+            <font-awesome-icon :icon="faArrowLeft" class="mr-2" />
+            <span>Wstecz</span>
+          </Button>
+          <Button type="submit" label="Utwórz nową grę" class="w-full" />
         </div>
       </form>
     </div>
@@ -406,7 +361,12 @@ import {
 import { ref, reactive, watch, computed, onMounted } from 'vue'
 import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons'
 import { useToast } from 'vue-toastification'
-import DropDown from '../dropDown.vue'
+import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
+import Dropdown from 'primevue/dropdown'
+import Button from 'primevue/button'
+import ColorPicker from 'primevue/colorpicker'
+import Checkbox from 'primevue/checkbox'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
 
@@ -465,16 +425,29 @@ const selectedTeam = computed<Team | undefined>(() => {
   return teams.value.find((team) => team.id === currentlyEditingTeamId.value)
 })
 
-// POPRAWKA: Nowa właściwość obliczeniowa do filtrowania plansz przeciwnika
 const opponentBoardOptions = computed<Board[]>(() => {
   if (!selectedBoardId.value) {
-    return data.boards // Jeśli żadna plansza drużyny nie jest wybrana, pokaż wszystkie
+    return data.boards
   }
-  // Zwróć listę plansz, które nie mają ID wybranej planszy drużyny
   return data.boards.filter((board) => board.boards_Id !== selectedBoardId.value)
 })
 
+const allProcessesSelected = computed(() => {
+  return (
+    availableProcesses.value.length > 0 &&
+    selectedProcessIds.value.length === availableProcesses.value.length
+  )
+})
+
 // --- FUNKCJE ---
+const toggleAllProcesses = () => {
+  if (allProcessesSelected.value) {
+    selectedProcessIds.value = []
+  } else {
+    selectedProcessIds.value = availableProcesses.value.map((p) => p.processId)
+  }
+}
+
 const updateTeamsArray = (count: number) => {
   const newTeams: Team[] = []
   for (let i = 0; i < count; i++) {
@@ -629,7 +602,6 @@ const defaultColors = [
   '#36454F',
 ]
 
-// POPRAWKA: Nowy watcher, który resetuje wybór planszy przeciwnika, jeśli wystąpi konflikt
 watch(selectedBoardId, (newId) => {
   if (newId === selectedOponentBoardId.value) {
     selectedOponentBoardId.value = null
@@ -683,5 +655,14 @@ onMounted(async () => {
   border-radius: 0.25rem;
   border: 0.1rem solid transparent;
   background-clip: content-box;
+}
+
+/* Fix dla dropdownów - usuwa padding z lewej strony */
+:deep(.custom-dropdown .p-dropdown-label) {
+  padding-left: 0.75rem !important;
+}
+
+:deep(.custom-dropdown .p-dropdown-trigger) {
+  width: 2.5rem;
 }
 </style>

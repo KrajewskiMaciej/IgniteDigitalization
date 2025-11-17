@@ -9,6 +9,7 @@ import App from './App.vue'
 import router from './router'
 import { i18n } from './plugins/i18n/index'
 import { primevue } from '@/plugins/primevue'
+import ConfirmationService from 'primevue/confirmationservice'
 
 const app = createApp(App)
 
@@ -21,5 +22,6 @@ app.use(Toast, options)
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(i18n)
 app.use(primevue)
+app.use(ConfirmationService)
 
 app.mount('#app')

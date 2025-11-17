@@ -1,47 +1,44 @@
 <template>
   <nav
-    class="w-full bg-secondary py-3 px-6 flex flex-row justify-between items-center border-b-2 border-lgray-accent"
+    class="w-full bg-secondary py-3 px-6 flex flex-row justify-between items-center border-b border-surface-700"
   >
     <div>
       <RouterLink to="/">
         <img :src="logo" class="h-12" alt="ITM logo" />
       </RouterLink>
     </div>
-    <div class="flex justify-center items-center mr-5">
-      <div @click="toggleDropdown" class="cursor-pointer">
-        <font-awesome-icon
-          :icon="faCircleUser"
-          class="h-8 text-white hover:text-accent transition-all duration-300"
-        />
-      </div>
+    <div class="relative">
       <div
-        class="text-white ml-3 hidden sm:block cursor-pointer hover:text-accent"
+        class="flex justify-center items-center text-surface-0 gap-2 mr-5 hover:text-primary-400 transition-all duration-300 ease-out cursor-pointer"
         @click="toggleDropdown"
       >
-        {{ username }}
+        <font-awesome-icon :icon="faCircleUser" class="h-8" />
+        <div class="hidden sm:block">
+          {{ username }}
+        </div>
       </div>
-    </div>
 
-    <div
-      v-show="isDropdownOpen"
-      class="flex flex-col items-center absolute top-16 right-16 w-48 bg-secondary rounded-md shadow-lg py-1 z-50 border-solid border-2 border-lgray-accent"
-      ref="dropdownMenu"
-    >
-      <button
-        @click="isVisible = true"
-        class="flex items-center w-full px-4 py-2 text-sm text-white hover:text-gray-500"
+      <div
+        v-show="isDropdownOpen"
+        class="flex flex-col items-center absolute top-full right-0 mt-2 w-48 bg-secondary rounded-md shadow-lg py-1 z-50 border-solid border-2 border-lgray-accent"
+        ref="dropdownMenu"
       >
-        <span>Ustawienia konta</span>
-        <font-awesome-icon :icon="faGear" class="ml-2" />
-      </button>
-      <hr class="border-lgray-accent w-[90%]" />
-      <button
-        @click="logout"
-        class="flex items-center w-full px-4 py-2 text-sm text-white hover:text-red-600"
-      >
-        <span>Wyloguj się</span>
-        <font-awesome-icon :icon="faRightFromBracket" class="ml-2" />
-      </button>
+        <button
+          @click="isVisible = true"
+          class="flex items-center w-full px-4 py-2 text-sm text-white hover:text-gray-500"
+        >
+          <span>Ustawienia konta</span>
+          <font-awesome-icon :icon="faGear" class="ml-2" />
+        </button>
+        <hr class="border-lgray-accent w-[90%]" />
+        <button
+          @click="logout"
+          class="flex items-center w-full px-4 py-2 text-sm text-white hover:text-red-600"
+        >
+          <span>Wyloguj się</span>
+          <font-awesome-icon :icon="faRightFromBracket" class="ml-2" />
+        </button>
+      </div>
     </div>
   </nav>
 
@@ -77,7 +74,7 @@ interface User {
 const authStore = useAuthStore()
 const router = useRouter()
 
-const isDropdownOpen = ref(false)
+const isDropdownOpen = ref<boolean>(false)
 // POPRAWKA: Jawne typowanie refa dla elementu DOM
 const dropdownMenu = ref<HTMLDivElement | null>(null)
 const username = ref('')

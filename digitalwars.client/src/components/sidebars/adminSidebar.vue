@@ -1,6 +1,6 @@
 <template>
   <aside
-    class="h-container bg-secondary text-white flex flex-col rounded-r-md border-t-2 border-r-2 border-b-2 border-solid border-lgray-accent"
+    class="h-container bg-secondary text-white flex flex-col rounded-r-md border-t border-r border-b border-surface-700"
     :class="isSideBarOpen ? 'w-64' : 'w-16'"
   >
     <div class="py-6 flex flex-row justify-between items-center px-4">
@@ -18,7 +18,7 @@
     <nav class="flex-1 px-2 py-2">
       <ul class="space-y-2">
         <li
-          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
             to="/admin"
@@ -31,7 +31,7 @@
         </li>
 
         <li
-          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
           @click="handleStats"
         >
           <div
@@ -81,7 +81,7 @@
         </li>
 
         <li
-          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
             class="flex items-center gap-4 px-4 py-3 rounded-md"
@@ -94,7 +94,7 @@
         </li>
 
         <li
-          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
             class="flex items-center gap-4 px-4 py-3 rounded-md"
@@ -107,7 +107,7 @@
         </li>
 
         <li
-          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
             class="flex items-center gap-4 px-4 py-3 rounded-md"
@@ -120,7 +120,7 @@
         </li>
 
         <li
-          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
             to="/admin/cheatSheet"
@@ -133,7 +133,7 @@
         </li>
 
         <li
-          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
             to="/admin/exportToPDF"

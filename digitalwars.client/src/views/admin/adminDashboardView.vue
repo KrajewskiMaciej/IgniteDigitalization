@@ -7,9 +7,9 @@
 
       <!--Content-->
       <div
-        class="flex-1 ml-4 bg-secondary border-t-2 border-l-2 border-b-2 border-lgray-accent rounded-md shadow-sm text-center"
+        class="flex-1 ml-4 bg-secondary border-t border-l border-b border-surface-700 rounded-md flex flex-col"
       >
-        <RouterView />
+        <RouterView class="flex-1" />
       </div>
     </div>
     <div class="mt-2">
