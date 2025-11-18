@@ -1,301 +1,409 @@
 <template>
-  <div
-    class="flex flex-col md:flex-row bg-secondary p-4 rounded-md text-white w-full max-w-7xl mx-auto space-y-6 md:space-y-0 md:space-x-6"
-  >
-    <!-- Lewa kolumna -->
-    <div class="flex-1 p-4 bg-secondary rounded-md min-h-[500px]">
-      <h2 class="text-xl font-bold mb-4 text-center">
-        Wybierz stół i {{ actionMode === 'cards' ? 'decyzję' : 'przedmiot' }}
-      </h2>
-
-      <!-- Przełącznik kart/przedmiotów -->
-      <div class="flex justify-center gap-4 mb-4">
-        <button
-          @click="actionMode = 'cards'"
-          :class="
-            actionMode === 'cards'
-              ? 'bg-accent text-black shadow'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          "
-          class="px-4 py-1 rounded font-semibold transition"
-        >
-          Decyzje
-        </button>
-        <button
-          @click="actionMode = 'items'"
-          :class="
-            actionMode === 'items'
-              ? 'bg-accent text-black shadow'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          "
-          class="px-4 py-1 rounded font-semibold transition"
-        >
-          Przedmioty
-        </button>
-      </div>
-
-      <select
-        v-if="!teamId"
-        v-model="selectedTableId"
-        class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-2"
-      >
-        <option disabled value="">-- Wybierz stół --</option>
-        <option v-for="team in tables" :key="team.teamId" :value="team.teamId">
-          {{ team.teamName }}
-        </option>
-      </select>
-
-      <select
-        v-if="actionMode === 'cards'"
-        v-model="selectedCardId"
-        class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-2"
-      >
-        <option disabled value="">-- Wybierz kartę --</option>
-        <option v-for="card in cards" :key="card.id" :value="card.id">
-          {{ card.id }} - {{ card.title }}
-        </option>
-      </select>
-
-      <select
-        v-else
-        v-model="selectedItemId"
-        class="bg-tertiary border-2 border-lgray-accent rounded-md px-3 py-2 w-full mb-2"
-      >
-        <option disabled value="">-- Wybierz przedmiot --</option>
-        <option v-for="item in items" :key="item.id" :value="item.id">
-          {{ item.id }} - {{ item.title }}
-        </option>
-      </select>
-
-      <p
-        v-if="actionMode === 'cards' && selectedCard"
-        class="text-sm text-center text-gray-300 mt-2 italic"
-      >
-        {{ selectedCard.description }}
+  <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
+    <!-- Nagłówek -->
+    <div class="text-center">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+        Panel Decyzji
+      </h1>
+      <p class="text-gray-400 text-sm md:text-base">
+        Zarządzaj decyzjami i przedmiotami dla drużyn
       </p>
-      <p
-        v-if="actionMode === 'items' && selectedItem"
-        class="text-sm text-center text-gray-300 mt-2 italic"
-      >
-        {{ selectedItem.description }}
-      </p>
-
-      <p v-if="actionMode === 'cards' && selectedCard" class="text-center text-sm mt-2">
-        Koszt karty: <span class="font-semibold">{{ selectedCard?.cost || 0 }} bitów</span>
-      </p>
-      <p v-if="actionMode === 'items' && selectedItem" class="text-center text-sm mt-2">
-        Koszt przedmiotu: <span class="font-semibold">{{ selectedItem?.cost || 0 }} bitów</span>
-      </p>
-
-      <p v-if="selectedTableId" class="text-center text-sm mt-1">
-        Bity {{ selectedTeam?.teamName }}: <span class="font-semibold">{{ currentBits }}</span>
-      </p>
-      <div class="flex justify-center mt-4">
-        <button
-          v-if="actionMode === 'cards'"
-          :disabled="!selectedCardId || !selectedTableId"
-          @click="playCard"
-          class="px-4 py-2 bg-lime-500 text-black font-bold rounded hover:bg-lime-600 disabled:opacity-50"
-        >
-          Zagraj kartę
-        </button>
-
-        <button
-          v-else
-          :disabled="!selectedItemId || !selectedTableId"
-          @click="giveItem"
-          class="px-4 py-2 bg-cyan-500 text-black font-bold rounded hover:bg-cyan-600 disabled:opacity-50"
-        >
-          Użyj przedmiot
-        </button>
-      </div>
-
-      <!-- Wybór i zatwierdzenie zdarzenia (tylko w widoku ogólnym) -->
-      <div v-if="!teamId" class="mt-6">
-        <label class="block text-lg font-bold mb-2">Wybierz zdarzenie losowe:</label>
-
-        <select
-          v-model="selectedPendingEventIndex"
-          class="bg-tertiary text-base border border-gray-500 rounded px-3 py-2 w-full mb-2"
-        >
-          <option v-for="(event, index) in availableEvents" :key="index" :value="event.eventId">
-            {{ event.shortDesc }}
-          </option>
-        </select>
-
-        <p
-          v-if="selectedEvent && selectedEvent.eventId"
-          class="text-sm text-center text-gray-300 mt-2 italic mb-4"
-        >
-          {{ selectedEvent.longDesc }}
-        </p>
-
-        <div class="flex justify-center">
-          <button
-            @click="applySelectedEvent"
-            class="px-4 py-1 bg-blue-500 text-sm font-semibold text-white rounded hover:bg-blue-600"
-          >
-            Zastosuj
-          </button>
-        </div>
-      </div>
-
-      <!-- Trzy przełączniki -->
-      <div class="mt-6 mb-4 flex flex-wrap gap-6 justify-center items-center">
-        <div class="flex items-center gap-2">
-          <label
-            class="relative w-16 h-8 rounded-full cursor-pointer block transition-colors duration-300"
-            :class="showMenu ? 'bg-accent' : 'bg-primary'"
-          >
-            <input type="checkbox" class="sr-only" v-model="showMenu" />
-            <span
-              class="w-6 h-6 bg-white absolute left-1 top-1 rounded-full transition-transform duration-300"
-              :class="{ 'translate-x-8': showMenu }"
-            ></span>
-          </label>
-          <span class="text-sm">Menu</span>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <label
-            class="relative w-16 h-8 rounded-full cursor-pointer block transition-colors duration-300"
-            :class="showOwnBoard ? 'bg-accent' : 'bg-primary'"
-          >
-            <input type="checkbox" class="sr-only" v-model="showOwnBoard" />
-            <span
-              class="w-6 h-6 bg-white absolute left-1 top-1 rounded-full transition-transform duration-300"
-              :class="{ 'translate-x-8': showOwnBoard }"
-            ></span>
-          </label>
-          <span class="text-sm">Twoja plansza</span>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <label
-            class="relative w-16 h-8 rounded-full cursor-pointer block transition-colors duration-300"
-            :class="showOpponentsBoard ? 'bg-accent' : 'bg-primary'"
-          >
-            <input type="checkbox" class="sr-only" v-model="showOpponentsBoard" />
-            <span
-              class="w-6 h-6 bg-white absolute left-1 top-1 rounded-full transition-transform duration-300"
-              :class="{ 'translate-x-8': showOpponentsBoard }"
-            ></span>
-          </label>
-          <span class="text-sm">Plansza rywali</span>
-        </div>
-      </div>
-
-      <!-- GameBoard -->
-      <div class="w-full flex justify-center">
-        <GameBoard :config="enemyFormData" :game-mode="false" :pawns="enemyPawns" />
-      </div>
     </div>
 
-    <!-- Prawa kolumna: decyzje do zatwierdzenia -->
-    <div class="flex-1 p-4 bg-secondary rounded-md min-h-[500px]">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-center">🕒 Panel decyzji</h2>
-        <div class="flex justify-center gap-2 mb-4">
-          <button
-            @click="decisionMode = 'pending'"
-            :class="[
-              'px-4 py-2 rounded font-semibold transition',
-              decisionMode === 'pending'
-                ? 'bg-accent text-black shadow'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600',
-            ]"
-          >
-            Do zatwierdzenia
-          </button>
-
-          <button
-            @click="decisionMode = 'history'"
-            :class="[
-              'px-4 py-2 rounded font-semibold transition',
-              decisionMode === 'history'
-                ? 'bg-accent text-black shadow'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600',
-            ]"
-          >
-            Historia decyzji
-          </button>
-        </div>
-      </div>
-
-      <!-- Decyzje do zatwierdzenia -->
-      <div
-        v-if="decisionMode === 'pending'"
-        class="overflow-y-auto scroll-smooth max-h-[650px] pr-2 space-y-3 border border-lgray-accent rounded-md shadow-inner bg-secondary-dark p-2"
-      >
-        <div v-if="loadingPending" class="text-center text-gray-400">Ładowanie sugestii...</div>
-        <div v-else-if="pendingDecisions.length === 0" class="text-center text-gray-400 p-4">
-          Brak decyzji do zatwierdzenia.
-        </div>
-
-        <div
-          v-for="entry in pendingDecisions"
-          :key="entry.logId"
-          class="p-2 rounded border border-yellow-500 bg-secondary relative"
-        >
-          <p>
-            <strong>{{ entry.tableName }}</strong> sugeruje:
-          </p>
-          <p class="font-semibold text-lg">{{ entry.cardTitle }}</p>
-          <p class="text-xs text-gray-400 mt-1">Zasugerowano: {{ formatDate(entry.timestamp) }}</p>
-          <div class="flex justify-end space-x-2 mt-2">
-            <button
-              @click="approveDecision(entry.logId)"
-              class="px-2 py-1 bg-green-500 text-sm text-black rounded hover:bg-green-600"
-            >
-              Zatwierdź
-            </button>
-            <button
-              @click="rejectDecision(entry.logId)"
-              class="px-2 py-1 bg-red-500 text-sm text-white rounded hover:bg-red-600"
-            >
-              Odrzuć
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Historia decyzji -->
-      <div v-else class="space-y-4 max-h-[650px] overflow-y-auto scroll-smooth">
-        <div v-if="loadingHistory" class="text-center text-gray-400">Ładowanie historii...</div>
-        <div v-else-if="decisions.length === 0" class="text-center text-gray-400">
-          Brak decyzji w historii dla tej gry.
-        </div>
-
-        <div v-for="(entry, index) in decisions" :key="index" class="mb-2">
-          <!-- Specjalny wygląd dla powiadomienia o evencie -->
-          <div
-            v-if="entry.isEventNotification"
-            class="border border-blue-500 rounded p-3 bg-blue-900/50 text-center"
-          >
-            <h3 class="font-bold text-lg text-blue-300">Nowe Wydarzenie</h3>
-            <p class="text-white mt-1">{{ entry.feedbackDescription }}</p>
-            <p class="text-xs text-gray-400 mt-2">Aktywowano: {{ formatDate(entry.timestamp) }}</p>
-          </div>
-
-          <!-- Normalny wygląd dla zagrania karty -->
-          <div v-else class="border border-gray-600 rounded p-3 bg-secondary relative">
-            <div
-              v-if="entry.eventAppliedId"
-              class="absolute top-1 right-2 px-2 py-0.5 bg-purple-600 text-white text-xs font-bold rounded-full"
-            >
-              EVENT
+    <div class="max-w-7xl mx-auto w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Lewa kolumna - Akcje -->
+        <div class="space-y-6">
+          <!-- Sekcja wyboru akcji -->
+          <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+            <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+              <div class="bg-primary-500/20 p-2.5 rounded-lg">
+                <font-awesome-icon :icon="faGamepad" class="h-6 text-primary-400" />
+              </div>
+              <h2 class="text-xl md:text-2xl font-bold text-white">Zarządzanie akcjami</h2>
             </div>
-            <p>
-              <strong>{{ entry.tableName }}</strong> – Karta ID: {{ entry.cardId }}
-            </p>
-            <p :class="entry.result === 'Pozytywny' ? 'text-green-400' : 'text-red-400'">
-              <strong>Wynik:</strong> {{ entry.result }}
-            </p>
-            <p class="text-sm mt-1">
-              Zagrano kartę: <span class="font-semibold">{{ entry.cardTitle }}</span>
-            </p>
-            <p class="text-sm mt-1">{{ entry.feedbackDescription || 'Brak opisu feedbacku.' }}</p>
-            <p class="text-xs text-gray-400 mt-1">Zagrano: {{ formatDate(entry.timestamp) }}</p>
+
+            <!-- Przełącznik kart/przedmiotów -->
+            <div class="flex gap-3 mb-5">
+              <Button
+                :label="'Decyzje'"
+                @click="actionMode = 'cards'"
+                :severity="actionMode === 'cards' ? undefined : 'secondary'"
+                class="flex-1"
+                outlined
+              >
+              </Button>
+              <Button
+                :label="'Przedmioty'"
+                @click="actionMode = 'items'"
+                :severity="actionMode === 'items' ? undefined : 'secondary'"
+                class="flex-1"
+                outlined
+              >
+              </Button>
+              <Button
+                :label="'Zdarzenia'"
+                @click="actionMode = 'events'"
+                :severity="actionMode === 'events' ? undefined : 'secondary'"
+                class="flex-1"
+                outlined
+              >
+              </Button>
+            </div>
+
+            <!-- Wybór stołu -->
+            <div v-if="!teamId && (actionMode === 'cards' || actionMode === 'items')" class="mb-4">
+              <label class="block mb-2 text-sm font-semibold text-gray-300">Wybierz stół:</label>
+              <Dropdown
+                v-model="selectedTableId"
+                :options="tables"
+                optionLabel="teamName"
+                optionValue="teamId"
+                placeholder="Wybierz stół..."
+                class="w-full"
+              >
+                <template #option="slotProps">
+                  <div class="flex items-center justify-between gap-2 w-full">
+                    <span>{{ slotProps.option.teamName }}</span>
+                    <span class="text-green-400">{{ slotProps.option.teamBud }} bitów</span>
+                  </div>
+                </template>
+              </Dropdown>
+            </div>
+
+            <!-- Wybór karty -->
+            <div v-if="actionMode === 'cards'" class="mb-4">
+              <label class="block mb-2 text-sm font-semibold text-gray-300">Wybierz kartę:</label>
+              <Dropdown
+                v-model="selectedCardId"
+                :options="cards"
+                optionLabel="title"
+                optionValue="id"
+                placeholder="Wybierz kartę..."
+                class="w-full"
+                :disabled="loading.cards"
+              >
+                <template #value="slotProps">
+                  <div v-if="slotProps.value" class="flex items-center gap-2">
+                    <span class="text-blue-400">#{{ slotProps.value }}</span>
+                    <span>{{ cards.find((c) => c.id === slotProps.value)?.title }}</span>
+                  </div>
+                  <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                </template>
+                <template #option="slotProps">
+                  <div class="flex items-center gap-2">
+                    <span class="text-blue-400">#{{ slotProps.option.id }}</span>
+                    <span>{{ slotProps.option.title }}</span>
+                  </div>
+                </template>
+              </Dropdown>
+            </div>
+
+            <!-- Wybór przedmiotu -->
+            <div v-if="actionMode === 'items'" class="mb-4">
+              <label class="block mb-2 text-sm font-semibold text-gray-300">
+                Wybierz przedmiot:
+              </label>
+              <Dropdown
+                v-model="selectedItemId"
+                :options="items"
+                optionLabel="title"
+                optionValue="id"
+                placeholder="Wybierz przedmiot..."
+                class="w-full"
+                :disabled="loading.items"
+              >
+                <template #value="slotProps">
+                  <div v-if="slotProps.value" class="flex items-center gap-2">
+                    <span class="text-green-400">#{{ slotProps.value }}</span>
+                    <span>{{ items.find((i) => i.id === slotProps.value)?.title }}</span>
+                  </div>
+                  <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                </template>
+                <template #option="slotProps">
+                  <div class="flex items-center gap-2">
+                    <span class="text-green-400">#{{ slotProps.option.id }}</span>
+                    <span>{{ slotProps.option.title }}</span>
+                  </div>
+                </template>
+              </Dropdown>
+            </div>
+
+            <div v-if="actionMode === 'events'" class="mb-4">
+              <label class="block mb-2 text-sm font-semibold text-gray-300">
+                Wybierz zdarzenie:
+              </label>
+              <Dropdown
+                v-model="selectedPendingEventIndex"
+                :options="availableEvents"
+                optionLabel="shortDesc"
+                optionValue="eventId"
+                placeholder="Wybierz zdarzenie..."
+                class="w-full"
+              >
+                <template #value="slotProps">
+                  <div v-if="slotProps.value !== null">
+                    <span>
+                      {{ availableEvents.find((e) => e.eventId === slotProps.value)?.shortDesc }}
+                    </span>
+                  </div>
+                  <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                </template>
+              </Dropdown>
+            </div>
+
+            <!-- Opis wybranej karty/przedmiotu -->
+            <div
+              v-if="
+                (actionMode === 'cards' && selectedCard) || (actionMode === 'items' && selectedItem)
+              "
+              class="bg-surface-800 rounded-lg p-4 border border-surface-700 mb-4"
+            >
+              <p class="text-sm text-gray-400 mb-1">Opis:</p>
+              <p class="text-sm text-gray-300">
+                {{ actionMode === 'cards' ? selectedCard?.description : selectedItem?.description }}
+              </p>
+              <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-700">
+                <span class="text-sm text-gray-400">Koszt:</span>
+                <span class="text-lg font-bold text-green-400">
+                  {{ (actionMode === 'cards' ? selectedCard?.cost : selectedItem?.cost) || 0 }}
+                  bitów
+                </span>
+              </div>
+            </div>
+
+            <div
+              v-if="selectedEvent && selectedEvent.eventId && actionMode === 'events'"
+              class="bg-surface-800 rounded-lg p-4 border border-surface-700 mb-4"
+            >
+              <p class="text-sm text-gray-400 mb-1">Opis zdarzenia:</p>
+              <p class="text-sm text-gray-300">{{ selectedEvent.longDesc }}</p>
+            </div>
+
+            <!-- Budżet drużyny -->
+            <div
+              v-if="
+                (selectedTableId && actionMode === 'cards') ||
+                (selectedTableId && actionMode === 'items')
+              "
+              class="bg-surface-800 rounded-lg p-4 border border-surface-700 mb-4"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-400">Budżet drużyny:</p>
+                  <p class="text-sm font-semibold text-white">{{ selectedTeam?.teamName }}</p>
+                </div>
+                <span class="text-2xl font-bold text-green-400">{{ currentBits }} bitów</span>
+              </div>
+            </div>
+
+            <!-- Przyciski akcji -->
+            <div class="flex justify-center">
+              <Button
+                v-if="actionMode === 'cards'"
+                :disabled="!selectedCardId || !selectedTableId"
+                @click="playCard"
+                :label="'Zagraj kartę'"
+                size="large"
+                class="w-full"
+              >
+              </Button>
+              <Button
+                v-if="actionMode === 'items'"
+                :disabled="!selectedItemId || !selectedTableId"
+                @click="giveItem"
+                :label="'Użyj przedmiot'"
+                size="large"
+                class="w-full"
+              >
+              </Button>
+              <Button
+                v-if="actionMode === 'events'"
+                :disabled="!selectedPendingEventIndex"
+                @click="applySelectedEvent"
+                :label="'Zastosuj zdarzenie'"
+                size="large"
+                class="w-full"
+              >
+              </Button>
+            </div>
+          </div>
+
+          <!-- Plansza rywali -->
+          <div class="w-full flex justify-center">
+            <GameBoard :config="enemyFormData" :game-mode="false" :pawns="enemyPawns" />
+          </div>
+        </div>
+
+        <!-- Prawa kolumna - Panel decyzji -->
+        <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+          <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+            <div class="bg-yellow-500/20 p-2.5 rounded-lg">
+              <font-awesome-icon :icon="faClock" class="h-6 text-yellow-400" />
+            </div>
+            <h2 class="text-xl md:text-2xl font-bold text-white">Panel decyzji</h2>
+          </div>
+
+          <!-- Przełącznik widoku decyzji -->
+          <div class="flex gap-3 mb-5">
+            <Button
+              :label="'Do zatwierdzenia'"
+              :severity="decisionMode === 'pending' ? undefined : 'secondary'"
+              @click="decisionMode = 'pending'"
+              class="flex-1"
+              outlined
+            >
+              <template #icon>
+                <font-awesome-icon :icon="faClock" class="h-4" />
+              </template>
+            </Button>
+            <Button
+              :label="'Historia'"
+              :severity="decisionMode === 'history' ? undefined : 'secondary'"
+              @click="decisionMode = 'history'"
+              class="flex-1"
+              outlined
+            >
+              <template #icon>
+                <font-awesome-icon :icon="faHistory" class="h-4" />
+              </template>
+            </Button>
+          </div>
+
+          <!-- Decyzje do zatwierdzenia -->
+          <div
+            v-if="decisionMode === 'pending'"
+            class="space-y-3 max-h-[75vh] overflow-y-auto custom-scrollbar"
+          >
+            <div v-if="loadingPending" class="text-center py-8">
+              <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
+              <p class="text-gray-400 mt-3">Ładowanie sugestii...</p>
+            </div>
+
+            <div
+              v-else-if="pendingDecisions.length === 0"
+              class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-surface-900/50"
+            >
+              <div
+                class="bg-surface-800/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3"
+              >
+                <font-awesome-icon :icon="faClock" class="h-8 text-surface-600" />
+              </div>
+              <p class="text-gray-400 text-sm font-medium">Brak decyzji do zatwierdzenia</p>
+            </div>
+
+            <div
+              v-for="entry in pendingDecisions"
+              :key="entry.logId"
+              class="border-l-4 border-yellow-500 rounded-lg p-4 bg-surface-800 shadow-lg"
+            >
+              <div class="flex items-start justify-between mb-2">
+                <div>
+                  <p class="text-white font-semibold">{{ entry.tableName }}</p>
+                  <p class="text-sm text-gray-400">sugeruje kartę</p>
+                </div>
+                <span
+                  class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-semibold rounded"
+                >
+                  Oczekuje
+                </span>
+              </div>
+              <p class="text-lg font-bold text-primary-400 mb-2">{{ entry.cardTitle }}</p>
+              <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
+
+              <div class="flex gap-2 mt-4">
+                <Button
+                  @click="approveDecision(entry.logId)"
+                  :label="'Zatwierdź'"
+                  severity="success"
+                  size="small"
+                  class="flex-1"
+                >
+                  <template #icon>
+                    <font-awesome-icon :icon="faCheck" class="h-3" />
+                  </template>
+                </Button>
+                <Button
+                  @click="rejectDecision(entry.logId)"
+                  :label="'Odrzuć'"
+                  severity="danger"
+                  size="small"
+                  class="flex-1"
+                >
+                  <template #icon>
+                    <font-awesome-icon :icon="faTimes" class="h-3" />
+                  </template>
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Historia decyzji -->
+          <div v-else class="space-y-3 max-h-[75vh] overflow-y-auto custom-scrollbar">
+            <div v-if="loadingHistory" class="text-center py-8">
+              <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
+              <p class="text-gray-400 mt-3">Ładowanie historii...</p>
+            </div>
+
+            <div
+              v-else-if="decisions.length === 0"
+              class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-surface-900/50"
+            >
+              <div
+                class="bg-surface-800/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3"
+              >
+                <font-awesome-icon :icon="faHistory" class="h-8 text-surface-600" />
+              </div>
+              <p class="text-gray-400 text-sm font-medium">Brak decyzji w historii</p>
+            </div>
+
+            <div v-for="(entry, index) in decisions" :key="index">
+              <div
+                v-if="entry.isEventNotification"
+                class="border-l-4 border-blue-500 rounded-lg p-4 bg-blue-900/30 shadow-lg"
+              >
+                <div class="flex items-center gap-2 mb-2">
+                  <font-awesome-icon :icon="faBolt" class="h-5 text-blue-400" />
+                  <h3 class="font-bold text-lg text-blue-300">Nowe Wydarzenie</h3>
+                </div>
+                <p class="text-white mt-2">{{ entry.feedbackDescription }}</p>
+                <p class="text-xs text-gray-500 mt-2">{{ formatDate(entry.timestamp) }}</p>
+              </div>
+
+              <div
+                v-else
+                class="border-l-4 rounded-lg p-4 bg-surface-800 shadow-lg relative"
+                :class="entry.result === 'Pozytywny' ? 'border-green-500' : 'border-red-500'"
+              >
+                <div
+                  v-if="entry.eventAppliedId"
+                  class="absolute top-2 right-2 px-2 py-1 bg-purple-600 text-white text-xs font-bold rounded-full"
+                >
+                  EVENT
+                </div>
+                <div class="flex items-start justify-between mb-2">
+                  <div>
+                    <p class="text-white font-semibold">{{ entry.tableName }}</p>
+                    <p class="text-sm text-gray-400">Karta ID: {{ entry.cardId }}</p>
+                  </div>
+                  <span
+                    class="px-2 py-1 text-xs font-semibold rounded"
+                    :class="
+                      entry.result === 'Pozytywny'
+                        ? 'bg-green-500/20 text-green-400'
+                        : 'bg-red-500/20 text-red-400'
+                    "
+                  >
+                    {{ entry.result }}
+                  </span>
+                </div>
+                <p class="text-lg font-bold text-primary-400 mb-2">{{ entry.cardTitle }}</p>
+                <p class="text-sm text-gray-300 mb-2">
+                  {{ entry.feedbackDescription || 'Brak opisu feedbacku.' }}
+                </p>
+                <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -306,6 +414,19 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useToast } from 'vue-toastification'
+import {
+  faGamepad,
+  faBolt,
+  faChessBoard,
+  faClock,
+  faHistory,
+  faCheck,
+  faTimes,
+} from '@fortawesome/free-solid-svg-icons'
+import Dropdown from 'primevue/dropdown'
+import Button from 'primevue/button'
+import ProgressSpinner from 'primevue/progressspinner'
+
 import GameBoard from '@/components/game/gameBoard.vue'
 import apiConfig from '@/services/apiConfig'
 import apiServices from '@/services/apiServices'
@@ -474,7 +595,7 @@ const selectedEvent = computed<GameEvent | undefined>(() =>
 )
 
 const decisionMode = ref('history')
-const actionMode = ref('cards')
+const actionMode = ref<'cards' | 'items' | 'events'>('cards')
 const selectedItemId = ref<number | null>(null)
 
 watch(selectedTableId, (newTeamId) => {
@@ -685,14 +806,13 @@ async function executeAction(isCard: boolean) {
     gameId: gameId,
     teamId: team.teamId,
     deckId: deckId.value,
-    boardId: team.boardId, // Pobierane z obiektu wybranej drużyny
+    boardId: team.boardId,
     cost: entity.cost || 0,
     ForceExecution: true,
   }
 
   try {
     console.log('Wysyłany Id Karty: ', entity.id)
-    // Używamy typu generycznego, aby TypeScript wiedział, jak wygląda odpowiedź
     const response = await apiServices.post<{ message?: string; newTeamBudget: number }>(
       endpoint,
       payload,
@@ -700,17 +820,13 @@ async function executeAction(isCard: boolean) {
 
     toast.success(response.data?.message || 'Akcja przetworzona pomyślnie.')
 
-    // BARDZIEJ WYDAJNA AKTUALIZACJA STANU:
-    // Zamiast ponownie pobierać wszystkie drużyny, aktualizujemy budżet tej jednej.
     const teamToUpdate = tables.value.find((t) => t.teamId === team.teamId)
     if (teamToUpdate) {
       teamToUpdate.teamBud = response.data.newTeamBudget
     } else {
-      // Jeśli z jakiegoś powodu nie znaleziono drużyny, awaryjnie pobierz wszystkie
       await fetchTeams()
     }
 
-    // Odśwież listę dostępnych kart/przedmiotów dla drużyny
     await fetchAvailableCardsForTeam()
   } catch (error: any) {
     toast.error(error.response?.data?.message || 'Wystąpił błąd podczas wykonywania akcji.')
@@ -803,3 +919,23 @@ onUnmounted(() => {
   if (gameId) signalService.leaveGameRoom(String(gameId))
 })
 </script>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
+</style>
