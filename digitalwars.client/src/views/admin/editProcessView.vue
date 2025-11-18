@@ -12,6 +12,9 @@
       <!-- Sekcja wyboru talii -->
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+          <div class="bg-primary-500/20 p-2.5 rounded-lg">
+            <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
+          </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
         </div>
 
@@ -38,6 +41,9 @@
         class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
       >
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+          <div class="bg-primary-500/20 p-2.5 rounded-lg">
+            <font-awesome-icon :icon="faChessPawn" class="h-6 text-primary-400" />
+          </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">Procesy</h2>
         </div>
 
@@ -223,7 +229,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
 import { useToast } from 'vue-toastification'
-import { faTrash, faPlus, faLayerGroup, faPenToSquare } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faPlus, faLayerGroup, faPenToSquare, faChessPawn } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
@@ -390,7 +396,6 @@ watch(selectedDeck, async (newDeck) => {
     try {
       const response = await apiService.get(apiConfig.processes.getByDeck(newDeck))
       processesData.value = response.data
-      toast.success('Pomyślnie pobrano procesy')
     } catch (error) {
       console.error('Błąd przy pobieraniu procesów:', error)
       toast.error('Błąd podczas pobierania procesów')
@@ -424,7 +429,6 @@ onMounted(async () => {
   try {
     const response = await apiService.get(apiConfig.admin.deck.getAll)
     decksData.value = response.data
-    toast.success('Pomyślnie pobrano talie kart')
   } catch (error) {
     console.error('Błąd przy pobieraniu talii:', error)
     toast.error('Błąd podczas pobierania talii kart')

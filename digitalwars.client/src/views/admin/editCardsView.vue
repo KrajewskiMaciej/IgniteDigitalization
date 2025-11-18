@@ -54,19 +54,6 @@
             class="w-full"
             :disabled="isLoadingDecks"
           >
-            <template #value="slotProps">
-              <div v-if="slotProps.value" class="flex items-center gap-2">
-                <span class="text-primary-400">#{{ slotProps.value }}</span>
-                <span>{{ decksData.find((d) => d.id === slotProps.value)?.title }}</span>
-              </div>
-              <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
-            </template>
-            <template #option="slotProps">
-              <div class="flex items-center gap-2">
-                <span class="text-primary-400">#{{ slotProps.option.id }}</span>
-                <span>{{ slotProps.option.title }}</span>
-              </div>
-            </template>
           </Dropdown>
         </div>
       </div>
@@ -166,8 +153,8 @@
           class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
         >
           <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-            <div class="bg-purple-500/20 p-2.5 rounded-lg">
-              <font-awesome-icon :icon="faComment" class="h-6 text-purple-400" />
+            <div class="bg-primary-500/20 p-2.5 rounded-lg">
+              <font-awesome-icon :icon="faComment" class="h-6 text-primary-400" />
             </div>
             <h2 class="text-xl md:text-2xl font-bold text-white">Edycja feedbacku</h2>
           </div>
