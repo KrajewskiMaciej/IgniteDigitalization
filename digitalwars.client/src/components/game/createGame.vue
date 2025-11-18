@@ -365,7 +365,6 @@ import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
-import ColorPicker from 'primevue/colorpicker'
 import Checkbox from 'primevue/checkbox'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
@@ -583,23 +582,22 @@ const handleSubmit = async () => {
   }
 }
 
-// --- WATCHERY I CYKL ŻYCIA ---
 const defaultColors = [
-  '#8B0000',
-  '#2D1B69',
-  '#1B4332',
-  '#A4133C',
-  '#7209B7',
-  '#6A994E',
-  '#2B2D42',
-  '#CC6600',
-  '#B8860B',
-  '#008B8B',
-  '#8B008B',
-  '#556B2F',
-  '#722F37',
-  '#4A4A4A',
-  '#36454F',
+  '#ef4444', // red-500
+  '#8b5cf6', // purple-500
+  '#10b981', // green-500
+  '#ec4899', // pink-500
+  '#a855f7', // violet-500
+  '#84cc16', // lime-500
+  '#06b6d4', // cyan-500
+  '#f97316', // orange-500
+  '#eab308', // yellow-500
+  '#14b8a6', // teal-500
+  '#d946ef', // fuchsia-500
+  '#22c55e', // green-400
+  '#f43f5e', // rose-500
+  '#6366f1', // indigo-500
+  '#0ea5e9', // sky-500
 ]
 
 watch(selectedBoardId, (newId) => {
