@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-surface-800">
+  <div class="flex flex-col min-h-screen bg-surface-850">
     <AdminNavbar />
 
     <div class="flex flex-1 mt-2">
@@ -7,7 +7,7 @@
 
       <!--Content-->
       <div
-        class="flex-1 ml-4 bg-secondary border-t-2 border-l-2 border-b-2 border-lgray-accent rounded-md shadow-sm text-center"
+        class="flex-1 ml-4 bg-secondary border-t border-l border-b border-surface-700 rounded-md flex flex-col"
       >
         <RouterView />
       </div>

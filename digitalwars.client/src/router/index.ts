@@ -12,9 +12,7 @@ import gameStatistics from '@/views/game/gameStatistics.vue'
 import editItems from '@/views/admin/editItems.vue'
 import decisionHistoryView from '@/views/game/gameDecisionHistoryView.vue'
 import testBoard from '@/views/testBoard.vue'
-import editBitsView from '@/views/game/editBitsView.vue'
 import decisionPanel from '@/views/game/decisionPanelView.vue'
-import blockCards from '@/views/game/blockCardsView.vue'
 import resetPasswordView from '@/views/resetPasswordView.vue'
 import confirmEmailView from '@/views/confirmEmailView.vue'
 import apiServices from '@/services/apiServices'
@@ -23,6 +21,7 @@ import gameView from '@/views/admin/adminGameView.vue'
 import tableDecisionPanelView from '@/views/game/tableDecisionPanelView.vue'
 import exportToPdfView from '@/views/admin/exportToPdfView.vue'
 import editProcessView from '@/views/admin/editProcessView.vue'
+import TableManagmentView from '@/views/admin/TableManagmentView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -110,15 +109,9 @@ const router = createRouter({
           props: true,
         },
         {
-          path: ':gameId/editbits',
-          name: 'edit-bits',
-          component: editBitsView,
-          props: true,
-        },
-        {
-          path: ':gameId/blockcards',
-          name: 'block-cards',
-          component: blockCards,
+          path: ':gameId/table-management',
+          name: 'table-management',
+          component: TableManagmentView,
           props: true,
         },
         {
@@ -133,6 +126,12 @@ const router = createRouter({
           // FIX: Poprawiono literówkę w nazwie i zapewniono unikalność
           name: 'table-decision-panel',
           component: tableDecisionPanelView,
+          props: true,
+        },
+        {
+          path: ':gameId/cheatSheet',
+          name: 'admin-game-cheat-sheet',
+          component: cheatSheetView,
           props: true,
         },
         {

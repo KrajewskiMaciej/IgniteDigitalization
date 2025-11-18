@@ -229,7 +229,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
 import { useToast } from 'vue-toastification'
-import { faTrash, faPlus, faLayerGroup, faPenToSquare, faChessPawn } from '@fortawesome/free-solid-svg-icons'
+import {
+  faTrash,
+  faPlus,
+  faLayerGroup,
+  faPenToSquare,
+  faChessPawn,
+} from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'

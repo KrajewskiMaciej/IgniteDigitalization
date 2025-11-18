@@ -45,45 +45,18 @@
           </RouterLink>
         </li>
 
-        <!-- Panel stołu -->
+        <!--Moduł zarządzania stołem-->
         <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
-          @click="handleGameManager"
         >
-          <div
-            class="flex items-center px-4 py-3 rounded-md"
-            :class="isSideBarOpen ? 'justify-between' : 'justify-center'"
+          <RouterLink
+            :to="`/admin/game/${gameId}/table-management`"
+            class="flex items-center gap-4 px-4 py-3 rounded-md"
+            :class="isSideBarOpen ? '' : 'justify-center'"
           >
-            <div>
-              <font-awesome-icon
-                :icon="faGamepad"
-                class="h-4 text-accent"
-                :class="isSideBarOpen ? 'mr-4' : 'mr-0'"
-              />
-              <span v-if="isSideBarOpen">Panel sterowania stołem</span>
-            </div>
-            <font-awesome-icon
-              v-if="isSideBarOpen"
-              :icon="isGameManagerDropdownOpen ? faArrowUp : faArrowDown"
-              class="h-4"
-            />
-          </div>
-
-          <div v-show="isGameManagerDropdownOpen" class="flex flex-col py-1 space-y-1">
-            <RouterLink
-              :to="`/admin/game/${gameId}/editbits`"
-              class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
-              @click.stop
-              >Zmień ilość bitów stołu</RouterLink
-            >
-
-            <RouterLink
-              :to="`/admin/game/${gameId}/blockcards`"
-              class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
-              @click.stop
-              >Odblokuj kartę</RouterLink
-            >
-          </div>
+            <font-awesome-icon :icon="faUsersGear" class="h-4 text-accent" />
+            <span v-if="isSideBarOpen">Panel zarządzania stołem</span>
+          </RouterLink>
         </li>
 
         <!-- Statystyki -->
@@ -141,8 +114,8 @@
           </div>
         </li>
 
-        <!-- Chat / decyzje -->
-        <li
+        <!-- Chat, narazie nie ma więc zakomentowuje i nie wiem czy ma być po stronie admina -->
+        <!-- <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
@@ -153,14 +126,14 @@
             <font-awesome-icon :icon="faPenToSquare" class="h-4 text-accent" />
             <span v-if="isSideBarOpen">Chat</span>
           </RouterLink>
-        </li>
+        </li> -->
 
         <!-- CheatSheet -->
         <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
-            to="/admin/cheatSheet"
+            :to="`/admin/game/${gameId}/cheatSheet`"
             class="flex items-center gap-4 px-4 py-3 rounded-md"
             :class="isSideBarOpen ? '' : 'justify-center'"
           >
@@ -169,8 +142,8 @@
           </RouterLink>
         </li>
 
-        <!-- Generuj grę -->
-        <li
+        <!-- Generuj grę, nie ma tego więc zakomentowuje -->
+        <!-- <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
@@ -181,7 +154,7 @@
             <font-awesome-icon :icon="faFileSignature" class="h-4 text-accent" />
             <span v-if="isSideBarOpen">Wygeneruj grę</span>
           </RouterLink>
-        </li>
+        </li> -->
 
         <!-- Powrót do admina -->
         <li
@@ -207,16 +180,13 @@ import { ref } from 'vue'
 import {
   faArrowDown,
   faArrowUp,
-  faGamepad,
   faChartLine,
-  faPenToSquare,
   faFile,
-  faFileSignature,
-  faHouse,
   faArrowLeft,
   faArrowRight,
   faUsers,
   faTable,
+  faUsersGear,
 } from '@fortawesome/free-solid-svg-icons'
 
 const isSideBarOpen = ref(true)
