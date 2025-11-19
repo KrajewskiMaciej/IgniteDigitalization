@@ -7,7 +7,7 @@
       <p class="text-gray-400 text-sm md:text-base">Dokumenty i narzędzia do zarządzania grą</p>
     </div>
 
-    <div class="max-w-7xl mx-auto w-full space-y-6">
+    <div class="max-w-6xl mx-auto w-full space-y-6">
       <div class="border border-surface-700 rounded-lg p-5 bg-surface-900">
         <div
           class="flex justify-between items-center mb-5"

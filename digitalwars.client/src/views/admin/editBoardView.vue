@@ -9,6 +9,7 @@
             :class="{ 'border-primary-400': activeView === 'add' }"
             @click="activeView = 'add'"
             outlined
+            :severity="activeView === 'add' ? undefined : 'secondary'"
             label="Dodaj nową planszę"
             class="w-60"
           >
@@ -19,6 +20,7 @@
           <Button
             :class="{ 'border-primary-400': activeView === 'edit' }"
             @click="activeView = 'edit'"
+            :severity="activeView === 'edit' ? undefined : 'secondary'"
             outlined
             label="Edytuj planszę"
             class="w-60"

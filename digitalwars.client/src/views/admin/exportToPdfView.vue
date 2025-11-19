@@ -8,7 +8,7 @@
       <p class="text-gray-400 text-sm md:text-base">Generuj pliki PDF z kartami i planszami</p>
     </div>
 
-    <div class="max-w-5xl mx-auto w-full space-y-6">
+    <div class="max-w-6xl mx-auto w-full space-y-6">
       <!-- Sekcja 1: Eksport talii kart -->
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-700">

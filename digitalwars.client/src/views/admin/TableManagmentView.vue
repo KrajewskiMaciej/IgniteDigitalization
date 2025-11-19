@@ -7,7 +7,7 @@
       </h1>
     </div>
 
-    <div class="max-w-5xl mx-auto w-full space-y-6">
+    <div class="max-w-6xl mx-auto w-full space-y-6">
       <!-- Sekcja wyboru drużyny -->
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
