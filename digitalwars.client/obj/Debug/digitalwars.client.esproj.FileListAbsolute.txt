@@ -1,2 +1,0 @@
-D:\DigitalWars\digitalwars.client\obj\Debug\digitalwars.client.esproj.CoreCompileInputs.cache
-D:\DigitalWars\digital-wars\digitalwars.client\obj\Debug\digitalwars.client.esproj.CoreCompileInputs.cache

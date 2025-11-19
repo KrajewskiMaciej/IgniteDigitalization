@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 
 namespace backend.Controllers
 {
@@ -65,11 +67,23 @@ namespace backend.Controllers
             try
             {
                 await _boardService.DeleteBoardAsync(id, userId.Value);
-                return NoContent();
+                return NoContent(); // HTTP 204
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is MySqlException mySqlEx && mySqlEx.Number == 1451)
+                {
+                    // Zwróć błąd 409 Conflict z czytelnym komunikatem
+                    return Conflict(new { message = "Nie można usunąć tej planszy, ponieważ jest ona wciąż używana przez co najmniej jedną grę.", errorCode = 1000 });
+                }
+
+                // Jeśli to inny błąd bazy danych, zwróć generyczny błąd 500
+                return StatusCode(500, "Wystąpił wewnętrzny błąd serwera podczas usuwania danych.");
             }
             catch (Exception ex)
             {
-                return Forbid(ex.Message);
+                // Złap inne błędy z serwisu (np. "nie znaleziono")
+                return BadRequest(new { message = ex.Message });
             }
         }
     }
