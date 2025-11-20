@@ -53,6 +53,7 @@ builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IPlayerQueryService, PlayerQueryService>();
 builder.Services.AddScoped<IPlayerActionService, PlayerActionService>();
+builder.Services.AddScoped<ICheatsheetService, CheatsheetService>();
 builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx =>
 {
     // Ustaw pojemność kolejki, np. 100

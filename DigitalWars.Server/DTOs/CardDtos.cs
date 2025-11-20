@@ -19,4 +19,17 @@ namespace backend.Dtos
         public string EffectDescription { get; set; } = string.Empty; // Opis efektu, jaki daje karta
         public bool IsActive { get; set; } = false; // Czy przedmiot jest obecnie aktywny
     }
+
+    public class CardTypeDto
+    {
+        public int Cards_Id { get; set; }
+        public int Card_Id { get; set; }
+        public string CardType { get; set; } = string.Empty;
+    }
+
+    public class CheatsheetMapDto
+    {
+        public Dictionary<int, List<int>> EnablersMap { get; set; } = new Dictionary<int, List<int>>();
+        public List<CardTypeDto> CardTypes { get; set; } = new List<CardTypeDto>();
+    }
 }
