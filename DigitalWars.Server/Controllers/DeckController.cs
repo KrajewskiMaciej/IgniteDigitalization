@@ -9,16 +9,11 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using backend.Dtos;
 
 namespace backend.Controllers
 {
     // DTO do aktualizacji przedmiotu
-    public class UpdateItemDto
-    {
-        public string ShortDesc { get; set; } = string.Empty;
-        public string LongDesc { get; set; } = string.Empty;
-    }
-
     [Authorize]
     [ApiController]
     [Route("api/admin/deck")]
@@ -93,6 +88,90 @@ namespace backend.Controllers
             return Ok(decisionCards);
         }
 
+        [HttpPut("decisions/edit")]
+        public async Task<IActionResult> EditDecisionCards([FromBody] int cardId, [FromBody] UpdateCardDto dto)
+        {
+            var decision = await _context.Decisions
+                .Include(d => d.Card)
+                .FirstOrDefaultAsync(d => d.Card.Card_Id == cardId);
+
+            if (decision == null)
+            {
+                return NotFound("Decyzja o podanym ID nie została znaleziona.");
+            }
+
+            decision.Decisions_Short_Desc = dto.ShortDesc;
+            decision.Decisions_Long_Desc = dto.LongDesc;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Decyzja została pomyślnie zaktualizowana." });
+        }
+
+        [HttpGet("feedbacks")]
+        public async Task<IActionResult> GetCardFeedbacks([FromQuery] int cardId)
+        {
+            var feedbacks = await _context.Feedbacks
+                .AsNoTracking()
+                .Include(f => f.Cards)
+                .Where(f => f.Cards.Card_Id == cardId)
+                .ToListAsync();
+
+            var positive = feedbacks.FirstOrDefault(f => f.Status == true);
+            var negative = feedbacks.FirstOrDefault(f => f.Status == false);
+
+            var response = new CardFeedbacksDto
+            {
+                PositiveFeedback = positive != null ? new FeedbackDetailsDto
+                {
+                    Feedbacks_Id = positive.Feedbacks_Id,
+                    Feedbacks_Long_Description = positive.Feedbacks_Long_Description
+                } : null,
+
+                NegativeFeedback = negative != null ? new FeedbackDetailsDto
+                {
+                    Feedbacks_Id = negative.Feedbacks_Id,
+                    Feedbacks_Long_Description = negative.Feedbacks_Long_Description
+                } : null
+            };
+
+            return Ok(response);
+        }
+
+        [HttpPut("feedbacks/edit")]
+        public async Task<IActionResult> UpdateCardFeedbacks([FromQuery] int cardId, [FromBody] UpdateCardFeedbacksDto dto)
+        {
+            var card = await _context.Cards
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Card_Id == cardId);
+
+            if (card == null)
+            {
+                return NotFound($"Karta o ID {cardId} nie została znaleziona.");
+            }
+
+            var positiveFeedback = await _context.Feedbacks.FirstOrDefaultAsync(f => f.Cards_Id == card.Cards_Id && f.Status == true);
+            var negativeFeedback = await _context.Feedbacks.FirstOrDefaultAsync(f => f.Cards_Id == card.Cards_Id && f.Status == false);
+
+            if (positiveFeedback == null)
+            {
+                positiveFeedback = new Feedback { Cards_Id = card.Cards_Id, Status = true };
+                _context.Feedbacks.Add(positiveFeedback);
+            }
+            positiveFeedback.Feedbacks_Long_Description = dto.PositiveDescription;
+
+            if (negativeFeedback == null)
+            {
+                negativeFeedback = new Feedback { Cards_Id = card.Cards_Id, Status = false };
+                _context.Feedbacks.Add(negativeFeedback);
+            }
+            negativeFeedback.Feedbacks_Long_Description = dto.NegativeDescription;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Feedbacki zostały pomyślnie zaktualizowane." });
+        }
+
         [HttpGet("items")]
         public async Task<IActionResult> GetItemsForDeck([FromQuery] int deckId)
         {
@@ -129,7 +208,7 @@ namespace backend.Controllers
         }
 
         [HttpPut("items/{cardId}")]
-        public async Task<IActionResult> UpdateItem(int cardId, [FromBody] UpdateItemDto dto)
+        public async Task<IActionResult> UpdateItem(int cardId, [FromBody] UpdateCardDto dto)
         {
             var hardware = await _context.Hardwares.FirstOrDefaultAsync(h => h.Cards.Card_Id == cardId);
             if (hardware != null)

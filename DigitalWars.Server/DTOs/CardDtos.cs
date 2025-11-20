@@ -32,4 +32,11 @@ namespace backend.Dtos
         public Dictionary<int, List<int>> EnablersMap { get; set; } = new Dictionary<int, List<int>>();
         public List<CardTypeDto> CardTypes { get; set; } = new List<CardTypeDto>();
     }
+
+    public class UpdateCardDto
+    {
+        public string ShortDesc { get; set; } = string.Empty;
+        public string LongDesc { get; set; } = string.Empty;
+    }
+
 }
