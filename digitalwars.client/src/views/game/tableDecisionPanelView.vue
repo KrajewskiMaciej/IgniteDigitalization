@@ -583,7 +583,7 @@ onMounted(async () => {
 
   try {
     await signalService.start()
-    await signalService.joinGameRoomAsPlayer(String(gameIdNum), String(teamIdNum))
+    await signalService.joinGameRoomAsAdmin(String(gameIdNum))
     console.log(`Pomyślnie dołączono do pokoju SignalR dla gry: ${gameIdNum}`)
   } catch (err) {
     console.error('Błąd połączenia SignalR: ', err)
@@ -593,7 +593,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (props.gameId) {
-    signalService.leaveGameRoomAsPlayer(String(props.gameId), String(props.teamId))
+    signalService.leaveGameRoomAsAdmin(String(props.gameId))
   }
 })
 </script>

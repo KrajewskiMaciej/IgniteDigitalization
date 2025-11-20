@@ -72,5 +72,7 @@ export const pl = {
   //Erorr
   errorServerUnavailable: 'Serwer jest niedostępny. Spróbuj ponownie później.',
   errorBoardDeleteConflict: 'Nie można usunąć planszy, ponieważ jest powiązana z istniejącą grą.',
+  warningNotEnoughBudget: 'Nie masz wystarczającej ilości bitów, aby zagrać tę kartę.',
+  teamHasNotEnoughBits: 'Drużyna {teamName} nie ma wystarczającej ilości bitów, aby zagrać tę kartę.',
   accept: 'Akceptuj',
 }

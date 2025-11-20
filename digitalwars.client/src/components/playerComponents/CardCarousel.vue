@@ -133,6 +133,9 @@ import apiServices from '@/services/apiServices'
 import { useToast } from 'vue-toastification'
 import { useSwipe } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Card {
@@ -307,9 +310,6 @@ const sendCardSelection = async () => {
     cost: cost,
   }
 
-  console.log(
-    `Zagrywanie karty ID ${cardId} - Enablers: ${hasEnablers}, Wystarczający budżet: ${hasSufficientBudget}, Sukces: ${isSuccess}`,
-  )
 
   const apiUrl = isSuccess
     ? apiConfig.player.playCardSuccess(cardId)
@@ -321,9 +321,13 @@ const sendCardSelection = async () => {
       cardPlayData,
     )
 
-  } catch (err: any) {
-    toast.error(err.response?.data?.message ?? 'Wystąpił błąd podczas komunikacji z serwerem.')
-    console.error('Błąd podczas zagrywania karty:', err)
+    } catch (err: any) {
+      if (err.response?.data?.errorCode === 'NotEnoughBudget') {
+        toast.warning(t('warningNotEnoughBudget'))
+      } else {
+      toast.error(err.response?.data?.message ?? 'Wystąpił błąd podczas komunikacji z serwerem.')
+      console.error('Błąd podczas zagrywania karty:', err)
+    }
   }
 }
 

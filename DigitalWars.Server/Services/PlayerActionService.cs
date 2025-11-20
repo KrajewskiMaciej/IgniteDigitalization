@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Exceptions;
 
 namespace backend.Services
 {
@@ -71,6 +72,12 @@ namespace backend.Services
                 }
                 finalCost *= (1 + eventCostModifier);
 
+            }
+
+            //Nie wiem jak obsługujesz błędy, więc dodałem własny wyjątek w ten sposób 
+            if (team.Teams_Bud < finalCost)
+            {
+                throw new GameException("Budżet za niski", "NotEnoughBudget");
             }
 
             bool isItem = cardType == CardType.Hardware || cardType == CardType.Software;
