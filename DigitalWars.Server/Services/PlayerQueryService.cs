@@ -37,6 +37,17 @@ namespace backend.Services
                 .Distinct()
                 .ToHashSetAsync();
 
+            //Karty które czekają na zatwierdzenie admina
+            var pendingCardInternalIds = await _context.GameLogs
+                .AsNoTracking()
+                .Where(gl => gl.Games_Id == gameId && gl.Teams_Id == teamId && gl.Cards_Id.HasValue && gl.Is_Approved == false)
+                .Select(gl => gl.Cards_Id!.Value)
+                .Distinct()
+                .ToHashSetAsync();
+
+            var blockedCardInternalIds = new HashSet<int>(playedCardInternalIds);
+            blockedCardInternalIds.UnionWith(pendingCardInternalIds);
+
             // Krok 2: Pobierz WEWNĘTRZNE ID kart, które zostały specjalnie odblokowane dla tej drużyny w tej grze.
             var teamSpecificUnlockedCardIds = await _context.CardEnablers
                 .AsNoTracking()
@@ -64,7 +75,7 @@ namespace backend.Services
             var decisionCards = await _context.Decisions
                 .AsNoTracking()
                 .Include(d => d.Card)
-                .Where(d => d.Card.Decks_Id == deckId && !playedCardInternalIds.Contains(d.Cards_Id))
+                .Where(d => d.Card.Decks_Id == deckId && !blockedCardInternalIds.Contains(d.Cards_Id))
                 .OrderBy(d => d.Card.Card_Id)
                 .Select(d => new UnifiedCardDto
                 {
@@ -82,7 +93,7 @@ namespace backend.Services
             var hardwareCards = await _context.Hardwares
                 .AsNoTracking()
                 .Include(h => h.Cards)
-                .Where(h => h.Cards.Decks_Id == deckId && !playedCardInternalIds.Contains(h.Cards_Id))
+                .Where(h => h.Cards.Decks_Id == deckId && !blockedCardInternalIds.Contains(h.Cards_Id))
                 .OrderBy(h => h.Cards.Card_Id) // Dodano sortowanie dla spójności
                 .Select(h => new UnifiedCardDto
                 {
@@ -98,7 +109,7 @@ namespace backend.Services
             var softwareCards = await _context.Softwares
                 .AsNoTracking()
                 .Include(s => s.Cards)
-                .Where(s => s.Cards.Decks_Id == deckId && !playedCardInternalIds.Contains(s.Cards_Id))
+                .Where(s => s.Cards.Decks_Id == deckId && !blockedCardInternalIds.Contains(s.Cards_Id))
                 .OrderBy(s => s.Cards.Card_Id) // Dodano sortowanie dla spójności
                 .Select(s => new UnifiedCardDto
                 {

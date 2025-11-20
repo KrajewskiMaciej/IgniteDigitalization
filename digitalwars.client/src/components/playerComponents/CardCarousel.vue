@@ -121,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, watchEffect } from 'vue'
+import { ref, computed, watch, watchEffect, onMounted, defineExpose } from 'vue'
 import {
   faChevronLeft,
   faChevronRight,
@@ -151,13 +151,13 @@ interface CardsApiResponse {
 }
 
 // --- Reaktywne referencje i stałe ---
-const toast = useToast()
-const decisionCards = ref<Card[]>([])
-const itemCards = ref<Card[]>([])
-const currentIndex = ref(0)
+const toast = useToast();
+const decisionCards = ref<Card[]>([]);
+const itemCards = ref<Card[]>([]);
+const currentIndex = ref(0);
 const loading = ref(true)
-const fetchError = ref<string | null>(null)
-const isDropdownOpen = ref<boolean>(false)
+const fetchError = ref<string | null>(null);
+const isDropdownOpen = ref<boolean>(false);
 const selectCard = (index: number) => {
   currentIndex.value = index
   isDropdownOpen.value = false
@@ -173,10 +173,9 @@ const props = defineProps({
   currentBudget: { type: Number, default: 0 },
   showingDecisionCards: { type: Boolean, required: true },
   isOnlineGame: { type: Boolean, default: true },
-  isIndependentTeam: { type: Boolean, default: true },
+  isIndependentTeam: { type: Boolean, required: true },
 })
 
-const emit = defineEmits(['card-action-completed'])
 
 const cardRef = useTemplateRef('cardRef')
 const { isSwiping, direction } = useSwipe(cardRef)
@@ -229,10 +228,11 @@ const cardStyle = computed(() => {
 })
 
 const buttonLabel = computed(() => {
-  return props.isIndependentTeam ? 'Wybierz kartę' : 'Sugeruj kartę'
+  return props.isIndependentTeam ? 'Wybierz kartę' : 'Zasugeruj kartę'
 })
 
 async function fetchCards() {
+  console.log('Będę pobierać karty z API...');
   const { deckId, gameId, teamId } = props
   if (deckId == null || gameId == null || teamId == null) {
     fetchError.value = 'Brak wymaganych danych do pobrania kart.'
@@ -307,6 +307,10 @@ const sendCardSelection = async () => {
     cost: cost,
   }
 
+  console.log(
+    `Zagrywanie karty ID ${cardId} - Enablers: ${hasEnablers}, Wystarczający budżet: ${hasSufficientBudget}, Sukces: ${isSuccess}`,
+  )
+
   const apiUrl = isSuccess
     ? apiConfig.player.playCardSuccess(cardId)
     : apiConfig.player.playCardFailure(cardId)
@@ -316,18 +320,20 @@ const sendCardSelection = async () => {
       apiUrl,
       cardPlayData,
     )
-    toast.success(response.data?.message ?? 'Akcja została wykonana.')
-    emit('card-action-completed', {
-      success: true,
-      newBudget: response.data.newTeamBudget,
-    })
-    await fetchCards()
+
   } catch (err: any) {
     toast.error(err.response?.data?.message ?? 'Wystąpił błąd podczas komunikacji z serwerem.')
     console.error('Błąd podczas zagrywania karty:', err)
-    emit('card-action-completed', { success: false })
   }
 }
+
+defineExpose({
+  fetchCards,
+})
+
+onMounted(() => {
+  console.log('isIndependentTeam:', props.isIndependentTeam);
+})
 
 // --- Watchers ---
 watch(displayCards, () => {

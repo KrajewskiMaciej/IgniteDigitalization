@@ -70,5 +70,6 @@ export const en = {
 
   //Erorr
   errorServerUnavailable: 'Server is unavailable. Please try again later.',
+  errorBoardDeleteConflict: 'Cannot delete the board because it is associated with an existing game.',
   accept: 'Accept',
 }

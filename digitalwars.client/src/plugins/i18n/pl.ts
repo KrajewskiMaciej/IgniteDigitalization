@@ -71,5 +71,6 @@ export const pl = {
   strongPassword: 'Silne hasło',
   //Erorr
   errorServerUnavailable: 'Serwer jest niedostępny. Spróbuj ponownie później.',
+  errorBoardDeleteConflict: 'Nie można usunąć planszy, ponieważ jest powiązana z istniejącą grą.',
   accept: 'Akceptuj',
 }

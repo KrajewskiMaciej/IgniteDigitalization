@@ -18,8 +18,10 @@ let startPromise: Promise<void> | null = null
 interface ISignalRService {
   connection: signalR.HubConnection
   start: () => Promise<void>
-  joinGameRoom: (gameId: string) => Promise<void> | undefined
-  leaveGameRoom: (gameId: string) => Promise<void> | undefined
+  joinGameRoomAsAdmin: (gameId: string) => Promise<void> | undefined
+  leaveGameRoomAsAdmin: (gameId: string) => Promise<void> | undefined
+  joinGameRoomAsPlayer: (gameId: string, teamId: string) => Promise<void> | undefined
+  leaveGameRoomAsPlayer: (gameId: string, teamId: string) => Promise<void> | undefined
 }
 
 const signalRService: ISignalRService = {
@@ -42,21 +44,37 @@ const signalRService: ISignalRService = {
 
   // POPRAWKA: Typ parametru 'gameId' został zmieniony na 'string', aby pasował do backendu (GameHub.cs)
   // i sposobu wywołania z playerView.vue.
-  joinGameRoom: (gameId: string) => {
+  joinGameRoomAsAdmin: (gameId: string) => {
     if (connection.state === signalR.HubConnectionState.Connected) {
       // Nie ma potrzeby konwertować na string, ponieważ już nim jest.
-      return connection.invoke('JoinGameRoom', gameId)
+      return connection.invoke('JoinGameRoomAsAdmin', gameId)
     }
     console.warn('SignalR: Próba dołączenia do pokoju bez aktywnego połączenia.')
     return undefined
   },
 
   // POPRAWKA: Typ parametru 'gameId' również zmieniony na 'string'.
-  leaveGameRoom: (gameId: string) => {
+  leaveGameRoomAsAdmin: (gameId: string) => {
     if (connection.state === signalR.HubConnectionState.Connected) {
-      return connection.invoke('LeaveGameRoom', gameId)
+      return connection.invoke('LeaveGameRoomAsAdmin', gameId)
     }
     console.warn('SignalR: Próba opuszczenia pokoju bez aktywnego połączenia.')
+    return undefined
+  },
+
+  joinGameRoomAsPlayer: (gameId: string, teamId: string) => {
+    if (connection.state === signalR.HubConnectionState.Connected) {
+      return connection.invoke('JoinGameRoomAsPlayer', gameId, teamId)
+    }
+    console.warn('SignalR: Próba dołączenia do pokoju gracza bez aktywnego połączenia.')
+    return undefined
+  },
+
+  leaveGameRoomAsPlayer: (gameId: string, teamId: string) => {
+    if (connection.state === signalR.HubConnectionState.Connected) {
+      return connection.invoke('LeaveGameRoomAsPlayer', gameId, teamId)
+    }
+    console.warn('SignalR: Próba opuszczenia pokoju gracza bez aktywnego połączenia.')
     return undefined
   },
 }

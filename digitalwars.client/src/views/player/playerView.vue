@@ -119,6 +119,7 @@
               <Suspense>
                 <template #default>
                   <CardCarousel
+                    ref="cardCarouselRef"
                     v-show="gameData && gameData.deckId"
                     :deck-id="gameData.deckId"
                     :team-id="gameData.teamId"
@@ -126,9 +127,8 @@
                     :board-id="gameData.boardConfig?.boardId"
                     :current-budget="currentGlobalBudget"
                     :showing-decision-cards="showingDecisionCards"
-                    :is-online-game="gameData.IsOnline"
-                    :is-independent-team="gameData.IsIndependent"
-                    @card-action-completed="handleCardActionCompleted"
+                    :is-online-game="gameData.isOnline"
+                    :is-independent-team="gameData.isIndependent"
                   />
                 </template>
                 <template #fallback>
@@ -203,6 +203,7 @@
             <Suspense>
               <template #default>
                 <CardCarousel
+                  ref="cardCarouselRef"
                   v-if="gameData && gameData.deckId"
                   :deck-id="gameData.deckId"
                   :team-id="gameData.teamId"
@@ -210,9 +211,8 @@
                   :board-id="gameData.boardConfig?.boardId"
                   :current-budget="currentGlobalBudget"
                   :showing-decision-cards="showingDecisionCards"
-                  :is-online-game="gameData.IsOnline"
-                  :is-independent-team="gameData.IsIndependent"
-                  @card-action-completed="handleCardActionCompleted"
+                  :is-online-game="gameData.isOnline"
+                  :is-independent-team="gameData.isIndependent"
                 />
               </template>
               <template #fallback>
@@ -318,6 +318,19 @@
       @close-chat="showChat = false"
     />
   </div>
+
+    <IndependentTeam 
+      @close="showIndependentTeamModal = false"
+      :isVisible="showIndependentTeamModal"
+      :teamName="gameData?.teamName!"
+    />
+
+    <NotIndependentTeam 
+      @close="showNotIndependentTeamModal = false"
+      :isVisible="showNotIndependentTeamModal"
+      :teamName="gameData?.teamName!"
+    />
+
 </template>
 
 <script setup lang="ts">
@@ -328,18 +341,19 @@ import GameBoard from '@/components/game/gameBoard.vue'
 import Footer from '@/components/footers/adminFooter.vue'
 import CardCarousel from '@/components/playerComponents/CardCarousel.vue'
 import PlayerMenu from '@/components/playerComponents/playerMenu.vue'
-import { RouterView } from 'vue-router'
 import apiConfig from '@/services/apiConfig'
 import apiServices from '@/services/apiServices'
 import signalrService from '@/services/signalService'
 import GameStatusDisplay from '@/components/playerComponents/gameStatusDisplay.vue'
-import GameChat from '@/components/game/gameChat.vue'
+import GameChat from '@/components/game/GameChat.vue'
+import IndependentTeam from '@/components/game/IndependentTeam.vue'
+import NotIndependentTeam from '@/components/game/NotIndependentTeam.vue'
 import type { BoardConfig, GameData, Pawn, RawPawnData, GameStatusError } from '@/interfaces/types'
 import { useBreakpoints } from '@vueuse/core'
 import { faCommentDots } from '@fortawesome/free-solid-svg-icons'
 import { onClickOutside } from '@vueuse/core'
 
-const chatRef = ref<HTMLElement | null>(null)
+const chatRef = ref<HTMLElement | null>(null);
 
 onClickOutside(chatRef, () => {
   showChat.value = false
@@ -360,10 +374,13 @@ const props = defineProps({
 const mobileView = ref('board')
 const showingDecisionCards = ref(true)
 const currentPanel = ref('menu')
-const leftOpen = ref(false)
-const rightOpen = ref(true)
+const leftOpen = ref(true);
+const rightOpen = ref(true);
 const currentBoard = ref('player')
-const showChat = ref(false)
+const showChat = ref(false);
+const showIndependentTeamModal = ref<boolean>(false);
+const showNotIndependentTeamModal = ref<boolean>(false);
+const cardCarouselRef = ref<InstanceType<typeof CardCarousel> | null>(null);
 
 const gameData = ref<GameData | null>(null)
 const isLoading = ref(true)
@@ -391,8 +408,9 @@ const createDefaultBoardConfig = (): BoardConfig => ({
 
 const formData = reactive<BoardConfig>(createDefaultBoardConfig())
 const enemyformData = reactive<BoardConfig>(createDefaultBoardConfig())
-
 const gameStatusError = ref<GameStatusError | null>(null)
+
+
 
 // --- FUNKCJE ---
 const fetchGameDataByToken = async (token: string) => {
@@ -409,6 +427,12 @@ const fetchGameDataByToken = async (token: string) => {
       apiConfig.player.getPlayerSessionDataByToken(token),
     )
     gameData.value = response.data
+
+    if (gameData.value.isIndependent) {
+      showIndependentTeamModal.value = true;
+    } else {
+      showNotIndependentTeamModal.value = true;
+    }
 
     currentGlobalBudget.value = gameData.value.teamBudget
 
@@ -458,34 +482,8 @@ const fetchGameDataByToken = async (token: string) => {
   }
 }
 
-const handleCardActionCompleted = async (eventPayload: {
-  success: boolean
-  newBudget?: number
-}) => {
-  if (eventPayload.success && gameData.value) {
-    if (typeof eventPayload.newBudget === 'number') {
-      currentGlobalBudget.value = eventPayload.newBudget
-    }
-    if (playerMenuRef.value) {
-      playerMenuRef.value.fetchGameLog()
-      playerMenuRef.value.fetchTeamBud()
-    }
-    await fetchPawns()
-    await fetchRivalPawns()
-  }
-}
-
 const handleBudgetChangeFromMenu = (newBudgetFromMenu: number) => {
   currentGlobalBudget.value = newBudgetFromMenu
-}
-
-const showLeftPanel = () => {
-  rightOpen.value = false
-  leftOpen.value = true
-}
-const showRightPanel = () => {
-  leftOpen.value = false
-  rightOpen.value = true
 }
 
 const fetchPawns = async () => {
@@ -541,10 +539,18 @@ const onBoardUpdate = (data: any) => {
 const onHistoryUpdate = () => {
   console.log("SignalR: Otrzymano 'HistoryUpdated'. Odświeżam historię.")
   if (playerMenuRef.value) {
-    playerMenuRef.value.fetchGameLog()
+    playerMenuRef.value.fetchGameLog();
+    playerMenuRef.value.fetchTeamBud();
   }
 }
 
+const onPendingUpdate = () => {
+  console.log("SignalR: Otrzymano 'PendingUpdated'. Odświeżam karty");
+  if (cardCarouselRef.value) {
+    cardCarouselRef.value.fetchCards();
+  }
+
+}
 let isSignalRInitialized = false
 
 watch(
@@ -556,10 +562,11 @@ watch(
       isSignalRInitialized = true
       try {
         await signalrService.start()
-        await signalrService.joinGameRoom(String(gameData.value.gameId))
+        await signalrService.joinGameRoomAsPlayer(String(gameData.value.gameId), String(gameData.value.teamId))
         console.log(`SignalR: Połączono i dołączono do pokoju gry ${gameData.value.gameId}`)
         signalrService.connection.on('BoardUpdated', onBoardUpdate)
         signalrService.connection.on('HistoryUpdated', onHistoryUpdate)
+        signalrService.connection.on('PendingUpdated', onPendingUpdate)
       } catch (err) {
         console.error('Błąd połączenia SignalR w playerView: ', err)
       }
@@ -575,9 +582,10 @@ onMounted(() => {
 onUnmounted(() => {
   if (gameData.value?.gameId) {
     console.log(`SignalR: Opuszczanie pokoju gry ${gameData.value.gameId}`)
-    signalrService.leaveGameRoom(String(gameData.value.gameId))
-    signalrService.connection.off('BoardUpdated', onBoardUpdate)
-    signalrService.connection.off('HistoryUpdated', onHistoryUpdate)
+    signalrService.leaveGameRoomAsPlayer(String(gameData.value.gameId), String(gameData.value.teamId))
+    signalrService.connection.off('BoardUpdated', onBoardUpdate);
+    signalrService.connection.off('HistoryUpdated', onHistoryUpdate);
+    signalrService.connection.off('PendingUpdated', onPendingUpdate);
   }
 })
 </script>

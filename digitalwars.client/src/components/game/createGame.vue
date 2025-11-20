@@ -552,12 +552,15 @@ const handleSubmit = async () => {
     GameMode: selectedGameMode.value !== 'stationary',
     StartBits: Number(numberOfBits.value),
     Teams: teams.value.map((team) => ({
-      Name: team.name,
-      Colour: team.colour,
-      IsAbleToMakeDecisions: team.isAbleToMakeDecisions,
+      name: team.name,
+      colour: team.colour,
+      isAbleToMakeDecisions: team.isAbleToMakeDecisions,
     })),
     Processes: selectedProcessesForPayload,
   }
+
+
+  console.log('Payload tworzenia gry:', gamePayload);
 
   try {
     const response = await apiService.post<{ message?: string }>(
