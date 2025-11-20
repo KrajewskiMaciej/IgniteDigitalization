@@ -18,7 +18,7 @@
         <p class="text-base text-gray-200">
           Drużyna
           <span class="text-primary-400 font-semibold">{{ teamName }}</span>
-          może teraz podejmować
+          może podejmować
           <span class="text-green-400 font-bold">samodzielne decyzje</span>.
         </p>
 
