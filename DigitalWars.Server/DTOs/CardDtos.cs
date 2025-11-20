@@ -35,6 +35,7 @@ namespace backend.Dtos
 
     public class UpdateCardDto
     {
+        public int CardId { get; set; }
         public string ShortDesc { get; set; } = string.Empty;
         public string LongDesc { get; set; } = string.Empty;
     }

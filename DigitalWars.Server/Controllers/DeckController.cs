@@ -89,11 +89,11 @@ namespace backend.Controllers
         }
 
         [HttpPut("decisions/edit")]
-        public async Task<IActionResult> EditDecisionCards([FromBody] int cardId, [FromBody] UpdateCardDto dto)
+        public async Task<IActionResult> EditDecisionCards([FromBody] UpdateCardDto dto)
         {
             var decision = await _context.Decisions
                 .Include(d => d.Card)
-                .FirstOrDefaultAsync(d => d.Card.Card_Id == cardId);
+                .FirstOrDefaultAsync(d => d.Card.Card_Id == dto.CardId);
 
             if (decision == null)
             {
@@ -208,9 +208,9 @@ namespace backend.Controllers
         }
 
         [HttpPut("items/{cardId}")]
-        public async Task<IActionResult> UpdateItem(int cardId, [FromBody] UpdateCardDto dto)
+        public async Task<IActionResult> UpdateItem([FromBody] UpdateCardDto dto)
         {
-            var hardware = await _context.Hardwares.FirstOrDefaultAsync(h => h.Cards.Card_Id == cardId);
+            var hardware = await _context.Hardwares.FirstOrDefaultAsync(h => h.Cards.Card_Id == dto.CardId);
             if (hardware != null)
             {
                 hardware.Hardwares_Short_Desc = dto.ShortDesc;
@@ -218,7 +218,7 @@ namespace backend.Controllers
             }
             else
             {
-                var software = await _context.Softwares.FirstOrDefaultAsync(s => s.Cards.Card_Id == cardId);
+                var software = await _context.Softwares.FirstOrDefaultAsync(s => s.Cards.Card_Id == dto.CardId);
                 if (software != null)
                 {
                     software.Softwares_Short_Desc = dto.ShortDesc;
