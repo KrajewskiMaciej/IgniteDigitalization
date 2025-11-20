@@ -318,6 +318,19 @@
       @close-chat="showChat = false"
     />
   </div>
+
+    <IndependentTeam 
+      @close="showIndependentTeamModal = false"
+      :isVisible="showIndependentTeamModal"
+      :teamName="gameData?.teamName!"
+    />
+
+    <NotIndependentTeam 
+      @close="showNotIndependentTeamModal = false"
+      :isVisible="showNotIndependentTeamModal"
+      :teamName="gameData?.teamName!"
+    />
+
 </template>
 
 <script setup lang="ts">
@@ -333,6 +346,8 @@ import apiServices from '@/services/apiServices'
 import signalrService from '@/services/signalService'
 import GameStatusDisplay from '@/components/playerComponents/gameStatusDisplay.vue'
 import GameChat from '@/components/game/GameChat.vue'
+import IndependentTeam from '@/components/game/IndependentTeam.vue'
+import NotIndependentTeam from '@/components/game/NotIndependentTeam.vue'
 import type { BoardConfig, GameData, Pawn, RawPawnData, GameStatusError } from '@/interfaces/types'
 import { useBreakpoints } from '@vueuse/core'
 import { faCommentDots } from '@fortawesome/free-solid-svg-icons'
@@ -362,7 +377,9 @@ const currentPanel = ref('menu')
 const leftOpen = ref(true);
 const rightOpen = ref(true);
 const currentBoard = ref('player')
-const showChat = ref(false)
+const showChat = ref(false);
+const showIndependentTeamModal = ref<boolean>(false);
+const showNotIndependentTeamModal = ref<boolean>(false);
 const cardCarouselRef = ref<InstanceType<typeof CardCarousel> | null>(null);
 
 const gameData = ref<GameData | null>(null)
@@ -411,8 +428,11 @@ const fetchGameDataByToken = async (token: string) => {
     )
     gameData.value = response.data
 
-
-    console.log('Pobrane dane gry:', gameData.value);
+    if (gameData.value.isIndependent) {
+      showIndependentTeamModal.value = true;
+    } else {
+      showNotIndependentTeamModal.value = true;
+    }
 
     currentGlobalBudget.value = gameData.value.teamBudget
 
