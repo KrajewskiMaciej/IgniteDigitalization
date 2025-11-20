@@ -571,6 +571,7 @@ watch(
 
 onMounted(async () => {
   const gameIdNum = Number(props.gameId)
+  const teamIdNum = Number(props.teamId) 
   if (isNaN(gameIdNum)) {
     toast.error('Błąd krytyczny: Brak lub nieprawidłowe ID gry!')
     return
@@ -582,7 +583,7 @@ onMounted(async () => {
 
   try {
     await signalService.start()
-    await signalService.joinGameRoom(String(gameIdNum))
+    await signalService.joinGameRoomAsPlayer(String(gameIdNum), String(teamIdNum))
     console.log(`Pomyślnie dołączono do pokoju SignalR dla gry: ${gameIdNum}`)
   } catch (err) {
     console.error('Błąd połączenia SignalR: ', err)
@@ -592,7 +593,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (props.gameId) {
-    signalService.leaveGameRoom(String(props.gameId))
+    signalService.leaveGameRoomAsPlayer(String(props.gameId), String(props.teamId))
   }
 })
 </script>

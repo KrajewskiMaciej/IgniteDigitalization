@@ -54,7 +54,7 @@ defineProps({
 
 const emit = defineEmits(['update:name', 'update'])
 
-const handleInput = (value: string) => {
+const handleInput = (value: string | undefined) => {
   emit('update:name', value)
   emit('update')
 }

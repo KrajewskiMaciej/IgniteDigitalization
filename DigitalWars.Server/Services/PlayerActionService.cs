@@ -135,23 +135,19 @@ namespace backend.Services
         public async Task ApproveLogAsync(int logId)
         {
             var logToApprove = await _context.GameLogs.FindAsync(logId);
-            if (logToApprove == null) throw new Exception("Nie znaleziono logu do zatwierdzenia.");
-            if (logToApprove.Is_Approved != false) throw new Exception("Ten log nie oczekuje na zatwierdzenie.");
+            if (logToApprove == null)
+            {
+                throw new Exception("Nie znaleziono logu do zatwierdzenia.");
+            }
+
+            if (logToApprove.Is_Approved != false)
+            {
+                throw new Exception("Ten log nie oczekuje na zatwierdzenie.");
+            }
 
             logToApprove.Is_Approved = true;
 
             await ExecuteCardEffects(logToApprove);
-
-            if (logToApprove.Teams_Id == null)
-            {
-                throw new Exception("Log do zatwierdzenia nie ma przypisanej drużyny.");
-            }
-
-             if (logToApprove.Games_Id == null)
-            {
-                throw new Exception("Log do zatwierdzenia nie ma przypisanego gry.");
-            }
-
 
             await NotifyAdmin(logToApprove.Games_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated");
             await NotifyTeam(logToApprove.Games_Id, logToApprove.Teams_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated");
@@ -225,7 +221,7 @@ namespace backend.Services
             return ((int)Math.Round(baseMoveX * boosterX), (int)Math.Round(baseMoveY * boosterY));
         }
 
-       private async Task NotifyAdmin(int gameId, params string[] methods)
+        private async Task NotifyAdmin(int gameId, params string[] methods)
         {
             foreach (var method in methods)
             {

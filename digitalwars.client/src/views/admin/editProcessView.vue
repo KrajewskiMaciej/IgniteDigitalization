@@ -243,7 +243,7 @@ import Button from 'primevue/button'
 import { useConfirm } from 'primevue/useconfirm'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
-import pawnPreview from '@/components/game/pawnPreview.vue'
+import pawnPreview from '@/components/game/PawnPreview.vue'
 
 const toast = useToast()
 const confirm = useConfirm()
@@ -400,7 +400,7 @@ watch(selectedDeck, async (newDeck) => {
     isAddingNewProcess.value = false
 
     try {
-      const response = await apiService.get(apiConfig.processes.getByDeck(newDeck))
+      const response = await apiService.get<Process[]>(apiConfig.processes.getByDeck(newDeck))
       processesData.value = response.data
     } catch (error) {
       console.error('Błąd przy pobieraniu procesów:', error)
@@ -433,7 +433,7 @@ watch(selectedProcess, (newProcess) => {
 // --- LIFECYCLE ---
 onMounted(async () => {
   try {
-    const response = await apiService.get(apiConfig.admin.deck.getAll)
+    const response = await apiService.get<Deck[]>(apiConfig.admin.deck.getAll)
     decksData.value = response.data
   } catch (error) {
     console.error('Błąd przy pobieraniu talii:', error)

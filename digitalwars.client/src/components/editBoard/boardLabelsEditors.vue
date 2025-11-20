@@ -157,9 +157,9 @@ const removeLabelUp = (index: number) => {
   }
 }
 
-const updateLabelUp = (index: number, value: string) => {
+const updateLabelUp = (index: number, value: string | undefined) => {
   const updatedLabels = [...props.labelsUp]
-  updatedLabels[index] = value
+  updatedLabels[index] = value ?? ''
   emit('update:labelsUp', updatedLabels)
   emit('update')
 }
@@ -189,9 +189,9 @@ const removeLabelRight = (index: number) => {
   }
 }
 
-const updateLabelRight = (index: number, value: string) => {
+const updateLabelRight = (index: number, value: string | undefined) => {
   const updatedLabels = [...props.labelsRight]
-  updatedLabels[index] = value
+  updatedLabels[index] = value ?? ''
   emit('update:labelsRight', updatedLabels)
   emit('update')
 }

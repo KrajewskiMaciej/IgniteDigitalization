@@ -4,7 +4,7 @@ import * as signalR from '@microsoft/signalr'
 // Pobierz URL huba z zmiennych środowiskowych lub użyj domyślnego.
 const HUB_URL = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL.replace(/^http/, 'ws')}/gameHub`
-  : 'http://localhost:5023/gameHub'
+  : '/gameHub'
 
 const connection = new signalR.HubConnectionBuilder()
   .withUrl(HUB_URL)

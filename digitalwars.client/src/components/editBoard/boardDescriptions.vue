@@ -46,7 +46,7 @@ defineProps({
 
 const emit = defineEmits(['update:descriptionDown', 'update:descriptionLeft', 'update'])
 
-const handleInput = (value: string, type: 'down' | 'left') => {
+const handleInput = (value: string | undefined, type: 'down' | 'left') => {
   if (type === 'down') {
     emit('update:descriptionDown', value)
   } else {
