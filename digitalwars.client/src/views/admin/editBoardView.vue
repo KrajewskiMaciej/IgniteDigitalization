@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <div class="grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-[55fr_45fr]">
       <div
         class="order-2 md:order-1 flex flex-col justify-start border-2 border-surface-700 py-6 px-4 m-4 rounded-lg text-white bg-tertiary"
       >

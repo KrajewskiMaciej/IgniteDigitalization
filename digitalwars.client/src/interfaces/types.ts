@@ -269,8 +269,8 @@ export interface GameData {
   deckId: number
   teamId: number
   gameId: number
-  IsOnline: boolean
-  IsIndependent: boolean
+  isOnline: boolean
+  isIndependent: boolean
   boardConfig: BoardConfig
   rivalBoardConfig?: BoardConfig
 }

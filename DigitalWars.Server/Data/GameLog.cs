@@ -4,7 +4,7 @@ namespace backend.Data
     {
         public int Games_Logs_Id { get; set; }
         public DateTime Data { get; set; }
-        public int? Teams_Id { get; set; }
+        public int Teams_Id { get; set; }
         public Team? Teams { get; set; } = null!;
         public int Games_Id { get; set; }
         public Game Games { get; set; } = null!;

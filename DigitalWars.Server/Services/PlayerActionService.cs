@@ -70,6 +70,7 @@ namespace backend.Services
                         break;
                 }
                 finalCost *= (1 + eventCostModifier);
+
             }
 
             bool isItem = cardType == CardType.Hardware || cardType == CardType.Software;
@@ -115,11 +116,13 @@ namespace backend.Services
             if (gameLogEntry.Is_Approved == true)
             {
                 await ExecuteCardEffects(gameLogEntry);
-                await NotifyClients(gameLogEntry.Games_Id, "HistoryUpdated");
+                await NotifyAdmin(gameLogEntry.Games_Id, "HistoryUpdated");
+                await NotifyTeam(gameLogEntry.Games_Id, cardData.TeamId, "HistoryUpdated", "PendingUpdated", "BoardUpdated");
             }
             else
             {
-                await NotifyClients(gameLogEntry.Games_Id, "PendingUpdated");
+                await NotifyAdmin(gameLogEntry.Games_Id, "PendingUpdated");
+                await NotifyTeam(gameLogEntry.Games_Id, cardData.TeamId, "PendingUpdated");
             }
 
             return new
@@ -139,7 +142,19 @@ namespace backend.Services
 
             await ExecuteCardEffects(logToApprove);
 
-            await NotifyClients(logToApprove.Games_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated");
+            if (logToApprove.Teams_Id == null)
+            {
+                throw new Exception("Log do zatwierdzenia nie ma przypisanej drużyny.");
+            }
+
+             if (logToApprove.Games_Id == null)
+            {
+                throw new Exception("Log do zatwierdzenia nie ma przypisanego gry.");
+            }
+
+
+            await NotifyAdmin(logToApprove.Games_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated");
+            await NotifyTeam(logToApprove.Games_Id, logToApprove.Teams_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated");
         }
 
         public async Task RejectLogAsync(int logId)
@@ -150,7 +165,8 @@ namespace backend.Services
             _context.GameLogs.Remove(logToReject);
             await _context.SaveChangesAsync();
 
-            await NotifyClients(logToReject.Games_Id, "PendingUpdated");
+            await NotifyAdmin(logToReject.Games_Id, "PendingUpdated");
+            await NotifyTeam(logToReject.Games_Id, logToReject.Teams_Id, "PendingUpdated");
         }
 
         private async Task ExecuteCardEffects(GameLog gameLogEntry)
@@ -209,11 +225,19 @@ namespace backend.Services
             return ((int)Math.Round(baseMoveX * boosterX), (int)Math.Round(baseMoveY * boosterY));
         }
 
-        private async Task NotifyClients(int gameId, params string[] methods)
+       private async Task NotifyAdmin(int gameId, params string[] methods)
         {
             foreach (var method in methods)
             {
                 await _hubContext.Clients.Group($"game-{gameId}").SendAsync(method);
+            }
+        }
+
+        private async Task NotifyTeam(int gameId, int teamId, params string[] methods)
+        {
+            foreach (var method in methods)
+            {
+                await _hubContext.Clients.Group($"game-{gameId}-team-{teamId}").SendAsync(method);
             }
         }
     }

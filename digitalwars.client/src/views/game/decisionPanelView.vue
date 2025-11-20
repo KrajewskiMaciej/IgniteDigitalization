@@ -308,7 +308,14 @@
                   Oczekuje
                 </span>
               </div>
-              <p class="text-lg font-bold text-primary-400 mb-2">{{ entry.cardTitle }}</p>
+              <div class="mb-2">
+                <p class="text-lg font-bold text-primary-400 leading-tight">
+                  {{ entry.cardTitle }}
+                </p>
+                <p class="text-xs text-gray-500 mt-1">
+                  ID karty: <span class="font-semibold text-gray-400">{{ entry.cardId }}</span>
+                </p>
+              </div>
               <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
 
               <div class="flex gap-2 mt-4">
@@ -667,6 +674,8 @@ const fetchPendingDecisions = async () => {
       tableId: log.teamId,
       tableName: log.teamName,
     }))
+
+    console.log('Pobrane decyzje oczekujące:', pendingDecisions.value);
   } catch (error: any) {
     toast.error('Błąd podczas pobierania sugestii.')
     console.error('Błąd pobierania sugestii:', error.response?.data || error.message)
@@ -837,10 +846,14 @@ const playCard = () => executeAction(true)
 const giveItem = () => executeAction(false)
 
 const approveDecision = async (logId: number) => {
+  console.log('Jaki log jest do zatwierdzenia  ?', logId);
   try {
-    await apiServices.post(apiConfig.player.approveLog(logId), {})
-    toast.success('Sugestia została zatwierdzona!')
+    const response = await apiServices.post(apiConfig.player.approveLog(logId), {})
+    toast.success('Sugestia została zatwierdzona!');
+    console.log(response.data, 'Co otrzymałem po approve ?');
     await Promise.all([fetchPendingDecisions(), fetchDecisionHistory()])
+    console.log('Zaktualizowano listę decyzji po zatwierdzeniu do zatwierdzenia:', pendingDecisions.value);
+    console.log('Pobrana historia decyzji:', decisions.value);
   } catch (error: any) {
     toast.error('Wystąpił błąd podczas zatwierdzania sugestii.')
     console.error('Błąd zatwierdzania:', error.response?.data || error.message)
@@ -905,7 +918,7 @@ onMounted(async () => {
 
   try {
     await signalService.start()
-    await signalService.joinGameRoom(String(gameId))
+    await signalService.joinGameRoomAsAdmin(String(gameId))
     console.log('Połączono z SignalR i dołączono do pokoju gry.')
     signalService.connection.on('HistoryUpdated', () => fetchDecisionHistory())
     signalService.connection.on('PendingUpdated', () => fetchPendingDecisions())
@@ -916,7 +929,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  if (gameId) signalService.leaveGameRoom(String(gameId))
+  if (gameId) signalService.leaveGameRoomAsAdmin(String(gameId))
 })
 </script>
 

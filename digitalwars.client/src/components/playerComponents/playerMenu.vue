@@ -15,7 +15,7 @@
       <h2 class="text-lg font-semibold mb-2 text-white">Decyzje</h2>
 
       <!-- Lista -->
-      <div class="overflow-y-auto pr-2 flex-grow">
+      <div class="overflow-y-auto custom-scrollbar pr-2 flex-grow">
         <div v-if="isLoading" class="text-center text-gray-500">Ładowanie historii...</div>
         <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
         <div v-else-if="gameLogEntries.length === 0" class="text-center text-gray-400">
@@ -184,7 +184,6 @@ defineExpose({
 
 // --- Logika cyklu życia i SignalR ---
 const handleHistoryUpdate = () => {
-  console.log("PlayerMenu: Otrzymano 'HistoryUpdated'. Odświeżam dane.")
   fetchData()
 }
 
@@ -214,3 +213,24 @@ onUnmounted(() => {
   }
 })
 </script>
+
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
+</style>
