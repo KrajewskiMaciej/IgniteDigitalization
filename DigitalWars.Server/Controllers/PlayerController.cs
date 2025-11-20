@@ -8,6 +8,7 @@ using backend.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Collections.Generic;
+using backend.Exceptions;
 
 namespace backend.Controllers
 {
@@ -313,6 +314,10 @@ namespace backend.Controllers
                 var result = await _actionService.PlayCardAsync(cardId, cardData, wasSuccess: true);
                 return Ok(result);
             }
+            catch (GameException ex)
+            {
+                return BadRequest(new { message = ex.Message, errorCode = ex.ErrorCode });
+            }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
@@ -326,6 +331,10 @@ namespace backend.Controllers
             {
                 var result = await _actionService.PlayCardAsync(cardId, cardData, wasSuccess: false);
                 return Ok(result);
+            }
+            catch (GameException ex)
+            {
+                return BadRequest(new { message = ex.Message, errorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {

@@ -71,5 +71,7 @@ export const en = {
   //Erorr
   errorServerUnavailable: 'Server is unavailable. Please try again later.',
   errorBoardDeleteConflict: 'Cannot delete the board because it is associated with an existing game.',
+  warningNotEnoughBudget: 'You do not have enough bits to play this card.',
+  teamHasNotEnoughBits: 'Team {teamName} does not have enough bits to play this card.',
   accept: 'Accept',
 }

@@ -421,10 +421,10 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useToast } from 'vue-toastification'
+import { useI18n } from 'vue-i18n'
 import {
   faGamepad,
   faBolt,
-  faChessBoard,
   faClock,
   faHistory,
   faCheck,
@@ -571,6 +571,7 @@ const tables = ref<Team[]>([])
 const cards = ref<Card[]>([])
 const items = ref<Item[]>([])
 const availableEvents = ref<GameEvent[]>([])
+const { t } = useI18n();
 const enemyFormData = reactive<BoardConfigForComponent>({
   name: '',
   labelsUp: [],
@@ -792,7 +793,7 @@ async function executeAction(isCard: boolean) {
     return
   }
   if (team.teamBud < (entity.cost || 0)) {
-    toast.error(`Drużyna ${team.teamName} ma za mało bitów!`)
+    toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }));
     return
   }
   let wasSuccess: boolean
@@ -838,6 +839,10 @@ async function executeAction(isCard: boolean) {
 
     await fetchAvailableCardsForTeam()
   } catch (error: any) {
+    if (error.response?.data?.errorCode === 'NotEnoughBudget') {
+      toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }));
+      return
+    }
     toast.error(error.response?.data?.message || 'Wystąpił błąd podczas wykonywania akcji.')
     console.error('Błąd akcji karty/przedmiotu:', error.response?.data || error.message)
   }
