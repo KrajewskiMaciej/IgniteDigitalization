@@ -52,6 +52,32 @@ namespace backend.Controllers
             }
         }
 
+        [HttpGet("download-template")]
+        public IActionResult DownloadTemplate()
+        {
+            try
+            {
+                var fileName = "DigitalWars_SzablonKart.xlsx";
+                var filePath = Path.Combine(AppContext.BaseDirectory, "Templates", fileName);
+
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return NotFound(new { message = "Plik szablonu nie został znaleziony na serwerze." });
+                }
+
+                // Typ MIME dla plików .xlsx
+                var mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                // Zwraca plik, który przeglądarka potraktuje jako plik do pobrania
+                return PhysicalFile(filePath, mimeType, fileName);
+            }
+            catch (Exception ex)
+            {
+                // Logowanie błędu byłoby tu wskazane
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Wystąpił wewnętrzny błąd serwera: {ex.Message}" });
+            }
+        }
+
         [HttpPut("edit")]
         public async Task<IActionResult> EditDeck([FromBody] EditDeckDto dto)
         {
