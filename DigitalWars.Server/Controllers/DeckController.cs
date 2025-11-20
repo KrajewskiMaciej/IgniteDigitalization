@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using backend.Dtos;
+using Microsoft.CodeAnalysis.Differencing;
 
 namespace backend.Controllers
 {
@@ -49,6 +50,34 @@ namespace backend.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Wystąpił krytyczny błąd serwera: {ex.Message}");
             }
+        }
+
+        [HttpPut("edit")]
+        public async Task<IActionResult> EditDeck([FromBody] EditDeckDto dto)
+        {
+            var userId = CurrentUserId;
+            if (userId == null)
+            {
+                return Unauthorized("Brak danych uwierzytelniającego użytkownika.");
+            }
+
+            var deckToEdit = await _context.Decks
+                .FirstOrDefaultAsync(deck => deck.Decks_Id == dto.Decks_Id && deck.Users_Id == userId.Value);
+
+            if (deckToEdit == null)
+            {
+                return NotFound("Nie znaleziono talii o podanym ID lub nie masz do niej uprawnień.");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Decks_Name))
+            {
+                return BadRequest("Nazwa talii nie może być pusta.");
+            }
+
+            deckToEdit.Deck_Name = dto.Decks_Name;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Nazwa talii została pomyślnie zaktualizowana." });
         }
 
         [HttpGet("get")]
