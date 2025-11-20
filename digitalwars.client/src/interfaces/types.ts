@@ -246,20 +246,26 @@ export interface ApiService {
   getFile: (endpoint: string, params?: any) => Promise<any>
   postForFile: (endpoint: string, data?: any) => Promise<any>
 }
-
 export interface BoardConfig {
   boardId: number
   name: string
+
+  // Etykiety
   labelsUp: string[]
   labelsRight: string[]
-  borderColors: string[]
-  descriptionDown: string
-  descriptionLeft: string
-  rows: number
-  cols: number
+
+  // Kolory
   cellColor: string
   borderColor: string
-  Borders_Colors?: string[]
+  borderColors: string[]        
+
+  // Opisy
+  descriptionDown: string
+  descriptionLeft: string
+
+  // Wymiary
+  rows: number
+  cols: number
 }
 
 export interface GameData {
@@ -272,7 +278,7 @@ export interface GameData {
   isOnline: boolean
   isIndependent: boolean
   boardConfig: BoardConfig
-  rivalBoardConfig?: BoardConfig
+  rivalBoardConfig?: any
 }
 
 export interface GameStatusError {

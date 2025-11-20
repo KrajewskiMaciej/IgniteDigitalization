@@ -382,6 +382,8 @@ const showIndependentTeamModal = ref<boolean>(false);
 const showNotIndependentTeamModal = ref<boolean>(false);
 const cardCarouselRef = ref<InstanceType<typeof CardCarousel> | null>(null);
 
+import { fillBoardConfig } from '@/composables/BoardHelpers'
+
 const gameData = ref<GameData | null>(null)
 const isLoading = ref(true)
 const errorLoading = ref<string | null>(null)
@@ -428,6 +430,8 @@ const fetchGameDataByToken = async (token: string) => {
     )
     gameData.value = response.data
 
+    console.log('Pobrano dane gry przez token:', gameData.value);
+
     if (gameData.value.isIndependent) {
       showIndependentTeamModal.value = true;
     } else {
@@ -436,10 +440,15 @@ const fetchGameDataByToken = async (token: string) => {
 
     currentGlobalBudget.value = gameData.value.teamBudget
 
-    Object.assign(formData, gameData.value.boardConfig)
+    const apiBoardConfig = gameData.value.boardConfig
+
+    fillBoardConfig(formData, apiBoardConfig);
+
 
     if (gameData.value.rivalBoardConfig) {
-      Object.assign(enemyformData, gameData.value.rivalBoardConfig)
+      fillBoardConfig(enemyformData, gameData.value.rivalBoardConfig);
+
+      console.log('Plansza konkurecji:', gameData.value.rivalBoardConfig);
     } else {
       console.warn('Brak konfiguracji rivalBoardConfig.')
     }
