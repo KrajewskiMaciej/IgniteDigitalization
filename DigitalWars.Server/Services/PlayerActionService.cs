@@ -135,6 +135,8 @@ namespace backend.Services
             if (logToApprove == null) throw new Exception("Nie znaleziono logu do zatwierdzenia.");
             if (logToApprove.Is_Approved != false) throw new Exception("Ten log nie oczekuje na zatwierdzenie.");
 
+            logToApprove.Is_Approved = true;
+
             await ExecuteCardEffects(logToApprove);
 
             await NotifyClients(logToApprove.Games_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated");

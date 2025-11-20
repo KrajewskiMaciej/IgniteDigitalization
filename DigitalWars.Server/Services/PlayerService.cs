@@ -29,7 +29,24 @@ namespace backend.Services
 
         public async Task SetGameProcessPosAsync(int gameId, int teamId)
         {
-            _logger.LogInformation("Rozpoczynanie aktualizacji pozycji dla GameId: {GameId}, TeamId: {TeamId}", gameId, teamId);
+            _logger.LogInformation("Rozpoczynanie aktualizacji pozycji PIONKÓW-PROCESÓW dla GameId: {GameId}, TeamId: {TeamId}", gameId, teamId);
+
+            // [KROK 1] Pobranie planszy dla pionków-procesów.
+            // Upewniamy się, że pobieramy planszę z pionka, który jest procesem (ma przypisane Games_Processes_Id).
+            var processBoardInfo = await _context.GameBoards
+                .AsNoTracking()
+                .Where(gb => gb.Games_Id == gameId && gb.Teams_Id == teamId && gb.Games_Processes_Id != null)
+                .Select(gb => new { gb.Boards.Rows, gb.Boards.Cols })
+                .FirstOrDefaultAsync();
+
+            if (processBoardInfo == null)
+            {
+                _logger.LogWarning("Nie znaleziono planszy dla pionków-procesów w grze {GameId}. Przerywanie aktualizacji.", gameId);
+                return;
+            }
+
+            double maxPozX = processBoardInfo.Cols > 0 ? processBoardInfo.Cols - 1 : 0;
+            double maxPozY = processBoardInfo.Rows > 0 ? processBoardInfo.Rows - 1 : 0;
 
             var movesByGeneralProcessId = await _context.GameLogSpecs
                 .AsNoTracking()
@@ -49,11 +66,9 @@ namespace backend.Services
 
             if (!movesByGeneralProcessId.Any())
             {
-                _logger.LogInformation("Brak nowych ruchów do przetworzenia.");
+                _logger.LogInformation("Brak nowych ruchów dla pionków-procesów.");
                 return;
             }
-
-            _logger.LogInformation("Obliczono pozycje dla {Count} typów procesów.", movesByGeneralProcessId.Count);
 
             var gameBoardEntriesToUpdate = await _context.GameBoards
                 .Include(gb => gb.Games_Processes)
@@ -64,8 +79,6 @@ namespace backend.Services
                     gb.Games_Processes != null)
                 .ToListAsync();
 
-            _logger.LogInformation("Znaleziono {Count} pionków-procesów na planszy do potencjalnej aktualizacji.", gameBoardEntriesToUpdate.Count);
-
             foreach (var entry in gameBoardEntriesToUpdate)
             {
                 if (entry.Games_Processes != null && movesByGeneralProcessId.TryGetValue(entry.Games_Processes.Processes_Id, out var newPosition))
@@ -73,20 +86,17 @@ namespace backend.Services
                     var finalX = newPosition.FinalPosX / PositionDivisor;
                     var finalY = newPosition.FinalPosY / PositionDivisor;
 
-                    _logger.LogInformation(
-                        "Aktualizacja pionka GameBoardId: {GameBoardId} (z ProcessId: {ProcessId}). Nowa pozycja: ({X}, {Y})",
-                        entry.Games_Boards_Id,
-                        entry.Games_Processes.Processes_Id,
-                        finalX,
-                        finalY);
+                    // [KROK 2] Zastosowanie ograniczeń planszy procesów
+                    double clampedX = Math.Max(0, Math.Min(finalX, maxPozX));
+                    double clampedY = Math.Max(0, Math.Min(finalY, maxPozY));
 
-                    entry.Poz_X = finalX;
-                    entry.Poz_Y = finalY;
+                    entry.Poz_X = clampedX;
+                    entry.Poz_Y = clampedY;
                 }
             }
 
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Zakończono aktualizację pozycji.");
+            _logger.LogInformation("Zakończono aktualizację pozycji pionków-procesów.");
 
             await _hubContext.Clients.Group($"game-{gameId}").SendAsync("BoardUpdated");
         }
@@ -94,24 +104,24 @@ namespace backend.Services
         public async Task SetTeamPosAsync(int gameId, int teamId)
         {
             var processPawns = await _context.GameBoards
-            .Where(gb =>
-                gb.Games_Id == gameId &&
-                gb.Teams_Id == teamId &&
-                gb.Games_Processes_Id != null &&
-                gb.Games_Processes != null &&
-                gb.Games_Processes.Processes != null)
-            .Select(gb => new PawnData
-            {
-                ProcessId = gb.Games_Processes!.Processes!.Processes_Id,
-                PosX = gb.Poz_X,
-                PosY = gb.Poz_Y,
-                Weight = gb.Games_Processes.Processes.Processes_Weight
-            })
-            .ToListAsync();
+                .Where(gb =>
+                    gb.Games_Id == gameId &&
+                    gb.Teams_Id == teamId &&
+                    gb.Games_Processes_Id != null &&
+                    gb.Games_Processes != null &&
+                    gb.Games_Processes.Processes != null)
+                .Select(gb => new PawnData
+                {
+                    ProcessId = gb.Games_Processes!.Processes!.Processes_Id,
+                    PosX = gb.Poz_X,
+                    PosY = gb.Poz_Y,
+                    Weight = gb.Games_Processes.Processes.Processes_Weight
+                })
+                .ToListAsync();
 
             if (!processPawns.Any())
             {
-                _logger.LogWarning("Nie znaleziono pionków-procesów dla drużyny {TeamId} w grze {GameId}. Nie można obliczyć pozycji.", teamId, gameId);
+                _logger.LogWarning("Nie znaleziono pionków-procesów dla drużyny {TeamId} w grze {GameId}. Nie można obliczyć pozycji drużyny.", teamId, gameId);
                 return;
             }
 
@@ -123,7 +133,9 @@ namespace backend.Services
             int finalAvgX = (int)Math.Round(weightedSumX);
             int finalAvgY = (int)Math.Round(weightedSumY);
 
+            // [KROK 1] Znajdź główny pionek drużyny I JEGO PLANSZĘ
             var teamPawnEntry = await _context.GameBoards
+                .Include(gb => gb.Boards) // Dołączamy powiązaną encję Board
                 .FirstOrDefaultAsync(gb => gb.Games_Id == gameId && gb.Teams_Id == teamId && gb.Games_Processes_Id == null);
 
             if (teamPawnEntry == null)
@@ -131,16 +143,30 @@ namespace backend.Services
                 _logger.LogError("BŁĄD KRYTYCZNY: Nie znaleziono głównego pionka dla drużyny {TeamId} w grze {GameId}.", teamId, gameId);
                 return;
             }
+            if (teamPawnEntry.Boards == null)
+            {
+                _logger.LogError("BŁĄD KRYTYCZNY: Pionek drużyny {TeamId} nie ma przypisanej planszy.", teamId);
+                return;
+            }
 
-            teamPawnEntry.Poz_X = finalAvgX;
-            teamPawnEntry.Poz_Y = finalAvgY;
+            // [KROK 2] Oblicz granice planszy DRUŻYNY
+            double maxTeamPozX = teamPawnEntry.Boards.Cols > 0 ? teamPawnEntry.Boards.Cols - 1 : 0;
+            double maxTeamPozY = teamPawnEntry.Boards.Rows > 0 ? teamPawnEntry.Boards.Rows - 1 : 0;
+
+            // [KROK 3] Zastosuj ograniczenia planszy drużyny
+            double clampedX = Math.Max(0, Math.Min(finalAvgX, maxTeamPozX));
+            double clampedY = Math.Max(0, Math.Min(finalAvgY, maxTeamPozY));
+
+            teamPawnEntry.Poz_X = clampedX;
+            teamPawnEntry.Poz_Y = clampedY;
 
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Zaktualizowano średnią ważoną pozycję ({PosX}, {PosY}) dla drużyny {TeamId} w grze {GameId}.", finalAvgX, finalAvgY, teamId, gameId);
+            _logger.LogInformation("Zaktualizowano średnią ważoną pozycję ({PosX}, {PosY}) dla drużyny {TeamId} w grze {GameId}.", clampedX, clampedY, teamId, gameId);
 
             await _hubContext.Clients.Group(gameId.ToString()).SendAsync("BoardUpdated", new { teamId });
         }
 
+        // ... reszta serwisu (ProcessAndNormalizeWeights, klasy PawnData itd.) pozostaje bez zmian ...
         private List<NormalizedPawnData> ProcessAndNormalizeWeights(List<PawnData> pawns)
         {
             var pawnsWithWeight = pawns.Where(p => p.Weight > 0).ToList();
