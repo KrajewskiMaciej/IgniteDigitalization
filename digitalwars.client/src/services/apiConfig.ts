@@ -19,6 +19,7 @@ const endpoints = {
       cards: (deckId: number) => `/admin/deck/decisions?deckId=${deckId}`,
       items: (deckId: number) => `/admin/deck/items?deckId=${deckId}`,
       updateItem: (cardId: number) => `/admin/deck/items/${cardId}`,
+      getCardsTemplate : '/admin/deck/download-template',
     },
     settings: {
       licenses: '/admin/licenses',
@@ -54,7 +55,8 @@ const endpoints = {
     // --- CORRECTED & VERIFIED ENDPOINTS from PlayerController ---
     getTeamInfo: (gameId: number, teamId: number) => `/player/game/${gameId}/team/${teamId}/info`,
     getTeamsManagement: (gameId: number): string => `/admin/game/${gameId}/teams-management`,
-    updateTeamBudget: (teamId: number): string => `player/team/${teamId}/budget`,
+    updateTeamBudget: (gameId: number, teamId: number): string =>
+      `player/team/${gameId}/${teamId}/budget`,
     unlockCard: (gameId: number) => `/player/game/${gameId}/unlock-card`,
     getPendingLogs: (gameId: number) => `/player/game/${gameId}/pending-logs`,
     getGameEvents: (decks_Id: number) => `/player/game-events?decks_Id=${decks_Id}`, // Expects decks_Id as query param

@@ -18,17 +18,30 @@
           @change="handleFileChange"
           style="display: none"
         />
-
-        <Button
+        <div class="flex gap-2  justify-center">
+           <Button
           @click="triggerFileInput"
           severity="success"
           size="large"
           label="Wczytaj talię z pliku Excel"
         >
           <template #icon>
-            <font-awesome-icon :icon="faFileExcel" class="h-4" />
+            <font-awesome-icon :icon="faFileExcel" class="mr-2" />
           </template>
         </Button>
+
+        <Button
+          @click="handleDownloadTemplate"
+          size="large"
+          label="Pobierz szablon kart"
+
+        >
+          <template #icon>
+            <font-awesome-icon :icon="faDownload" class="mr-2" />
+          </template>
+          
+        </Button>
+        </div>
       </div>
 
       <!-- Sekcja wyboru talii -->
@@ -313,6 +326,7 @@ import {
   faFileExcel,
   faLayerGroup,
   faComment,
+  faDownload
 } from '@fortawesome/free-solid-svg-icons'
 import { ref, watch, onMounted } from 'vue'
 import apiConfig from '@/services/apiConfig'
@@ -323,6 +337,7 @@ import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
+import apiServices from '@/services/apiServices'
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Deck {
@@ -390,6 +405,29 @@ async function handleFileChange(event: Event): Promise<void> {
   } catch (error: any) {
     toast.error(`Błąd przy wysyłaniu pliku: ${error.response?.data?.message || error.message}`)
     console.error('Błąd przy wysyłaniu pliku:', error)
+  }
+}
+
+
+const handleDownloadTemplate = async () => {
+  try {
+    const response = await apiServices.getFile(apiConfig.admin.deck.getCardsTemplate);
+    console.log('Co otrzymałem w odpowiedzi ?', response.data);
+
+    const file = response.data
+
+    const url = window.URL.createObjectURL(file);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'DigitalWars_SzablonKart.xlsx';
+    link.click();
+
+    window.URL.revokeObjectURL(url);
+
+  }  catch (error) {
+    console.error('Błąd przy pobieraniu szablonu kart:', error)
+    toast.error('Nie udało się pobrać szablonu kart.')
   }
 }
 
