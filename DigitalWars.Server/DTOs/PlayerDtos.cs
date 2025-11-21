@@ -61,6 +61,7 @@ namespace backend.Dtos
         public int TeamId { get; set; }
         public string TeamName { get; set; } = string.Empty;
         public double TeamBud { get; set; }
+        public string TeamColor { get; set; } = string.Empty;
         public int BoardId { get; set; }
         public int? DeckId { get; set; }
         public string? TeamToken { get; set; } = string.Empty;
