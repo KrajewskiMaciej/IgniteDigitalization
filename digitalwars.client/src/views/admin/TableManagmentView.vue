@@ -309,7 +309,7 @@ const saveBudget = async () => {
 
   isSavingBudget.value = true
   try {
-    await apiService.put(apiConfig.player.updateTeamBudget(teamId), {
+    await apiService.put(apiConfig.player.updateTeamBudget(gameId,teamId), {
       newBudget: budgetInputValue.value,
     })
     toast.success(`Zapisano nowy budżet dla drużyny "${teamName}".`)

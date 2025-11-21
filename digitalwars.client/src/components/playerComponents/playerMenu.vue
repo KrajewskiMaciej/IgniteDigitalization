@@ -139,8 +139,6 @@ async function fetchData() {
       apiServices.get<{ budget: number }>(apiConfig.player.getCurrency, { teamId: props.teamId }),
     ])
 
-    console.log('Otrzymane logi historii:', historyResponse.data)
-    console.log('Otrzymany budżet:', budgetResponse.data)
 
     if (Array.isArray(historyResponse.data)) {
       gameLogEntries.value = historyResponse.data.map((log: ApiLogEntry): ProcessedLogEntry => {
@@ -177,15 +175,23 @@ async function fetchData() {
   }
 }
 
+
+const handleFetchBudget = async ()  => {
+  try {
+    const budgetResponse = await apiServices.get<{ budget: number }>(apiConfig.player.getCurrency, { teamId: props.teamId })
+    currentBudget.value = budgetResponse.data.budget
+    emit('budget-changed-in-menu', currentBudget.value)
+  } catch (err) {
+    console.error('Błąd podczas pobierania budżetu:', err);
+  }
+}
+
 defineExpose({
   fetchGameLog: fetchData,
   fetchTeamBud: fetchData,
+  handleFetchBudget,
 })
 
-// --- Logika cyklu życia i SignalR ---
-const handleHistoryUpdate = () => {
-  fetchData()
-}
 
 watch(
   hasRequiredIds,
@@ -197,21 +203,6 @@ watch(
   { immediate: true },
 )
 
-onMounted(() => {
-  if (signalrService.connection) {
-    signalrService.connection.on('HistoryUpdated', handleHistoryUpdate)
-    console.log("PlayerMenu: Zarejestrowano listener 'HistoryUpdated'.")
-  } else {
-    console.warn('PlayerMenu: Połączenie SignalR nie było aktywne podczas montowania komponentu.')
-  }
-})
-
-onUnmounted(() => {
-  if (signalrService.connection) {
-    signalrService.connection.off('HistoryUpdated', handleHistoryUpdate)
-    console.log("PlayerMenu: Usunięto listener 'HistoryUpdated'.")
-  }
-})
 </script>
 
 

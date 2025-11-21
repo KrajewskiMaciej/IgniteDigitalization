@@ -392,7 +392,7 @@ const currentGlobalBudget = ref(0)
 const pawns = ref<Pawn[]>([])
 const enemypawns = ref<Pawn[]>([])
 
-const playerMenuRef = ref<{ fetchGameLog: () => void; fetchTeamBud: () => void } | null>(null)
+const playerMenuRef = ref<{ fetchGameLog: () => void; fetchTeamBud: () => void, handleFetchBudget: () => void } | null>(null)
 
 const createDefaultBoardConfig = (): BoardConfig => ({
   boardId: 0,
@@ -560,6 +560,12 @@ const onPendingUpdate = () => {
   }
 
 }
+
+const onBudgetUpdate = () => {
+  if (playerMenuRef.value) {
+    playerMenuRef.value.handleFetchBudget();
+  }
+}
 let isSignalRInitialized = false
 
 watch(
@@ -576,6 +582,7 @@ watch(
         signalrService.connection.on('BoardUpdated', onBoardUpdate)
         signalrService.connection.on('HistoryUpdated', onHistoryUpdate)
         signalrService.connection.on('PendingUpdated', onPendingUpdate)
+        signalrService.connection.on('BudgetUpdated', onBudgetUpdate)
       } catch (err) {
         console.error('Błąd połączenia SignalR w playerView: ', err)
       }
@@ -595,6 +602,7 @@ onUnmounted(() => {
     signalrService.connection.off('BoardUpdated', onBoardUpdate);
     signalrService.connection.off('HistoryUpdated', onHistoryUpdate);
     signalrService.connection.off('PendingUpdated', onPendingUpdate);
+    signalrService.connection.off('BudgetUpdated', onBudgetUpdate);
   }
 })
 </script>

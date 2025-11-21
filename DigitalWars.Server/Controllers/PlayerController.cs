@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Collections.Generic;
 using backend.Exceptions;
+using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Controllers
 {
@@ -18,12 +19,14 @@ namespace backend.Controllers
     {
         private readonly IPlayerQueryService _queryService;
         private readonly IPlayerActionService _actionService;
+        private readonly IHubContext<GameHub> _hubContext;
         private readonly AppDbContext _context;
 
-        public PlayerController(IPlayerQueryService queryService, IPlayerActionService actionService, AppDbContext context)
+        public PlayerController(IPlayerQueryService queryService, IPlayerActionService actionService, IHubContext<GameHub> hubContext, AppDbContext context)
         {
             _queryService = queryService;
             _actionService = actionService;
+            _hubContext = hubContext;
             _context = context;
         }
 
@@ -79,14 +82,15 @@ namespace backend.Controllers
         }
 
         [Authorize]
-        [HttpPut("team/{teamId}/budget")]
-        public async Task<IActionResult> UpdateTeamBudget(int teamId, [FromBody] UpdateBudgetDto dto)
+        [HttpPut("team/{gameId}/{teamId}/budget")]
+        public async Task<IActionResult> UpdateTeamBudget(int teamId, int gameId, [FromBody] UpdateBudgetDto dto)
         {
             var team = await _context.Teams.FindAsync(teamId);
             if (team == null) return NotFound();
 
             team.Teams_Bud = dto.NewBudget;
             await _context.SaveChangesAsync();
+            await _hubContext.Clients.Group($"game-{gameId}-team-{teamId}").SendAsync("BudgetUpdated", dto.NewBudget);
             return Ok(new { message = "Budżet zaktualizowany." });
         }
 
