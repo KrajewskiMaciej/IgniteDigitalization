@@ -559,8 +559,7 @@ const handleSubmit = async () => {
     Processes: selectedProcessesForPayload,
   }
 
-
-  console.log('Payload tworzenia gry:', gamePayload);
+  console.log('Payload tworzenia gry:', gamePayload)
 
   try {
     const response = await apiService.post<{ message?: string }>(

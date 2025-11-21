@@ -5,15 +5,11 @@
 
     <!-- Modal -->
     <div
-      class="bg-surface-800 z-20 text-white relative border border-surface-700 animate-jump-in
-             w-full h-full flex flex-col justify-center p-6 
-             sm:w-[90vw] sm:max-w-lg sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-8"
+      class="bg-surface-800 z-20 text-white relative border border-surface-700 animate-jump-in w-full h-full flex flex-col justify-center p-6 sm:w-[90vw] sm:max-w-lg sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-8"
     >
       <!-- Treść główna -->
       <div class="flex flex-col justify-center items-center text-center px-2">
-        <h1 class="text-white font-nasalization text-xl md:text-2xl mb-4">
-          Kontrola Game Mastera
-        </h1>
+        <h1 class="text-white font-nasalization text-xl md:text-2xl mb-4">Kontrola Game Mastera</h1>
 
         <p class="text-base text-gray-200">
           <span class="text-primary-400 font-semibold">{{ teamName }}</span>
@@ -45,12 +41,7 @@
 
       <!-- Przyciski -->
       <div class="mt-6 flex justify-center px-2">
-        <Button
-          type="button"
-          class="px-6 w-full sm:w-auto"
-          @click="handleClose"
-          label="OK"
-        />
+        <Button type="button" class="px-6 w-full sm:w-auto" @click="handleClose" label="OK" />
       </div>
     </div>
   </div>
@@ -58,7 +49,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
-import Button from 'primevue/button';
+import Button from 'primevue/button'
 
 const props = defineProps<{
   isVisible: boolean

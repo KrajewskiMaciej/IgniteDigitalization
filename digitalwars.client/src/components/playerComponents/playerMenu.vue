@@ -139,7 +139,6 @@ async function fetchData() {
       apiServices.get<{ budget: number }>(apiConfig.player.getCurrency, { teamId: props.teamId }),
     ])
 
-
     if (Array.isArray(historyResponse.data)) {
       gameLogEntries.value = historyResponse.data.map((log: ApiLogEntry): ProcessedLogEntry => {
         if (log.isEventNotification) {
@@ -175,14 +174,15 @@ async function fetchData() {
   }
 }
 
-
-const handleFetchBudget = async ()  => {
+const handleFetchBudget = async () => {
   try {
-    const budgetResponse = await apiServices.get<{ budget: number }>(apiConfig.player.getCurrency, { teamId: props.teamId })
+    const budgetResponse = await apiServices.get<{ budget: number }>(apiConfig.player.getCurrency, {
+      teamId: props.teamId,
+    })
     currentBudget.value = budgetResponse.data.budget
     emit('budget-changed-in-menu', currentBudget.value)
   } catch (err) {
-    console.error('Błąd podczas pobierania budżetu:', err);
+    console.error('Błąd podczas pobierania budżetu:', err)
   }
 }
 
@@ -191,7 +191,6 @@ defineExpose({
   fetchTeamBud: fetchData,
   handleFetchBudget,
 })
-
 
 watch(
   hasRequiredIds,
@@ -202,9 +201,7 @@ watch(
   },
   { immediate: true },
 )
-
 </script>
-
 
 <style scoped>
 .custom-scrollbar::-webkit-scrollbar {

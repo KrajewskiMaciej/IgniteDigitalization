@@ -257,7 +257,7 @@ export interface BoardConfig {
   // Kolory
   cellColor: string
   borderColor: string
-  borderColors: string[]        
+  borderColors: string[]
 
   // Opisy
   descriptionDown: string

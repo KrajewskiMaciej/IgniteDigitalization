@@ -135,7 +135,7 @@ import { useSwipe } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Card {
@@ -154,13 +154,13 @@ interface CardsApiResponse {
 }
 
 // --- Reaktywne referencje i stałe ---
-const toast = useToast();
-const decisionCards = ref<Card[]>([]);
-const itemCards = ref<Card[]>([]);
-const currentIndex = ref(0);
+const toast = useToast()
+const decisionCards = ref<Card[]>([])
+const itemCards = ref<Card[]>([])
+const currentIndex = ref(0)
 const loading = ref(true)
-const fetchError = ref<string | null>(null);
-const isDropdownOpen = ref<boolean>(false);
+const fetchError = ref<string | null>(null)
+const isDropdownOpen = ref<boolean>(false)
 const selectCard = (index: number) => {
   currentIndex.value = index
   isDropdownOpen.value = false
@@ -178,7 +178,6 @@ const props = defineProps({
   isOnlineGame: { type: Boolean, default: true },
   isIndependentTeam: { type: Boolean, required: true },
 })
-
 
 const cardRef = useTemplateRef('cardRef')
 const { isSwiping, direction } = useSwipe(cardRef)
@@ -235,7 +234,7 @@ const buttonLabel = computed(() => {
 })
 
 async function fetchCards() {
-  console.log('Będę pobierać karty z API...');
+  console.log('Będę pobierać karty z API...')
   const { deckId, gameId, teamId } = props
   if (deckId == null || gameId == null || teamId == null) {
     fetchError.value = 'Brak wymaganych danych do pobrania kart.'
@@ -310,7 +309,6 @@ const sendCardSelection = async () => {
     cost: cost,
   }
 
-
   const apiUrl = isSuccess
     ? apiConfig.player.playCardSuccess(cardId)
     : apiConfig.player.playCardFailure(cardId)
@@ -320,11 +318,10 @@ const sendCardSelection = async () => {
       apiUrl,
       cardPlayData,
     )
-
-    } catch (err: any) {
-      if (err.response?.data?.errorCode === 'NotEnoughBudget') {
-        toast.warning(t('warningNotEnoughBudget'))
-      } else {
+  } catch (err: any) {
+    if (err.response?.data?.errorCode === 'NotEnoughBudget') {
+      toast.warning(t('warningNotEnoughBudget'))
+    } else {
       toast.error(err.response?.data?.message ?? 'Wystąpił błąd podczas komunikacji z serwerem.')
       console.error('Błąd podczas zagrywania karty:', err)
     }
@@ -336,7 +333,7 @@ defineExpose({
 })
 
 onMounted(() => {
-  console.log('isIndependentTeam:', props.isIndependentTeam);
+  console.log('isIndependentTeam:', props.isIndependentTeam)
 })
 
 // --- Watchers ---

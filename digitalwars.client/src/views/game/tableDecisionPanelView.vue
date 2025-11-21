@@ -571,7 +571,7 @@ watch(
 
 onMounted(async () => {
   const gameIdNum = Number(props.gameId)
-  const teamIdNum = Number(props.teamId) 
+  const teamIdNum = Number(props.teamId)
   if (isNaN(gameIdNum)) {
     toast.error('Błąd krytyczny: Brak lub nieprawidłowe ID gry!')
     return

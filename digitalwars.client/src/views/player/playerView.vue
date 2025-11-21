@@ -319,18 +319,17 @@
     />
   </div>
 
-    <IndependentTeam 
-      @close="showIndependentTeamModal = false"
-      :isVisible="showIndependentTeamModal"
-      :teamName="gameData?.teamName!"
-    />
+  <IndependentTeam
+    @close="showIndependentTeamModal = false"
+    :isVisible="showIndependentTeamModal"
+    :teamName="gameData?.teamName!"
+  />
 
-    <NotIndependentTeam 
-      @close="showNotIndependentTeamModal = false"
-      :isVisible="showNotIndependentTeamModal"
-      :teamName="gameData?.teamName!"
-    />
-
+  <NotIndependentTeam
+    @close="showNotIndependentTeamModal = false"
+    :isVisible="showNotIndependentTeamModal"
+    :teamName="gameData?.teamName!"
+  />
 </template>
 
 <script setup lang="ts">
@@ -353,7 +352,7 @@ import { useBreakpoints } from '@vueuse/core'
 import { faCommentDots } from '@fortawesome/free-solid-svg-icons'
 import { onClickOutside } from '@vueuse/core'
 
-const chatRef = ref<HTMLElement | null>(null);
+const chatRef = ref<HTMLElement | null>(null)
 
 onClickOutside(chatRef, () => {
   showChat.value = false
@@ -374,13 +373,13 @@ const props = defineProps({
 const mobileView = ref('board')
 const showingDecisionCards = ref(true)
 const currentPanel = ref('menu')
-const leftOpen = ref(true);
-const rightOpen = ref(true);
+const leftOpen = ref(true)
+const rightOpen = ref(true)
 const currentBoard = ref('player')
-const showChat = ref(false);
-const showIndependentTeamModal = ref<boolean>(false);
-const showNotIndependentTeamModal = ref<boolean>(false);
-const cardCarouselRef = ref<InstanceType<typeof CardCarousel> | null>(null);
+const showChat = ref(false)
+const showIndependentTeamModal = ref<boolean>(false)
+const showNotIndependentTeamModal = ref<boolean>(false)
+const cardCarouselRef = ref<InstanceType<typeof CardCarousel> | null>(null)
 
 import { fillBoardConfig } from '@/composables/BoardHelpers'
 
@@ -392,7 +391,11 @@ const currentGlobalBudget = ref(0)
 const pawns = ref<Pawn[]>([])
 const enemypawns = ref<Pawn[]>([])
 
-const playerMenuRef = ref<{ fetchGameLog: () => void; fetchTeamBud: () => void, handleFetchBudget: () => void } | null>(null)
+const playerMenuRef = ref<{
+  fetchGameLog: () => void
+  fetchTeamBud: () => void
+  handleFetchBudget: () => void
+} | null>(null)
 
 const createDefaultBoardConfig = (): BoardConfig => ({
   boardId: 0,
@@ -412,8 +415,6 @@ const formData = reactive<BoardConfig>(createDefaultBoardConfig())
 const enemyformData = reactive<BoardConfig>(createDefaultBoardConfig())
 const gameStatusError = ref<GameStatusError | null>(null)
 
-
-
 // --- FUNKCJE ---
 const fetchGameDataByToken = async (token: string) => {
   if (!token) {
@@ -430,25 +431,24 @@ const fetchGameDataByToken = async (token: string) => {
     )
     gameData.value = response.data
 
-    console.log('Pobrano dane gry przez token:', gameData.value);
+    console.log('Pobrano dane gry przez token:', gameData.value)
 
     if (gameData.value.isIndependent) {
-      showIndependentTeamModal.value = true;
+      showIndependentTeamModal.value = true
     } else {
-      showNotIndependentTeamModal.value = true;
+      showNotIndependentTeamModal.value = true
     }
 
     currentGlobalBudget.value = gameData.value.teamBudget
 
     const apiBoardConfig = gameData.value.boardConfig
 
-    fillBoardConfig(formData, apiBoardConfig);
-
+    fillBoardConfig(formData, apiBoardConfig)
 
     if (gameData.value.rivalBoardConfig) {
-      fillBoardConfig(enemyformData, gameData.value.rivalBoardConfig);
+      fillBoardConfig(enemyformData, gameData.value.rivalBoardConfig)
 
-      console.log('Plansza konkurecji:', gameData.value.rivalBoardConfig);
+      console.log('Plansza konkurecji:', gameData.value.rivalBoardConfig)
     } else {
       console.warn('Brak konfiguracji rivalBoardConfig.')
     }
@@ -548,22 +548,21 @@ const onBoardUpdate = (data: any) => {
 const onHistoryUpdate = () => {
   console.log("SignalR: Otrzymano 'HistoryUpdated'. Odświeżam historię.")
   if (playerMenuRef.value) {
-    playerMenuRef.value.fetchGameLog();
-    playerMenuRef.value.fetchTeamBud();
+    playerMenuRef.value.fetchGameLog()
+    playerMenuRef.value.fetchTeamBud()
   }
 }
 
 const onPendingUpdate = () => {
-  console.log("SignalR: Otrzymano 'PendingUpdated'. Odświeżam karty");
+  console.log("SignalR: Otrzymano 'PendingUpdated'. Odświeżam karty")
   if (cardCarouselRef.value) {
-    cardCarouselRef.value.fetchCards();
+    cardCarouselRef.value.fetchCards()
   }
-
 }
 
 const onBudgetUpdate = () => {
   if (playerMenuRef.value) {
-    playerMenuRef.value.handleFetchBudget();
+    playerMenuRef.value.handleFetchBudget()
   }
 }
 let isSignalRInitialized = false
@@ -577,7 +576,10 @@ watch(
       isSignalRInitialized = true
       try {
         await signalrService.start()
-        await signalrService.joinGameRoomAsPlayer(String(gameData.value.gameId), String(gameData.value.teamId))
+        await signalrService.joinGameRoomAsPlayer(
+          String(gameData.value.gameId),
+          String(gameData.value.teamId),
+        )
         console.log(`SignalR: Połączono i dołączono do pokoju gry ${gameData.value.gameId}`)
         signalrService.connection.on('BoardUpdated', onBoardUpdate)
         signalrService.connection.on('HistoryUpdated', onHistoryUpdate)
@@ -598,11 +600,14 @@ onMounted(() => {
 onUnmounted(() => {
   if (gameData.value?.gameId) {
     console.log(`SignalR: Opuszczanie pokoju gry ${gameData.value.gameId}`)
-    signalrService.leaveGameRoomAsPlayer(String(gameData.value.gameId), String(gameData.value.teamId))
-    signalrService.connection.off('BoardUpdated', onBoardUpdate);
-    signalrService.connection.off('HistoryUpdated', onHistoryUpdate);
-    signalrService.connection.off('PendingUpdated', onPendingUpdate);
-    signalrService.connection.off('BudgetUpdated', onBudgetUpdate);
+    signalrService.leaveGameRoomAsPlayer(
+      String(gameData.value.gameId),
+      String(gameData.value.teamId),
+    )
+    signalrService.connection.off('BoardUpdated', onBoardUpdate)
+    signalrService.connection.off('HistoryUpdated', onHistoryUpdate)
+    signalrService.connection.off('PendingUpdated', onPendingUpdate)
+    signalrService.connection.off('BudgetUpdated', onBudgetUpdate)
   }
 })
 </script>

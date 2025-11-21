@@ -65,7 +65,10 @@
                 <template #option="slotProps">
                   <div class="flex items-center justify-between gap-2 w-full">
                     <div class="flex gap-2 items-center">
-                      <div :style="{ backgroundColor: slotProps.option.teamColor }" class="w-4 h-4 rounded-full"></div>
+                      <div
+                        :style="{ backgroundColor: slotProps.option.teamColor }"
+                        class="w-4 h-4 rounded-full"
+                      ></div>
                       <span>{{ slotProps.option.teamName }}</span>
                     </div>
                     <span class="text-green-400">{{ slotProps.option.teamBud }} bitów</span>
@@ -118,14 +121,26 @@
               >
                 <template #value="slotProps">
                   <div v-if="slotProps.value" class="flex items-center gap-2">
-                    <span  :class="items.find((i) => i.id === slotProps.value)?.type ===  'software' ? 'text-green-400' : 'text-orange-400'">#{{ slotProps.value }}</span>
+                    <span
+                      :class="
+                        items.find((i) => i.id === slotProps.value)?.type === 'software'
+                          ? 'text-green-400'
+                          : 'text-orange-400'
+                      "
+                      >#{{ slotProps.value }}</span
+                    >
                     <span>{{ items.find((i) => i.id === slotProps.value)?.title }}</span>
                   </div>
                   <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
                 </template>
                 <template #option="slotProps">
                   <div class="flex items-center gap-2">
-                    <span :class="slotProps.option.type ===  'software' ? 'text-green-400' : 'text-orange-400'">#{{ slotProps.option.id }}</span>
+                    <span
+                      :class="
+                        slotProps.option.type === 'software' ? 'text-green-400' : 'text-orange-400'
+                      "
+                      >#{{ slotProps.option.id }}</span
+                    >
                     <span>{{ slotProps.option.title }}</span>
                   </div>
                 </template>
@@ -572,7 +587,7 @@ const tables = ref<Team[]>([])
 const cards = ref<Card[]>([])
 const items = ref<Item[]>([])
 const availableEvents = ref<GameEvent[]>([])
-const { t } = useI18n();
+const { t } = useI18n()
 const enemyFormData = reactive<BoardConfigForComponent>({
   name: '',
   labelsUp: [],
@@ -669,7 +684,7 @@ const fetchPendingDecisions = async () => {
       tableName: log.teamName,
     }))
 
-    console.log('Pobrane decyzje oczekujące:', pendingDecisions.value);
+    console.log('Pobrane decyzje oczekujące:', pendingDecisions.value)
   } catch (error: any) {
     toast.error('Błąd podczas pobierania sugestii.')
     console.error('Błąd pobierania sugestii:', error.response?.data || error.message)
@@ -684,7 +699,7 @@ const fetchTeams = async () => {
     const response = await apiServices.get(apiConfig.player.getTeamsManagement(gameId))
     tables.value = response.data as Team[]
 
-    console.log('Pobrane drużyny:', tables.value);
+    console.log('Pobrane drużyny:', tables.value)
   } catch (error: any) {
     toast.error('Błąd pobierania drużyn.')
     console.error('Błąd pobierania drużyn:', error.response?.data || error.message)
@@ -699,26 +714,26 @@ const fetchAvailableCardsForTeam = async () => {
   try {
     const url = apiConfig.player.getCards(deckId.value, gameId, team.teamId)
     const response = await apiServices.get(url)
-    const data = response.data as { decisionCards: Card[]; hardwareCards: Item[]; softwareCards: Item[] }
+    const data = response.data as {
+      decisionCards: Card[]
+      hardwareCards: Item[]
+      softwareCards: Item[]
+    }
     cards.value = data.decisionCards || []
-    
+
     const softwareCards = data.softwareCards.map((item) => ({
       ...item,
       type: 'software',
-    }));
+    }))
 
-    console.log('Pobrane karty oprogramowania:', softwareCards);
+    console.log('Pobrane karty oprogramowania:', softwareCards)
 
     const hardwareCards = data.hardwareCards.map((item) => ({
       ...item,
       type: 'hardware',
-    })); 
-
-
-  
+    }))
 
     items.value = [...softwareCards, ...hardwareCards]
-
   } catch (error: any) {
     toast.error('Błąd pobierania dostępnych kart i przedmiotów.')
     console.error('Błąd pobierania kart:', error.response?.data || error.message)
@@ -805,7 +820,7 @@ async function executeAction(isCard: boolean) {
     return
   }
   if (team.teamBud < (entity.cost || 0)) {
-    toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }));
+    toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }))
     return
   }
   let wasSuccess: boolean
@@ -852,7 +867,7 @@ async function executeAction(isCard: boolean) {
     await fetchAvailableCardsForTeam()
   } catch (error: any) {
     if (error.response?.data?.errorCode === 'NotEnoughBudget') {
-      toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }));
+      toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }))
       return
     }
     toast.error(error.response?.data?.message || 'Wystąpił błąd podczas wykonywania akcji.')
@@ -863,14 +878,17 @@ const playCard = () => executeAction(true)
 const giveItem = () => executeAction(false)
 
 const approveDecision = async (logId: number) => {
-  console.log('Jaki log jest do zatwierdzenia  ?', logId);
+  console.log('Jaki log jest do zatwierdzenia  ?', logId)
   try {
     const response = await apiServices.post(apiConfig.player.approveLog(logId), {})
-    toast.success('Sugestia została zatwierdzona!');
-    console.log(response.data, 'Co otrzymałem po approve ?');
+    toast.success('Sugestia została zatwierdzona!')
+    console.log(response.data, 'Co otrzymałem po approve ?')
     await Promise.all([fetchPendingDecisions(), fetchDecisionHistory()])
-    console.log('Zaktualizowano listę decyzji po zatwierdzeniu do zatwierdzenia:', pendingDecisions.value);
-    console.log('Pobrana historia decyzji:', decisions.value);
+    console.log(
+      'Zaktualizowano listę decyzji po zatwierdzeniu do zatwierdzenia:',
+      pendingDecisions.value,
+    )
+    console.log('Pobrana historia decyzji:', decisions.value)
   } catch (error: any) {
     toast.error('Wystąpił błąd podczas zatwierdzania sugestii.')
     console.error('Błąd zatwierdzania:', error.response?.data || error.message)

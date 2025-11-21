@@ -113,8 +113,7 @@ import { useI18n } from 'vue-i18n'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
 
-
-const { t } = useI18n();
+const { t } = useI18n()
 
 // --- INTERFEJSY ---
 
@@ -354,10 +353,8 @@ const handleDeleteBoard = () => {
         }
       } catch (error: any) {
         if (error.response?.status === 409) {
-          toast.warning(
-            t('errorBoardDeleteConflict')
-          );
-          return;
+          toast.warning(t('errorBoardDeleteConflict'))
+          return
         }
         const errorMessage = error.response?.data || error.message || 'Nieznany błąd'
         toast.error(`Błąd usuwania: ${errorMessage}`)
