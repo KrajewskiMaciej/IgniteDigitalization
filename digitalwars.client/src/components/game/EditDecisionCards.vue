@@ -487,9 +487,19 @@ async function saveCard(): Promise<void> {
   if (!currentCard.value) return
   isSavingCard.value = true
   try {
-    // TODO: Implementacja logiki zapisu karty do API
-    console.log('Zapisywanie karty:', currentCard.value)
-    toast.success(`Zapisano kartę: ${currentCard.value.title}`)
+    const response = await apiService.put(apiConfig.admin.deck.updateCard,{
+      cardId: currentCard.value.id,
+      shortDesc: currentCard.value.title,
+      longDesc: currentCard.value.description
+    })
+
+    const cardToUpdated = cardsData.value.find(card =>  card.id === currentCard.value?.id);
+
+    if (cardToUpdated) {
+      cardToUpdated.title = currentCard.value.title;
+      cardToUpdated.description = currentCard.value.description;
+    }
+
   } catch (error) {
     toast.error('Nie udało się zapisać karty')
     console.error('Błąd zapisu karty:', error)
