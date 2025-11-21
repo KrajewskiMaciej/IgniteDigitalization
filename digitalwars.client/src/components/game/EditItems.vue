@@ -10,35 +10,73 @@
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
       <!-- Sekcja wyboru talii -->
-      <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
-        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-primary-500/20 p-2.5 rounded-lg">
-            <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
+        <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+          <!-- Nagłówek -->
+          <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+            <div class="bg-primary-500/20 p-2.5 rounded-lg">
+              <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
+            </div>
+            <div>
+              <h2 class="text-xl md:text-2xl font-bold text-white">Talie kart</h2>
+              <p class="text-xs md:text-sm text-surface-300/70 mt-1">
+                Wybierz talię, a następnie zaktualizuj jej nazwę.
+              </p>
+            </div>
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
-        </div>
 
-        <div>
-          <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            Wybierz talię kart:
-          </label>
-          <Dropdown
-            id="deck-select"
-            v-model="selectedDeck"
-            :options="decksData"
-            optionLabel="title"
-            optionValue="id"
-            placeholder="Wybierz talię..."
-            class="w-full"
-            :disabled="isLoadingDecks"
-          >
-          </Dropdown>
+          <!-- Wybór talii -->
+          <div>
+            <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
+              Wybierz talię kart:
+            </label>
+            <Dropdown
+              id="deck-select"
+              v-model="selectedDeckId"
+              :options="decksData"
+              optionLabel="title"
+              optionValue="id"
+              placeholder="Wybierz talię..."
+              class="w-full"
+              :disabled="isLoadingDecks"
+            />
+          </div>
+
+          <!-- Edycja nazwy -->
+          <div
+              v-if="deckName"
+              class="mt-6 p-4 bg-surface-800 border border-surface-700 rounded-lg grid grid-cols-4 gap-4"
+            >
+              <!-- Pole inputa -->
+              <div class="md:col-span-3 flex flex-col">
+                <label
+                  for="deck-name"
+                  class="mb-2 text-sm font-semibold text-gray-300"
+                >
+                  Nazwa talii
+                </label>
+
+                <InputText
+                  id="deck-name"
+                  v-model="deckName"
+                  class="w-full"
+                  placeholder="Wpisz nową nazwę talii..."
+                />
+              </div>
+
+              <!-- Przycisk -->
+              <div class="flex items-end">
+                <Button
+                  label="Zmień nazwę"
+                  class="w-full"
+                  @click="handleSaveDeckName"
+                />
+              </div>
+            </div>
         </div>
-      </div>
 
       <!-- Sekcja wyboru przedmiotu -->
       <div
-        v-if="selectedDeck"
+        v-if="selectedDeckId"
         class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
       >
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
@@ -95,7 +133,7 @@
           <h2 class="text-xl md:text-2xl font-bold text-white">Edycja przedmiotu</h2>
         </div>
 
-        <form @submit.prevent="handleSave" class="space-y-5">
+        <form @submit.prevent="handleSaveItem" class="space-y-5">
           <!-- Tytuł przedmiotu -->
           <div>
             <label for="item-title" class="block mb-2 text-sm font-semibold text-gray-300">
@@ -140,7 +178,7 @@
 
       <!-- Placeholder gdy brak wybranej talii -->
       <div
-        v-if="!selectedDeck"
+        v-if="!selectedDeckId"
         class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-surface-900/50"
       >
         <div
@@ -182,17 +220,41 @@ interface Item {
 
 const toast = useToast()
 
-const selectedDeck = ref<number | undefined>(undefined)
+const selectedDeckId = ref<number | undefined>(undefined)
 const selectedItem = ref<number | undefined>(undefined)
 
 // --- Stan komponentu z jawnymi typami ---
 const decksData = ref<Deck[]>([])
 const itemsData = ref<Item[]>([])
 const currentItem = ref<Item | null>(null)
+const deckName = ref<string>('');
 
 const isLoadingDecks = ref(true)
 const isLoadingItems = ref(false)
 const isSaving = ref(false)
+
+
+const handleSaveDeckName = async () => {
+  if (deckName.value.trim() === '') {
+    toast.warning('Nazwa talii kart nie może być pusta');
+    return;
+  }
+  try {
+    const response = await apiService.put(apiConfig.admin.deck.updateDeckName, {
+        decks_Id: selectedDeckId.value,
+        decks_Name: deckName.value,
+    })
+
+    console.log('Odpowiedź:', response);
+    const deck = decksData.value.find(deck => deck.id === selectedDeckId.value);
+    if (deck) {
+      deck.title = deckName.value;
+    }
+  } catch (error) {
+    toast.error('Błąd podczas aktualizacji nazwy talii');
+  }
+}
+
 
 // --- Pobieranie danych z API ---
 const fetchDecks = async () => {
@@ -223,14 +285,19 @@ const fetchItemsForDeck = async (deckId: number) => {
 }
 
 // --- Logika zapisu ---
-const handleSave = async () => {
+const handleSaveItem = async () => {
   if (!currentItem.value) {
     toast.warning('Brak przedmiotu do zapisania.')
     return
   }
   isSaving.value = true
   try {
-    await apiService.put(apiConfig.admin.deck.updateItem(currentItem.value.id), currentItem.value)
+    console.log(currentItem.value.id, 'ID');
+    await apiService.put(apiConfig.admin.deck.updateItem(currentItem.value.id),{
+      cardId: currentItem.value.id,
+      shortDesc: currentItem.value.shortDesc,
+      longDesc: currentItem.value.longDesc
+    })
 
     const index = itemsData.value.findIndex((item) => item.id === currentItem.value!.id)
     if (index !== -1) {
@@ -252,7 +319,7 @@ const handleSave = async () => {
 }
 
 // --- Obserwatorzy zmian ---
-watch(selectedDeck, (newDeckId) => {
+watch(selectedDeckId, (newDeckId) => {
   selectedItem.value = undefined
   currentItem.value = null
 
@@ -260,6 +327,10 @@ watch(selectedDeck, (newDeckId) => {
     fetchItemsForDeck(newDeckId)
   } else {
     itemsData.value = []
+  }
+  const deck = decksData.value.find(deck => deck.id === newDeckId);
+  if (deck) {
+    deckName.value = deck.title;
   }
 })
 
