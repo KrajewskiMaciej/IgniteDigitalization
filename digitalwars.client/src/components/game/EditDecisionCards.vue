@@ -18,41 +18,42 @@
           @change="handleFileChange"
           style="display: none"
         />
-        <div class="flex gap-2  justify-center">
-           <Button
-          @click="triggerFileInput"
-          severity="success"
-          size="large"
-          label="Wczytaj talię z pliku Excel"
-        >
-          <template #icon>
-            <font-awesome-icon :icon="faFileExcel" class="mr-2" />
-          </template>
-        </Button>
+        <div class="flex gap-2 justify-center">
+          <Button
+            @click="triggerFileInput"
+            severity="success"
+            size="large"
+            label="Wczytaj talię z pliku Excel"
+          >
+            <template #icon>
+              <font-awesome-icon :icon="faFileExcel" class="mr-2" />
+            </template>
+          </Button>
 
-        <Button
-          @click="handleDownloadTemplate"
-          size="large"
-          label="Pobierz szablon kart"
-
-        >
-          <template #icon>
-            <font-awesome-icon :icon="faDownload" class="mr-2" />
-          </template>
-          
-        </Button>
+          <Button @click="handleDownloadTemplate" size="large" label="Pobierz szablon kart">
+            <template #icon>
+              <font-awesome-icon :icon="faDownload" class="mr-2" />
+            </template>
+          </Button>
         </div>
       </div>
 
       <!-- Sekcja wyboru talii -->
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+        <!-- Nagłówek -->
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
           <div class="bg-primary-500/20 p-2.5 rounded-lg">
             <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
+          <div>
+            <h2 class="text-xl md:text-2xl font-bold text-white">Talie kart</h2>
+            <p class="text-xs md:text-sm text-surface-300/70 mt-1">
+              Wybierz talię, a następnie zaktualizuj jej nazwę.
+            </p>
+          </div>
         </div>
 
+        <!-- Wybór talii -->
         <div>
           <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
             Wybierz talię kart:
@@ -66,10 +67,41 @@
             placeholder="Wybierz talię..."
             class="w-full"
             :disabled="isLoadingDecks"
-          >
-          </Dropdown>
+          />
         </div>
-      </div>
+
+        <!-- Edycja nazwy -->
+        <div
+            v-if="deckName"
+            class="mt-6 p-4 bg-surface-800 border border-surface-700 rounded-lg grid grid-cols-4 gap-4"
+          >
+            <!-- Pole inputa -->
+            <div class="md:col-span-3 flex flex-col">
+              <label
+                for="deck-name"
+                class="mb-2 text-sm font-semibold text-gray-300"
+              >
+                Nazwa talii
+              </label>
+
+              <InputText
+                id="deck-name"
+                v-model="deckName"
+                class="w-full"
+                placeholder="Wpisz nową nazwę talii..."
+              />
+            </div>
+
+            <!-- Przycisk -->
+            <div class="flex items-end">
+              <Button
+                label="Zmień nazwę"
+                class="w-full"
+                @click="handleSaveDeckName"
+              />
+            </div>
+          </div>
+        </div>
 
       <!-- Grid z dwiema sekcjami -->
       <div v-if="selectedDeckId" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -326,7 +358,7 @@ import {
   faFileExcel,
   faLayerGroup,
   faComment,
-  faDownload
+  faDownload,
 } from '@fortawesome/free-solid-svg-icons'
 import { ref, watch, onMounted } from 'vue'
 import apiConfig from '@/services/apiConfig'
@@ -367,6 +399,7 @@ const selectedFeedbackId = ref<number | undefined>(undefined)
 const fileInput = ref<HTMLInputElement | null>(null)
 
 const decksData = ref<Deck[]>([])
+const deckName = ref<string>('')
 const cardsData = ref<Card[]>([])
 const feedbackData = ref<Feedback[]>([
   { id: 1, longDescription: 'Przykładowy feedback negatywny dla tej karty.', status: 'N' },
@@ -408,26 +441,45 @@ async function handleFileChange(event: Event): Promise<void> {
   }
 }
 
-
 const handleDownloadTemplate = async () => {
   try {
-    const response = await apiServices.getFile(apiConfig.admin.deck.getCardsTemplate);
-    console.log('Co otrzymałem w odpowiedzi ?', response.data);
+    const response = await apiServices.getFile(apiConfig.admin.deck.getCardsTemplate)
+    console.log('Co otrzymałem w odpowiedzi ?', response.data)
 
     const file = response.data
 
-    const url = window.URL.createObjectURL(file);
+    const url = window.URL.createObjectURL(file)
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'DigitalWars_SzablonKart.xlsx';
-    link.click();
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'DigitalWars_SzablonKart.xlsx'
+    link.click()
 
-    window.URL.revokeObjectURL(url);
-
-  }  catch (error) {
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
     console.error('Błąd przy pobieraniu szablonu kart:', error)
     toast.error('Nie udało się pobrać szablonu kart.')
+  }
+}
+
+const handleSaveDeckName = async () => {
+  if (deckName.value.trim() === '') {
+    toast.warning('Nazwa talii kart nie może być pusta');
+    return;
+  }
+  try {
+    const response = await apiService.put(apiConfig.admin.deck.updateDeckName, {
+        decks_Id: selectedDeckId.value,
+        decks_Name: deckName.value,
+    })
+
+    console.log('Odpowiedź:', response);
+    const deck = decksData.value.find(deck => deck.id === selectedDeckId.value);
+    if (deck) {
+      deck.title = deckName.value;
+    }
+  } catch (error) {
+    toast.error('Błąd podczas aktualizacji nazwy talii');
   }
 }
 
@@ -495,6 +547,12 @@ watch(selectedDeckId, async (newDeckId) => {
     cardsData.value = []
   } finally {
     isLoadingCards.value = false
+  }
+
+  const deck = decksData.value.find((deck) => deck.id === newDeckId)
+  console.log('Znaleziona talia kart:', deck)
+  if (deck) {
+    deckName.value = deck.title
   }
 })
 

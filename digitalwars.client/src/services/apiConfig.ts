@@ -19,7 +19,8 @@ const endpoints = {
       cards: (deckId: number) => `/admin/deck/decisions?deckId=${deckId}`,
       items: (deckId: number) => `/admin/deck/items?deckId=${deckId}`,
       updateItem: (cardId: number) => `/admin/deck/items/${cardId}`,
-      getCardsTemplate : '/admin/deck/download-template',
+      getCardsTemplate: '/admin/deck/download-template',
+      updateDeckName: '/admin/deck/edit'
     },
     settings: {
       licenses: '/admin/licenses',
