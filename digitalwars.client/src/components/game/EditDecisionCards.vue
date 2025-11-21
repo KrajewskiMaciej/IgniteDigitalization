@@ -210,46 +210,50 @@
                 Wybierz feedback:
               </label>
               <Dropdown
-                id="feedback-select"
-                v-model="selectedFeedbackId"
-                :options="feedbackData"
-                optionLabel="longDescription"
-                optionValue="id"
-                placeholder="Wybierz feedback..."
-                class="w-full"
-              >
-                <template #value="slotProps">
-                  <div v-if="slotProps.value" class="flex items-center gap-2">
-                    <span>
-                      {{
-                        feedbackData.find((f) => f.id === slotProps.value)?.status === 'P'
-                          ? '✅'
-                          : '❌'
-                      }}
-                    </span>
-                    <span class="truncate">
-                      {{
-                        feedbackData
-                          .find((f) => f.id === slotProps.value)
-                          ?.longDescription.substring(0, 40)
-                      }}...
-                    </span>
-                  </div>
-                  <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
-                </template>
-                <template #option="slotProps">
-                  <div class="flex items-center gap-2">
-                    <span>{{ slotProps.option.status === 'P' ? '✅' : '❌' }}</span>
-                    <span class="truncate">
-                      {{ slotProps.option.longDescription.substring(0, 40) }}...
-                    </span>
-                  </div>
-                </template>
-              </Dropdown>
+                  id="feedback-select"
+                  v-model="selectedFeedbackId"
+                  :options="feedbacksData"
+                  optionLabel="feedbacks_Long_Description"
+                  optionValue="feedbacks_Id"
+                  placeholder="Wybierz feedback..."
+                  class="w-full"
+                >
+                  <template #value="slotProps">
+                    <div v-if="slotProps.value" class="flex items-center gap-2">
+                      <div 
+                        class="flex items-center justify-center w-6 h-6 rounded p-2"
+                        :class="feedbacksData.find(f => f.feedbacks_Id === slotProps.value)?.status === 'positive' ? 'bg-green-500/20' : 'bg-red-500/20'"
+                      >
+                        <font-awesome-icon 
+                          :icon="feedbacksData.find(f => f.feedbacks_Id === slotProps.value)?.status === 'positive' ? faCircleCheck : faCircleXmark" 
+                          :class="feedbacksData.find(f => f.feedbacks_Id === slotProps.value)?.status === 'positive' ? 'text-green-400' : 'text-red-400'"
+                        />
+                      </div>
+                      <span>
+                        {{ feedbacksData.find(f => f.feedbacks_Id === slotProps.value)?.feedbacks_Long_Description.trim() === '' ? 'Brak opisu' : feedbacksData.find(f => f.feedbacks_Id === slotProps.value)?.feedbacks_Long_Description }}
+                      </span>
+                    </div>
+                    <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                  </template>
+                  <template #option="slotProps">
+                    <div class="flex items-center gap-2">
+                      <div 
+                        class="flex items-center justify-center w-6 h-6 rounded p-2"
+                        :class="slotProps.option.status === 'positive' ? 'bg-green-500/20' : 'bg-red-500/20'"
+                      >
+                        <font-awesome-icon 
+                          :icon="slotProps.option.status === 'positive' ? faCircleCheck : faCircleXmark" 
+                          :class="slotProps.option.status === 'positive' ? 'text-green-400' : 'text-red-400'"
+                        />
+                      </div>
+                      <span>{{ slotProps.option.feedbacks_Long_Description.trim() === '' ? 'Brak opisu' : truncateString(slotProps.option.feedbacks_Long_Description,55) }}</span>
+                    </div>
+                  </template>
+                </Dropdown>
             </div>
 
             <form
-              v-if="selectedFeedbackId && currentFeedback"
+              v-if="selectedFeedbackId && selectedFeedback"
               @submit.prevent="saveFeedback"
               class="space-y-5"
             >
@@ -263,60 +267,11 @@
                 </label>
                 <Textarea
                   id="feedbackDescription"
-                  v-model="currentFeedback.longDescription"
+                  v-model="selectedFeedback.feedbacks_Long_Description"
                   rows="8"
                   placeholder="Szczegółowy opis feedbacku..."
                   class="w-full"
                 />
-              </div>
-
-              <!-- Status feedbacku -->
-              <div>
-                <label class="block mb-2 text-sm font-semibold text-gray-300">
-                  Status feedbacku:
-                </label>
-                <div class="flex gap-4">
-                  <div
-                    class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors cursor-pointer flex-1"
-                    :class="
-                      currentFeedback.status === 'P'
-                        ? 'border-green-400 bg-green-500/20'
-                        : 'border-surface-600 hover:border-surface-500'
-                    "
-                    @click="currentFeedback.status = 'P'"
-                  >
-                    <input
-                      type="radio"
-                      id="status-positive"
-                      v-model="currentFeedback.status"
-                      value="P"
-                      class="w-4 h-4"
-                    />
-                    <label for="status-positive" class="text-white cursor-pointer flex-1">
-                      ✅ Pozytywny
-                    </label>
-                  </div>
-                  <div
-                    class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors cursor-pointer flex-1"
-                    :class="
-                      currentFeedback.status === 'N'
-                        ? 'border-red-400 bg-red-500/20'
-                        : 'border-surface-600 hover:border-surface-500'
-                    "
-                    @click="currentFeedback.status = 'N'"
-                  >
-                    <input
-                      type="radio"
-                      id="status-negative"
-                      v-model="currentFeedback.status"
-                      value="N"
-                      class="w-4 h-4"
-                    />
-                    <label for="status-negative" class="text-white cursor-pointer flex-1">
-                      ❌ Negatywny
-                    </label>
-                  </div>
-                </div>
               </div>
 
               <!-- Przycisk zapisu -->
@@ -326,7 +281,6 @@
                   :disabled="isSavingFeedback"
                   :loading="isSavingFeedback"
                   :label="isSavingFeedback ? 'Zapisywanie...' : 'Zapisz Feedback'"
-                  severity="secondary"
                   size="large"
                   class="w-full"
                 />
@@ -359,8 +313,10 @@ import {
   faLayerGroup,
   faComment,
   faDownload,
+  faCircleCheck,
+  faCircleXmark
 } from '@fortawesome/free-solid-svg-icons'
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
 import { useToast } from 'vue-toastification'
@@ -370,6 +326,8 @@ import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
 import apiServices from '@/services/apiServices'
+import type { IFeedback, IFeedbacksResponse } from '@/types/Feedbacks'
+import { truncateString } from '@/composables/truncateString'
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Deck {
@@ -384,30 +342,26 @@ interface Card {
   description: string
 }
 
-interface Feedback {
-  id: number
-  longDescription: string
-  status: 'P' | 'N'
-}
-
 // --- ZMIENNE REAKTYWNE ---
 const toast = useToast()
 const selectedDeckId = ref<number | undefined>(undefined)
 const selectedCardId = ref<number | undefined>(undefined)
 const selectedFeedbackId = ref<number | undefined>(undefined)
+const feedbacksData = ref<IFeedback[]>([]);
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
 const decksData = ref<Deck[]>([])
 const deckName = ref<string>('')
 const cardsData = ref<Card[]>([])
-const feedbackData = ref<Feedback[]>([
-  { id: 1, longDescription: 'Przykładowy feedback negatywny dla tej karty.', status: 'N' },
-  { id: 2, longDescription: 'Przykładowy feedback pozytywny dla tej karty.', status: 'P' },
-])
 
 const currentCard = ref<Card | null>(null)
-const currentFeedback = ref<Feedback | null>(null)
+const selectedFeedback = computed<IFeedback | null>(() => {
+  if (!selectedFeedbackId.value) return null
+  return feedbacksData.value.find(
+    (f) => f.feedbacks_Id === selectedFeedbackId.value
+  ) ?? null
+})
 
 const isLoadingDecks = ref(true)
 const isLoadingCards = ref(false)
@@ -418,6 +372,36 @@ const isSavingFeedback = ref(false)
 function triggerFileInput(): void {
   fileInput.value?.click()
 }
+
+const fetchFeedbacks = async () => {
+  if (!currentCard.value?.id) return
+
+  try {
+    const response = await apiService.get<IFeedbacksResponse>(
+      apiConfig.admin.deck.getFeedbacks(currentCard.value.id)
+    );
+
+    const data = response.data;
+
+    console.log('Pobrane procesy:', data);
+
+    const mapped: IFeedback[] = [
+      data.negativeFeedback
+        ? { ...data.negativeFeedback, status: 'negative' as const }
+        : undefined,
+
+      data.positiveFeedback
+        ? { ...data.positiveFeedback, status: 'positive' as const }
+        : undefined
+    ].filter((f): f is IFeedback => f !== undefined);
+
+    feedbacksData.value = mapped;
+
+  } catch (error) {
+    toast.error('Wystąpił błąd podczas pobierania feedbacków dla karty');
+    console.error('Błąd pobierania feedbacków:', error);
+  }
+};
 
 async function handleFileChange(event: Event): Promise<void> {
   const target = event.target as HTMLInputElement
@@ -509,12 +493,16 @@ async function saveCard(): Promise<void> {
 }
 
 async function saveFeedback(): Promise<void> {
-  if (!currentFeedback.value) return
+  if (!selectedFeedback.value) return
   isSavingFeedback.value = true
   try {
-    // TODO: Implementacja logiki zapisu feedbacku do API
-    console.log('Zapisywanie feedbacku:', currentFeedback.value)
-    toast.success(`Zapisano feedback`)
+    console.log('Feedbacki:', feedbacksData.value);
+    const negativeDescription = feedbacksData.value[0].feedbacks_Long_Description;
+    const positiveDescription = feedbacksData.value[1].feedbacks_Long_Description;
+    apiServices.put(apiConfig.admin.deck.updateFeedbacks(selectedCardId.value!),{
+      positiveDescription: positiveDescription,
+      negativeDescription: negativeDescription
+    })
   } catch (error) {
     toast.error('Nie udało się zapisać feedbacku')
     console.error('Błąd zapisu feedbacku:', error)
@@ -568,7 +556,6 @@ watch(selectedDeckId, async (newDeckId) => {
 
 watch(selectedCardId, (newCardId) => {
   selectedFeedbackId.value = undefined
-  currentFeedback.value = null
 
   if (newCardId) {
     const card = cardsData.value.find((c) => c.id === newCardId)
@@ -576,16 +563,10 @@ watch(selectedCardId, (newCardId) => {
   } else {
     currentCard.value = null
   }
+
+  fetchFeedbacks();
 })
 
-watch(selectedFeedbackId, (newFeedbackId) => {
-  if (newFeedbackId) {
-    const feedback = feedbackData.value.find((f) => f.id === newFeedbackId)
-    currentFeedback.value = feedback ? { ...feedback } : null
-  } else {
-    currentFeedback.value = null
-  }
-})
 
 // --- CYKL ŻYCIA KOMPONENTU ---
 onMounted(fetchDecks)

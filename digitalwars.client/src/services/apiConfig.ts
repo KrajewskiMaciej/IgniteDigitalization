@@ -22,6 +22,8 @@ const endpoints = {
       getCardsTemplate: '/admin/deck/download-template',
       updateDeckName: '/admin/deck/edit',
       updateCard: '/admin/deck/decisions/edit',
+      getFeedbacks: (cardId: number) => `/admin/deck/feedbacks?cardId=${cardId}`,
+      updateFeedbacks: (cardId: number) => `/admin/deck/feedbacks/edit?cardId=${cardId}`,
     },
     settings: {
       licenses: '/admin/licenses',
