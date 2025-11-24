@@ -101,7 +101,7 @@
               />
             </div>
           </div>
-        </div>
+      </div>
 
       <!-- Grid z dwiema sekcjami -->
       <div v-if="selectedDeckId" class="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -38,6 +38,10 @@ const endpoints = {
       boards: (teamBoardId: number, rivalBoardId: number) =>
         `/admin/exportBoards?teamBoardId=${teamBoardId}&rivalBoardId=${rivalBoardId}`,
     },
+    cheatsheet: {
+      getMap: (deckId: number, moduleId: number) => `/Cheatsheet/enablersMap?deckId=${deckId}&moduleId=${moduleId}`,
+      getEntreis: (gameId: number, teamId: number) => `/Cheatsheet/latestEntries?gameId=${gameId}&teamId=${teamId}`,
+    }
   },
   games: {
     // These are likely in a GamesController, assumed to be correct.

@@ -80,7 +80,6 @@
           </div>
         </li>
 
-
         <li
           class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
@@ -106,7 +105,6 @@
             <span v-if="isSideBarOpen">Ściąga mistrza gry</span>
           </RouterLink>
         </li>
-
 
         <li
           class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
