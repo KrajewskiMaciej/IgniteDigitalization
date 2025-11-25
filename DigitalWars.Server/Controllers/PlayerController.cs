@@ -45,6 +45,7 @@ namespace backend.Controllers
                     t.Teams_Id,
                     t.Teams_Name,
                     t.Teams_Bud,
+                    t.Teams_Color,
                     t.Games.Decks_Id,
                     Board = t.Games.Teams_Boards // Pobierz cały obiekt Board
                 })
@@ -60,6 +61,7 @@ namespace backend.Controllers
             {
                 TeamId = rawTeamData.Teams_Id,
                 TeamName = rawTeamData.Teams_Name,
+                TeamColor = rawTeamData.Teams_Color,
                 TeamBud = rawTeamData.Teams_Bud,
                 DeckId = rawTeamData.Decks_Id,
                 BoardConfig = new BoardConfigDto
@@ -129,6 +131,59 @@ namespace backend.Controllers
         {
             var logs = await _context.GameLogs
                 .Where(l => l.Games_Id == gameId && l.Is_Approved == false && l.Teams != null && l.Cards != null)
+                .Select(l => new
+                {
+                    LogId = l.Games_Logs_Id,
+                    // POPRAWKA: Użycie operatora ! (null-forgiving) jest bezpieczne, bo sprawdziliśmy `!= null` w `Where`
+                    TeamName = l.Teams!.Teams_Name,
+                    CardId = l.Cards!.Card_Id,
+                    InternalCardId = l.Cards_Id,
+                    l.Costs,
+                    Timestamp = l.Data
+                })
+                .ToListAsync();
+
+            // POPRAWKA: Filtruj logi, które z jakiegoś powodu nie mają InternalCardId, aby uniknąć błędu CS8629
+            var validLogs = logs.Where(l => l.InternalCardId.HasValue).ToList();
+
+            // POPRAWKA: Użyj .Value, co jest teraz bezpieczne
+            var cardIds = validLogs.Select(l => l.InternalCardId!.Value).ToList();
+
+            var decisionTitles = await _context.Decisions
+                .Where(d => cardIds.Contains(d.Cards_Id))
+                .ToDictionaryAsync(d => d.Cards_Id, d => d.Decisions_Short_Desc);
+
+            var hardwareTitles = await _context.Hardwares
+                .Where(h => cardIds.Contains(h.Cards_Id))
+                .ToDictionaryAsync(h => h.Cards_Id, h => h.Hardwares_Short_Desc);
+
+            var softwareTitles = await _context.Softwares
+                .Where(s => cardIds.Contains(s.Cards_Id))
+                .ToDictionaryAsync(s => s.Cards_Id, s => s.Softwares_Short_Desc);
+
+            // Użyj przefiltrowanej listy validLogs
+            var result = validLogs.Select(l => new
+            {
+                l.LogId,
+                l.TeamName,
+                l.CardId,
+                CardTitle = decisionTitles.GetValueOrDefault(l.InternalCardId!.Value) ??
+                            hardwareTitles.GetValueOrDefault(l.InternalCardId!.Value) ??
+                            softwareTitles.GetValueOrDefault(l.InternalCardId!.Value),
+                l.Costs,
+                l.Timestamp
+            });
+
+            return Ok(result);
+        }
+
+
+        [Authorize]
+        [HttpGet("game/{gameId}/{teamId}/pending-logs")]
+        public async Task<IActionResult> GetPendingLogs(int gameId, int teamId)
+        {
+            var logs = await _context.GameLogs
+                .Where(l => l.Games_Id == gameId && l.Teams_Id == teamId && l.Is_Approved == false && l.Teams != null && l.Cards != null)
                 .Select(l => new
                 {
                     LogId = l.Games_Logs_Id,

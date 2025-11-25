@@ -71,6 +71,7 @@ const endpoints = {
       `player/team/${gameId}/${teamId}/budget`,
     unlockCard: (gameId: number) => `/player/game/${gameId}/unlock-card`,
     getPendingLogs: (gameId: number) => `/player/game/${gameId}/pending-logs`,
+    getPendingLogsForTeam: (gameId: number, teamId: number) => `/player/game/${gameId}/${teamId}/pending-logs`,
     getGameEvents: (decks_Id: number) => `/player/game-events?decks_Id=${decks_Id}`, // Expects decks_Id as query param
     applyEvent: (gameId: number) => `/player/game/${gameId}/apply-event`,
     getHistoryVersion: (gameId: number, teamId?: number) =>
