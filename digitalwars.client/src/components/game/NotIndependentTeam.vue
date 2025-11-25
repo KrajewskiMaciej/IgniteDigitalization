@@ -26,7 +26,7 @@
 
       <!-- Progres -->
       <div class="space-y-2 px-2">
-        <div class="flex items-center justify-between text-xs text-gray-400">
+        <div class="flex items-center justify-between text-xs text-surface-400">
           <span>Okno zamknie się automatycznie</span>
           <span>za {{ secondsLeft }} s</span>
         </div>

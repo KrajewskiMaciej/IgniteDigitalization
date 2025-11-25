@@ -87,13 +87,13 @@
         <!-- Token -->
         <div class="text-center space-y-3">
           <div class="inline-block px-4 py-2 rounded-lg border border-surface-700">
-            <p class="text-xs text-gray-400 mb-1">Token drużyny</p>
+            <p class="text-xs text-surface-400 mb-1">Token drużyny</p>
             <p class="text-6xl font-bold tracking-wider">
               {{ table.token }}
             </p>
           </div>
 
-          <p class="text-xs text-gray-400 pt-2">Zeskanuj kod QR lub użyj tokenu aby dołączyć</p>
+          <p class="text-xs text-surface-400 pt-2">Zeskanuj kod QR lub użyj tokenu aby dołączyć</p>
         </div>
       </div>
     </div>

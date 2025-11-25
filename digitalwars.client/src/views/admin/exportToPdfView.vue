@@ -5,14 +5,14 @@
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
         Eksport gry do PDF
       </h1>
-      <p class="text-gray-400 text-sm md:text-base">Generuj pliki PDF z kartami i planszami</p>
+      <p class="text-surface-400 text-sm md:text-base">Generuj pliki PDF z kartami i planszami</p>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
       <!-- Sekcja 1: Eksport talii kart -->
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-700">
-          <div class="bg-primary-500/20 p-2.5 rounded-lg">
+          <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faFileExport" class="h-6 text-primary-400" />
           </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">Eksport kart</h2>
@@ -56,7 +56,7 @@
       <!-- Sekcja 2: Eksport plansz -->
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-700">
-          <div class="bg-green-400/20 p-2.5 rounded-lg">
+          <div class="bg-green-400/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faFileExport" class="h-6 text-green-400" />
           </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">Eksport plansz</h2>

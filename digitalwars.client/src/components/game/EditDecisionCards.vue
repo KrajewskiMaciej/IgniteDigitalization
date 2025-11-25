@@ -5,7 +5,7 @@
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
         Edycja Kart
       </h1>
-      <p class="text-gray-400 text-sm md:text-base">Zarządzaj kartami w talii</p>
+      <p class="text-surface-400 text-sm md:text-base">Zarządzaj kartami w talii</p>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
@@ -42,14 +42,8 @@
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
         <!-- Nagłówek -->
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-primary-500/20 p-2.5 rounded-lg">
+          <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
-          </div>
-          <div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">Talie kart</h2>
-            <p class="text-xs md:text-sm text-surface-300/70 mt-1">
-              Wybierz talię, a następnie zaktualizuj jej nazwę.
-            </p>
           </div>
         </div>
 
@@ -72,35 +66,28 @@
 
         <!-- Edycja nazwy -->
         <div
-            v-if="deckName"
-            class="mt-6 p-4 bg-surface-800 border border-surface-700 rounded-lg grid grid-cols-4 gap-4"
-          >
-            <!-- Pole inputa -->
-            <div class="md:col-span-3 flex flex-col">
-              <label
-                for="deck-name"
-                class="mb-2 text-sm font-semibold text-gray-300"
-              >
-                Nazwa talii
-              </label>
+          v-if="deckName"
+          class="mt-6 p-4 bg-surface-800 border border-surface-700 rounded-lg grid grid-cols-4 gap-4"
+        >
+          <!-- Pole inputa -->
+          <div class="md:col-span-3 flex flex-col">
+            <label for="deck-name" class="mb-2 text-sm font-semibold text-gray-300">
+              Nazwa talii
+            </label>
 
-              <InputText
-                id="deck-name"
-                v-model="deckName"
-                class="w-full"
-                placeholder="Wpisz nową nazwę talii..."
-              />
-            </div>
-
-            <!-- Przycisk -->
-            <div class="flex items-end">
-              <Button
-                label="Zmień nazwę"
-                class="w-full"
-                @click="handleSaveDeckName"
-              />
-            </div>
+            <InputText
+              id="deck-name"
+              v-model="deckName"
+              class="w-full"
+              placeholder="Wpisz nową nazwę talii..."
+            />
           </div>
+
+          <!-- Przycisk -->
+          <div class="flex items-end">
+            <Button label="Zmień nazwę" class="w-full" @click="handleSaveDeckName" />
+          </div>
+        </div>
       </div>
 
       <!-- Grid z dwiema sekcjami -->
@@ -108,7 +95,7 @@
         <!-- Sekcja edycji karty -->
         <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
           <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-            <div class="bg-blue-500/20 p-2.5 rounded-lg">
+            <div class="bg-blue-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
             </div>
             <h2 class="text-xl md:text-2xl font-bold text-white">Edycja karty</h2>
@@ -116,7 +103,7 @@
 
           <div v-if="isLoadingCards" class="text-center py-8">
             <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-            <p class="text-gray-400 mt-3">Ładowanie kart...</p>
+            <p class="text-surface-400 mt-3">Ładowanie kart...</p>
           </div>
 
           <div v-else class="space-y-5">
@@ -138,7 +125,7 @@
                     <span class="text-blue-400">#{{ slotProps.value }}</span>
                     <span>{{ cardsData.find((c) => c.id === slotProps.value)?.title }}</span>
                   </div>
-                  <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                  <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
                 </template>
                 <template #option="slotProps">
                   <div class="flex items-center gap-2">
@@ -198,7 +185,7 @@
           class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
         >
           <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-            <div class="bg-primary-500/20 p-2.5 rounded-lg">
+            <div class="bg-primary-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faComment" class="h-6 text-primary-400" />
             </div>
             <h2 class="text-xl md:text-2xl font-bold text-white">Edycja feedbacku</h2>
@@ -210,46 +197,78 @@
                 Wybierz feedback:
               </label>
               <Dropdown
-                  id="feedback-select"
-                  v-model="selectedFeedbackId"
-                  :options="feedbacksData"
-                  optionLabel="feedbacks_Long_Description"
-                  optionValue="feedbacks_Id"
-                  placeholder="Wybierz feedback..."
-                  class="w-full"
-                >
-                  <template #value="slotProps">
-                    <div v-if="slotProps.value" class="flex items-center gap-2">
-                      <div 
-                        class="flex items-center justify-center w-6 h-6 rounded p-2"
-                        :class="feedbacksData.find(f => f.feedbacks_Id === slotProps.value)?.status === 'positive' ? 'bg-green-500/20' : 'bg-red-500/20'"
-                      >
-                        <font-awesome-icon 
-                          :icon="feedbacksData.find(f => f.feedbacks_Id === slotProps.value)?.status === 'positive' ? faCircleCheck : faCircleXmark" 
-                          :class="feedbacksData.find(f => f.feedbacks_Id === slotProps.value)?.status === 'positive' ? 'text-green-400' : 'text-red-400'"
-                        />
-                      </div>
-                      <span>
-                        {{ feedbacksData.find(f => f.feedbacks_Id === slotProps.value)?.feedbacks_Long_Description.trim() === '' ? 'Brak opisu' : feedbacksData.find(f => f.feedbacks_Id === slotProps.value)?.feedbacks_Long_Description }}
-                      </span>
+                id="feedback-select"
+                v-model="selectedFeedbackId"
+                :options="feedbacksData"
+                optionLabel="feedbacks_Long_Description"
+                optionValue="feedbacks_Id"
+                placeholder="Wybierz feedback..."
+                class="w-full"
+              >
+                <template #value="slotProps">
+                  <div v-if="slotProps.value" class="flex items-center gap-2">
+                    <div
+                      class="flex items-center justify-center w-6 h-6 rounded p-2"
+                      :class="
+                        feedbacksData.find((f) => f.feedbacks_Id === slotProps.value)?.status ===
+                        'positive'
+                          ? 'bg-green-500/20'
+                          : 'bg-red-500/20'
+                      "
+                    >
+                      <font-awesome-icon
+                        :icon="
+                          feedbacksData.find((f) => f.feedbacks_Id === slotProps.value)?.status ===
+                          'positive'
+                            ? faCircleCheck
+                            : faCircleXmark
+                        "
+                        :class="
+                          feedbacksData.find((f) => f.feedbacks_Id === slotProps.value)?.status ===
+                          'positive'
+                            ? 'text-green-400'
+                            : 'text-red-400'
+                        "
+                      />
                     </div>
-                    <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
-                  </template>
-                  <template #option="slotProps">
-                    <div class="flex items-center gap-2">
-                      <div 
-                        class="flex items-center justify-center w-6 h-6 rounded p-2"
-                        :class="slotProps.option.status === 'positive' ? 'bg-green-500/20' : 'bg-red-500/20'"
-                      >
-                        <font-awesome-icon 
-                          :icon="slotProps.option.status === 'positive' ? faCircleCheck : faCircleXmark" 
-                          :class="slotProps.option.status === 'positive' ? 'text-green-400' : 'text-red-400'"
-                        />
-                      </div>
-                      <span>{{ slotProps.option.feedbacks_Long_Description.trim() === '' ? 'Brak opisu' : truncateString(slotProps.option.feedbacks_Long_Description,55) }}</span>
+                    <span>
+                      {{
+                        feedbacksData
+                          .find((f) => f.feedbacks_Id === slotProps.value)
+                          ?.feedbacks_Long_Description.trim() === ''
+                          ? 'Brak opisu'
+                          : feedbacksData.find((f) => f.feedbacks_Id === slotProps.value)
+                              ?.feedbacks_Long_Description
+                      }}
+                    </span>
+                  </div>
+                  <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
+                </template>
+                <template #option="slotProps">
+                  <div class="flex items-center gap-2">
+                    <div
+                      class="flex items-center justify-center w-6 h-6 rounded p-2"
+                      :class="
+                        slotProps.option.status === 'positive' ? 'bg-green-500/20' : 'bg-red-500/20'
+                      "
+                    >
+                      <font-awesome-icon
+                        :icon="
+                          slotProps.option.status === 'positive' ? faCircleCheck : faCircleXmark
+                        "
+                        :class="
+                          slotProps.option.status === 'positive' ? 'text-green-400' : 'text-red-400'
+                        "
+                      />
                     </div>
-                  </template>
-                </Dropdown>
+                    <span>{{
+                      slotProps.option.feedbacks_Long_Description.trim() === ''
+                        ? 'Brak opisu'
+                        : truncateString(slotProps.option.feedbacks_Long_Description, 55)
+                    }}</span>
+                  </div>
+                </template>
+              </Dropdown>
             </div>
 
             <form
@@ -300,7 +319,7 @@
         >
           <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
         </div>
-        <p class="text-gray-400 text-sm font-medium">Wybierz talię aby zarządzać kartami</p>
+        <p class="text-surface-400 text-sm font-medium">Wybierz talię aby zarządzać kartami</p>
       </div>
     </div>
   </div>
@@ -314,7 +333,7 @@ import {
   faComment,
   faDownload,
   faCircleCheck,
-  faCircleXmark
+  faCircleXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { ref, watch, onMounted, computed } from 'vue'
 import apiConfig from '@/services/apiConfig'
@@ -347,7 +366,7 @@ const toast = useToast()
 const selectedDeckId = ref<number | undefined>(undefined)
 const selectedCardId = ref<number | undefined>(undefined)
 const selectedFeedbackId = ref<number | undefined>(undefined)
-const feedbacksData = ref<IFeedback[]>([]);
+const feedbacksData = ref<IFeedback[]>([])
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
@@ -358,9 +377,7 @@ const cardsData = ref<Card[]>([])
 const currentCard = ref<Card | null>(null)
 const selectedFeedback = computed<IFeedback | null>(() => {
   if (!selectedFeedbackId.value) return null
-  return feedbacksData.value.find(
-    (f) => f.feedbacks_Id === selectedFeedbackId.value
-  ) ?? null
+  return feedbacksData.value.find((f) => f.feedbacks_Id === selectedFeedbackId.value) ?? null
 })
 
 const isLoadingDecks = ref(true)
@@ -378,30 +395,25 @@ const fetchFeedbacks = async () => {
 
   try {
     const response = await apiService.get<IFeedbacksResponse>(
-      apiConfig.admin.deck.getFeedbacks(currentCard.value.id)
-    );
+      apiConfig.admin.deck.getFeedbacks(currentCard.value.id),
+    )
 
-    const data = response.data;
+    const data = response.data
 
-    console.log('Pobrane procesy:', data);
+    console.log('Pobrane procesy:', data)
 
     const mapped: IFeedback[] = [
-      data.negativeFeedback
-        ? { ...data.negativeFeedback, status: 'negative' as const }
-        : undefined,
+      data.negativeFeedback ? { ...data.negativeFeedback, status: 'negative' as const } : undefined,
 
-      data.positiveFeedback
-        ? { ...data.positiveFeedback, status: 'positive' as const }
-        : undefined
-    ].filter((f): f is IFeedback => f !== undefined);
+      data.positiveFeedback ? { ...data.positiveFeedback, status: 'positive' as const } : undefined,
+    ].filter((f): f is IFeedback => f !== undefined)
 
-    feedbacksData.value = mapped;
-
+    feedbacksData.value = mapped
   } catch (error) {
-    toast.error('Wystąpił błąd podczas pobierania feedbacków dla karty');
-    console.error('Błąd pobierania feedbacków:', error);
+    toast.error('Wystąpił błąd podczas pobierania feedbacków dla karty')
+    console.error('Błąd pobierania feedbacków:', error)
   }
-};
+}
 
 async function handleFileChange(event: Event): Promise<void> {
   const target = event.target as HTMLInputElement
@@ -448,22 +460,22 @@ const handleDownloadTemplate = async () => {
 
 const handleSaveDeckName = async () => {
   if (deckName.value.trim() === '') {
-    toast.warning('Nazwa talii kart nie może być pusta');
-    return;
+    toast.warning('Nazwa talii kart nie może być pusta')
+    return
   }
   try {
     const response = await apiService.put(apiConfig.admin.deck.updateDeckName, {
-        decks_Id: selectedDeckId.value,
-        decks_Name: deckName.value,
+      decks_Id: selectedDeckId.value,
+      decks_Name: deckName.value,
     })
 
-    console.log('Odpowiedź:', response);
-    const deck = decksData.value.find(deck => deck.id === selectedDeckId.value);
+    console.log('Odpowiedź:', response)
+    const deck = decksData.value.find((deck) => deck.id === selectedDeckId.value)
     if (deck) {
-      deck.title = deckName.value;
+      deck.title = deckName.value
     }
   } catch (error) {
-    toast.error('Błąd podczas aktualizacji nazwy talii');
+    toast.error('Błąd podczas aktualizacji nazwy talii')
   }
 }
 
@@ -471,19 +483,18 @@ async function saveCard(): Promise<void> {
   if (!currentCard.value) return
   isSavingCard.value = true
   try {
-    const response = await apiService.put(apiConfig.admin.deck.updateCard,{
+    const response = await apiService.put(apiConfig.admin.deck.updateCard, {
       cardId: currentCard.value.id,
       shortDesc: currentCard.value.title,
-      longDesc: currentCard.value.description
+      longDesc: currentCard.value.description,
     })
 
-    const cardToUpdated = cardsData.value.find(card =>  card.id === currentCard.value?.id);
+    const cardToUpdated = cardsData.value.find((card) => card.id === currentCard.value?.id)
 
     if (cardToUpdated) {
-      cardToUpdated.title = currentCard.value.title;
-      cardToUpdated.description = currentCard.value.description;
+      cardToUpdated.title = currentCard.value.title
+      cardToUpdated.description = currentCard.value.description
     }
-
   } catch (error) {
     toast.error('Nie udało się zapisać karty')
     console.error('Błąd zapisu karty:', error)
@@ -496,12 +507,12 @@ async function saveFeedback(): Promise<void> {
   if (!selectedFeedback.value) return
   isSavingFeedback.value = true
   try {
-    console.log('Feedbacki:', feedbacksData.value);
-    const negativeDescription = feedbacksData.value[0].feedbacks_Long_Description;
-    const positiveDescription = feedbacksData.value[1].feedbacks_Long_Description;
-    apiServices.put(apiConfig.admin.deck.updateFeedbacks(selectedCardId.value!),{
+    console.log('Feedbacki:', feedbacksData.value)
+    const negativeDescription = feedbacksData.value[0].feedbacks_Long_Description
+    const positiveDescription = feedbacksData.value[1].feedbacks_Long_Description
+    apiServices.put(apiConfig.admin.deck.updateFeedbacks(selectedCardId.value!), {
       positiveDescription: positiveDescription,
-      negativeDescription: negativeDescription
+      negativeDescription: negativeDescription,
     })
   } catch (error) {
     toast.error('Nie udało się zapisać feedbacku')
@@ -564,9 +575,8 @@ watch(selectedCardId, (newCardId) => {
     currentCard.value = null
   }
 
-  fetchFeedbacks();
+  fetchFeedbacks()
 })
-
 
 // --- CYKL ŻYCIA KOMPONENTU ---
 onMounted(fetchDecks)

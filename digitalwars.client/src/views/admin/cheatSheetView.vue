@@ -4,7 +4,7 @@
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
         Materiały pomocnicze
       </h1>
-      <p class="text-gray-400 text-sm md:text-base">Dokumenty i narzędzia do zarządzania grą</p>
+      <p class="text-surface-400 text-sm md:text-base">Dokumenty i narzędzia do zarządzania grą</p>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
@@ -14,7 +14,7 @@
           :class="showFilesSection ? 'border-b border-surface-700 pb-4' : ''"
         >
           <div class="flex gap-3 items-center mt-1">
-            <div class="bg-red-500/20 p-2.5 rounded-lg">
+            <div class="bg-red-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faFilePdf" class="h-6 text-red-500" />
             </div>
             <h2 class="text-xl md:text-2xl font-bold text-white">Dokumenty PDF</h2>
@@ -23,7 +23,7 @@
             <button>
               <font-awesome-icon
                 :icon="showFilesSection ? faChevronUp : faChevronDown"
-                class="h-5 text-gray-400 hover:text-primary-400 transition-colors duration-200"
+                class="h-5 text-surface-400 hover:text-primary-400 transition-colors duration-200"
                 @click="showFilesSection = !showFilesSection"
               />
             </button>
@@ -103,7 +103,7 @@
                 :key="index"
                 class="flex items-center justify-between bg-surface-800/70 p-3.5 rounded-lg border-2 border-surface-600 hover:border-primary-400 hover:bg-surface-800 transition-all duration-200"
               >
-                <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
                   <div class="bg-red-500/20 p-1.5 rounded">
                     <font-awesome-icon :icon="faFilePdf" class="h-4 text-red-500 flex-shrink-0" />
                   </div>
@@ -137,7 +137,7 @@
             >
               <font-awesome-icon :icon="faFileCircleQuestion" class="h-10 text-surface-600" />
             </div>
-            <p class="text-gray-400 text-sm font-medium">Brak otwartych dokumentów</p>
+            <p class="text-surface-400 text-sm font-medium">Brak otwartych dokumentów</p>
             <p class="text-gray-500 text-xs mt-1">Wybierz PDF i kliknij "Podgląd"</p>
           </div>
         </div>
@@ -151,7 +151,7 @@
           <TabView v-model:activeIndex="activePDFIndex" class="pdf-tabs">
             <TabPanel v-for="(window, index) in pdfWindows" :key="index">
               <template #header>
-                <div class="flex items-center gap-2.5 px-2">
+                <div class="flex items-center gap-3 px-2">
                   <span class="font-medium">{{
                     availablePDFs.find((p) => p.path === window.path)?.name
                   }}</span>
@@ -176,7 +176,7 @@
       >
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-surface-700">
           <div class="flex items-center gap-3">
-            <div class="bg-primary-500/20 p-2.5 rounded-lg">
+            <div class="bg-primary-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faDiagramProject" class="h-6 text-primary-400" />
             </div>
             <h2 class="text-xl md:text-2xl font-bold text-white">Drzewo decyzji</h2>

@@ -9,9 +9,9 @@
       <homeAdminButtons @open-create-game="showCreateGame = true" />
       <hr class="mt-2 border-lgray-accent" />
 
-      <div v-if="loadingGames" class="text-center py-4 text-gray-400">Ładowanie gier...</div>
+      <div v-if="loadingGames" class="text-center py-4 text-surface-400">Ładowanie gier...</div>
       <div v-else-if="fetchError" class="text-center py-4 text-red-500">{{ fetchError }}</div>
-      <div v-else-if="activeGames.length === 0" class="text-center py-4 text-gray-400">
+      <div v-else-if="activeGames.length === 0" class="text-center py-4 text-surface-400">
         Brak aktywnych gier. Utwórz nową, aby zacząć.
       </div>
       <div v-else class="overflow-auto px-2 pb-4">

@@ -5,14 +5,14 @@
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
         Edycja Procesów
       </h1>
-      <p class="text-gray-400 text-sm md:text-base">Zarządzaj procesami w talii kart</p>
+      <p class="text-surface-400 text-sm md:text-base">Zarządzaj procesami w talii kart</p>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
       <!-- Sekcja wyboru talii -->
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-primary-500/20 p-2.5 rounded-lg">
+          <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
           </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
@@ -41,7 +41,7 @@
         class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
       >
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-primary-500/20 p-2.5 rounded-lg">
+          <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faChessPawn" class="h-6 text-primary-400" />
           </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">Procesy</h2>
@@ -75,7 +75,7 @@
                     processesData.find((p) => p.processId === slotProps.value)?.processDesc
                   }}</span>
                 </div>
-                <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
               </template>
               <template #option="slotProps">
                 <div class="flex items-center gap-2">
@@ -122,7 +122,7 @@
         class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
       >
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-blue-500/20 p-2.5 rounded-lg">
+          <div class="bg-blue-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
           </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">
@@ -187,7 +187,7 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                  <span class="text-sm text-gray-400">Aktualny kolor:</span>
+                  <span class="text-sm text-surface-400">Aktualny kolor:</span>
                   <span class="text-white text-sm">{{
                     editedProcess.processColor.toUpperCase()
                   }}</span>
@@ -220,7 +220,7 @@
         >
           <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
         </div>
-        <p class="text-gray-400 text-sm font-medium">Wybierz talię aby zarządzać procesami</p>
+        <p class="text-surface-400 text-sm font-medium">Wybierz talię aby zarządzać procesami</p>
       </div>
     </div>
   </div>

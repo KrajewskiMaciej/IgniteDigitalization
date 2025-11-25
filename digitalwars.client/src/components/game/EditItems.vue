@@ -5,74 +5,61 @@
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
         Edycja Przedmiotów
       </h1>
-      <p class="text-gray-400 text-sm md:text-base">Zarządzaj przedmiotami w talii kart</p>
+      <p class="text-surface-400 text-sm md:text-base">Zarządzaj przedmiotami w talii kart</p>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
       <!-- Sekcja wyboru talii -->
-        <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
-          <!-- Nagłówek -->
-          <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-            <div class="bg-primary-500/20 p-2.5 rounded-lg">
-              <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
-            </div>
-            <div>
-              <h2 class="text-xl md:text-2xl font-bold text-white">Talie kart</h2>
-              <p class="text-xs md:text-sm text-surface-300/70 mt-1">
-                Wybierz talię, a następnie zaktualizuj jej nazwę.
-              </p>
-            </div>
+      <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+        <!-- Nagłówek -->
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+          <div class="bg-primary-500/20 p-3 rounded-lg">
+            <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
           </div>
+        </div>
 
-          <!-- Wybór talii -->
-          <div>
-            <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
-              Wybierz talię kart:
+        <!-- Wybór talii -->
+        <div>
+          <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
+            Wybierz talię kart:
+          </label>
+          <Dropdown
+            id="deck-select"
+            v-model="selectedDeckId"
+            :options="decksData"
+            optionLabel="title"
+            optionValue="id"
+            placeholder="Wybierz talię..."
+            class="w-full"
+            :disabled="isLoadingDecks"
+          />
+        </div>
+
+        <!-- Edycja nazwy -->
+        <div
+          v-if="deckName"
+          class="mt-6 p-4 bg-surface-800 border border-surface-700 rounded-lg grid grid-cols-4 gap-4"
+        >
+          <!-- Pole inputa -->
+          <div class="md:col-span-3 flex flex-col">
+            <label for="deck-name" class="mb-2 text-sm font-semibold text-gray-300">
+              Nazwa talii
             </label>
-            <Dropdown
-              id="deck-select"
-              v-model="selectedDeckId"
-              :options="decksData"
-              optionLabel="title"
-              optionValue="id"
-              placeholder="Wybierz talię..."
+
+            <InputText
+              id="deck-name"
+              v-model="deckName"
               class="w-full"
-              :disabled="isLoadingDecks"
+              placeholder="Wpisz nową nazwę talii..."
             />
           </div>
 
-          <!-- Edycja nazwy -->
-          <div
-              v-if="deckName"
-              class="mt-6 p-4 bg-surface-800 border border-surface-700 rounded-lg grid grid-cols-4 gap-4"
-            >
-              <!-- Pole inputa -->
-              <div class="md:col-span-3 flex flex-col">
-                <label
-                  for="deck-name"
-                  class="mb-2 text-sm font-semibold text-gray-300"
-                >
-                  Nazwa talii
-                </label>
-
-                <InputText
-                  id="deck-name"
-                  v-model="deckName"
-                  class="w-full"
-                  placeholder="Wpisz nową nazwę talii..."
-                />
-              </div>
-
-              <!-- Przycisk -->
-              <div class="flex items-end">
-                <Button
-                  label="Zmień nazwę"
-                  class="w-full"
-                  @click="handleSaveDeckName"
-                />
-              </div>
-            </div>
+          <!-- Przycisk -->
+          <div class="flex items-end">
+            <Button label="Zmień nazwę" class="w-full" @click="handleSaveDeckName" />
+          </div>
         </div>
+      </div>
 
       <!-- Sekcja wyboru przedmiotu -->
       <div
@@ -80,7 +67,7 @@
         class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
       >
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-green-500/20 p-2.5 rounded-lg">
+          <div class="bg-green-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faMicrochip" class="h-6 text-green-400" />
           </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">Przedmioty</h2>
@@ -88,7 +75,7 @@
 
         <div v-if="isLoadingItems" class="text-center py-8">
           <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-          <p class="text-gray-400 mt-3">Ładowanie przedmiotów...</p>
+          <p class="text-surface-400 mt-3">Ładowanie przedmiotów...</p>
         </div>
 
         <div v-else>
@@ -109,7 +96,7 @@
                 <span class="text-green-400">#{{ slotProps.value }}</span>
                 <span>{{ itemsData.find((i) => i.id === slotProps.value)?.shortDesc }}</span>
               </div>
-              <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+              <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
             </template>
             <template #option="slotProps">
               <div class="flex items-center gap-2">
@@ -127,7 +114,7 @@
         class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
       >
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-blue-500/20 p-2.5 rounded-lg">
+          <div class="bg-blue-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
           </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">Edycja przedmiotu</h2>
@@ -186,7 +173,7 @@
         >
           <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
         </div>
-        <p class="text-gray-400 text-sm font-medium">Wybierz talię aby zarządzać przedmiotami</p>
+        <p class="text-surface-400 text-sm font-medium">Wybierz talię aby zarządzać przedmiotami</p>
       </div>
     </div>
   </div>
@@ -227,34 +214,32 @@ const selectedItem = ref<number | undefined>(undefined)
 const decksData = ref<Deck[]>([])
 const itemsData = ref<Item[]>([])
 const currentItem = ref<Item | null>(null)
-const deckName = ref<string>('');
+const deckName = ref<string>('')
 
 const isLoadingDecks = ref(true)
 const isLoadingItems = ref(false)
 const isSaving = ref(false)
 
-
 const handleSaveDeckName = async () => {
   if (deckName.value.trim() === '') {
-    toast.warning('Nazwa talii kart nie może być pusta');
-    return;
+    toast.warning('Nazwa talii kart nie może być pusta')
+    return
   }
   try {
     const response = await apiService.put(apiConfig.admin.deck.updateDeckName, {
-        decks_Id: selectedDeckId.value,
-        decks_Name: deckName.value,
+      decks_Id: selectedDeckId.value,
+      decks_Name: deckName.value,
     })
 
-    console.log('Odpowiedź:', response);
-    const deck = decksData.value.find(deck => deck.id === selectedDeckId.value);
+    console.log('Odpowiedź:', response)
+    const deck = decksData.value.find((deck) => deck.id === selectedDeckId.value)
     if (deck) {
-      deck.title = deckName.value;
+      deck.title = deckName.value
     }
   } catch (error) {
-    toast.error('Błąd podczas aktualizacji nazwy talii');
+    toast.error('Błąd podczas aktualizacji nazwy talii')
   }
 }
-
 
 // --- Pobieranie danych z API ---
 const fetchDecks = async () => {
@@ -292,11 +277,11 @@ const handleSaveItem = async () => {
   }
   isSaving.value = true
   try {
-    console.log(currentItem.value.id, 'ID');
-    await apiService.put(apiConfig.admin.deck.updateItem(currentItem.value.id),{
+    console.log(currentItem.value.id, 'ID')
+    await apiService.put(apiConfig.admin.deck.updateItem(currentItem.value.id), {
       cardId: currentItem.value.id,
       shortDesc: currentItem.value.shortDesc,
-      longDesc: currentItem.value.longDesc
+      longDesc: currentItem.value.longDesc,
     })
 
     const index = itemsData.value.findIndex((item) => item.id === currentItem.value!.id)
@@ -328,9 +313,9 @@ watch(selectedDeckId, (newDeckId) => {
   } else {
     itemsData.value = []
   }
-  const deck = decksData.value.find(deck => deck.id === newDeckId);
+  const deck = decksData.value.find((deck) => deck.id === newDeckId)
   if (deck) {
-    deckName.value = deck.title;
+    deckName.value = deck.title
   }
 })
 

@@ -138,8 +138,8 @@
         v-if="decisionMode === 'pending'"
         class="overflow-y-auto scroll-smooth max-h-[650px] pr-2 space-y-3 border border-lgray-accent rounded-md shadow-inner bg-secondary-dark p-2"
       >
-        <div v-if="loading.pending" class="text-center text-gray-400">Ładowanie sugestii...</div>
-        <div v-else-if="pendingDecisions.length === 0" class="text-center text-gray-400 p-4">
+        <div v-if="loading.pending" class="text-center text-surface-400">Ładowanie sugestii...</div>
+        <div v-else-if="pendingDecisions.length === 0" class="text-center text-surface-400 p-4">
           Brak decyzji do zatwierdzenia.
         </div>
         <div
@@ -151,7 +151,9 @@
             <strong>{{ entry.tableName }}</strong> sugeruje:
           </p>
           <p class="font-semibold text-lg">{{ entry.cardTitle }}</p>
-          <p class="text-xs text-gray-400 mt-1">Zasugerowano: {{ formatDate(entry.timestamp) }}</p>
+          <p class="text-xs text-surface-400 mt-1">
+            Zasugerowano: {{ formatDate(entry.timestamp) }}
+          </p>
           <div class="flex justify-end space-x-2 mt-2">
             <button
               @click="approveDecision(entry.logId)"
@@ -169,8 +171,8 @@
         </div>
       </div>
       <div v-else class="space-y-4 max-h-[650px] overflow-y-auto scroll-smooth">
-        <div v-if="loading.history" class="text-center text-gray-400">Ładowanie historii...</div>
-        <div v-else-if="decisions.length === 0" class="text-center text-gray-400 p-4">
+        <div v-if="loading.history" class="text-center text-surface-400">Ładowanie historii...</div>
+        <div v-else-if="decisions.length === 0" class="text-center text-surface-400 p-4">
           Brak decyzji w historii dla tej gry.
         </div>
         <div v-for="(entry, index) in decisions" :key="index" class="mb-2">
@@ -180,7 +182,9 @@
           >
             <h3 class="font-bold text-lg text-blue-300">Nowe Wydarzenie</h3>
             <p class="text-white mt-1">{{ entry.feedbackDescription }}</p>
-            <p class="text-xs text-gray-400 mt-2">Aktywowano: {{ formatDate(entry.timestamp) }}</p>
+            <p class="text-xs text-surface-400 mt-2">
+              Aktywowano: {{ formatDate(entry.timestamp) }}
+            </p>
           </div>
           <div v-else class="border border-gray-600 rounded p-3 bg-secondary relative">
             <div
@@ -199,7 +203,7 @@
               Zagrano kartę: <span class="font-semibold">{{ entry.cardTitle }}</span>
             </p>
             <p class="text-sm mt-1">{{ entry.feedbackDescription || 'Brak opisu feedbacku.' }}</p>
-            <p class="text-xs text-gray-400 mt-1">Zagrano: {{ formatDate(entry.timestamp) }}</p>
+            <p class="text-xs text-surface-400 mt-1">Zagrano: {{ formatDate(entry.timestamp) }}</p>
           </div>
         </div>
       </div>

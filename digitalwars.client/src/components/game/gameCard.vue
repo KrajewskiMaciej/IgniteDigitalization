@@ -16,7 +16,7 @@
           </h3>
           <div class="flex gap-1.5 items-center mt-1">
             <div class="rounded-full w-2 h-2" :class="getStatus(game.status).color"></div>
-            <span class="text-xs text-gray-400">{{ getStatus(game.status).text }}</span>
+            <span class="text-xs text-surface-400">{{ getStatus(game.status).text }}</span>
           </div>
         </div>
       </div>

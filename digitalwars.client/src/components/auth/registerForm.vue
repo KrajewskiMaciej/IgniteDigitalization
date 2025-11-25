@@ -49,7 +49,7 @@
             />
             <button
               @click="showPassword = !showPassword"
-              class="h-8 w-8 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200"
+              class="h-8 w-8 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
               type="button"
             >
               <font-awesome-icon :icon="showPassword ? faEye : faEyeSlash" class="h-5 w-5" />
@@ -76,7 +76,7 @@
             />
             <button
               @click="showConfirmPassword = !showConfirmPassword"
-              class="h-8 w-8 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200"
+              class="h-8 w-8 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
               type="button"
             >
               <font-awesome-icon :icon="showConfirmPassword ? faEye : faEyeSlash" class="h-5 w-5" />

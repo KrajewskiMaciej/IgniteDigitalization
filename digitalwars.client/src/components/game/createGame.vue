@@ -312,10 +312,10 @@
               outlined
             />
           </div>
-          <div v-if="isLoadingProcesses" class="text-center text-gray-400">
+          <div v-if="isLoadingProcesses" class="text-center text-surface-400">
             <p>Ładowanie procesów...</p>
           </div>
-          <div v-else-if="availableProcesses.length === 0" class="text-center text-gray-400">
+          <div v-else-if="availableProcesses.length === 0" class="text-center text-surface-400">
             <p>Brak dostępnych procesów dla wybranej talii.</p>
           </div>
           <div v-else class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-2">
@@ -328,7 +328,9 @@
               <div class="ml-3 flex items-center gap-2 flex-1">
                 <div class="flex-1">
                   <span class="font-bold text-white">{{ process.processDesc }}</span>
-                  <span class="text-sm text-gray-400 ml-2"> - {{ process.processLongDesc }}</span>
+                  <span class="text-sm text-surface-400 ml-2">
+                    - {{ process.processLongDesc }}</span
+                  >
                 </div>
                 <span
                   class="w-6 h-6 rounded-full inline-block border-2 border-tertiary flex-shrink-0"

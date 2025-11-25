@@ -18,7 +18,7 @@
       <div class="overflow-y-auto custom-scrollbar pr-2 flex-grow">
         <div v-if="isLoading" class="text-center text-gray-500">Ładowanie historii...</div>
         <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
-        <div v-else-if="gameLogEntries.length === 0" class="text-center text-gray-400">
+        <div v-else-if="gameLogEntries.length === 0" class="text-center text-surface-400">
           Brak historii decyzji.
         </div>
         <ul v-else class="space-y-3 text-sm">
@@ -46,14 +46,14 @@
               </div>
 
               <div class="font-semibold text-sm">
-                <span class="text-gray-400">Karta {{ decision.cardId }}</span>
+                <span class="text-surface-400">Karta {{ decision.cardId }}</span>
                 <span class="mx-1">→</span>
                 <span class="text-white">{{ decision.choice }}</span>
               </div>
 
               <div class="border-t border-gray-600 pt-2">
                 <div class="flex items-center gap-2 mb-1">
-                  <span class="text-gray-400 text-xs">Wynik:</span>
+                  <span class="text-surface-400 text-xs">Wynik:</span>
                   <span
                     class="font-bold text-sm"
                     :class="{

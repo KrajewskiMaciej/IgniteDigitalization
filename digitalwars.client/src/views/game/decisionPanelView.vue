@@ -5,7 +5,7 @@
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
         Panel Decyzji
       </h1>
-      <p class="text-gray-400 text-sm md:text-base">
+      <p class="text-surface-400 text-sm md:text-base">
         Zarządzaj decyzjami i przedmiotami dla drużyn
       </p>
     </div>
@@ -17,7 +17,7 @@
           <!-- Sekcja wyboru akcji -->
           <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
             <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-              <div class="bg-primary-500/20 p-2.5 rounded-lg">
+              <div class="bg-primary-500/20 p-3 rounded-lg">
                 <font-awesome-icon :icon="faGamepad" class="h-6 text-primary-400" />
               </div>
               <h2 class="text-xl md:text-2xl font-bold text-white">Zarządzanie akcjami</h2>
@@ -94,7 +94,7 @@
                     <span class="text-blue-400">#{{ slotProps.value }}</span>
                     <span>{{ cards.find((c) => c.id === slotProps.value)?.title }}</span>
                   </div>
-                  <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                  <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
                 </template>
                 <template #option="slotProps">
                   <div class="flex items-center gap-2">
@@ -131,7 +131,7 @@
                     >
                     <span>{{ items.find((i) => i.id === slotProps.value)?.title }}</span>
                   </div>
-                  <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                  <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
                 </template>
                 <template #option="slotProps">
                   <div class="flex items-center gap-2">
@@ -165,7 +165,7 @@
                       {{ availableEvents.find((e) => e.eventId === slotProps.value)?.shortDesc }}
                     </span>
                   </div>
-                  <span v-else class="text-gray-400">{{ slotProps.placeholder }}</span>
+                  <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
                 </template>
               </Dropdown>
             </div>
@@ -177,12 +177,12 @@
               "
               class="bg-surface-800 rounded-lg p-4 border border-surface-700 mb-4"
             >
-              <p class="text-sm text-gray-400 mb-1">Opis:</p>
+              <p class="text-sm text-surface-400 mb-1">Opis:</p>
               <p class="text-sm text-gray-300">
                 {{ actionMode === 'cards' ? selectedCard?.description : selectedItem?.description }}
               </p>
               <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-700">
-                <span class="text-sm text-gray-400">Koszt:</span>
+                <span class="text-sm text-surface-400">Koszt:</span>
                 <span class="text-lg font-bold text-green-400">
                   {{ (actionMode === 'cards' ? selectedCard?.cost : selectedItem?.cost) || 0 }}
                   bitów
@@ -194,7 +194,7 @@
               v-if="selectedEvent && selectedEvent.eventId && actionMode === 'events'"
               class="bg-surface-800 rounded-lg p-4 border border-surface-700 mb-4"
             >
-              <p class="text-sm text-gray-400 mb-1">Opis zdarzenia:</p>
+              <p class="text-sm text-surface-400 mb-1">Opis zdarzenia:</p>
               <p class="text-sm text-gray-300">{{ selectedEvent.longDesc }}</p>
             </div>
 
@@ -208,7 +208,7 @@
             >
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-gray-400">Budżet drużyny:</p>
+                  <p class="text-sm text-surface-400">Budżet drużyny:</p>
                   <p class="text-sm font-semibold text-white">{{ selectedTeam?.teamName }}</p>
                 </div>
                 <span class="text-2xl font-bold text-green-400">{{ currentBits }} bitów</span>
@@ -256,7 +256,7 @@
         <!-- Prawa kolumna - Panel decyzji -->
         <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
           <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-            <div class="bg-yellow-500/20 p-2.5 rounded-lg">
+            <div class="bg-yellow-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faClock" class="h-6 text-yellow-400" />
             </div>
             <h2 class="text-xl md:text-2xl font-bold text-white">Panel decyzji</h2>
@@ -295,7 +295,7 @@
           >
             <div v-if="loadingPending" class="text-center py-8">
               <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-              <p class="text-gray-400 mt-3">Ładowanie sugestii...</p>
+              <p class="text-surface-400 mt-3">Ładowanie sugestii...</p>
             </div>
 
             <div
@@ -307,7 +307,7 @@
               >
                 <font-awesome-icon :icon="faClock" class="h-8 text-surface-600" />
               </div>
-              <p class="text-gray-400 text-sm font-medium">Brak decyzji do zatwierdzenia</p>
+              <p class="text-surface-400 text-sm font-medium">Brak decyzji do zatwierdzenia</p>
             </div>
 
             <div
@@ -318,7 +318,7 @@
               <div class="flex items-start justify-between mb-2">
                 <div>
                   <p class="text-white font-semibold">{{ entry.tableName }}</p>
-                  <p class="text-sm text-gray-400">sugeruje kartę</p>
+                  <p class="text-sm text-surface-400">sugeruje kartę</p>
                 </div>
                 <span
                   class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-semibold rounded"
@@ -331,7 +331,7 @@
                   {{ entry.cardTitle }}
                 </p>
                 <p class="text-xs text-gray-500 mt-1">
-                  ID karty: <span class="font-semibold text-gray-400">{{ entry.cardId }}</span>
+                  ID karty: <span class="font-semibold text-surface-400">{{ entry.cardId }}</span>
                 </p>
               </div>
               <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
@@ -367,7 +367,7 @@
           <div v-else class="space-y-3 max-h-[75vh] overflow-y-auto custom-scrollbar">
             <div v-if="loadingHistory" class="text-center py-8">
               <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-              <p class="text-gray-400 mt-3">Ładowanie historii...</p>
+              <p class="text-surface-400 mt-3">Ładowanie historii...</p>
             </div>
 
             <div
@@ -379,7 +379,7 @@
               >
                 <font-awesome-icon :icon="faHistory" class="h-8 text-surface-600" />
               </div>
-              <p class="text-gray-400 text-sm font-medium">Brak decyzji w historii</p>
+              <p class="text-surface-400 text-sm font-medium">Brak decyzji w historii</p>
             </div>
 
             <div v-for="(entry, index) in decisions" :key="index">
@@ -409,7 +409,7 @@
                 <div class="flex items-start justify-between mb-2">
                   <div>
                     <p class="text-white font-semibold">{{ entry.tableName }}</p>
-                    <p class="text-sm text-gray-400">Karta ID: {{ entry.cardId }}</p>
+                    <p class="text-sm text-surface-400">Karta ID: {{ entry.cardId }}</p>
                   </div>
                   <span
                     class="px-2 py-1 text-xs font-semibold rounded"
