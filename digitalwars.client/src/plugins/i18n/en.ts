@@ -75,4 +75,15 @@ export const en = {
   warningNotEnoughBudget: 'You do not have enough bits to play this card.',
   teamHasNotEnoughBits: 'Team {teamName} does not have enough bits to play this card.',
   accept: 'Accept',
+
+  //Dynamic cheat sheet
+  dynamicCheatSheet: 'Dynamic game cheat sheet',
+  lookHowTeamsAreDoing: 'See how teams are doing in the game in real-time.',
+  zoomIn: 'Zoom In',
+  zoomOut: 'Zoom Out',
+  leftRightLayout: 'Left-Right Layout',
+  topBottomLayout: 'Top-Bottom Layout',
+  fitView: 'Fit View',
+  resetView: 'Reset View',
+  tables: 'Tables',
 }

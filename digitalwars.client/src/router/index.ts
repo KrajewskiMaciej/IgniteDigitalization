@@ -19,6 +19,7 @@ import tableDecisionPanelView from '@/views/game/tableDecisionPanelView.vue'
 import exportToPdfView from '@/views/admin/exportToPdfView.vue'
 import TableManagmentView from '@/views/admin/TableManagmentView.vue'
 import GameplayElementsEditiorView from '@/views/admin/GameplayElementsEditiorView.vue'
+import DynamicCheatSheetView from '@/views/admin/DynamicCheatSheetView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -126,6 +127,12 @@ const router = createRouter({
           path: ':gameId',
           name: 'table-view',
           component: gameView,
+          props: true,
+        },
+        {
+          path: ':gameId/DynamicCheatSheet',
+          name: 'dynamic-cheat-sheet',
+          component: DynamicCheatSheetView,
           props: true,
         },
       ],

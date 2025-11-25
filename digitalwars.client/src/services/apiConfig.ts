@@ -39,9 +39,13 @@ const endpoints = {
         `/admin/exportBoards?teamBoardId=${teamBoardId}&rivalBoardId=${rivalBoardId}`,
     },
     cheatsheet: {
-      getMap: (deckId: number, moduleId: number) => `/Cheatsheet/enablersMap?deckId=${deckId}&moduleId=${moduleId}`,
-      getEntreis: (gameId: number, teamId: number) => `/Cheatsheet/latestEntries?gameId=${gameId}&teamId=${teamId}`,
-    }
+      getMap: (deckId: number, moduleId?: number) =>
+        moduleId
+          ? `/Cheatsheet/enablersMap?deckId=${deckId}&moduleId=${moduleId}`
+          : `/Cheatsheet/enablersMap?deckId=${deckId}`,
+      getEntreis: (gameId: number, teamId: number) =>
+        `/Cheatsheet/latestEntries?gameId=${gameId}&teamId=${teamId}`,
+    },
   },
   games: {
     // These are likely in a GamesController, assumed to be correct.

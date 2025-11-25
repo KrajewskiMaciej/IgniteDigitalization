@@ -142,6 +142,19 @@
           </RouterLink>
         </li>
 
+        <li
+          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+        >
+          <RouterLink
+            :to="`/admin/game/${gameId}/dynamicCheatSheet`"
+            class="flex items-center gap-4 px-4 py-3 rounded-md"
+            :class="isSideBarOpen ? '' : 'justify-center'"
+          >
+            <font-awesome-icon :icon="faFile" class="h-4 text-accent" />
+            <span v-if="isSideBarOpen">Dynamiczna Ściąga mistrza gry</span>
+          </RouterLink>
+        </li>
+
         <!-- Generuj grę, nie ma tego więc zakomentowuje -->
         <!-- <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"

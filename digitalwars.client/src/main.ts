@@ -10,6 +10,8 @@ import router from './router'
 import { i18n } from './plugins/i18n/index'
 import { primevue } from '@/plugins/primevue'
 import ConfirmationService from 'primevue/confirmationservice'
+import '@vue-flow/core/dist/style.css'
+import '@vue-flow/core/dist/theme-default.css'
 
 const app = createApp(App)
 

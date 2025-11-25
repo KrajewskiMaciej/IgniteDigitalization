@@ -76,4 +76,15 @@ export const pl = {
   teamHasNotEnoughBits:
     'Drużyna {teamName} nie ma wystarczającej ilości bitów, aby zagrać tę kartę.',
   accept: 'Akceptuj',
+
+  //Dynamic cheat sheet
+  dynamicCheatSheet: 'Dynamiczna ściąga gry',
+  lookHowTeamsAreDoing: 'Zobacz, jak radzą sobie zespoły w grze w czasie rzeczywistym.',
+  zoomIn: 'Powiększ',
+  zoomOut: 'Pomniejsz',
+  leftRightLayout: 'Układ lewo-prawo',
+  topBottomLayout: 'Układ góra-dół',
+  fitView: 'Dopasuj widok',
+  resetView: 'Zresetuj widok',
+  tables: 'Stoły',
 }
