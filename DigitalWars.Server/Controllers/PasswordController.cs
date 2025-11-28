@@ -23,8 +23,11 @@ namespace backend.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> RequestPasswordReset([FromBody] ResetPasswordRequest request)
         {
-            await _authService.InitiatePasswordResetAsync(request.Email);
-            // Zawsze zwracamy OK, aby zapobiec "user enumeration"
+            var result = await _authService.InitiatePasswordResetAsync(request.Email);
+
+            if (!result)
+                return Conflict(new { message = "Nie znaleziono użytkownika z podanym adresem e-mail." });
+                
             return Ok(new { success = true, message = "Jeśli konto istnieje, link do resetu hasła został wysłany." });
         }
 

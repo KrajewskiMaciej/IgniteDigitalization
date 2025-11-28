@@ -1,10 +1,13 @@
 <template>
   <div class="animate-fade" v-if="!isEmailSent">
-    <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-4 sm:mb-8 text-center">
+
+     <div class="flex justify-center items-center">
+       <font-awesome-icon :icon="faUserLock" class="text-6xl mb-3 text-accent" />
+    </div>
+
+    <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-4 text-center">
       {{ t('forgotPasswordQuestion') }}
     </h2>
-
-    <font-awesome-icon :icon="faUserLock" class="text-6xl mb-3 text-accent" />
 
     <div
       class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-6 sm:mb-8"
@@ -39,21 +42,26 @@
         ></div>
       </button>
 
-      <span
-        class="text-accent hover:text-purple-300 transition-colors cursor-pointer"
-        @click="emit('backToLogin')"
-      >
-        {{ t('backToLogin') }}
-      </span>
+      <div class="flex justify-center items-center">
+        <span
+          class="text-accent hover:text-purple-300 transition-colors cursor-pointer"
+          @click="emit('backToLogin')"
+        >
+          {{ t('backToLogin') }}
+        </span>
+      </div>
     </form>
   </div>
 
   <div v-else class="animate-fade-right">
+    <div class="flex justify-center items-center">
+        <font-awesome-icon :icon="faEnvelopeCircleCheck" class="mb-3 text-6xl text-accent" />
+    </div>
+
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
       {{ t('checkYourEmail') }}
     </h2>
 
-    <font-awesome-icon :icon="faEnvelopeCircleCheck" class="mb-3 h-20 text-accent" />
 
     <div class="w-100 h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
 
@@ -100,6 +108,7 @@ const { t } = useI18n()
 // --- KROK 3: Definicja typu dla błędu API ---
 interface ApiError {
   message?: string
+  status: number
   toString: () => string
 }
 
@@ -129,12 +138,19 @@ const handleSendEmail = async () => {
     // Jawne typowanie błędu
     // --- KROK 4: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
+    const status: number = apiError.status
 
-    toast.error(t('invalidEmailOrEmailDoesntExist'), {
-      // --- KROK 5: Użycie enumu POSITION ---
-      position: POSITION.TOP_CENTER,
-    })
+    console.log('Jaki błąd otrzymuje:', apiError.status);
 
+    if(status === 409) {
+         toast.warning(t('invalidEmailOrEmailDoesntExist'), {
+            position: POSITION.TOP_CENTER,
+        })
+    } else{
+      toast.error(t('errorServerUnavailable'), {
+        position: POSITION.TOP_CENTER
+      })
+    }
     console.error('Wystąpił błąd:', apiError.message || apiError.toString())
   }
 }

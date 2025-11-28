@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using backend.Dtos;
 using BCrypt.Net;
 
+
 namespace backend.Services
 {
     public interface IAuthService
@@ -14,7 +15,7 @@ namespace backend.Services
         Task<(User user, List<Claim> claims)> ValidateUserCredentialsAsync(string username, string password);
         Task<ErrorResponseDto?> RegisterUserAsync(string username, string email, string password);
         Task ConfirmUserEmailAsync(string token);
-        Task InitiatePasswordResetAsync(string email);
+        Task<bool> InitiatePasswordResetAsync(string email);
         Task<bool> IsPasswordResetTokenValidAsync(string token);
         Task ResetPasswordAsync(string token, string newPassword);
         Task<User?> GetUserByIdAsync(int userId);
@@ -110,16 +111,20 @@ namespace backend.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task InitiatePasswordResetAsync(string email)
+        public async Task<bool> InitiatePasswordResetAsync(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (user != null)
+            if (user == null)
             {
-                user.Link_Token = Guid.NewGuid().ToString();
-                user.Token_Expire_Date = DateTime.UtcNow.AddMinutes(15);
-                await _context.SaveChangesAsync();
-                await _emailService.SendPasswordResetEmailAsync(user.Email, user.Link_Token, user.Token_Expire_Date);
+                return false;
             }
+        
+            user.Link_Token = Guid.NewGuid().ToString();
+            user.Token_Expire_Date = DateTime.UtcNow.AddMinutes(15);
+            await _context.SaveChangesAsync();
+            await _emailService.SendPasswordResetEmailAsync(user.Email, user.Link_Token, user.Token_Expire_Date);
+
+            return true;
         }
 
         public async Task<bool> IsPasswordResetTokenValidAsync(string token)

@@ -1,17 +1,21 @@
 <template>
   <!--Informacja o potwierdzeniu adresu email-->
-  <div class="animate-fade-right">
+  <div class="animate-fade-right ">
+
+    <div class="flex justify-center items-center">
+      <font-awesome-icon :icon="faEnvelopeOpen" class="mb-3 text-6xl text-accent" />
+    </div>
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
       {{ t('registrationSuccessful') }}
     </h2>
 
-    <font-awesome-icon :icon="faEnvelopeOpen" class="mb-3 text-6xl text-accent" />
+    
 
     <div
       class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-6 sm:mb-8"
     ></div>
 
-    <div class="text-sm text-gray-300 mb-3">
+    <div class="text-sm text-gray-300 mb-3 text-center">
       <p>{{ t('oneMoreStepLeft') }}</p>
       <p>
         {{ t('toYourEmailAddress') }} <b>{{ email }}</b>
@@ -19,12 +23,14 @@
       <p>{{ t('weHaveSentVerificationLink') }}</p>
       <p>{{ t('checkSpamFolder') }}</p>
     </div>
-    <span
-      class="text-accent hover:text-purple-300 transition-colors cursor-pointer"
-      @click="emit('backToLogin')"
-    >
-      {{ t('goToLogin') }}
-    </span>
+    <div class="flex justify-center items-center">
+       <span
+          class="text-accent hover:text-purple-300 transition-colors cursor-pointer"
+          @click="emit('backToLogin')"
+        >
+          {{ t('goToLogin') }}
+      </span>
+    </div>
   </div>
 </template>
 
