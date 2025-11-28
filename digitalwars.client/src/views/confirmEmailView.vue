@@ -1,63 +1,67 @@
 <template>
-  <div class="bg-primary min-h-screen">
-    <div class="fixed inset-0 flex items-center justify-center z-50">
+  <div class="bg-surface-800 min-h-screen">
+    <div class="fixed inset-0 flex items-center justify-center z-50 p-4">
       <div class="absolute inset-0 bg-black/40 transition-opacity duration-300"></div>
       <div
-        class="bg-primary text-white rounded-lg relative z-10 border-2 border-accent transition-all duration-300 p-6 sm:p-8 md:p-10 lg:p-12 max-h-[90vh] w-full max-w-lg"
+        class="bg-surface-900 text-white rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
       >
-        <!--Widok potwierdzonego email użytkownika-->
         <div v-if="isTokenValid">
-          <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
+          <font-awesome-icon
+            :icon="faUserCheck"
+            class="text-5xl sm:text-6xl text-accent mb-4 block mx-auto"
+          />
+
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">
             Konto aktywne
           </h2>
 
-          <font-awesome-icon
-            :icon="faUserCheck"
-            class="h-20 text-accent mb-3 text-center block mx-auto"
-          />
+          <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
-          <div class="w-100 h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
-
-          <div class="text-center text-md text-gray-300">
-            <p class="mb-3">Twoje konto jest już aktywne i możesz z niego korzystać.</p>
+          <div class="text-center text-sm sm:text-base text-gray-300 space-y-3">
+            <p>Twoje konto jest już aktywne i możesz z niego korzystać.</p>
             <p>Wróć do strony logowania i zaloguj się na swoje konto.</p>
-            <p class="mt-3">
-              Zostaniesz automatycznie przekierowany do strony logowania za
-              <span class="text-accent font-bold">{{ time }}s</span>.
+            <p class="text-gray-400">
+              Automatyczne przekierowanie za
+              <span class="text-accent font-bold text-lg">{{ time }}s</span>
             </p>
           </div>
+
           <button
             @click="handleReturnToLogin"
-            class="bg-tertiary hover:bg-accent text-white w-full rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg mt-5"
+            class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all duration-300 overflow-hidden group text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 mt-6"
           >
-            Zaloguj się
+            <span class="relative z-10">Zaloguj się</span>
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+            ></div>
           </button>
         </div>
 
-        <!--Widok wygasłego linku-->
         <div v-else>
-          <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
+          <font-awesome-icon
+            :icon="faCircleXmark"
+            class="text-5xl sm:text-6xl text-red-500 mb-4 block mx-auto"
+          />
+
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">
             Link wygasł
           </h2>
 
-          <font-awesome-icon
-            :icon="faCircleXmark"
-            class="h-20 text-red-500 mb-3 text-center block mx-auto"
-          />
+          <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
-          <div class="w-100 h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
-
-          <div class="text-center text-gray-300">
-            <p class="mb-3">
-              Wygląda na to, że twój link aktywacyjny wygasł lub jest nieprawidłowy.
-            </p>
-            <p class="mb-4">Aby otrzymać nowy link aktywacyjny zaloguj się na nowo.</p>
+          <div class="text-center text-sm sm:text-base text-gray-300 space-y-3">
+            <p>Wygląda na to, że twój link aktywacyjny wygasł lub jest nieprawidłowy.</p>
+            <p>Aby otrzymać nowy link aktywacyjny zaloguj się na nowo.</p>
           </div>
+
           <button
             @click="handleReturnToLogin"
-            class="bg-tertiary hover:bg-accent text-white w-full rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg mt-5"
+            class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all duration-300 overflow-hidden group text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 mt-6"
           >
-            Powrót do logowania
+            <span class="relative z-10">Powrót do logowania</span>
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+            ></div>
           </button>
         </div>
       </div>

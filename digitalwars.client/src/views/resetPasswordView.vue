@@ -1,42 +1,40 @@
 <template>
-  <div class="bg-primary min-h-screen">
-    <div class="fixed inset-0 flex items-center justify-center z-50">
+  <div class="bg-surface-800 min-h-screen">
+    <div class="fixed inset-0 flex items-center justify-center z-50 p-4">
       <div class="absolute inset-0 bg-black/40 transition-opacity duration-300"></div>
       <div
-        class="bg-primary text-white rounded-lg relative z-10 border-2 border-accent transition-all duration-300 p-6 sm:p-8 md:p-10 lg:p-12 max-h-[90vh] w-full max-w-lg"
+        class="bg-surface-900 text-white rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
       >
-        <!-- Formularz  zmiany hasła -->
         <div v-if="isTokenValid">
-          <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">
             Zmień hasło
           </h2>
 
-          <div class="w-100 h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
+          <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
           <form @submit.prevent="handleChangePassword">
             <label
               for="register-password"
-              class="block font-bold text-xs sm:text-sm text-left mb-1"
+              class="block font-medium text-xs sm:text-sm text-left mb-1.5"
             >
               Nowe hasło
             </label>
-            <!-- Nowe hasło -->
             <div
-              class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-md transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent mb-3"
+              class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-lg transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent mb-3"
             >
               <input
                 :type="showPassword ? 'text' : 'password'"
-                id="register-confirm-password"
+                id="register-password"
                 v-model="changePasswordData.password"
-                class="w-full px-3 py-2 bg-transparent focus:outline-none focus:ring-0 text-white flex-grow"
+                class="w-full px-3 py-2.5 bg-transparent focus:outline-none focus:ring-0 text-white flex-grow text-sm sm:text-base"
                 required
               />
               <button
                 @click="showPassword = !showPassword"
-                class="h-8 w-8 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
+                class="h-9 w-9 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
                 type="button"
               >
-                <font-awesome-icon :icon="showPassword ? faEye : faEyeSlash" class="h-5 w-5" />
+                <font-awesome-icon :icon="showPassword ? faEye : faEyeSlash" class="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
             </div>
 
@@ -44,81 +42,69 @@
               <passwordStrength :password="changePasswordData.password" />
             </div>
 
-            <!-- Potwierdź nowe hasło -->
             <label
-              for="register-password"
-              class="block font-bold text-xs sm:text-sm text-left mb-1"
+              for="register-confirm-password"
+              class="block font-medium text-xs sm:text-sm text-left mb-1.5"
             >
               Potwierdź nowe hasło
             </label>
-            <!-- Nowe hasło -->
             <div
-              class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-md transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent mb-3"
+              class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-lg transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent mb-4"
             >
               <input
                 :type="showConfirmPassword ? 'text' : 'password'"
                 id="register-confirm-password"
                 v-model="changePasswordData.confirmPassword"
-                class="w-full px-3 py-2 bg-transparent focus:outline-none focus:ring-0 text-white flex-grow"
+                class="w-full px-3 py-2.5 bg-transparent focus:outline-none focus:ring-0 text-white flex-grow text-sm sm:text-base"
                 required
               />
               <button
                 @click="showConfirmPassword = !showConfirmPassword"
-                class="h-8 w-8 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
+                class="h-9 w-9 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
                 type="button"
               >
                 <font-awesome-icon
                   :icon="showConfirmPassword ? faEye : faEyeSlash"
-                  class="h-5 w-5"
+                  class="h-4 w-4 sm:h-5 sm:w-5"
                 />
               </button>
             </div>
 
-            <div class="bg-tertiary rounded-md px-3 py-2 mb-5">
-              <ul class="list-disc text-left text-white pl-4">
+            <div class="bg-tertiary/50 rounded-lg px-4 py-3 mb-5 border border-white/5">
+              <ul class="space-y-1.5 text-left pl-1">
                 <li
-                  :class="{
-                    'text-green-500': passwordRequirements.length,
-                    'text-gray-500': !passwordRequirements.length,
-                  }"
-                  class="text-xs transition-colors duration-300"
+                  :class="passwordRequirements.length ? 'text-green-400' : 'text-gray-500'"
+                  class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
+                  <span class="w-1.5 h-1.5 rounded-full" :class="passwordRequirements.length ? 'bg-green-400' : 'bg-gray-500'"></span>
                   Co najmniej 8 znaków
                 </li>
                 <li
-                  :class="{
-                    'text-green-500': passwordRequirements.uppercase,
-                    'text-gray-500': !passwordRequirements.uppercase,
-                  }"
-                  class="text-xs transition-colors duration-300"
+                  :class="passwordRequirements.uppercase ? 'text-green-400' : 'text-gray-500'"
+                  class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
+                  <span class="w-1.5 h-1.5 rounded-full" :class="passwordRequirements.uppercase ? 'bg-green-400' : 'bg-gray-500'"></span>
                   Co najmniej jedna duża litera
                 </li>
                 <li
-                  :class="{
-                    'text-green-500': passwordRequirements.lowercase,
-                    'text-gray-500': !passwordRequirements.lowercase,
-                  }"
-                  class="text-xs transition-colors duration-300"
+                  :class="passwordRequirements.lowercase ? 'text-green-400' : 'text-gray-500'"
+                  class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
+                  <span class="w-1.5 h-1.5 rounded-full" :class="passwordRequirements.lowercase ? 'bg-green-400' : 'bg-gray-500'"></span>
                   Co najmniej jedna mała litera
                 </li>
                 <li
-                  :class="{
-                    'text-green-500': passwordRequirements.special,
-                    'text-gray-500': !passwordRequirements.special,
-                  }"
-                  class="text-xs transition-colors duration-300"
+                  :class="passwordRequirements.special ? 'text-green-400' : 'text-gray-500'"
+                  class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
+                  <span class="w-1.5 h-1.5 rounded-full" :class="passwordRequirements.special ? 'bg-green-400' : 'bg-gray-500'"></span>
                   Co najmniej jeden znak specjalny
                 </li>
                 <li
-                  :class="{
-                    'text-green-500': passwordRequirements.digit,
-                    'text-gray-500': !passwordRequirements.digit,
-                  }"
-                  class="text-xs transition-colors duration-300"
+                  :class="passwordRequirements.digit ? 'text-green-400' : 'text-gray-500'"
+                  class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
+                  <span class="w-1.5 h-1.5 rounded-full" :class="passwordRequirements.digit ? 'bg-green-400' : 'bg-gray-500'"></span>
                   Co najmniej jedna cyfra
                 </li>
               </ul>
@@ -126,44 +112,50 @@
 
             <button
               type="submit"
-              class="text-white w-full py-4 rounded-lg font-medium transition-all duration-300 shadow-sm shadow-accent/40 mb-5"
+              :disabled="!allPasswordRequirementsMet || isLoading"
+              class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all duration-300 overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed text-white"
               :class="
                 allPasswordRequirementsMet
-                  ? 'bg-accent/50 hover:shadow-lg hover:shadow-accent/60 hover:bg-accent'
-                  : 'bg-tertiary'
+                  ? 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50'
+                  : 'bg-tertiary shadow-sm'
               "
-              :disabled="!allPasswordRequirementsMet || isLoading"
             >
-              {{ isLoading ? 'Zmiana hasła...' : 'Zmień hasło' }}
+              <span class="relative z-10">{{ isLoading ? 'Zmiana hasła...' : 'Zmień hasło' }}</span>
+              <div
+                v-if="allPasswordRequirementsMet"
+                class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+              ></div>
             </button>
           </form>
         </div>
 
-        <!--Widok wygaśnietego tokenu-->
         <div v-else>
-          <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
+          <font-awesome-icon
+            :icon="faCircleXmark"
+            class="text-5xl sm:text-6xl text-red-500 mb-4 block mx-auto"
+          />
+
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">
             Link wygasł
           </h2>
 
-          <font-awesome-icon
-            :icon="faCircleXmark"
-            class="h-20 text-red-500 mb-3 text-center block mx-auto"
-          />
+          <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
-          <div class="w-100 h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
-
-          <div class="text-center">
-            <p class="mb-3">Wygląda na to, że twój link do resetowania hasła wygasł.</p>
+          <div class="text-center text-sm sm:text-base text-gray-300 space-y-3">
+            <p>Wygląda na to, że twój link do resetowania hasła wygasł.</p>
             <p>
-              Powróć do strony logowania i wybierz opcję "Zapomniałem hasła" żeby otrzymać nowy
-              link.
+              Powróć do strony logowania i wybierz opcję "Zapomniałem hasła" żeby otrzymać nowy link.
             </p>
           </div>
+
           <button
             @click="handleReturnToLogin"
-            class="bg-tertiary hover:bg-accent text-white w-full rounded-lg font-medium transition-all duration-300 shadow-sm hover:shadow-lg shadow-accent/40 hover:shadow-accent/60 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg mt-5"
+            class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all duration-300 overflow-hidden group text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 mt-6"
           >
-            Powrót do logowania
+            <span class="relative z-10">Powrót do logowania</span>
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+            ></div>
           </button>
         </div>
       </div>
