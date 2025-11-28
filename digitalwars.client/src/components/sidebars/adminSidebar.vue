@@ -93,6 +93,20 @@
           </RouterLink>
         </li>
 
+         <li
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+        >
+          <RouterLink
+            class="flex items-center gap-4 px-4 py-3 rounded-md"
+            :class="isSideBarOpen ? '' : 'justify-center'"
+            to="/admin/editBoard"
+          >
+            <font-awesome-icon :icon="faChessBoard" class="h-4 text-accent" />
+            <span v-if="isSideBarOpen">Edycja planszy</span>
+          </RouterLink>
+        </li>
+
+        
         <li
           class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
@@ -134,6 +148,7 @@ import {
   faFilePdf,
   faArrowLeft,
   faArrowRight,
+  faChessBoard
 } from '@fortawesome/free-solid-svg-icons'
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
