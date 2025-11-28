@@ -113,7 +113,7 @@ if (app.Environment.IsDevelopment())
 
     // Użyj CORS, aby pozwolić na komunikację z serwerem deweloperskim Vue
     app.UseCors(policy => policy
-        .WithOrigins("http://localhost:61536") // Adres Twojego frontendu w trybie dev
+        .WithOrigins("http://localhost:9000") // Adres Twojego frontendu w trybie dev
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials());
@@ -133,7 +133,7 @@ app.UseAuthorization();
 
 logger.LogInformation("[API] Konfiguracja Przekierowań");
 app.MapControllers();
-app.MapHub<GameHub>("/gameHub");
+app.MapHub<GameHub>("/api/gameHub");
 
 // Przekieruj wszystkie niepasujące do API ścieżki do frontendu (dla Vue Router)
 app.MapFallbackToFile("/index.html");
