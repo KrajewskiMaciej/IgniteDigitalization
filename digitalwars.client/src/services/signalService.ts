@@ -2,9 +2,8 @@
 import * as signalR from '@microsoft/signalr'
 
 // Pobierz URL huba z zmiennych środowiskowych lub użyj domyślnego.
-const HUB_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_WEBSOCKET_URL}/gameHub`
-  : 'http://localhost:5023/gameHub'
+const HUB_URL =
+  import.meta.env.MODE === 'production' ? '/api/gameHub' : `${import.meta.env.VITE_API_URL}/gameHub`
 
 console.log('SignalR: Używany HUB_URL:', HUB_URL)
 
