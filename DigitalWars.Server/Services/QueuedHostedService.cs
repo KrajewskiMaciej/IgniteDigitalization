@@ -4,11 +4,13 @@ namespace backend.Services
     {
         private readonly ILogger<QueuedHostedService> _logger;
         public IBackgroundTaskQueue TaskQueue { get; }
+        private readonly IServiceProvider _serviceProvider;
 
-        public QueuedHostedService(IBackgroundTaskQueue taskQueue, ILogger<QueuedHostedService> logger)
+        public QueuedHostedService(IBackgroundTaskQueue taskQueue, ILogger<QueuedHostedService> logger, IServiceProvider serviceProvider)
         {
             TaskQueue = taskQueue;
             _logger = logger;
+            _serviceProvider = serviceProvider;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -22,14 +24,16 @@ namespace backend.Services
             while (!stoppingToken.IsCancellationRequested)
             {
                 var workItem = await TaskQueue.DequeueAsync(stoppingToken);
-
-                try
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    await workItem(stoppingToken);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error occurred executing {WorkItem}.", nameof(workItem));
+                    try
+                    {
+                        await workItem(stoppingToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error occurred executing {WorkItem}.", nameof(workItem));
+                    }
                 }
             }
         }
