@@ -26,15 +26,15 @@ namespace backend.Services
         private readonly IEmailService _emailService;
         private readonly IProvisioningService _provisioningService;
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public AuthService(AppDbContext context, IEmailService emailService, IProvisioningService provisioningService, IBackgroundTaskQueue backgroundTaskQueue, IServiceProvider serviceProvider)
+        public AuthService(AppDbContext context, IEmailService emailService, IProvisioningService provisioningService, IBackgroundTaskQueue backgroundTaskQueue, IServiceScopeFactory scopeFactory) // <--- Zmiana tutaj
         {
             _context = context;
             _emailService = emailService;
             _provisioningService = provisioningService;
             _backgroundTaskQueue = backgroundTaskQueue;
-            _serviceProvider = serviceProvider;
+            _scopeFactory = scopeFactory;
         }
 
         public async Task<(User user, List<Claim> claims)> ValidateUserCredentialsAsync(string username, string password)
@@ -79,7 +79,7 @@ namespace backend.Services
 
             _backgroundTaskQueue.QueueBackgroundWorkItem(async token =>
             {
-                using var scope = _serviceProvider.CreateScope();
+                using var scope = _scopeFactory.CreateScope();
                 var scopedProvisioningService = scope.ServiceProvider.GetRequiredService<IProvisioningService>();
                 var scopedEmailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 
