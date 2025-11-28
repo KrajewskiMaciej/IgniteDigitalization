@@ -133,9 +133,7 @@ namespace backend.Services
             var emailBody = await File.ReadAllTextAsync(templatePath);
 
             // Krok 3: Przygotuj dynamiczne dane do wstawienia
-
-            var frontendBaseUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
-            var resetLink = $"{frontendBaseUrl}/resetPassword/{resetToken}";
+            var resetLink = $"{_frontendSettings.BaseUrl}/resetPassword/{resetToken}";
             string expireDateString = expireDate.HasValue ? $"{expireDate.Value:dd.MM.yyyy HH:mm}" : "brak daty";
             // Lub jeśli jesteś pewien, że wartość istnieje:
             if (expireDate.HasValue)
