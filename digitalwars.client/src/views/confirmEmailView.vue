@@ -11,9 +11,7 @@
             class="text-5xl sm:text-6xl text-accent mb-4 block mx-auto"
           />
 
-          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">
-            Konto aktywne
-          </h2>
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">Konto aktywne</h2>
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
@@ -43,9 +41,7 @@
             class="text-5xl sm:text-6xl text-red-500 mb-4 block mx-auto"
           />
 
-          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">
-            Link wygasł
-          </h2>
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">Link wygasł</h2>
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 

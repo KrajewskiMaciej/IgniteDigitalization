@@ -1,8 +1,7 @@
 <template>
   <div class="animate-fade" v-if="!isEmailSent">
-
-     <div class="flex justify-center items-center">
-       <font-awesome-icon :icon="faUserLock" class="text-6xl mb-3 text-accent" />
+    <div class="flex justify-center items-center">
+      <font-awesome-icon :icon="faUserLock" class="text-6xl mb-3 text-accent" />
     </div>
 
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-4 text-center">
@@ -55,13 +54,12 @@
 
   <div v-else class="animate-fade-right">
     <div class="flex justify-center items-center">
-        <font-awesome-icon :icon="faEnvelopeCircleCheck" class="mb-3 text-6xl text-accent" />
+      <font-awesome-icon :icon="faEnvelopeCircleCheck" class="mb-3 text-6xl text-accent" />
     </div>
 
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
       {{ t('checkYourEmail') }}
     </h2>
-
 
     <div class="w-100 h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
 
@@ -140,15 +138,15 @@ const handleSendEmail = async () => {
     const apiError = error as ApiError
     const status: number = apiError.status
 
-    console.log('Jaki błąd otrzymuje:', apiError.status);
+    console.log('Jaki błąd otrzymuje:', apiError.status)
 
-    if(status === 409) {
-         toast.warning(t('invalidEmailOrEmailDoesntExist'), {
-            position: POSITION.TOP_CENTER,
-        })
-    } else{
+    if (status === 409) {
+      toast.warning(t('invalidEmailOrEmailDoesntExist'), {
+        position: POSITION.TOP_CENTER,
+      })
+    } else {
       toast.error(t('errorServerUnavailable'), {
-        position: POSITION.TOP_CENTER
+        position: POSITION.TOP_CENTER,
       })
     }
     console.error('Wystąpił błąd:', apiError.message || apiError.toString())

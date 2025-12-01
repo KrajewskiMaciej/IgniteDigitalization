@@ -105,12 +105,9 @@ interface ProcessedLogEntry {
   eventApplied: boolean
 }
 
-// --- Reaktywne referencje i Props ---
-// POPRAWKA: Jawne typowanie tablicy `gameLogEntries`
 const gameLogEntries = ref<ProcessedLogEntry[]>([])
 const currentBudget = ref(0)
 const isLoading = ref(true)
-// POPRAWKA: Zmieniono typ `error`, aby akceptował string lub null
 const error = ref<string | null>(null)
 
 const props = defineProps({
@@ -120,10 +117,8 @@ const props = defineProps({
 
 const emit = defineEmits(['budget-changed-in-menu'])
 
-// --- Computed Properties ---
 const hasRequiredIds = computed(() => props.gameId != null && props.teamId != null)
 
-// --- Metody pobierania danych ---
 async function fetchData() {
   if (!hasRequiredIds.value) return
 

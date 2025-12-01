@@ -87,4 +87,10 @@ export const pl = {
   fitView: 'Dopasuj widok',
   resetView: 'Zresetuj widok',
   tables: 'Stoły',
+  editMode: 'Tryb edycji',
+  saveChanges: 'Zapisz zmiany',
+  rejectChanges: 'Odrzuć zmiany',
+
+  suggectCard: 'Zasugeruj kartę',
+  playCard: 'Zagraj kartę',
 }

@@ -86,4 +86,11 @@ export const en = {
   fitView: 'Fit View',
   resetView: 'Reset View',
   tables: 'Tables',
+  editMode: 'Edit mode',
+  saveChanges: 'Save changes',
+  rejectChanges: 'Reject changes',
+
+  //
+  suggectCard: 'Suggest Card',
+  playCard: 'Play Card',
 }

@@ -6,9 +6,7 @@
         class="bg-surface-900 text-white rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
       >
         <div v-if="isTokenValid">
-          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">
-            Zmień hasło
-          </h2>
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">Zmień hasło</h2>
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
@@ -34,7 +32,10 @@
                 class="h-9 w-9 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
                 type="button"
               >
-                <font-awesome-icon :icon="showPassword ? faEye : faEyeSlash" class="h-4 w-4 sm:h-5 sm:w-5" />
+                <font-awesome-icon
+                  :icon="showPassword ? faEye : faEyeSlash"
+                  class="h-4 w-4 sm:h-5 sm:w-5"
+                />
               </button>
             </div>
 
@@ -76,35 +77,50 @@
                   :class="passwordRequirements.length ? 'text-green-400' : 'text-gray-500'"
                   class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
-                  <span class="w-1.5 h-1.5 rounded-full" :class="passwordRequirements.length ? 'bg-green-400' : 'bg-gray-500'"></span>
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    :class="passwordRequirements.length ? 'bg-green-400' : 'bg-gray-500'"
+                  ></span>
                   Co najmniej 8 znaków
                 </li>
                 <li
                   :class="passwordRequirements.uppercase ? 'text-green-400' : 'text-gray-500'"
                   class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
-                  <span class="w-1.5 h-1.5 rounded-full" :class="passwordRequirements.uppercase ? 'bg-green-400' : 'bg-gray-500'"></span>
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    :class="passwordRequirements.uppercase ? 'bg-green-400' : 'bg-gray-500'"
+                  ></span>
                   Co najmniej jedna duża litera
                 </li>
                 <li
                   :class="passwordRequirements.lowercase ? 'text-green-400' : 'text-gray-500'"
                   class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
-                  <span class="w-1.5 h-1.5 rounded-full" :class="passwordRequirements.lowercase ? 'bg-green-400' : 'bg-gray-500'"></span>
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    :class="passwordRequirements.lowercase ? 'bg-green-400' : 'bg-gray-500'"
+                  ></span>
                   Co najmniej jedna mała litera
                 </li>
                 <li
                   :class="passwordRequirements.special ? 'text-green-400' : 'text-gray-500'"
                   class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
-                  <span class="w-1.5 h-1.5 rounded-full" :class="passwordRequirements.special ? 'bg-green-400' : 'bg-gray-500'"></span>
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    :class="passwordRequirements.special ? 'bg-green-400' : 'bg-gray-500'"
+                  ></span>
                   Co najmniej jeden znak specjalny
                 </li>
                 <li
                   :class="passwordRequirements.digit ? 'text-green-400' : 'text-gray-500'"
                   class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
-                  <span class="w-1.5 h-1.5 rounded-full" :class="passwordRequirements.digit ? 'bg-green-400' : 'bg-gray-500'"></span>
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    :class="passwordRequirements.digit ? 'bg-green-400' : 'bg-gray-500'"
+                  ></span>
                   Co najmniej jedna cyfra
                 </li>
               </ul>
@@ -135,16 +151,15 @@
             class="text-5xl sm:text-6xl text-red-500 mb-4 block mx-auto"
           />
 
-          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">
-            Link wygasł
-          </h2>
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">Link wygasł</h2>
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
           <div class="text-center text-sm sm:text-base text-gray-300 space-y-3">
             <p>Wygląda na to, że twój link do resetowania hasła wygasł.</p>
             <p>
-              Powróć do strony logowania i wybierz opcję "Zapomniałem hasła" żeby otrzymać nowy link.
+              Powróć do strony logowania i wybierz opcję "Zapomniałem hasła" żeby otrzymać nowy
+              link.
             </p>
           </div>
 

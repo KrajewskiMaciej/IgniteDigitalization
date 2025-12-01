@@ -93,7 +93,7 @@
           </RouterLink>
         </li>
 
-         <li
+        <li
           class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
@@ -106,7 +106,6 @@
           </RouterLink>
         </li>
 
-        
         <li
           class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
@@ -148,7 +147,7 @@ import {
   faFilePdf,
   faArrowLeft,
   faArrowRight,
-  faChessBoard
+  faChessBoard,
 } from '@fortawesome/free-solid-svg-icons'
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'

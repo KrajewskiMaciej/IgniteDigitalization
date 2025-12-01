@@ -873,10 +873,10 @@ async function executeAction(isCard: boolean) {
     toast.error(error.response?.data?.message || 'Wystąpił błąd podczas wykonywania akcji.')
     console.error('Błąd akcji karty/przedmiotu:', error.response?.data || error.message)
   }
-   if (isCard) {
-    selectedCardId.value = null;
+  if (isCard) {
+    selectedCardId.value = null
   } else {
-    selectedItemId.value = null;
+    selectedItemId.value = null
   }
 }
 const playCard = () => executeAction(true)

@@ -1,16 +1,18 @@
 <template>
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
-   <div class="text-center">
+    <div class="text-center">
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
         Panel Decyzji
       </h1>
       <p class="text-surface-400 text-sm md:text-base mb-3">
         Zarządzaj decyzjami i przedmiotami dla drużyny
       </p>
-      <div class="inline-flex gap-3 items-center px-6 py-3 bg-surface-900 border border-surface-700 rounded-xl shadow-lg">
-        <div 
-          class="w-5 h-5 rounded-full ring-2 ring-surface-600 shadow-lg" 
-          :style="{backgroundColor: teamData?.teamColor}"
+      <div
+        class="inline-flex gap-3 items-center px-6 py-3 bg-surface-900 border border-surface-700 rounded-xl shadow-lg"
+      >
+        <div
+          class="w-5 h-5 rounded-full ring-2 ring-surface-600 shadow-lg"
+          :style="{ backgroundColor: teamData?.teamColor }"
         ></div>
         <span class="font-nasalization font-bold text-2xl text-surface-0 tracking-wide">
           {{ teamData?.teamName }}
@@ -389,7 +391,7 @@ interface TeamData {
 }
 interface Card {
   id: number
-  deckId: number,
+  deckId: number
   displayOrder: number
   title: string
   description: string
@@ -401,7 +403,7 @@ interface ICardsResponse {
   decisionCards: Card[]
   hardwareCards: Card[]
   softwareCards: Card[]
-} 
+}
 interface Item {
   id: number
   title: string
@@ -543,7 +545,7 @@ const fetchAllDataForTeam = async () => {
       Object.assign(formData, sessionData.boardConfig)
     }
 
-    console.log('Dane drużyny:', response.data);
+    console.log('Dane drużyny:', response.data)
 
     teamData.value = {
       teamId: sessionData.teamId,
@@ -580,15 +582,15 @@ const fetchAvailableCardsAndItems = async () => {
 
     const response = await apiServices.get<ICardsResponse>(url)
 
-    console.log('Pobrane dane kart', response.data);
+    console.log('Pobrane dane kart', response.data)
 
     cards.value = response.data.decisionCards || []
-    
+
     const softwareCards = (response.data.softwareCards || []).map((item: Item) => ({
       ...item,
       type: 'software',
     }))
-    
+
     const hardwareCards = (response.data.hardwareCards || []).map((item: Item) => ({
       ...item,
       type: 'hardware',
@@ -636,9 +638,11 @@ const fetchDecisionHistory = async () => {
 
 const fetchPendingDecisions = async () => {
   try {
-    const response = await apiServices.get<PendingDecision[]>(apiConfig.player.getPendingLogsForTeam(Number(props.gameId), Number(props.teamId)));
+    const response = await apiServices.get<PendingDecision[]>(
+      apiConfig.player.getPendingLogsForTeam(Number(props.gameId), Number(props.teamId)),
+    )
     pendingDecisions.value = response.data
-    console.log('Pobrane decyzje do akceptacji:', pendingDecisions.value);
+    console.log('Pobrane decyzje do akceptacji:', pendingDecisions.value)
   } catch (error) {
     toast.error('Błąd pobierania sugestii.')
   }
@@ -747,9 +751,9 @@ const executeCardOrItemAction = async (isCard: boolean) => {
   }
 
   if (isCard) {
-    selectedCardId.value = null;
+    selectedCardId.value = null
   } else {
-    selectedItemId.value = null;
+    selectedItemId.value = null
   }
 }
 
@@ -776,7 +780,6 @@ const rejectDecision = async (logId: number) => {
   }
 }
 
-
 const formatDate = (timestamp: string) => new Date(timestamp).toLocaleString('pl-PL')
 
 onMounted(async () => {
@@ -796,7 +799,9 @@ onMounted(async () => {
   try {
     await signalService.start()
     await signalService.joinGameRoomAsPlayer(String(gameIdNum), String(props.teamId))
-    console.log(`Pomyślnie dołączono do pokoju SignalR dla gry: ${gameIdNum}, zespół: ${props.teamId}`)
+    console.log(
+      `Pomyślnie dołączono do pokoju SignalR dla gry: ${gameIdNum}, zespół: ${props.teamId}`,
+    )
   } catch (err) {
     console.error('Błąd połączenia SignalR: ', err)
   }

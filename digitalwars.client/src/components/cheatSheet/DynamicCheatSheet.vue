@@ -91,13 +91,13 @@
             <div class="space-y-4">
               <div>
                 <h3 class="text-white font-bold text-sm mb-2 flex items-center gap-2">
-                  <font-awesome-icon :icon="faPeopleLine" class="text-xl text-primary-400"/>
+                  <font-awesome-icon :icon="faPeopleLine" class="text-xl text-primary-400" />
                   {{ t('tables') }}
                 </h3>
                 <div class="flex flex-col gap-2">
-                  <div 
-                    v-for="table in tables" 
-                    :key="table.teamId" 
+                  <div
+                    v-for="table in tables"
+                    :key="table.teamId"
                     class="flex gap-2 items-center hover:bg-surface-700/50 p-1 rounded transition-colors"
                   >
                     <div
@@ -113,7 +113,7 @@
 
               <div>
                 <h3 class="text-white font-bold text-sm mb-2 flex items-center gap-2">
-                   <font-awesome-icon :icon="faCircleInfo" class="text-xl text-primary-400"/>
+                  <font-awesome-icon :icon="faCircleInfo" class="text-xl text-primary-400" />
                   Legenda
                 </h3>
                 <div class="flex flex-col gap-2">
@@ -166,7 +166,7 @@ import {
   faExpand,
   faRotate,
   faPeopleLine,
-  faCircleInfo
+  faCircleInfo,
 } from '@fortawesome/free-solid-svg-icons'
 import Button from 'primevue/button'
 import { VueFlow, MarkerType, useVueFlow, Panel } from '@vue-flow/core'
@@ -182,17 +182,19 @@ interface IProps {
   gameId: number
 }
 
-const props = defineProps<IProps>();
-const toast = useToast();
+const props = defineProps<IProps>()
+const toast = useToast()
 
-const gameId = ref<number>(props.gameId);
-const tables = ref<ITeamManagmentResponse[]>([]);
-const deckId = ref<number>();
-const latestEntry = ref<number>();
-const currentLayout = useStorage<'TB' | 'LR'>('prefferedLayour', 'TB');
-const decisionCardsData = ref<IDecisonCard[]>([]);
-const itemsData = ref<IItemCard[]>([]);
-const tableEntries = ref<Record<number, Array<{teamId: number, teamColor: string, teamName: string}>>>({});
+const gameId = ref<number>(props.gameId)
+const tables = ref<ITeamManagmentResponse[]>([])
+const deckId = ref<number>()
+const latestEntry = ref<number>()
+const currentLayout = useStorage<'TB' | 'LR'>('prefferedLayour', 'TB')
+const decisionCardsData = ref<IDecisonCard[]>([])
+const itemsData = ref<IItemCard[]>([])
+const tableEntries = ref<
+  Record<number, Array<{ teamId: number; teamColor: string; teamName: string }>>
+>({})
 
 const nodeTypes = markRaw({
   decision: CustomNode,
@@ -297,7 +299,7 @@ const fetchTemasInfo = async () => {
     )
 
     tables.value = response.data
-    console.log('Stoły:', tables.value);
+    console.log('Stoły:', tables.value)
   } catch {
     toast.error(`Wystąpił błąd podczas pobierania informacji o drużynach w grze: ${gameId.value}`)
   }
@@ -319,7 +321,7 @@ const fetchEnablersMap = async () => {
   }
 }
 
-//Ostatnia zagrana karta z sukcesem przez każdą drużynę 
+//Ostatnia zagrana karta z sukcesem przez każdą drużynę
 const fetchAllTeamsEntries = async () => {
   const entriesPromises = tables.value.map(async (table) => {
     try {
@@ -330,7 +332,7 @@ const fetchAllTeamsEntries = async () => {
         cardsId: response.data,
         teamId: table.teamId,
         teamColor: table.teamColor,
-        teamName: table.teamName
+        teamName: table.teamName,
       }
     } catch {
       console.error(`Błąd podczas pobierania entries dla zespołu ${table.teamId}`)
@@ -341,23 +343,23 @@ const fetchAllTeamsEntries = async () => {
   const results = await Promise.all(entriesPromises)
 
   console.log('Rezultaty:', results)
-  
-  results.forEach(result => {
+
+  results.forEach((result) => {
     if (!result) return
 
-    const card = cardTypes.value.find(card => card.cards_Id === result.cardsId)
-    
+    const card = cardTypes.value.find((card) => card.cards_Id === result.cardsId)
+
     if (card) {
       const cardId = card.card_Id
-      
+
       if (!tableEntries.value[cardId]) {
         tableEntries.value[cardId] = []
       }
-      
+
       tableEntries.value[cardId].push({
         teamId: result.teamId,
         teamColor: result.teamColor,
-        teamName: result.teamName
+        teamName: result.teamName,
       })
     }
   })
@@ -394,7 +396,12 @@ const fetchItems = async () => {
 onMounted(async () => {
   await Promise.all([fetchDeckId(), fetchTemasInfo()])
 
-  await Promise.all([fetchEnablersMap(), fetchDecisionCards(), fetchItems(), fetchAllTeamsEntries()])
+  await Promise.all([
+    fetchEnablersMap(),
+    fetchDecisionCards(),
+    fetchItems(),
+    fetchAllTeamsEntries(),
+  ])
 
   createNodesFromCards(cardTypes.value)
   createEdgesFromEnablers(enablers.value!, cardTypes.value)

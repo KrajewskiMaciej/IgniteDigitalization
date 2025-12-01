@@ -59,7 +59,7 @@
         </div>
       </div>
 
-      <!-- Karta z dynamicznym tłem -->
+      <!-- Karta -->
       <div
         ref="cardRef"
         class="w-full h-full bg-gradient-to-br from-transparent to-transparent rounded-b-2xl shadow-2xl text-surface-0 flex"
@@ -149,7 +149,7 @@ interface Card {
 
 interface CardsApiResponse {
   decisionCards: Card[]
-  hardwareCards: Card[] // Zakładamy, że API rozdziela karty przedmiotów
+  hardwareCards: Card[]
   softwareCards: Card[]
 }
 
@@ -194,7 +194,6 @@ useSwipe(cardRef, {
   },
 })
 
-// --- Computed Properties (Właściwości Obliczeniowe) ---
 const displayCards = computed<Card[]>(() => {
   return props.showingDecisionCards ? decisionCards.value : itemCards.value
 })
@@ -230,7 +229,7 @@ const cardStyle = computed(() => {
 })
 
 const buttonLabel = computed(() => {
-  return props.isIndependentTeam ? 'Wybierz kartę' : 'Zasugeruj kartę'
+  return props.isIndependentTeam ? t('playCard') : t('suggectCard')
 })
 
 async function fetchCards() {
@@ -255,9 +254,6 @@ async function fetchCards() {
       type: 'decision',
     }))
 
-    // --- KLUCZOWA POPRAWKA ---
-    // Jawnie typujemy stałe jako Card[], aby TypeScript poprawnie
-    // zinterpretował typ właściwości 'type' i uniknął błędu.
     const hardware: Card[] = (response.data?.hardwareCards ?? []).map((card) => ({
       ...card,
       type: 'hardware',
@@ -266,7 +262,6 @@ async function fetchCards() {
       ...card,
       type: 'software',
     }))
-    // --- KONIEC POPRAWKI ---
 
     itemCards.value = [...software, ...hardware]
   } catch (error: any) {
@@ -332,11 +327,6 @@ defineExpose({
   fetchCards,
 })
 
-onMounted(() => {
-  console.log('isIndependentTeam:', props.isIndependentTeam)
-})
-
-// --- Watchers ---
 watch(displayCards, () => {
   currentIndex.value = 0
 })
