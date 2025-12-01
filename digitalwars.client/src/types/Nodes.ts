@@ -8,7 +8,7 @@ export interface ICardNode {
     label: string
     cardType: 'Decision' | 'Software' | 'Hardware'
     card: IDecisonCard
-    tables: Array<{ teamId: number; teamName: string; teamColor: string }>
+    tables?: Array<{ teamId: number; teamName: string; teamColor: string }>
     layoutDirection: 'TB' | 'LR'
   }
 }

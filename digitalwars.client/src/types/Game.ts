@@ -39,3 +39,9 @@ export interface IItemCard {
   longDesc: string
   itemType: 'Software' | 'Hardware'
 }
+
+export interface IPendingEnablerChange {
+  cardId: number
+  cardsId: number
+  enablers: number[]  
+}

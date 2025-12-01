@@ -39,6 +39,18 @@
             <font-awesome-icon :icon="faChessPawn" class="mr-2" />
           </template>
         </Button>
+
+        <Button
+          :label="'Enablery'"
+          @click="currentView = 'enablers'"
+          outlined
+          size="large"
+          :severity="currentView === 'enablers' ? undefined : 'secondary'"
+        >
+          <template #icon>
+            <font-awesome-icon :icon="faLock" class="mr-2" />
+          </template>
+        </Button>
       </div>
     </div>
 
@@ -46,6 +58,7 @@
       <EditDecisionCards v-if="currentView === 'decisions'" />
       <EditItems v-else-if="currentView === 'items'" />
       <EditProccesses v-else-if="currentView === 'processes'" />
+      <DynamicCheatSheetEdit v-else-if="currentView === 'enablers'" />
     </div>
   </div>
 </template>
@@ -56,7 +69,8 @@ import EditDecisionCards from '@/components/game/EditDecisionCards.vue'
 import EditItems from '@/components/game/EditItems.vue'
 import EditProccesses from '@/components/game/EditProccesses.vue'
 import Button from 'primevue/button'
-import { faMicrochip, faChessPawn, faClone } from '@fortawesome/free-solid-svg-icons'
+import { faMicrochip, faChessPawn, faClone ,faLock } from '@fortawesome/free-solid-svg-icons'
+import DynamicCheatSheetEdit from '@/components/cheatSheet/DynamicCheatSheetEdit.vue'
 
-const currentView = ref<'items' | 'decisions' | 'processes'>('decisions')
+const currentView = ref<'items' | 'decisions' | 'processes' | 'enablers'>('decisions')
 </script>
