@@ -49,6 +49,7 @@ export const pl = {
   oldPasswordPlaceholder: 'Stare hasło...',
   newPasswordPlaceholder: 'Nowe hasło...',
   confirmPasswordPlaceholder: 'Potwierdź hasło...',
+  emailOrUsername: 'E-mail lub nazwa użytkownika',
 
   //Scan QR
   scanQRCode: 'Skanuj kod QR',

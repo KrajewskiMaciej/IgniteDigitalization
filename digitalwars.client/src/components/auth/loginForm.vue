@@ -7,7 +7,7 @@
     <form @submit.prevent="handleLogin" class="space-y-4 sm:space-y-5">
       <div class="space-y-1.5">
         <label for="email" class="block font-bold text-xs sm:text-sm text-left">
-          {{ t('email') }}
+          {{ t('emailOrUsername') }}
         </label>
         <input
           type="email"

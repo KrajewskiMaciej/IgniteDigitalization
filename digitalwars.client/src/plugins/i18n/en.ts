@@ -47,6 +47,7 @@ export const en = {
   passwordChangedSuccessfully: 'Password changed successfully!',
   oldPasswordPlaceholder: 'Old password...',
   newPasswordPlaceholder: 'New password...',
+  emailOrUsername: 'Email or Username',
 
   //Scan QR
   scanQRCode: 'Scan QR Code',
