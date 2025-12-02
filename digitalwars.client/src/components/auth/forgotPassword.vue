@@ -1,24 +1,24 @@
 <template>
-  <div class="animate-fade" v-if="!isEmailSent">
+  <div class="w-full h-full animate-fade" v-if="!isEmailSent">
     <div class="flex justify-center items-center">
-      <font-awesome-icon :icon="faUserLock" class="text-6xl mb-3 text-accent" />
+      <font-awesome-icon :icon="faUserLock" class="text-5xl sm:text-6xl mb-3 sm:mb-4 text-accent" />
     </div>
 
-    <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-4 text-center">
+    <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-3 sm:mb-4 text-center">
       {{ t('forgotPasswordQuestion') }}
     </h2>
 
     <div
-      class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-6 sm:mb-8"
-    ></div>
+      class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-4 sm:mb-6"
+    />
 
-    <form @submit.prevent="handleSendEmail">
-      <div class="text-gray-300 mt-2 mb-2 text-center">
+    <form @submit.prevent="handleSendEmail" class="space-y-4 sm:space-y-5">
+      <div class="text-sm sm:text-base text-gray-300 text-center space-y-1">
         <p>{{ t('enterYourEmail') }}</p>
         <p>{{ t('weWillSendPasswordResetLink') }}</p>
       </div>
 
-      <div class="space-y-1 mb-5">
+      <div class="space-y-1.5">
         <label for="email" class="block font-bold text-xs sm:text-sm text-left">
           {{ t('email') }}
         </label>
@@ -26,55 +26,58 @@
           type="email"
           id="email"
           v-model="email"
-          class="w-full px-3 py-2 bg-tertiary border border-gray-600 rounded-md text-white focus:outline-none focus:border-accent text-sm sm:text-base"
+          class="w-full px-3 py-2.5 sm:py-3 bg-tertiary border border-gray-600 rounded-lg text-white focus:outline-none focus:border-accent text-sm sm:text-base"
           required
         />
       </div>
 
       <button
         type="submit"
-        class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base md:text-lg transition-all duration-300 overflow-hidden group text-white mb-5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50"
+        class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base md:text-lg transition-all duration-300 overflow-hidden group text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50"
       >
         <span class="relative z-10">{{ t('resetPassword') }}</span>
         <div
           class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
-        ></div>
+        />
       </button>
 
       <div class="flex justify-center items-center">
-        <span
-          class="text-accent hover:text-purple-300 transition-colors cursor-pointer"
+        <button
+          type="button"
           @click="emit('backToLogin')"
+          class="px-5 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-medium text-accent hover:text-white bg-transparent hover:bg-accent/20 border border-accent/50 hover:border-accent rounded-lg transition-all duration-300"
         >
           {{ t('backToLogin') }}
-        </span>
+        </button>
       </div>
     </form>
   </div>
 
-  <div v-else class="animate-fade-right">
+  <div v-else class="w-full h-full animate-fade-right">
     <div class="flex justify-center items-center">
-      <font-awesome-icon :icon="faEnvelopeCircleCheck" class="mb-3 text-6xl text-accent" />
+      <font-awesome-icon :icon="faEnvelopeCircleCheck" class="mb-3 sm:mb-4 text-5xl sm:text-6xl text-accent" />
     </div>
 
-    <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
+    <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-3 sm:mb-4 text-center">
       {{ t('checkYourEmail') }}
     </h2>
 
-    <div class="w-100 h-0.5 mb-1 sm:mb-2 md:mb-3 lg:mb-4 bg-accent"></div>
+    <div
+      class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-4 sm:mb-6"
+    />
 
-    <div class="text-sm text-gray-300 text-center">
+    <div class="text-sm sm:text-base text-gray-300 text-center space-y-1.5 mb-4 sm:mb-6">
       <p>{{ t('weHaveSentPasswordResetInstructions') }}</p>
       <p>
-        {{ t('toAddress') }} <b>{{ email }}</b>
+        {{ t('toAddress') }} <b class="text-white">{{ email }}</b>
       </p>
-      <p>{{ t('checkSpamFolder') }}</p>
+      <p class="text-xs sm:text-sm text-gray-400">{{ t('checkSpamFolder') }}</p>
     </div>
 
     <button
       @click="handleSendEmail"
       :disabled="!canResend"
-      class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base md:text-lg transition-all duration-300 overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed text-white mt-5"
+      class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base md:text-lg transition-all duration-300 overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed text-white"
       :class="
         canResend
           ? 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50'
@@ -87,7 +90,7 @@
       <div
         v-if="canResend"
         class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
-      ></div>
+      />
     </button>
   </div>
 </template>

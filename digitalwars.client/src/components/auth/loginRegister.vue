@@ -108,6 +108,11 @@ import RegisterForm from '@/components/auth/registerForm.vue'
 import ForgotPassword from './forgotPassword.vue'
 import ConfirmEmail from './confirmEmail.vue'
 import { useI18n } from 'vue-i18n'
+import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+
+const breakpoints = useBreakpoints(breakpointsTailwind)
+
+const bigScreen = breakpoints.greater('md');
 
 const { t } = useI18n()
 

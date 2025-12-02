@@ -1,43 +1,43 @@
 <template>
-  <div class="px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-3">
-    <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-2 sm:mb-3 text-center">
+  <div class="w-full h-full">
+    <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-3 sm:mb-4 text-center">
       {{ t('signInToYourAccount') }}
     </h2>
 
-    <form @submit.prevent="handleLogin" class="space-y-3 sm:space-y-4">
-      <div class="space-y-1">
+    <form @submit.prevent="handleLogin" class="space-y-4 sm:space-y-5">
+      <div class="space-y-1.5">
         <label for="email" class="block font-bold text-xs sm:text-sm text-left">
-          {{ t('email') }}</label
-        >
+          {{ t('email') }}
+        </label>
         <input
           type="email"
           id="email"
           v-model="loginData.email"
-          class="w-full px-3 py-2 bg-tertiary border border-gray-600 rounded-md text-white focus:outline-none focus:border-accent text-sm sm:text-base"
+          class="w-full px-3 py-2.5 sm:py-3 bg-tertiary border border-gray-600 rounded-lg text-white focus:outline-none focus:border-accent text-sm sm:text-base"
           required
         />
       </div>
 
-      <div class="space-y-1">
+      <div class="space-y-1.5">
         <label for="password" class="block font-bold text-xs sm:text-sm text-left">
           {{ t('password') }}
         </label>
         <div
-          class="flex items-center gap-2 bg-tertiary border border-gray-600 rounded-md transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent"
+          class="flex items-center gap-2 bg-tertiary border border-gray-600 rounded-lg transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent"
         >
           <input
             :type="showPassword ? 'text' : 'password'"
             id="password"
             v-model="loginData.password"
-            class="w-full px-3 py-2 bg-transparent focus:outline-none focus:ring-0 text-white placeholder-gray-400 flex-grow"
+            class="w-full px-3 py-2.5 sm:py-3 bg-transparent focus:outline-none focus:ring-0 text-white placeholder-gray-400 flex-grow text-sm sm:text-base"
             required
           />
           <button
             @click="showPassword = !showPassword"
-            class="h-8 w-8 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
+            class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 mr-1.5 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
             type="button"
           >
-            <font-awesome-icon :icon="showPassword ? faEye : faEyeSlash" class="h-5 w-5" />
+            <font-awesome-icon :icon="showPassword ? faEye : faEyeSlash" class="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </div>
       </div>
@@ -65,7 +65,7 @@
         <div
           v-if="isLoginFormValid"
           class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
-        ></div>
+        />
       </button>
     </form>
   </div>
