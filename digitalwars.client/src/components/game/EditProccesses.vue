@@ -242,11 +242,16 @@ import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import { useConfirm } from 'primevue/useconfirm'
 import apiConfig from '@/services/apiConfig'
-import apiService from '@/services/apiServices'
+import apiServices from '@/services/apiServices'
 import pawnPreview from '@/components/game/PawnPreview.vue'
 
 const toast = useToast()
 const confirm = useConfirm()
+
+interface IProcessResponse {
+  message: string
+  processId: number
+}
 
 // --- INTERFACES ---
 interface Deck {
@@ -315,7 +320,7 @@ const deleteSelectedProcess = async () => {
     acceptLabel: 'Usuń',
     accept: async () => {
       try {
-        // API call to delete process
+        await apiServices.delete(apiConfig.processes.deleteProcess(selectedProcess.value!));
         processesData.value = processesData.value.filter(
           (process) => process.processId !== processId,
         )
@@ -343,13 +348,23 @@ const saveProcessChanges = async () => {
 
   try {
     if (isAddingNewProcess.value) {
-      // API call to add process
+
+      const response  = await apiServices.post<IProcessResponse>(apiConfig.processes.addProcess, {
+        deck_Id: selectedDeck.value,
+        process_Desc: editedProcess.value.processDesc,
+        process_Long_Desc: editedProcess.value.processLongDesc,
+        process_Color: editedProcess.value.processColor,
+        process_Weight: 0.15 //Na razie na sztywno przypisana waga może później będziemy obsługiwać
+      });
+
       const newProcess: Process = {
         ...editedProcess.value,
-        processId: Date.now(),
+        processId: response.data.processId,
         deckId: selectedDeck.value!,
       }
       processesData.value.push(newProcess)
+
+      selectedProcess.value = response.data.processId;
 
       toast.success('Nowy proces został dodany')
     } else {
@@ -357,6 +372,14 @@ const saveProcessChanges = async () => {
       const index = processesData.value.findIndex(
         (process) => process.processId === selectedProcess.value,
       )
+      
+
+      const response = await apiServices.put(apiConfig.processes.editProcess(selectedProcess.value!), {
+        process_Desc: editedProcess.value.processDesc,
+        process_Long_Desc: editedProcess.value.processLongDesc,
+        process_Color: editedProcess.value.processColor,
+      });
+      
       if (index !== -1) {
         processesData.value[index] = {
           ...editedProcess.value,
@@ -365,16 +388,12 @@ const saveProcessChanges = async () => {
         }
       }
 
+
+
       toast.success('Proces został zaktualizowany')
     }
 
     isAddingNewProcess.value = false
-    selectedProcess.value = null
-    editedProcess.value = {
-      processDesc: '',
-      processLongDesc: '',
-      processColor: '#6B7280',
-    }
   } catch (error) {
     console.error('Błąd przy zapisie procesu:', error)
     toast.error('Błąd podczas zapisywania procesu')
@@ -400,7 +419,7 @@ watch(selectedDeck, async (newDeck) => {
     isAddingNewProcess.value = false
 
     try {
-      const response = await apiService.get<Process[]>(apiConfig.processes.getByDeck(newDeck))
+      const response = await apiServices.get<Process[]>(apiConfig.processes.getByDeck(newDeck))
       processesData.value = response.data
     } catch (error) {
       console.error('Błąd przy pobieraniu procesów:', error)
@@ -433,7 +452,7 @@ watch(selectedProcess, (newProcess) => {
 // --- LIFECYCLE ---
 onMounted(async () => {
   try {
-    const response = await apiService.get<Deck[]>(apiConfig.admin.deck.getAll)
+    const response = await apiServices.get<Deck[]>(apiConfig.admin.deck.getAll)
     decksData.value = response.data
   } catch (error) {
     console.error('Błąd przy pobieraniu talii:', error)

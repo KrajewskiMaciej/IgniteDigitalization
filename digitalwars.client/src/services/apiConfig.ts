@@ -104,6 +104,9 @@ const endpoints = {
   processes: {
     // This is likely in a ProcessesController, assumed to be correct.
     getByDeck: (deckId: number) => `/processes/by-deck/${deckId}`,
+    editProcess: (processId: number) => `/processes/edit/${processId}`,
+    deleteProcess: (processId: number) => `/processes/delete/${processId}`,
+    addProcess: '/processes/add',
   },
 }
 
