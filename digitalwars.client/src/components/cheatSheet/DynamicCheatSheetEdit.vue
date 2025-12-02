@@ -16,6 +16,7 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
           </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
         </div>
 
         <div>
@@ -291,7 +292,6 @@ const handleSaveChanges = async () => {
     return
   }
 
- 
   //Tutaj będzie odbicie się od backendu
 
   pendingEnablersChanges.value.clear()
@@ -344,9 +344,7 @@ const onEdgeClick = (event: { edge: { id: string; source: string; target: string
   const targetCardId = Number(event.edge.target.replace('card-', ''))
 
   if (enablers.value[targetCardId]) {
-    enablers.value[targetCardId] = enablers.value[targetCardId].filter(
-      (id) => id !== sourceCardId,
-    )
+    enablers.value[targetCardId] = enablers.value[targetCardId].filter((id) => id !== sourceCardId)
   }
 
   markCardAsChanged(targetCardId)
@@ -511,7 +509,6 @@ onMounted(async () => {
 .vue-flow.edit-mode .vue-flow__edge:hover path.vue-flow__edge-path {
   stroke: red !important;
 }
-
 
 .vue-flow.edit-mode .vue-flow__handle {
   opacity: 1;

@@ -16,6 +16,7 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
           </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
         </div>
 
         <!-- Wybór talii -->
