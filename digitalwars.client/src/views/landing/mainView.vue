@@ -1,7 +1,7 @@
 <template>
-<div>
+  <div>
     <div class="relative flex flex-col h-screen w-screen overflow-hidden bg-surface-900">
-      <div class="relative z-10 flex flex-col h-full">
+      <div class="relative z-20 flex flex-col h-full">
         <Navbar @open-video="handleShowVideo" />
 
         <div class="flex-1 relative">
@@ -13,23 +13,23 @@
             >
               <div
                 @click="handleGameMasterClick"
-                class="flex items-center px-8 py-3.5 rounded-full cursor-pointer transition-all duration-300 ease-out relative overflow-hidden group bg-surface-800/50 hover:bg-gradient-to-r hover:from-primary-400 hover:to-primary-500 hover:shadow-lg hover:shadow-primary-500/50 hover:scale-[1.02]"
+                class="flex items-center px-8 py-3.5 rounded-full cursor-pointer transition-all duration-600 ease-out relative overflow-hidden group bg-surface-800/50 hover:bg-gradient-to-r hover:from-primary-400 hover:to-primary-500 hover:shadow-lg hover:shadow-primary-500/50 hover:scale-[1.02]"
               >
-                <span class="mr-2.5 relative z-10">{{ t('gameMaster') }}</span>
-                <font-awesome-icon :icon="faUserGear" class="h-4 w-4 relative z-10" />
+                <span class="mr-2.5 relative z-20">{{ t('gameMaster') }}</span>
+                <font-awesome-icon :icon="faUserGear" class="h-4 w-4 relative z-20" />
                 <div
-                  class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+                  class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-500/20 to-primary-500/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"
                 />
               </div>
 
               <div
                 @click="showJoinByCode = true"
-                class="flex items-center px-8 py-3.5 rounded-full cursor-pointer transition-all duration-300 ease-out relative overflow-hidden group bg-surface-800/50 hover:bg-gradient-to-r hover:from-primary-400 hover:to-primary-500 hover:shadow-lg hover:shadow-primary-500/50 hover:scale-[1.02]"
+                class="flex items-center px-8 py-3.5 rounded-full cursor-pointer transition-all duration-600 ease-out relative overflow-hidden group bg-surface-800/50 hover:bg-gradient-to-r hover:from-primary-400 hover:to-primary-500 hover:shadow-lg hover:shadow-primary-500/50 hover:scale-[1.02]"
               >
-                <span class="mr-2.5 relative z-10">{{ t('player') }}</span>
-                <font-awesome-icon :icon="faUser" class="h-4 w-4 relative z-10" />
+                <span class="mr-2.5 relative z-20">{{ t('player') }}</span>
+                <font-awesome-icon :icon="faUser" class="h-4 w-4 relative z-20" />
                 <div
-                  class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+                  class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-500/20 to-primary-500/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"
                 />
               </div>
             </div>
@@ -39,23 +39,20 @@
         <Footer />
       </div>
 
-      <LoginRegister :is-visible="showAuthModal" @close="showAuthModal = false" />
+      <!-- <LoginRegister :is-visible="showAuthModal" @close="showAuthModal = false" /> -->
+      <NewAuth v-if="showAuthModal" @close="showAuthModal = false" />
       <joinByCode :is-visible="showJoinByCode" @close="showJoinByCode = false" />
     </div>
-      <Teleport v-if="showVideo" to="body">
-      <div 
+    <Teleport v-if="showVideo" to="body">
+      <div
         class="fixed inset-0 w-screen h-screen z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
       >
-        <video 
-          :autoplay="showVideo" 
-          class="w-full h-full rounded-lg disco-shadow"
-          @click.stop
-        >
+        <video :autoplay="showVideo" class="w-full h-full rounded-lg disco-shadow" @click.stop>
           <source src="/easteregss/gandalf.mp4" type="video/mp4" />
         </video>
       </div>
     </Teleport>
-</div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -69,27 +66,28 @@ import router from '@/router'
 import { faUser, faUserGear } from '@fortawesome/free-solid-svg-icons'
 import { useI18n } from 'vue-i18n'
 import AnimatedScene from '@/components/animations/AnimatedScene.vue'
-import { useCountdown} from '@vueuse/core'
+import { useCountdown } from '@vueuse/core'
+import loginRegister from '@/components/auth/loginRegister.vue'
+import NewAuth from '@/components/auth/NewAuth.vue'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
 
 const showAuthModal = ref<boolean>(false)
 const showJoinByCode = ref<boolean>(false)
-const showVideo = ref<boolean>(false);
+const showVideo = ref<boolean>(false)
 
-const countdownSeconds = shallowRef<number>(17);
-
+const countdownSeconds = shallowRef<number>(17)
 
 const { start } = useCountdown(countdownSeconds, {
   onComplete() {
-    showVideo.value = false;
+    showVideo.value = false
   },
 })
 
 const handleShowVideo = () => {
-  showVideo.value = true;
-  start(countdownSeconds);
+  showVideo.value = true
+  start(countdownSeconds)
 }
 
 onMounted(() => {
@@ -108,7 +106,6 @@ const handleGameMasterClick = () => {
 }
 </script>
 
-
 <style scoped>
 .disco-shadow {
   animation: disco 0.5s ease-in-out infinite;
@@ -116,25 +113,25 @@ const handleGameMasterClick = () => {
 
 @keyframes disco {
   0% {
-    box-shadow: 0 0 30px 10px rgba(239, 68, 68, 0.7);
+    box-shadow: 0 0 60px 20px rgba(239, 68, 68, 0.7);
   }
   16% {
-    box-shadow: 0 0 30px 10px rgba(249, 115, 22, 0.7);
+    box-shadow: 0 0 60px 20px rgba(249, 115, 22, 0.7);
   }
   33% {
-    box-shadow: 0 0 30px 10px rgba(234, 179, 8, 0.7);
+    box-shadow: 0 0 60px 20px rgba(234, 179, 8, 0.7);
   }
   50% {
-    box-shadow: 0 0 30px 10px rgba(34, 197, 94, 0.7);
+    box-shadow: 0 0 60px 20px rgba(34, 197, 94, 0.7);
   }
   66% {
-    box-shadow: 0 0 30px 10px rgba(59, 130, 246, 0.7);
+    box-shadow: 0 0 60px 20px rgba(59, 160, 246, 0.7);
   }
   83% {
-    box-shadow: 0 0 30px 10px rgba(168, 85, 247, 0.7);
+    box-shadow: 0 0 60px 20px rgba(168, 85, 247, 0.7);
   }
-  100% {
-    box-shadow: 0 0 30px 10px rgba(239, 68, 68, 0.7);
+  200% {
+    box-shadow: 0 0 60px 20px rgba(239, 68, 68, 0.7);
   }
 }
 </style>
