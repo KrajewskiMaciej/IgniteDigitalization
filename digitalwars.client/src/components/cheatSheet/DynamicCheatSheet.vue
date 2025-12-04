@@ -188,7 +188,6 @@ const toast = useToast()
 const gameId = ref<number>(props.gameId)
 const tables = ref<ITeamManagmentResponse[]>([])
 const deckId = ref<number>()
-const latestEntry = ref<number>()
 const currentLayout = useStorage<'TB' | 'LR'>('prefferedLayour', 'TB')
 const decisionCardsData = ref<IDecisonCard[]>([])
 const itemsData = ref<IItemCard[]>([])
@@ -315,7 +314,6 @@ const fetchEnablersMap = async () => {
     enablers.value = response.data.enablersMap
     cardTypes.value = response.data.cardTypes
 
-    console.log(response.data, 'response')
   } catch {
     toast.error('Wystąpił błąd podczas pobierania enablerów')
   }
@@ -323,6 +321,8 @@ const fetchEnablersMap = async () => {
 
 //Ostatnia zagrana karta z sukcesem przez każdą drużynę
 const fetchAllTeamsEntries = async () => {
+
+  console.log('Czy przy pobieraniu ostatnich zagranych kart mam typy kart?', cardTypes.value);
   const entriesPromises = tables.value.map(async (table) => {
     try {
       const response = await apiServices.get<number>(
@@ -342,12 +342,19 @@ const fetchAllTeamsEntries = async () => {
 
   const results = await Promise.all(entriesPromises)
 
-  console.log('Rezultaty:', results)
+  console.log('Rezultaty:', results);
+
 
   results.forEach((result) => {
     if (!result) return
 
+    console.log('Szukam cardsId:', result.cardsId)
+    console.log('Dostępne cards_Id:', cardTypes.value.map(c => c.cards_Id))
+    console.log('Dostępne card_Id:', cardTypes.value.map(c => c.card_Id))
+
     const card = cardTypes.value.find((card) => card.cards_Id === result.cardsId)
+
+    console.log('Czy znaleziono kartę ?', card);
 
     if (card) {
       const cardId = card.card_Id
@@ -364,7 +371,7 @@ const fetchAllTeamsEntries = async () => {
     }
   })
 
-  console.log('Team entries:', tableEntries.value)
+  console.log('Team entries:', tableEntries.value);
 }
 
 const fetchDecisionCards = async () => {
@@ -400,8 +407,9 @@ onMounted(async () => {
     fetchEnablersMap(),
     fetchDecisionCards(),
     fetchItems(),
-    fetchAllTeamsEntries(),
   ])
+
+  await fetchAllTeamsEntries(),
 
   createNodesFromCards(cardTypes.value)
   createEdgesFromEnablers(enablers.value!, cardTypes.value)
