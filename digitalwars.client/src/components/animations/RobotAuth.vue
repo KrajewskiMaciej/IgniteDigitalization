@@ -5,14 +5,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as THREE from 'three'
-// Importy loaderów
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { FontLoader } from 'three/addons/loaders/FontLoader.js'
-// Geometria tekstu
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
-// Kontrolery
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-// Post-processing (efekty wizualne)
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
@@ -20,7 +16,6 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 
 const container = ref<HTMLDivElement | null>(null)
 
-// --- Zmienne sceny ---
 let scene: THREE.Scene
 let camera: THREE.PerspectiveCamera
 let renderer: THREE.WebGLRenderer
@@ -28,11 +23,7 @@ let controls: OrbitControls
 let clock: THREE.Clock
 let animationId: number
 let rings: THREE.Group
-
-// --- Zmienne Post-processing ---
 let composer: EffectComposer
-
-// --- Obiekty 3D ---
 let robot: THREE.Group
 let particles: THREE.Group
 let particles2: THREE.Group
@@ -40,13 +31,12 @@ let textGroup: THREE.Group
 let orbitingObjects: any[] = []
 let sphere: THREE.Mesh
 
-// --- Elementy Robota ---
 let leftEye: THREE.Object3D | null = null
 let rightEye: THREE.Object3D | null = null
 let leftPupil: THREE.Object3D | null = null
 let rightPupil: THREE.Object3D | null = null
+let robotHead: THREE.Object3D | null = null
 
-const mouse = { x: 0, y: 0 }
 const fontPath = '/fonts/Nasalization Rg_Regular.json'
 
 const COLORS = {
@@ -54,16 +44,43 @@ const COLORS = {
   secondary: '#7c3aed',
   cyan: '#26C6DA',
   background: '#0f172a',
-
-  //Dla gwiazdek
   white: '#a1a1aa',
   pink: '#ec4899',
-
-  //Pionki
   pawnNavy: '#2563eb',
   pawnRed: '#dc2626',
   pawnGreen: '#059669',
   pawnYellow: '#d97706',
+}
+
+const ANIMATION = {
+  body: {
+    limitX: 0.08,
+    limitY: 0.2,
+    smoothing: 4,
+  },
+  head: {
+    limitX: 0.15,
+    limitY: 0.2,
+    smoothing: 6,
+  },
+  eyes: {
+    radius: 0.04,
+    smoothing: 8,
+  },
+  idle: {
+    enabled: true,
+    amplitude: 0.02,
+    speed: 0.8,
+  },
+}
+
+const mouse = { x: 0, y: 0 }
+const smoothMouse = { x: 0, y: 0 }
+let headStartRotation = { x: 0, y: 0, z: 0 }
+
+const smoothDamp = (current: number, target: number, smoothing: number, deltaTime: number): number => {
+  const factor = 1 - Math.exp(-smoothing * deltaTime)
+  return current + (target - current) * factor
 }
 
 const initScene = () => {
@@ -76,16 +93,16 @@ const initScene = () => {
 
   scene = new THREE.Scene()
   scene.background = new THREE.Color(COLORS.background)
-  scene.fog = new THREE.Fog(COLORS.background, 10, 60)
+  scene.fog = new THREE.Fog(COLORS.background, 12, 65)
 
   camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000)
-  camera.position.set(0, 2, 9) // Odsunąłem kamerę, żeby widzieć napisy
+  camera.position.set(0, 2, 9)
 
   renderer = new THREE.WebGLRenderer({ antialias: true })
   renderer.setSize(width, height)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.toneMapping = THREE.ReinhardToneMapping
-  renderer.toneMappingExposure = 1.2
+  renderer.toneMappingExposure = 1.4
   renderer.shadowMap.enabled = true
   container.value.appendChild(renderer.domElement)
 
@@ -93,34 +110,34 @@ const initScene = () => {
   controls.enableDamping = true
   controls.dampingFactor = 0.05
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1.2)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.5)
   scene.add(ambientLight)
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5)
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8)
   directionalLight.position.set(5, 8, 5)
   directionalLight.castShadow = true
   scene.add(directionalLight)
 
-  const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8)
-  directionalLight2.position.set(-5, 3, -5)
+  const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1.0)
+  directionalLight2.position.set(-5, 4, -5)
   scene.add(directionalLight2)
 
-  const pointLight1 = new THREE.PointLight(0x00e5ff, 1.5, 10)
-  pointLight1.position.set(-3, 2, 3)
+  const pointLight1 = new THREE.PointLight(0x00e5ff, 2.0, 14)
+  pointLight1.position.set(-4, 2, 4)
   scene.add(pointLight1)
 
-  const pointLight2 = new THREE.PointLight(0xff00ff, 1.2, 10)
-  pointLight2.position.set(3, 3, -2)
+  const pointLight2 = new THREE.PointLight(0xff00ff, 1.6, 12)
+  pointLight2.position.set(4, 3, -2)
   scene.add(pointLight2)
 
-  const pointLight3 = new THREE.PointLight(0xffaa00, 0.8, 8)
-  pointLight3.position.set(0, -2, 2)
+  const pointLight3 = new THREE.PointLight(0xffaa00, 1.0, 10)
+  pointLight3.position.set(0, -1, 3)
   scene.add(pointLight3)
 
-  const spotLight = new THREE.SpotLight(0xffffff, 2)
+  const spotLight = new THREE.SpotLight(0xffffff, 2.5)
   spotLight.position.set(0, 10, 0)
   spotLight.angle = Math.PI / 6
-  spotLight.penumbra = 0.3
+  spotLight.penumbra = 0.4
   spotLight.castShadow = true
   scene.add(spotLight)
 
@@ -135,16 +152,10 @@ const initScene = () => {
 
 const setupPostProcessing = (width: number, height: number) => {
   composer = new EffectComposer(renderer)
-
   const renderPass = new RenderPass(scene, camera)
   composer.addPass(renderPass)
 
-  const bloomPass = new UnrealBloomPass(
-    new THREE.Vector2(width, height),
-    0.6, // strength (siła świecenia)
-    0.4, // radius
-    0.1, // threshold
-  )
+  const bloomPass = new UnrealBloomPass(new THREE.Vector2(width, height), 0.6, 0.4, 0.1)
   composer.addPass(bloomPass)
 
   const outputPass = new OutputPass()
@@ -154,13 +165,11 @@ const setupPostProcessing = (width: number, height: number) => {
 const loadRobot = async () => {
   const loader = new GLTFLoader()
   try {
-    const gltf = await loader.loadAsync('/Robotv07.glb')
+    const gltf = await loader.loadAsync('/Robot.glb')
     robot = gltf.scene
-
     robot.position.set(0, 0, 0)
     robot.scale.set(1, 1, 1)
 
-    // Włączenie cieni na modelu
     robot.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         child.castShadow = true
@@ -170,27 +179,32 @@ const loadRobot = async () => {
 
     scene.add(robot)
 
-    leftEye = robot.getObjectByName('LeftEye')
-    rightEye = robot.getObjectByName('RightEye')
-    leftPupil = robot.getObjectByName('LeftPupil')
-    rightPupil = robot.getObjectByName('RightPupil')
+    leftEye = robot.getObjectByName('LeftEye')!
+    rightEye = robot.getObjectByName('RightEye')!
+    leftPupil = robot.getObjectByName('LeftPupil')!
+    rightPupil = robot.getObjectByName('RightPupil')!
+    robotHead = robot.getObjectByName('Head')!
 
-    console.log('Robot loaded!')
+    if (robotHead) {
+      headStartRotation = {
+        x: robotHead.rotation.x,
+        y: robotHead.rotation.y,
+        z: robotHead.rotation.z,
+      }
+    }
   } catch (error) {
     console.error('Error loading robot:', error)
   }
 }
 
 const createSphere = () => {
-  const spehereGeometry = new THREE.SphereGeometry(1.4, 24, 24)
+  const sphereGeometry = new THREE.SphereGeometry(1.4, 24, 24)
   const sphereMaterial = new THREE.MeshBasicMaterial({
     color: COLORS.secondary,
     wireframe: true,
   })
-  sphere = new THREE.Mesh(spehereGeometry, sphereMaterial)
-  sphere.position.y = 2
-  sphere.position.x = 5.0
-  sphere.position.z = -15
+  sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
+  sphere.position.set(5.0, 2, -15)
   scene.add(sphere)
 }
 
@@ -209,17 +223,13 @@ const createRings = () => {
       wireframe: true,
     })
     const ring = new THREE.Mesh(ringGeometry, ringMaterial)
-
     ring.rotation.x = Math.PI / 2
-
     rings.add(ring)
   })
 
   rings.position.set(5.0, 2, -15)
-
   rings.rotation.x = 0.2
   rings.rotation.z = 2.4
-
   scene.add(rings)
 }
 
@@ -253,15 +263,10 @@ const createText = () => {
 
       const centerOffset = -0.5 * (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x)
       const textMesh = new THREE.Mesh(textGeometry, textMaterial)
-
-      textMesh.position.x = centerOffset
-      textMesh.position.y = config.position
-      textMesh.position.z = 0
-
+      textMesh.position.set(centerOffset, config.position, 0)
       textGroup.add(textMesh)
     })
 
-    // Pochylenie tekstu, żeby leżał pod robotem
     textGroup.rotation.x = -0.2
     scene.add(textGroup)
   })
@@ -301,7 +306,6 @@ function createParticles() {
     return new THREE.Points(geometry, material)
   }
 
-  // Dodajemy chmury cząsteczek
   particles.add(createParticleCloud(150, COLORS.primary, 0.04, { x: 30, y: 15, z: 10 }, -5))
   particles2.add(createParticleCloud(160, COLORS.secondary, 0.03, { x: 30, y: 20, z: 15 }, -8))
   particles.add(createParticleCloud(140, COLORS.cyan, 0.025, { x: 16, y: 12, z: 8 }, -3))
@@ -416,14 +420,7 @@ const createPawn = (color: string) => {
 
 const createOrbitingObjects = () => {
   const objects = [
-    {
-      type: 'pawn',
-      color: COLORS.pawnRed,
-      orbitRadius: 2.8,
-      orbitSpeed: 0.18,
-      orbitTilt: 0.4,
-      startAngle: 0,
-    },
+    { type: 'pawn', color: COLORS.pawnRed, orbitRadius: 2.8, orbitSpeed: 0.18, orbitTilt: 0.4, startAngle: 0 },
     {
       type: 'pawn',
       color: COLORS.pawnGreen,
@@ -474,6 +471,7 @@ const createOrbitingObjects = () => {
     } else if (config.type === 'dice') {
       mesh = createDice(config.color)
     }
+
     const pivot = new THREE.Group()
     pivot.rotation.x = config.orbitTilt
     pivot.rotation.z = config.orbitTilt * 0.7
@@ -501,6 +499,57 @@ const createOrbitingObjects = () => {
   })
 }
 
+const updateRobotAnimation = (deltaTime: number, elapsed: number) => {
+  if (!robot) return
+
+  smoothMouse.x = smoothDamp(smoothMouse.x, mouse.x, 5, deltaTime)
+  smoothMouse.y = smoothDamp(smoothMouse.y, mouse.y, 5, deltaTime)
+
+  let idleX = 0
+  let idleY = 0
+  if (ANIMATION.idle.enabled) {
+    idleX = Math.sin(elapsed * ANIMATION.idle.speed) * ANIMATION.idle.amplitude
+    idleY = Math.sin(elapsed * ANIMATION.idle.speed * 0.7 + 1) * ANIMATION.idle.amplitude * 0.5
+  }
+
+  const targetBodyRotY = smoothMouse.x * ANIMATION.body.limitY + idleY
+  const targetBodyRotX = smoothMouse.y * ANIMATION.body.limitX + idleX
+
+  robot.rotation.y = smoothDamp(robot.rotation.y, targetBodyRotY, ANIMATION.body.smoothing, deltaTime)
+  robot.rotation.x = smoothDamp(robot.rotation.x, targetBodyRotX, ANIMATION.body.smoothing, deltaTime)
+
+  if (robotHead && headStartRotation) {
+    const headIdleX = Math.sin(elapsed * ANIMATION.idle.speed * 1.2) * ANIMATION.idle.amplitude * 0.5
+    const headIdleY = Math.cos(elapsed * ANIMATION.idle.speed * 0.9) * ANIMATION.idle.amplitude * 0.3
+
+    const targetHeadX = headStartRotation.x - smoothMouse.y * ANIMATION.head.limitX + headIdleX
+    const targetHeadY = headStartRotation.y + headIdleY
+
+    robotHead.rotation.x = smoothDamp(robotHead.rotation.x, targetHeadX, ANIMATION.head.smoothing, deltaTime)
+    robotHead.rotation.y = smoothDamp(robotHead.rotation.y, targetHeadY, ANIMATION.head.smoothing, deltaTime)
+  }
+}
+
+const updateEyes = (deltaTime: number) => {
+  if (!leftPupil || !rightPupil) return
+
+  const eyeRadius = ANIMATION.eyes.radius
+  let targetX = smoothMouse.x * eyeRadius
+  let targetY = smoothMouse.y * eyeRadius
+
+  const distance = Math.sqrt(targetX * targetX + targetY * targetY)
+  if (distance > eyeRadius) {
+    const ratio = eyeRadius / distance
+    targetX *= ratio
+    targetY *= ratio
+  }
+
+  leftPupil.position.x = smoothDamp(leftPupil.position.x, targetX, ANIMATION.eyes.smoothing, deltaTime)
+  leftPupil.position.y = smoothDamp(leftPupil.position.y, targetY, ANIMATION.eyes.smoothing, deltaTime)
+  rightPupil.position.x = smoothDamp(rightPupil.position.x, targetX, ANIMATION.eyes.smoothing, deltaTime)
+  rightPupil.position.y = smoothDamp(rightPupil.position.y, targetY, ANIMATION.eyes.smoothing, deltaTime)
+}
+
 const onMouseMove = (event: MouseEvent) => {
   if (!container.value) return
   const rect = container.value.getBoundingClientRect()
@@ -508,30 +557,12 @@ const onMouseMove = (event: MouseEvent) => {
   mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
 }
 
-const updateEyes = () => {
-  if (!leftPupil || !rightPupil) return
-  const eyeRadius = 0.04
-  let targetX = mouse.x * eyeRadius
-  let targetY = mouse.y * eyeRadius
-  const distance = Math.sqrt(targetX * targetX + targetY * targetY)
-
-  if (distance > eyeRadius) {
-    const ratio = eyeRadius / distance
-    targetX *= ratio
-    targetY *= ratio
-  }
-
-  const lerpFactor = 0.1
-  leftPupil.position.x += (targetX - leftPupil.position.x) * lerpFactor
-  leftPupil.position.y += (targetY - leftPupil.position.y) * lerpFactor
-  rightPupil.position.x += (targetX - rightPupil.position.x) * lerpFactor
-  rightPupil.position.y += (targetY - rightPupil.position.y) * lerpFactor
-}
-
 const animate = () => {
   animationId = requestAnimationFrame(animate)
 
+  const deltaTime = clock.getDelta()
   const elapsed = clock.getElapsedTime()
+
   const levitationSpeed = 0.4
   const levitationRange = 0.2
   const baseY = 2.0
@@ -548,6 +579,7 @@ const animate = () => {
     particles.rotation.y = elapsed * 0.05
     particles.position.y = Math.sin(elapsed * 0.2) * 0.2
   }
+
   if (particles2) {
     particles2.rotation.y = elapsed * 0.02
     particles2.position.z = Math.cos(elapsed * 0.1) * 0.2
@@ -573,9 +605,9 @@ const animate = () => {
     rings.rotation.z = baseZ + zOffset * 0.6
   }
 
-  updateEyes()
+  updateRobotAnimation(deltaTime, elapsed)
+  updateEyes(deltaTime)
   controls.update()
-
   composer.render()
 }
 
@@ -586,7 +618,6 @@ const handleResize = () => {
 
   camera.aspect = width / height
   camera.updateProjectionMatrix()
-
   renderer.setSize(width, height)
   composer.setSize(width, height)
 }
