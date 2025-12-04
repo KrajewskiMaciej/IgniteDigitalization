@@ -12,8 +12,10 @@ import * as d3 from 'd3'
 import { useToast } from 'vue-toastification'
 import type { PropType, Ref } from 'vue'
 import type { BoardConfig, Pawn } from '@/interfaces/types'
+const jumpSound = new Audio('/jump.mp3');
+jumpSound.volume = 0.2;
 
-// --- PROPSY ---
+
 const props = defineProps({
   config: {
     type: Object as PropType<BoardConfig>,
@@ -29,12 +31,19 @@ const props = defineProps({
   },
 })
 
-// --- Referencje do elementów ---
 const board: Ref<SVGGElement | null> = ref(null)
 const toast = useToast()
 const emit = defineEmits(['boardRendered'])
 
-// --- Właściwości Obliczeniowe ---
+const previousPositions = ref<Map<string | number, { x: number; y: number }>>(new Map())
+
+const ANIMATION = {
+  duration: 600,
+  hopHeight: 30,
+  easing: d3.easeCubicOut,
+  staggerDelay: 80,
+}
+
 const cellSize = computed(() => 40)
 const marginLeft = computed(() => 40)
 const marginRight = computed(() => 40)
@@ -51,7 +60,11 @@ const labelsY = computed(() =>
   Array.from({ length: props.config.rows }, (_, i) => (i + 1).toString()),
 )
 
-// --- Funkcje ---
+const pawnPath =
+  'M 225.5,294.5 C 231.979,295.491 238.646,295.824 245.5,295.5C 245.5,311.167 245.5,326.833 245.5,342.5C 179.833,342.5 114.167,342.5 48.5,342.5C 48.5,326.5 48.5,310.5 48.5,294.5C 55.1667,294.5 61.8333,294.5 68.5,294.5C 68.8256,290.116 68.4922,285.783 67.5,281.5C 59.5866,274.592 56.7533,265.925 59,255.5C 62.8813,244.72 70.548,238.72 82,237.5C 104.247,207.195 115.413,173.195 115.5,135.5C 92.123,118.375 84.2897,95.7084 92,67.5C 105.287,36.9129 128.453,24.4129 161.5,30C 194.896,41.2769 209.063,64.4436 204,99.5C 200.388,115.436 191.722,127.769 178,136.5C 178.299,166.031 185.633,193.698 200,219.5C 204.448,226.282 209.281,232.782 214.5,239C 235.289,244.415 241.123,256.915 232,276.5C 226.213,280.998 224.047,286.998 225.5,294.5 Z'
+const originalCenterX = 147
+const originalCenterY = 186
+
 function splitLabelIntoLines(text: string, maxLength = 15): string[] {
   if (!text || text.length <= maxLength) {
     return [text || '']
@@ -77,13 +90,64 @@ function splitLabelIntoLines(text: string, maxLength = 15): string[] {
   return [words.slice(0, bestSplitIndex).join(' '), words.slice(bestSplitIndex).join(' ')]
 }
 
-const drawBoard = () => {
+const getScreenPosition = (x: number, y: number) => ({
+  screenX: x * cellSize.value + marginLeft.value + cellSize.value / 2,
+  screenY: (props.config.rows - 1 - y) * cellSize.value + marginTop.value + cellSize.value / 2,
+})
+
+const calculateGroupOffsets = (count: number, index: number) => {
+  if (count === 1) return { offsetX: 0, offsetY: 0 }
+  const radius = Math.min(cellSize.value / 4, 10)
+  const angle = (index / count) * 2 * Math.PI
+  return {
+    offsetX: Math.cos(angle) * radius,
+    offsetY: Math.sin(angle) * radius,
+  }
+}
+
+const hopInterpolator = (t: number) => Math.sin(t * Math.PI)
+
+const animatePawnMove = (
+  pawnGroup: d3.Selection<SVGGElement, unknown, null, undefined>,
+  fromX: number,
+  fromY: number,
+  toX: number,
+  toY: number,
+  baseScale: number,
+  delay: number = 0,
+) => {
+  jumpSound.play();
+  pawnGroup
+    .transition()
+    .delay(delay)
+    .duration(ANIMATION.duration)
+    .ease(ANIMATION.easing)
+    .attrTween('transform', () => {
+      return (t: number) => {
+        const currentX = fromX + (toX - fromX) * t
+        const currentY = fromY + (toY - fromY) * t
+        const hop = hopInterpolator(t) * ANIMATION.hopHeight
+        const scale = baseScale * (1 + hopInterpolator(t) * 0.15)
+
+        return `translate(${currentX}, ${currentY - hop}) scale(${scale}) translate(${-originalCenterX}, ${-originalCenterY})`
+      }
+    })
+}
+
+const drawBoard = (animate = true) => {
   if (!board.value) return
 
   const svg = d3.select(board.value)
-  svg.selectAll('*').remove()
 
-  // Rysowanie siatki
+  const existingPawns = new Map<string | number, d3.Selection<SVGGElement, unknown, null, undefined>>()
+  svg.selectAll<SVGGElement, unknown>('.pawn-group').each(function () {
+    const group = d3.select(this)
+    const id = group.attr('data-pawn-id')
+    if (id) existingPawns.set(id, group)
+  })
+
+  svg.selectAll('*:not(.pawn-group)').remove()
+
   for (let row = 0; row < props.config.rows; row++) {
     for (let col = 0; col < props.config.cols; col++) {
       svg
@@ -98,7 +162,6 @@ const drawBoard = () => {
     }
   }
 
-  // Rysowanie etykiet i obramowań
   labelsX.value.forEach((label: string, i: number) => {
     svg
       .append('text')
@@ -109,6 +172,7 @@ const drawBoard = () => {
       .attr('fill', 'white')
       .text(label)
   })
+
   if (props.config.labelsUp) {
     props.config.labelsUp.forEach((label, i) => {
       const centerX = marginLeft.value + (2 * i + 1) * cellSize.value
@@ -130,6 +194,7 @@ const drawBoard = () => {
       })
     })
   }
+
   labelsY.value.forEach((label: string, i: number) => {
     svg
       .append('text')
@@ -144,6 +209,7 @@ const drawBoard = () => {
       .attr('fill', 'white')
       .text(label)
   })
+
   if (props.config.labelsRight) {
     props.config.labelsRight.forEach((label, i) => {
       svg
@@ -174,6 +240,7 @@ const drawBoard = () => {
     .attr('font-weight', 'bold')
     .attr('fill', 'white')
     .text(descLeft)
+
   svg
     .append('text')
     .attr('x', marginLeft.value + boardSizeX.value / 2)
@@ -184,9 +251,7 @@ const drawBoard = () => {
     .attr('fill', 'white')
     .text(descDown)
 
-  // --- KLUCZOWA POPRAWKA ---
   const borderColors = (props.config as any).Borders_Colors || props.config.borderColors
-  // --- KONIEC POPRAWKI ---
 
   for (let i = 0; i < props.config.cols; i += 2) {
     svg
@@ -229,13 +294,9 @@ const drawBoard = () => {
       .attr('stroke-width', 3)
   }
 
-  // Rysowanie pionków
-  const pawnPath =
-    'M 225.5,294.5 C 231.979,295.491 238.646,295.824 245.5,295.5C 245.5,311.167 245.5,326.833 245.5,342.5C 179.833,342.5 114.167,342.5 48.5,342.5C 48.5,326.5 48.5,310.5 48.5,294.5C 55.1667,294.5 61.8333,294.5 68.5,294.5C 68.8256,290.116 68.4922,285.783 67.5,281.5C 59.5866,274.592 56.7533,265.925 59,255.5C 62.8813,244.72 70.548,238.72 82,237.5C 104.247,207.195 115.413,173.195 115.5,135.5C 92.123,118.375 84.2897,95.7084 92,67.5C 105.287,36.9129 128.453,24.4129 161.5,30C 194.896,41.2769 209.063,64.4436 204,99.5C 200.388,115.436 191.722,127.769 178,136.5C 178.299,166.031 185.633,193.698 200,219.5C 204.448,226.282 209.281,232.782 214.5,239C 235.289,244.415 241.123,256.915 232,276.5C 226.213,280.998 224.047,286.998 225.5,294.5 Z'
-  const originalCenterX = 147
-  const originalCenterY = 186
-
   if (Array.isArray(props.pawns)) {
+    existingPawns.forEach((group) => group.remove())
+
     const grouped: Record<string, Pawn[]> = {}
     props.pawns.forEach((pawn) => {
       const key = `${pawn.x},${pawn.y}`
@@ -243,21 +304,27 @@ const drawBoard = () => {
       grouped[key].push(pawn)
     })
 
-    Object.entries(grouped).forEach(([key, group]) => {
-      const [x, y] = key.split(',').map(Number)
-      const baseX = x * cellSize.value + marginLeft.value + cellSize.value / 2
-      const baseY =
-        (props.config.rows - 1 - y) * cellSize.value + marginTop.value + cellSize.value / 2
+    let animationIndex = 0
+
+    Object.entries(grouped).forEach(([_, group]) => {
       const count = group.length
-      const radius = Math.min(cellSize.value / 4, 10)
       const scaleFactor = 1 / Math.sqrt(count)
       const baseScale = cellSize.value * 0.002 * scaleFactor
 
       group.forEach((pawn: Pawn, index: number) => {
-        const angle = (index / count) * 2 * Math.PI
-        const offsetX = count === 1 ? 0 : Math.cos(angle) * radius
-        const offsetY = count === 1 ? 0 : Math.sin(angle) * radius
-        const pawnGroup = svg.append('g')
+        const { screenX, screenY } = getScreenPosition(pawn.x, pawn.y)
+        const { offsetX, offsetY } = calculateGroupOffsets(count, index)
+        const targetX = screenX + offsetX
+        const targetY = screenY + offsetY
+
+        const prevPos = previousPositions.value.get(pawn.id)
+        const hasMoved = prevPos && (prevPos.x !== pawn.x || prevPos.y !== pawn.y)
+
+        const pawnGroup = svg
+          .append('g')
+          .attr('class', 'pawn-group')
+          .attr('data-pawn-id', String(pawn.id))
+
         pawnGroup
           .append('path')
           .attr('class', `pawn pawn-${pawn.id}`)
@@ -265,26 +332,73 @@ const drawBoard = () => {
           .attr('fill', pawn.color || 'gray')
           .attr('stroke', 'black')
           .attr('stroke-width', 1.2 / baseScale)
-          .attr(
-            'transform',
-            `translate(${baseX + offsetX}, ${baseY + offsetY}) scale(${baseScale}) translate(${-originalCenterX}, ${-originalCenterY})`,
+
+        if (animate && hasMoved && prevPos) {
+          const { screenX: fromScreenX, screenY: fromScreenY } = getScreenPosition(
+            prevPos.x,
+            prevPos.y,
           )
+
+          pawnGroup.attr(
+            'transform',
+            `translate(${fromScreenX}, ${fromScreenY}) scale(${baseScale}) translate(${-originalCenterX}, ${-originalCenterY})`,
+          )
+
+          animatePawnMove(
+            pawnGroup,
+            fromScreenX,
+            fromScreenY,
+            targetX,
+            targetY,
+            baseScale,
+            animationIndex * ANIMATION.staggerDelay,
+          )
+          animationIndex++
+        } else {
+          pawnGroup.attr(
+            'transform',
+            `translate(${targetX}, ${targetY}) scale(${baseScale}) translate(${-originalCenterX}, ${-originalCenterY})`,
+          )
+        }
+
         pawnGroup.append('title').text(pawn.name || `Pionek ${pawn.id}`)
+
+        previousPositions.value.set(pawn.id, { x: pawn.x, y: pawn.y })
       })
+    })
+
+    const currentIds = new Set(props.pawns.map((p) => p.id))
+    previousPositions.value.forEach((_, id) => {
+      if (!currentIds.has(id as any)) {
+        previousPositions.value.delete(id)
+      }
     })
   }
 }
 
-// --- Watchery i Cykl Życia ---
-watch(() => [props.config, props.pawns], drawBoard, { deep: true })
+watch(
+  () => props.config,
+  () => drawBoard(false),
+  { deep: true },
+)
+
+watch(
+  () => props.pawns,
+  () => drawBoard(true),
+  { deep: true },
+)
 
 onMounted(() => {
   try {
-    drawBoard()
+    props.pawns.forEach((pawn) => {
+      previousPositions.value.set(pawn.id, { x: pawn.x, y: pawn.y })
+    })
+    drawBoard(false)
     emit('boardRendered', true)
   } catch (error: any) {
     console.error('Błąd podczas pierwszego rysowania planszy:', error)
     toast.error(`Wystąpił krytyczny błąd podczas rysowania planszy: ${error.message}`)
   }
+  
 })
 </script>
