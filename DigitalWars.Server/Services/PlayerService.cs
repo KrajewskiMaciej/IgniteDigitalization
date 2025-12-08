@@ -54,7 +54,12 @@ namespace backend.Services
                     gls.Games_Logs.Games_Id == gameId &&
                     gls.Games_Logs.Teams_Id == teamId &&
                     gls.Games_Processes_Id.HasValue &&
-                    gls.Games_Processes != null)
+                    gls.Games_Processes != null &&
+                    gls.Games_Logs.Is_Approved == true &&
+                    gls.Games_Logs.Status == true
+                )
+                
+                    
                 .GroupBy(gls => gls.Games_Processes!.Processes_Id)
                 .Select(group => new
                 {

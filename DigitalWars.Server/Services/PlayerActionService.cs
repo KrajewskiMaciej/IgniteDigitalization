@@ -103,10 +103,43 @@ namespace backend.Services
                 Booster_X = eventBoosterX,
                 Booster_Y = eventBoosterY
             };
-            _context.GameLogs.Add(gameLogEntry);
 
-            // ... tutaj logika związana z tworzeniem GameLogSpec, jeśli jest potrzebna
-            // np. na podstawie definicji karty, dodajesz do gameLogEntry.GameLogSpecs
+            _context.GameLogs.Add(gameLogEntry);
+            await _context.SaveChangesAsync();
+
+            var cardWeights = await _context.CardWeights
+                            .Where(cw => cw.Cards_Id == cardEntity.Cards_Id)
+                            .ToListAsync();
+
+            foreach (var cardWeight in cardWeights)
+            {
+                var gameProcess = await _context.GameProcesses
+                    .FirstOrDefaultAsync(gp => 
+                        gp.Games_Id == cardData.GameId && 
+                        gp.Teams_Id == cardData.TeamId && 
+                        gp.Processes_Id == cardWeight.Processes_Id);
+
+                if (gameProcess != null)
+                {
+                    var spec = new GameLogSpec
+                    {
+                        Games_Logs_Id = gameLogEntry.Games_Logs_Id,
+                        Games_Processes_Id = gameProcess.Games_Processes_Id,
+                        Moves_X = cardWeight.Weights_X,
+                        Moves_Y = cardWeight.Weights_Y
+                    };
+                    _context.GameLogSpecs.Add(spec);
+                    
+                    _logger.LogInformation("Utworzono spec: Process={ProcessId}, X={X}, Y={Y}", 
+                        cardWeight.Processes_Id, cardWeight.Weights_X, cardWeight.Weights_Y);
+                }
+                else
+                {
+                    _logger.LogWarning("Nie znaleziono GameProcess dla Processes_Id={ProcessId}", cardWeight.Processes_Id);
+                }
+            }
+
+            await _context.SaveChangesAsync();
 
             if (team.Games_Events != null && team.Turns_Left > 0)
             {
@@ -153,7 +186,7 @@ namespace backend.Services
             }
 
             logToApprove.Is_Approved = true;
-
+            
             await ExecuteCardEffects(logToApprove);
 
             await NotifyAdmin(logToApprove.Games_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated");
@@ -189,6 +222,11 @@ namespace backend.Services
             double boosterX = logEntryWithSpecs.Booster_X ?? 0;
             double boosterY = logEntryWithSpecs.Booster_Y ?? 0;
 
+            _logger.LogInformation("=== ExecuteCardEffects - START ===");
+
+            _logger.LogInformation("Co tutaj się znajduję ?", logEntryWithSpecs.GameLogSpecs);
+            _logger.LogInformation("Co tutaj się znajduję ?", logEntryWithSpecs);
+
             // Zastosuj efekty zdefiniowane w każdej specyfikacji logu
             foreach (var spec in logEntryWithSpecs.GameLogSpecs)
             {
@@ -200,6 +238,9 @@ namespace backend.Services
                 //    Zakładamy, że boostery to mnożniki. Jeśli mają być wartościami dodawanymi, zmień `* (1 + booster)` na `+ booster`.
                 double finalMoveX = baseMoveX * (1 + boosterX);
                 double finalMoveY = baseMoveY * (1 + boosterY);
+
+                _logger.LogInformation("Bazowy ruch pionka to {MoveX} w osi X i {MoveY} w osi Y", baseMoveX, baseMoveY);
+                _logger.LogInformation("Pionek porusza się o {FinalX} w osi X i {FinalY} w osi Y (po boosterach)", finalMoveX, finalMoveY);
 
                 // 3. Zastosuj finalny, zmodyfikowany efekt na drużynie
                 //    (to jest przykład, dostosuj do swoich statystyk drużyny)
@@ -216,6 +257,9 @@ namespace backend.Services
             team.Teams_Bud -= logEntryWithSpecs.Costs ?? 0;
 
             await _context.SaveChangesAsync();
+
+            await _playerPosService.SetGameProcessPosAsync(logEntryWithSpecs.Games_Id, logEntryWithSpecs.Teams_Id);
+            await _playerPosService.SetTeamPosAsync(logEntryWithSpecs.Games_Id, logEntryWithSpecs.Teams_Id);
         }
 
         private (int, int) ApplyEventMovementBooster(int baseMoveX, int baseMoveY, GameEvent? activeEvent)
