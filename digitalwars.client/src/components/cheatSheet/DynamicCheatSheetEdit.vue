@@ -292,7 +292,18 @@ const handleSaveChanges = async () => {
     return
   }
 
-  //Tutaj będzie odbicie się od backendu
+  console.log('Jakie mam zmiany do zrobienia ?', changes);
+
+  for (const change of changes) {
+    const enablerCardsIds = change.enablers.map((cardId : number) => getCardsId(cardId)).filter((id): id is number => id !== undefined)
+
+    try {
+      await apiServices.put(apiConfig.admin.cheatsheet.editCardsEnablers(change.cardsId),  enablerCardsIds )
+    } catch {
+      toast.error(`Wystąpił błąd podczas edycji karty decyzji ${change.cardId}`);
+      return;
+    }
+  }
 
   pendingEnablersChanges.value.clear()
   isEditMode.value = false

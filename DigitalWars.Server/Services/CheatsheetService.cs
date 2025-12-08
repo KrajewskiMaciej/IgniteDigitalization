@@ -8,6 +8,7 @@ namespace backend.Services
     {
         Task<CheatsheetMapDto> GetEnablersMapAsync(int deckId, int? moduleId);
         Task<object> GetLatestEntriesAsync(int gameId, int? teamId);
+        Task EditEnablersForCard(int cardId, List<int> enablerCardsIds);
     }
 
     public class CheatsheetService : ICheatsheetService
@@ -105,5 +106,48 @@ namespace backend.Services
                 return latestEntriesByTeam;
             }
         }
+
+
+        public async Task EditEnablersForCard(int cardId, List<int> enablerCardsIds)
+        {
+            var card = await _context.Cards
+                .FirstOrDefaultAsync(c => c.Cards_Id == cardId);
+
+            if (card == null)
+            {
+                throw new Exception($"Nie znaleziono karty o podanym id: {cardId}");
+            }
+
+            foreach (var enablerCardId in enablerCardsIds)
+            {
+                var enablerCard = await _context.Cards
+                    .FirstOrDefaultAsync(c => c.Cards_Id == enablerCardId);
+
+                if (enablerCard == null)
+                {
+                    throw new Exception($"Nie znaleziono karty o podanym Card_Id: {enablerCardId}");
+                }
+            }
+
+            await _context.CardEnablers
+                .Where(enabler => enabler.Cards_Id == cardId)
+                .ExecuteDeleteAsync();
+            
+            foreach (var enablerCardId in enablerCardsIds)
+            {
+                var newEnabler = new CardEnabler
+                {
+                    Cards_Id = cardId,
+                    Enablers_Id = enablerCardId,
+                    Games_Id = null,
+                    Teams_Id = null
+                };
+
+                await _context.CardEnablers.AddAsync(newEnabler);
+            }
+
+            await _context.SaveChangesAsync();
+           
+        } 
     }
 }

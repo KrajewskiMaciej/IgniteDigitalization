@@ -36,5 +36,14 @@ namespace backend.Controllers
 
             return Ok(result);
         }
+
+
+        [HttpPut("editEnablers/{cardId}")]
+        public async Task<IActionResult> EditEnablers(int cardId, [FromBody] List<int> enablerIds)
+        {
+           await _cheatsheetService.EditEnablersForCard(cardId, enablerIds);
+
+           return Ok("Poszło");
+        } 
     }
 }
