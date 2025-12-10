@@ -258,8 +258,6 @@ namespace backend.Services
 
             _logger.LogInformation("=== ExecuteCardEffects - START ===");
 
-            _logger.LogInformation("Co tutaj się znajduję ?", logEntryWithSpecs.GameLogSpecs);
-            _logger.LogInformation("Co tutaj się znajduję ?", logEntryWithSpecs);
 
             // Zastosuj efekty zdefiniowane w każdej specyfikacji logu
             foreach (var spec in logEntryWithSpecs.GameLogSpecs)
@@ -273,18 +271,17 @@ namespace backend.Services
                 double finalMoveX = baseMoveX * (1 + boosterX);
                 double finalMoveY = baseMoveY * (1 + boosterY);
 
-                _logger.LogInformation("Bazowy ruch pionka to {MoveX} w osi X i {MoveY} w osi Y", baseMoveX, baseMoveY);
-                _logger.LogInformation("Pionek porusza się o {FinalX} w osi X i {FinalY} w osi Y (po boosterach)", finalMoveX, finalMoveY);
+            }
 
-                // 3. Zastosuj finalny, zmodyfikowany efekt na drużynie
-                //    (to jest przykład, dostosuj do swoich statystyk drużyny)
-                // team.SomeStatX += (int)Math.Round(finalMoveX);
-                // team.SomeStatY += (int)Math.Round(finalMoveY);
+            var isDecisionCard = await _context.Decisions.AnyAsync(d => d.Cards_Id == gameLogEntry.Cards_Id);
 
-                _logger.LogInformation(
-                    "Dla drużyny {TeamId} zastosowano efekt (Spec ID: {SpecId}): Zmiana X o {FinalX} (Baza: {BaseX}, Mnożnik z wydarzenia: {ModX}%)",
-                    team.Teams_Id, spec.Games_Logs_Specs_Id, finalMoveX, baseMoveX, boosterX * 100
-                );
+            _logger.LogInformation("Co mam w isDecisionCard: {isDecisionCard} ", isDecisionCard);
+            _logger.LogInformation("Co mam w logEntryWithSpecs.Status: {Status} ", logEntryWithSpecs.Status);
+
+            if (isDecisionCard && logEntryWithSpecs.Status == true)
+            {   
+                _logger.LogInformation("[ExecuteCardEffects] Karta decyzji zatwierdzona. Aktualizacja CheatSheet.");
+                await NotifyAdmin(logEntryWithSpecs.Games_Id, "CheatSheetUpdated");
             }
 
             // Na koniec potrąć finalny, przeliczony koszt z budżetu

@@ -140,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, nextTick, markRaw, shallowRef } from 'vue'
+import { onMounted, ref, nextTick, markRaw, onUnmounted, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 import apiServices from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
@@ -156,6 +156,7 @@ import type { ICardNode, ICardEdge } from '@/types/Nodes'
 import { Background } from '@vue-flow/background'
 import { useI18n } from 'vue-i18n'
 import CustomNode from './CustomNode.vue'
+import signalRService from '@/services/signalService'
 
 import {
   faDiagramProject,
@@ -400,7 +401,37 @@ const fetchItems = async () => {
   }
 }
 
+const onCheatSheetUpdated = async () => {
+  console.log('Event')
+  tableEntries.value = {};
+  await fetchAllTeamsEntries();
+}
+
+watch(tableEntries, (newEntries) => {
+  if (nodes.value.length === 0) return;
+  console.log('[CheatSheet] tableEntries zmienione, aktualizacja węzłów');
+  
+  nodes.value = nodes.value.map((node) => {
+    const cardId = Number(node.id.replace('card-', ''));
+    return {
+      ...node,
+      data: {
+        ...node.data,
+        tables: newEntries[cardId] ?? [],
+      },
+    };
+  });
+}, { deep: true }); 
+
 onMounted(async () => {
+  //Logika dołączenia do pokojui
+  try{
+    await signalRService.start();
+    await signalRService.joinGameRoomAsAdmin(String(gameId.value));
+  } catch {
+    console.error("Wystąpił błąd podczas dołączania do pokoju SignalR");
+  }
+  signalRService.connection.on('CheatSheetUpdated', () => onCheatSheetUpdated());
   await Promise.all([fetchDeckId(), fetchTemasInfo()])
 
   await Promise.all([
@@ -413,6 +444,10 @@ onMounted(async () => {
 
   createNodesFromCards(cardTypes.value)
   createEdgesFromEnablers(enablers.value!, cardTypes.value)
+})
+
+onUnmounted(() => {
+  signalRService.connection.off('CheatSheetUpdated');
 })
 </script>
 
