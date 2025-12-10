@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using QuestPDF.Infrastructure;
+using Microsoft.AspNetCore.StaticFiles;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -123,8 +124,16 @@ else
     // Konfiguracja dla PUBLIKACJI NA AZURE (i innych środowisk produkcyjnych)
     logger.LogInformation("[API] Konfiguracja Zależności dla: Plików statycznych i Przekierowania HTTPS");
     app.UseHttpsRedirection();
-    app.UseDefaultFiles(); // Serwuj index.html
-    app.UseStaticFiles(); // Serwuj pliki z wwwroot (zbudowany frontend)
+    app.UseDefaultFiles();
+    
+    var provider = new FileExtensionContentTypeProvider();
+    provider.Mappings[".glb"] = "model/gltf-binary";
+    provider.Mappings[".gltf"] = "model/gltf+json";
+
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        ContentTypeProvider = provider
+    });
 }
 
 logger.LogInformation("[API] Konfiguracja Autoryzacji i Autentykacji");
