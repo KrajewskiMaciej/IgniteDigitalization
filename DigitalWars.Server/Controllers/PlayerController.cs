@@ -21,13 +21,15 @@ namespace backend.Controllers
         private readonly IPlayerActionService _actionService;
         private readonly IHubContext<GameHub> _hubContext;
         private readonly AppDbContext _context;
+        private readonly ILogger<PlayerController> _logger;
 
-        public PlayerController(IPlayerQueryService queryService, IPlayerActionService actionService, IHubContext<GameHub> hubContext, AppDbContext context)
+        public PlayerController(IPlayerQueryService queryService, IPlayerActionService actionService, IHubContext<GameHub> hubContext, AppDbContext context, ILogger<PlayerController> logger)
         {
             _queryService = queryService;
             _actionService = actionService;
             _hubContext = hubContext;
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet("game/{gameId}/team/{teamId}/info")]
@@ -368,17 +370,33 @@ namespace backend.Controllers
         [HttpPost("success/{cardId}")]
         public async Task<IActionResult> SendSuccess(int cardId, [FromBody] CardDataDto cardData)
         {
+            // Log wejściowy
+            _logger.LogInformation("[PlayerController_SendSuccess] Otrzymano żądanie. DeckId: {DeckId}, CardId: {CardId}, TeamId: {TeamId}, GameId: {GameId}, Cost: {Cost}, Force: {Force}",
+                cardData.DeckId, cardId, cardData.TeamId, cardData.GameId, cardData.Cost, cardData.ForceExecution);
+
             try
             {
                 var result = await _actionService.PlayCardAsync(cardId, cardData, wasSuccess: true);
+
+                // Log sukcesu
+                _logger.LogInformation("[PlayerController_SendSuccess] Żądanie zakończone sukcesem dla CardId: {CardId}.", cardId);
+
                 return Ok(result);
             }
             catch (GameException ex)
             {
+                // Log błędu gry
+                _logger.LogError(ex, "[PlayerController_SendSuccess] Wystąpił GameException. CardId: {CardId}, Message: {Message}, Code: {Code}",
+                    cardId, ex.Message, ex.ErrorCode);
+
                 return BadRequest(new { message = ex.Message, errorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
+                // Log błędu ogólnego
+                _logger.LogError(ex, "[PlayerController_SendSuccess] Wystąpił nieoczekiwany błąd. CardId: {CardId}, Message: {Message}",
+                    cardId, ex.Message);
+
                 return BadRequest(new { message = ex.Message });
             }
         }
@@ -386,17 +404,33 @@ namespace backend.Controllers
         [HttpPost("failure/{cardId}")]
         public async Task<IActionResult> SendFailure(int cardId, [FromBody] CardDataDto cardData)
         {
+            // Log wejściowy
+            _logger.LogInformation("[PlayerController_SendFailure] Otrzymano żądanie. CardId: {CardId}, TeamId: {TeamId}, GameId: {GameId}, Cost: {Cost}, Force: {Force}",
+                cardId, cardData.TeamId, cardData.GameId, cardData.Cost, cardData.ForceExecution);
+
             try
             {
                 var result = await _actionService.PlayCardAsync(cardId, cardData, wasSuccess: false);
+
+                // Log sukcesu
+                _logger.LogInformation("[PlayerController_SendFailure] Żądanie zakończone sukcesem dla CardId: {CardId}.", cardId);
+
                 return Ok(result);
             }
             catch (GameException ex)
             {
+                // Log błędu gry
+                _logger.LogError(ex, "[PlayerController_SendFailure] Wystąpił GameException. CardId: {CardId}, Message: {Message}, Code: {Code}",
+                    cardId, ex.Message, ex.ErrorCode);
+
                 return BadRequest(new { message = ex.Message, errorCode = ex.ErrorCode });
             }
             catch (Exception ex)
             {
+                // Log błędu ogólnego
+                _logger.LogError(ex, "[PlayerController_SendFailure] Wystąpił nieoczekiwany błąd. CardId: {CardId}, Message: {Message}",
+                    cardId, ex.Message);
+
                 return BadRequest(new { message = ex.Message });
             }
         }

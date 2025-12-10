@@ -33,13 +33,24 @@ namespace backend.Services
 
         public async Task<object> PlayCardAsync(int cardId, CardDataDto cardData, bool wasSuccess)
         {
-            var cardEntity = await _context.Cards.FirstOrDefaultAsync(c => c.Card_Id == cardId);
-            if (cardEntity == null) throw new Exception($"Karta o identyfikatorze (Card_Id) {cardId} nie została znaleziona.");
+            _logger.LogInformation("[ActionService_PlayCardAsync] Rozpoczęcie przetwarzania. CardId: {CardId}, TeamId: {TeamId}, WasSuccess: {WasSuccess}, BaseCost: {Cost}",
+                cardId, cardData.TeamId, wasSuccess, cardData.Cost);
+
+            var cardEntity = await _context.Cards.FirstOrDefaultAsync(c => c.Card_Id == cardId && c.Decks_Id == cardData.DeckId);
+            if (cardEntity == null)
+            {
+                _logger.LogError("[ActionService_PlayCardAsync] Karta nie znaleziona: {CardId}", cardId);
+                throw new Exception($"Karta o identyfikatorze (Card_Id) {cardId} nie została znaleziona.");
+            }
 
             var team = await _context.Teams
                 .Include(t => t.Games_Events)
                 .FirstOrDefaultAsync(t => t.Teams_Id == cardData.TeamId);
-            if (team == null) throw new Exception($"Drużyna o ID {cardData.TeamId} nie została znaleziona.");
+            if (team == null)
+            {
+                _logger.LogError("[ActionService_PlayCardAsync] Drużyna nie znaleziona: {TeamId}", cardData.TeamId);
+                throw new Exception($"Drużyna o ID {cardData.TeamId} nie została znaleziona.");
+            }
 
             // Identyfikacja typu karty
             CardType cardType = CardType.Unknown;
@@ -47,17 +58,19 @@ namespace backend.Services
             else if (await _context.Hardwares.AnyAsync(h => h.Cards_Id == cardEntity.Cards_Id)) cardType = CardType.Hardware;
             else if (await _context.Softwares.AnyAsync(s => s.Cards_Id == cardEntity.Cards_Id)) cardType = CardType.Software;
 
+            _logger.LogInformation("[ActionService_PlayCardAsync] Zidentyfikowany typ karty: {CardType}", cardType);
+
             // Obliczenie finalnego kosztu i przechwycenie modyfikatorów
             double finalCost = cardData.Cost;
             double? eventBoosterX = null;
             double? eventBoosterY = null;
+            double eventCostModifier = 0.0; // Przeniesione wyżej dla logowania
 
             if (team.Games_Events != null)
             {
                 eventBoosterX = team.Games_Events.Boosters_X;
                 eventBoosterY = team.Games_Events.Boosters_Y;
 
-                double eventCostModifier = 0.0;
                 switch (cardType)
                 {
                     case CardType.Decision:
@@ -72,11 +85,18 @@ namespace backend.Services
                 }
                 finalCost *= (1 + eventCostModifier);
 
+                _logger.LogInformation("[ActionService_PlayCardAsync] Zastosowano modyfikator kosztu z wydarzenia. Modifier: {Modifier}, FinalCost: {FinalCost}",
+                    eventCostModifier, finalCost);
+            }
+            else
+            {
+                _logger.LogInformation("[ActionService_PlayCardAsync] Brak aktywnego wydarzenia wpływającego na koszt.");
             }
 
-            //Nie wiem jak obsługujesz błędy, więc dodałem własny wyjątek w ten sposób 
+            // Walidacja budżetu
             if (team.Teams_Bud < finalCost)
             {
+                _logger.LogWarning("[ActionService_PlayCardAsync] Budżet za niski. Wymagane: {FinalCost}, Dostępne: {Budget}", finalCost, team.Teams_Bud);
                 throw new GameException("Budżet za niski", "NotEnoughBudget");
             }
 
@@ -86,6 +106,9 @@ namespace backend.Services
             var feedback = await _context.Feedbacks
                 .AsNoTracking()
                 .FirstOrDefaultAsync(f => f.Cards_Id == cardEntity.Cards_Id && f.Cards.Decks_Id == cardData.DeckId && f.Status == finalStatus);
+
+            _logger.LogInformation("[ActionService_PlayCardAsync] Status karty: {FinalStatus}. Znaleziono FeedbackId: {FeedbackId}",
+                finalStatus, feedback?.Feedbacks_Id);
 
             var gameLogEntry = new GameLog
             {
@@ -98,8 +121,6 @@ namespace backend.Services
                 Costs = finalCost,
                 Status = finalStatus,
                 Is_Approved = team.Is_Independent || cardData.ForceExecution ? (bool?)true : false,
-
-                // Zapisujemy "zamrożone" wartości boosterów
                 Booster_X = eventBoosterX,
                 Booster_Y = eventBoosterY
             };
@@ -107,16 +128,21 @@ namespace backend.Services
             _context.GameLogs.Add(gameLogEntry);
             await _context.SaveChangesAsync();
 
+            _logger.LogInformation("[ActionService_PlayCardAsync] Utworzono GameLog o ID: {GameLogId}. Is_Approved: {IsApproved}",
+                gameLogEntry.Games_Logs_Id, gameLogEntry.Is_Approved);
+
             var cardWeights = await _context.CardWeights
                             .Where(cw => cw.Cards_Id == cardEntity.Cards_Id)
                             .ToListAsync();
 
+            _logger.LogInformation("[ActionService_PlayCardAsync] Znaleziono {Count} wag (CardWeights) dla karty.", cardWeights.Count);
+
             foreach (var cardWeight in cardWeights)
             {
                 var gameProcess = await _context.GameProcesses
-                    .FirstOrDefaultAsync(gp => 
-                        gp.Games_Id == cardData.GameId && 
-                        gp.Teams_Id == cardData.TeamId && 
+                    .FirstOrDefaultAsync(gp =>
+                        gp.Games_Id == cardData.GameId &&
+                        gp.Teams_Id == cardData.TeamId &&
                         gp.Processes_Id == cardWeight.Processes_Id);
 
                 if (gameProcess != null)
@@ -129,13 +155,14 @@ namespace backend.Services
                         Moves_Y = cardWeight.Weights_Y
                     };
                     _context.GameLogSpecs.Add(spec);
-                    
-                    _logger.LogInformation("Utworzono spec: Process={ProcessId}, X={X}, Y={Y}", 
+
+                    _logger.LogInformation("[ActionService_PlayCardAsync] Utworzono spec: Process={ProcessId}, X={X}, Y={Y}",
                         cardWeight.Processes_Id, cardWeight.Weights_X, cardWeight.Weights_Y);
                 }
                 else
                 {
-                    _logger.LogWarning("Nie znaleziono GameProcess dla Processes_Id={ProcessId}", cardWeight.Processes_Id);
+                    _logger.LogWarning("[ActionService_PlayCardAsync] Nie znaleziono GameProcess dla Processes_Id={ProcessId}, TeamId={TeamId}, GameId={GameId}",
+                        cardWeight.Processes_Id, cardData.TeamId, cardData.GameId);
                 }
             }
 
@@ -144,9 +171,12 @@ namespace backend.Services
             if (team.Games_Events != null && team.Turns_Left > 0)
             {
                 team.Turns_Left--;
+                _logger.LogInformation("[ActionService_PlayCardAsync] Zmniejszono liczbę tur wydarzenia. Pozostało: {TurnsLeft}", team.Turns_Left);
+
                 if (team.Turns_Left == 0)
                 {
-                    _logger.LogInformation("Wydarzenie '{EventName}' dla drużyny {TeamId} zakończyło się.", team.Games_Events.Events_Short_Desc, team.Teams_Id);
+                    _logger.LogInformation("[ActionService_PlayCardAsync] Wydarzenie '{EventName}' dla drużyny {TeamId} zakończyło się.",
+                        team.Games_Events.Events_Short_Desc, team.Teams_Id);
                     team.Games_Events_Id = null;
                 }
             }
@@ -155,15 +185,19 @@ namespace backend.Services
 
             if (gameLogEntry.Is_Approved == true)
             {
+                _logger.LogInformation("[ActionService_PlayCardAsync] Log zatwierdzony. Wykonywanie efektów karty i powiadamianie.");
                 await ExecuteCardEffects(gameLogEntry);
                 await NotifyAdmin(gameLogEntry.Games_Id, "HistoryUpdated");
                 await NotifyTeam(gameLogEntry.Games_Id, cardData.TeamId, "HistoryUpdated", "PendingUpdated", "BoardUpdated");
             }
             else
             {
+                _logger.LogInformation("[ActionService_PlayCardAsync] Log oczekuje na zatwierdzenie. Wysyłanie powiadomień PendingUpdated.");
                 await NotifyAdmin(gameLogEntry.Games_Id, "PendingUpdated");
                 await NotifyTeam(gameLogEntry.Games_Id, cardData.TeamId, "PendingUpdated");
             }
+
+            _logger.LogInformation("[ActionService_PlayCardAsync] Zakończono pomyślnie. Nowy budżet: {NewBudget}", team.Teams_Bud);
 
             return new
             {
@@ -186,7 +220,7 @@ namespace backend.Services
             }
 
             logToApprove.Is_Approved = true;
-            
+
             await ExecuteCardEffects(logToApprove);
 
             await NotifyAdmin(logToApprove.Games_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated");

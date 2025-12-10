@@ -46,7 +46,11 @@ const endpoints = {
           : `/Cheatsheet/enablersMap?deckId=${deckId}`,
       getEntreis: (gameId: number, teamId: number) =>
         `/Cheatsheet/latestEntries?gameId=${gameId}&teamId=${teamId}`,
+<<<<<<< HEAD
       editCardsEnablers: (cardId: number) => `/Cheatsheet/editEnablers/${cardId}`,
+=======
+      editCardsEnablers: (cardsId: number) => `/Cheatsheet/editEnablers/${cardsId}`,
+>>>>>>> e977e57ff30a20cc479dc55b42f7dc22822d41cb
     },
   },
   games: {
