@@ -3,3 +3,4 @@ obj/
 bin/
 publish/
 wwwroot/
+Properties/PublishProfiles/

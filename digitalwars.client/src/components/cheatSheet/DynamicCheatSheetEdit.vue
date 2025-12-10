@@ -300,7 +300,7 @@ const handleSaveChanges = async () => {
     try {
       await apiServices.put(apiConfig.admin.cheatsheet.editCardsEnablers(change.cardsId),  enablerCardsIds )
     } catch {
-      toast.error(`Wystąpił błąd podczas edycji karty decyzji ${change.cardId}`);
+      toast.error(`Wystąpił błąd podczas edycji enablera karty ${change.cardId}`);
       return;
     }
   }
