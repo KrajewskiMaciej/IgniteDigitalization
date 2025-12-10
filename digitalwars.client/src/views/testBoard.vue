@@ -8,6 +8,7 @@
       :gameMode="true"
       :posX="posX"
       :posY="posY"
+      :pawns="currentPawns"
       :pawnColor="'#0000ff'"
     />
   </div>
@@ -49,7 +50,7 @@
 
 <script setup lang="ts">
 import gameBoard from '@/components/game/gameBoard.vue'
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
   faArrowRight,
@@ -63,6 +64,31 @@ import type { BoardConfig } from '@/interfaces/types'
 
 const posX = ref(0)
 const posY = ref(0)
+
+
+const currentPawns = computed(() => [
+  {
+    id: 1, // Unikalne ID
+    x: posX.value,
+    y: posY.value,
+    color: '#0000ff', // Kolor pionka
+    name: 'Mój Pionek'
+  },
+    {
+    id: 2, // Unikalne ID
+    x: posX.value,
+    y: posY.value,
+    color: '#00ffff', // Kolor pionka
+    name: 'Mój Pionek'
+  },
+    {
+    id: 3, // Unikalne ID
+    x: posX.value,
+    y: posY.value,
+    color: '#000fff', // Kolor pionka
+    name: 'Mój Pionek'
+  }
+])
 
 // KROK 2: Użyj interfejsu i popraw nazwy pól oraz dodaj brakujące 'boardId'
 const formData = reactive<BoardConfig>({
@@ -93,10 +119,10 @@ const moveRight = () => {
 }
 
 const moveUp = () => {
-  posY.value--
+  posY.value++
 }
 
 const moveDown = () => {
-  posY.value++
+  posY.value--
 }
 </script>
