@@ -764,7 +764,6 @@ const approveDecision = async (logId: number) => {
   try {
     await apiServices.post(apiConfig.player.approveLog(logId), {})
     toast.success('Sugestia została zatwierdzona!')
-    await Promise.all([fetchPendingDecisions(), fetchDecisionHistory()])
   } catch (error) {
     toast.error('Wystąpił błąd podczas zatwierdzania sugestii.')
   }
@@ -774,7 +773,6 @@ const rejectDecision = async (logId: number) => {
   try {
     await apiServices.delete(apiConfig.player.rejectLog(logId))
     toast.info('Sugestia została odrzucona.')
-    await fetchPendingDecisions()
   } catch (error) {
     toast.error('Wystąpił błąd podczas odrzucania sugestii.')
   }

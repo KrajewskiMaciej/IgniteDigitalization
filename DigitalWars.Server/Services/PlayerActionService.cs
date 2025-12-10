@@ -187,8 +187,8 @@ namespace backend.Services
             {
                 _logger.LogInformation("[ActionService_PlayCardAsync] Log zatwierdzony. Wykonywanie efektów karty i powiadamianie.");
                 await ExecuteCardEffects(gameLogEntry);
-                await NotifyAdmin(gameLogEntry.Games_Id, "HistoryUpdated");
-                await NotifyTeam(gameLogEntry.Games_Id, cardData.TeamId, "HistoryUpdated", "PendingUpdated", "BoardUpdated");
+                await NotifyAdmin(gameLogEntry.Games_Id, "HistoryUpdated", "BudgetUpdated");
+                await NotifyTeam(gameLogEntry.Games_Id, cardData.TeamId, "HistoryUpdated", "PendingUpdated", "BoardUpdated", "BudgetUpdated");
             }
             else
             {
@@ -223,8 +223,8 @@ namespace backend.Services
 
             await ExecuteCardEffects(logToApprove);
 
-            await NotifyAdmin(logToApprove.Games_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated");
-            await NotifyTeam(logToApprove.Games_Id, logToApprove.Teams_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated");
+            await NotifyAdmin(logToApprove.Games_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated", "BudgetUpdated");
+            await NotifyTeam(logToApprove.Games_Id, logToApprove.Teams_Id, "PendingUpdated", "HistoryUpdated", "BoardUpdated", "BudgetUpdated");
         }
 
         public async Task RejectLogAsync(int logId)
