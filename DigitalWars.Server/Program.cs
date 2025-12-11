@@ -13,7 +13,7 @@ using Microsoft.OpenApi;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc;
 using backend.Hubs;
-
+using Microsoft.AspNetCore.Authorization;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -50,11 +50,11 @@ builder.Services.AddControllers()
             // Opcjonalnie: ignoruj cykliczne referencje, co jest częstym problemem w EF
             // options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         });
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<backend.Services.EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("FrontendSettings"));
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<JwtService>();
-builder.Services.AddScoped<IProvisioningService, ProvisioningService>();
+builder.Services.AddScoped<backend.Services.IEmailService, backend.Services.EmailService>();
+builder.Services.AddScoped<backend.Services.JwtService>();
+builder.Services.AddScoped<backend.Services.IProvisioningService, backend.Services.ProvisioningService>();
 builder.Services.AddScoped<backend.Services.IAuthService, backend.Services.AuthService>();
 builder.Services.AddScoped<backend.Services.IPlayerService, backend.Services.PlayerService>();
 builder.Services.AddScoped<backend.Services.IGameService, backend.Services.GameService>();
@@ -62,10 +62,10 @@ builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IPlayerQueryService, PlayerQueryService>();
 builder.Services.AddScoped<backend.Services.IPlayerActionService, backend.Services.PlayerActionService>();
 builder.Services.AddScoped<ICheatsheetService, CheatsheetService>();
-builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx =>
+builder.Services.AddSingleton<backend.Services.IBackgroundTaskQueue>(ctx =>
 {
     // Ustaw pojemność kolejki, np. 100
-    return new BackgroundTaskQueue(100);
+    return new backend.Services.BackgroundTaskQueue(100);
 });
 builder.Services.AddHostedService<QueuedHostedService>();
 
@@ -74,6 +74,15 @@ builder.Services.AddScoped<DigitalWars.Server.Services.IPlayerService, DigitalWa
 builder.Services.AddScoped<DigitalWars.Server.Services.IAuthService, DigitalWars.Server.Services.AuthService>();
 builder.Services.AddScoped<DigitalWars.Server.Services.IPlayerActionService, DigitalWars.Server.Services.PlayerActionService>();
 builder.Services.AddScoped<DigitalWars.Server.Services.IGameService, DigitalWars.Server.Services.GameService>();
+builder.Services.AddScoped<DigitalWars.Server.Services.JwtService>();
+builder.Services.Configure<DigitalWars.Server.Services.EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<DigitalWars.Server.Services.IEmailService, DigitalWars.Server.Services.EmailService>();
+builder.Services.AddSingleton<DigitalWars.Server.Services.IBackgroundTaskQueue>(ctx =>
+{
+    // Ustaw pojemność kolejki, np. 100
+    return new DigitalWars.Server.Services.BackgroundTaskQueue(100);
+});
+builder.Services.AddScoped<DigitalWars.Server.Services.IProvisioningService, DigitalWars.Server.Services.ProvisioningService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -121,23 +130,27 @@ builder.Services.AddVersionedApiExplorer(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen();
+builder.Services.ConfigureOptions<DigitalWars.Server.Settings.ConfigureSwaggerOptions>();
+
+// 1. Konfiguracja Autoryzacji
+builder.Services.AddAuthorization(options =>
 {
-    // Dodaj opis dla każdej wersji API
-    var provider = builder.Services.BuildServiceProvider()
-        .GetRequiredService<IApiVersionDescriptionProvider>();
+    // Polityka dla Admina: Użytkownik musi być zalogowany I NIE MOŻE mieć claima "Teams_Id"
+    // (zakładamy, że tylko tokeny drużynowe mają ten claim, a tokeny Userów/Adminów nie)
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireAssertion(context =>
+            context.User.Identity != null &&
+            context.User.Identity.IsAuthenticated &&
+            !context.User.HasClaim(c => c.Type == "Teams_Id")
+        ));
 
-    foreach (var description in provider.ApiVersionDescriptions)
-    {
-        options.SwaggerDoc(description.GroupName, new Microsoft.OpenApi.Models.OpenApiInfo()
-        {
-            Title = $"DigitalWars API {description.ApiVersion}",
-            Version = description.ApiVersion.ToString(),
-            Description = "Dokumentacja API z wersjonowaniem"
-        });
-    }
+    // Polityka domyślna (TeamAccess): Wystarczy, że jest zalogowany (Admin LUB Team)
+    // To będzie domyślne [Authorize]
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
 });
-
 
 var app = builder.Build();
 
@@ -202,7 +215,7 @@ logger.LogInformation("[API] Konfiguracja Migracji");
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var provisioningService = scope.ServiceProvider.GetRequiredService<IProvisioningService>();
+    var provisioningService = scope.ServiceProvider.GetRequiredService<backend.Services.IProvisioningService>();
     try
     {
         logger.LogInformation("[API] Rozpoczynam migrację bazy danych...");

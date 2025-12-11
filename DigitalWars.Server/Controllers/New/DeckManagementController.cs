@@ -1,16 +1,17 @@
-using backend.Controllers;
 using backend.Data;
-using backend.Dtos;
-using backend.Services;
 using DigitalWars.Server.Dtos;
+using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
+using DigitalWars.Server.PdfGeneration;
+using QuestPDF.Fluent;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DigitalWars.Server.Controllers
 {
     [ApiVersion("2.0")]
     [Route("api/[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class DeckManagementController : BaseApiController
     {
         private readonly AppDbContext _context;
@@ -20,20 +21,6 @@ namespace DigitalWars.Server.Controllers
         {
             _context = context;
             _provisioningService = provisioningService;
-        }
-
-        [HttpGet("list")]
-        public async Task<IActionResult> GetAllDecks()
-        {
-            var userId = CurrentUserId;
-            if (userId == null) return Unauthorized();
-
-            var decks = await _context.Decks
-                .AsNoTracking()
-                .Where(deck => deck.Users_Id == userId.Value)
-                .Select(deck => new { id = deck.Decks_Id, title = deck.Deck_Name })
-                .ToListAsync();
-            return Ok(decks);
         }
 
         [HttpPost("create")]
@@ -47,14 +34,22 @@ namespace DigitalWars.Server.Controllers
                 var newDeck = await _provisioningService.CreateDeckFromFileForUserAsync(file, userId.Value, file.FileName);
                 return Ok(new { deckId = newDeck.Decks_Id });
             }
-            catch (ArgumentException)
-            {
-                return BadRequest(CreateError("INVALID_FILE", "invalidFile"));
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, CreateError("INTERNAL_ERROR", "internalError"));
-            }
+            catch (ArgumentException) { return BadRequest(CreateError("INVALID_FILE", "invalidFile")); }
+            catch (Exception) { return StatusCode(500, CreateError("INTERNAL_ERROR", "internalError")); }
+        }
+
+        [HttpGet("read")]
+        public async Task<IActionResult> GetAllDecks()
+        {
+            var userId = CurrentUserId;
+            if (userId == null) return Unauthorized();
+
+            var decks = await _context.Decks
+                .AsNoTracking()
+                .Where(deck => deck.Users_Id == userId.Value)
+                .Select(deck => new { id = deck.Decks_Id, title = deck.Deck_Name })
+                .ToListAsync();
+            return Ok(decks);
         }
 
         [HttpPut("update")]
@@ -79,6 +74,25 @@ namespace DigitalWars.Server.Controllers
                 return NotFound(CreateError("FILE_NOT_FOUND", "fileNotFound"));
 
             return PhysicalFile(filePath, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "DigitalWars_SzablonKart.xlsx");
+        }
+
+        [HttpGet("export-pdf")]
+        public async Task<IActionResult> GenerateCardsPdf([FromQuery] int deckId)
+        {
+            if (CurrentUserId == null) return Unauthorized();
+
+            var decisionCards = await _context.Decisions.Include(d => d.Card).Where(d => d.Card.Decks_Id == deckId)
+                .Select(d => new CardPdfModel { Id = d.Cards_Id, Title = d.Decisions_Short_Desc, Description = d.Decisions_Long_Desc, CardType = "Decision" }).ToListAsync();
+            var hardwareCards = await _context.Hardwares.Include(d => d.Cards).Where(i => i.Cards.Decks_Id == deckId)
+                .Select(i => new CardPdfModel { Id = i.Cards_Id, Title = i.Hardwares_Short_Desc, Description = i.Hardwares_Long_Desc, CardType = "Hardware" }).ToListAsync();
+            var softwareCards = await _context.Softwares.Include(d => d.Cards).Where(i => i.Cards.Decks_Id == deckId)
+                .Select(i => new CardPdfModel { Id = i.Cards_Id, Title = i.Softwares_Short_Desc, Description = i.Softwares_Long_Desc, CardType = "Software" }).ToListAsync();
+
+            var allCards = decisionCards.Concat(hardwareCards).Concat(softwareCards).OrderBy(c => c.Id).ToList();
+            if (!allCards.Any()) return NotFound(CreateError("NO_CARDS", "noCardsFound"));
+
+            var document = new CardsDocument(allCards);
+            return File(document.GeneratePdf(), "application/pdf", "DigitalWars_Karty.pdf");
         }
     }
 }

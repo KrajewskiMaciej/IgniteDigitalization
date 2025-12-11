@@ -6,7 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using DigitalWars.Server.Dtos;
 using BCrypt.Net;
-using backend.Services;
+using DigitalWars.Server.Services;
 
 
 namespace DigitalWars.Server.Services
@@ -14,6 +14,7 @@ namespace DigitalWars.Server.Services
     public interface IAuthService
     {
         Task<(User user, List<Claim> claims)> ValidateUserCredentialsAsync(string username, string password);
+        Task<(TeamTokenInfo teamInfo, List<Claim> claims)> ValidateTeamTokenAsync(string token);
         Task<ErrorResponseDto?> RegisterUserAsync(string username, string email, string password);
         Task ConfirmUserEmailAsync(string token);
         Task<bool> InitiatePasswordResetAsync(string email);
@@ -54,8 +55,46 @@ namespace DigitalWars.Server.Services
                 throw new Exception("E-mail nie został potwierdzony. Wysłano ponownie link aktywacyjny.");
             }
 
-            var claims = JwtService.GenerateToken(user);
+            var claims = JwtService.GenerateUserToken(user);
             return (user, claims);
+        }
+
+        public async Task<(TeamTokenInfo teamInfo, List<Claim> claims)> ValidateTeamTokenAsync(string token)
+        {
+            var team = await _context.Teams
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Teams_Token == token);
+
+            if (team == null)
+            {
+                throw new Exception("Nieprawidłowy token.");
+            }
+
+            var tokenInfo = new TeamTokenInfo
+            {
+                Teams_Id = team.Teams_Id,
+                Games_Id = team.Games_Id,
+                Teams_Name = team.Teams_Name,
+                Teams_Token = team.Teams_Token!,
+                Teams_Color = team.Teams_Color,
+                Is_Independent = team.Is_Independent ? 1 : 0,
+            };
+
+            // Dociągamy brakujące dane gry
+            var game = await _context.Games
+                .AsNoTracking()
+                .FirstOrDefaultAsync(g => g.Games_Id == team.Games_Id);
+
+            if (game != null)
+            {
+                tokenInfo.Decks_Id = game.Decks_Id;
+                tokenInfo.Teams_Boards_Id = game.Teams_Boards_Id;
+                tokenInfo.Rivals_Boards_Id = game.Rivals_Boards_Id;
+                tokenInfo.Is_Online = game.Is_Online ? 1 : 0;
+            }
+
+            var claims = JwtService.GenerateTeamToken(tokenInfo);
+            return (tokenInfo, claims);
         }
 
         public async Task<ErrorResponseDto?> RegisterUserAsync(string username, string email, string password)

@@ -1,5 +1,4 @@
 using backend.Data;
-using backend.Dtos;
 using DigitalWars.Server.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +35,7 @@ namespace DigitalWars.Server.Controllers
             return Ok(allItems);
         }
 
-        [HttpPut("update-item")]
+        [HttpPut("items-update")]
         public async Task<IActionResult> UpdateItem([FromBody] UpdateCardDto dto)
         {
             var hardware = await _context.Hardwares.FirstOrDefaultAsync(h => h.Cards.Card_Id == dto.CardId);
@@ -70,7 +69,7 @@ namespace DigitalWars.Server.Controllers
             return Ok(feedbacks);
         }
 
-        [HttpPut("update-feedback")]
+        [HttpPut("feedbacks-update")]
         public async Task<IActionResult> UpdateFeedbacks([FromQuery] int cardId, [FromBody] UpdateCardFeedbacksDto dto)
         {
             var card = await _context.Cards.FirstOrDefaultAsync(c => c.Card_Id == cardId);

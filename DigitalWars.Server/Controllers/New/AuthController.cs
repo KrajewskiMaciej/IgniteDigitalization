@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using DigitalWars.Server.Dtos;
 
 namespace DigitalWars.Server.Controllers
@@ -89,7 +87,7 @@ namespace DigitalWars.Server.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Ok(new { success = true, message = "Wylogowano pomyślnie" });
+            return Ok(new { success = true, message = "logoutSuccess" });
         }
     }
 }

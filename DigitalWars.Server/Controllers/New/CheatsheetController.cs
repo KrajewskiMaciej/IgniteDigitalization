@@ -14,7 +14,7 @@ namespace DigitalWars.Server.Controllers
             _cheatsheetService = cheatsheetService;
         }
 
-        [HttpGet("enablers")]
+        [HttpGet("map")]
         public async Task<IActionResult> GetEnablersMap([FromQuery] int deckId, [FromQuery] int? moduleId)
         {
             var cheatsheetData = await _cheatsheetService.GetEnablersMapAsync(deckId, moduleId);
@@ -32,7 +32,7 @@ namespace DigitalWars.Server.Controllers
             return Ok(result);
         }
 
-        [HttpPut("edit-enablers")]
+        [HttpPut("enablers-update")]
         public async Task<IActionResult> EditEnablers([FromQuery] int cardId, [FromBody] List<int> enablerIds)
         {
             await _cheatsheetService.EditEnablersForCard(cardId, enablerIds);

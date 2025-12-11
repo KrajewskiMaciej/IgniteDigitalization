@@ -19,95 +19,52 @@ namespace DigitalWars.Server.Controllers
             _actionService = actionService;
         }
 
-        [HttpGet("pending")]
-        public async Task<IActionResult> GetPendingLogs([FromQuery] int gameId, [FromQuery] int? teamId)
+        [HttpGet("read")]
+        public async Task<IActionResult> GetHistory([FromQuery] int? teamId = null)
         {
-            var query = _context.GameLogs
-                .Where(l => l.Games_Id == gameId && l.Is_Approved == false && l.Teams != null && l.Cards != null);
-
-            if (teamId.HasValue)
-                query = query.Where(l => l.Teams_Id == teamId.Value);
-
-            var logs = await query.Select(l => new
-            {
-                LogId = l.Games_Logs_Id,
-                TeamName = l.Teams!.Teams_Name,
-                CardId = l.Cards!.Card_Id,
-                InternalCardId = l.Cards_Id,
-                l.Costs,
-                Timestamp = l.Data
-            }).ToListAsync();
-
-            var validLogs = logs.Where(l => l.InternalCardId.HasValue).ToList();
-            var cardIds = validLogs.Select(l => l.InternalCardId!.Value).ToList();
-
-            var decisionTitles = await _context.Decisions.Where(d => cardIds.Contains(d.Cards_Id)).ToDictionaryAsync(d => d.Cards_Id, d => d.Decisions_Short_Desc);
-            var hardwareTitles = await _context.Hardwares.Where(h => cardIds.Contains(h.Cards_Id)).ToDictionaryAsync(h => h.Cards_Id, h => h.Hardwares_Short_Desc);
-            var softwareTitles = await _context.Softwares.Where(s => cardIds.Contains(s.Cards_Id)).ToDictionaryAsync(s => s.Cards_Id, s => s.Softwares_Short_Desc);
-
-            var result = validLogs.Select(l => new
-            {
-                l.LogId,
-                l.TeamName,
-                l.CardId,
-                CardTitle = decisionTitles.GetValueOrDefault(l.InternalCardId!.Value) ??
-                            hardwareTitles.GetValueOrDefault(l.InternalCardId!.Value) ??
-                            softwareTitles.GetValueOrDefault(l.InternalCardId!.Value),
-                l.Costs,
-                l.Timestamp
-            });
-
-            return Ok(result);
-        }
-
-        [HttpPost("approve")]
-        public async Task<IActionResult> ApproveLog([FromQuery] int logId)
-        {
+            int effectiveTeamId;
             try
             {
-                await _actionService.ApproveLogAsync(logId);
-                return Ok(new { message = "Zatwierdzono." });
+                effectiveTeamId = ResolveTeamId(teamId);
             }
-            catch
-            {
-                return BadRequest(CreateError("APPROVAL_ERROR", "approvalError"));
-            }
-        }
+            catch (ArgumentException ex) { return BadRequest(CreateError("MISSING_PARAM", ex.Message)); }
 
-        [HttpDelete("reject")]
-        public async Task<IActionResult> RejectLog([FromQuery] int logId)
-        {
-            try
-            {
-                await _actionService.RejectLogAsync(logId);
-                return Ok(new { message = "Odrzucono." });
-            }
-            catch
-            {
-                return BadRequest(CreateError("REJECTION_ERROR", "rejectionError"));
-            }
-        }
+            if (teamId == null) return Unauthorized();
+            var gameId = await _context.Teams.Where(t => t.Teams_Id == teamId).Select(t => t.Games_Id).FirstOrDefaultAsync();
 
-        [HttpPost("history")]
-        public async Task<IActionResult> GetHistory([FromBody] PlayerHistoryRequestDto request)
-        {
-            var query = _context.GameLogs
-                .Include(l => l.Teams)
-                .Include(l => l.Cards)
-                .Where(l => l.Games_Id == request.GameId && l.Is_Approved == true);
-
-            if (request.TeamId.HasValue)
-                query = query.Where(l => l.Teams_Id == request.TeamId.Value);
+            var query = _context.GameLogs.Include(l => l.Teams).Include(l => l.Cards)
+                .Where(l => l.Games_Id == gameId && l.Teams_Id == teamId.Value && l.Is_Approved == true);
 
             var rawLogs = await query.OrderByDescending(l => l.Data).ToListAsync();
+            return Ok(rawLogs.Select(l => new { l.Data, l.Teams?.Teams_Name, l.Cards?.Card_Id, Status = l.Status }));
+        }
 
-            return Ok(rawLogs.Select(l => new
-            {
-                l.Data,
-                l.Teams?.Teams_Name,
-                l.Cards?.Card_Id,
-                Status = l.Status
-            }));
+        [HttpGet("decision-waiting")]
+        public async Task<IActionResult> GetPendingLogs([FromQuery] int? teamId = null)
+        {
+            int effectiveTeamId;
+            try { effectiveTeamId = ResolveTeamId(teamId); }
+            catch (ArgumentException ex) { return BadRequest(CreateError("MISSING_PARAM", ex.Message)); }
+
+            if (teamId == null) return Unauthorized();
+            var gameId = await _context.Teams.Where(t => t.Teams_Id == teamId).Select(t => t.Games_Id).FirstOrDefaultAsync();
+
+            var query = _context.GameLogs.Where(l => l.Games_Id == gameId && l.Teams_Id == teamId && l.Is_Approved == false);
+            return Ok(await query.ToListAsync());
+        }
+
+        [HttpPost("decision-approve")]
+        public async Task<IActionResult> ApproveLog([FromQuery] int logId)
+        {
+            try { await _actionService.ApproveLogAsync(logId); return Ok(new { message = "Zatwierdzono." }); }
+            catch { return BadRequest(CreateError("APPROVAL_ERROR", "approvalError")); }
+        }
+
+        [HttpDelete("decision-reject")]
+        public async Task<IActionResult> RejectLog([FromQuery] int logId)
+        {
+            try { await _actionService.RejectLogAsync(logId); return Ok(new { message = "Odrzucono." }); }
+            catch { return BadRequest(CreateError("REJECTION_ERROR", "rejectionError")); }
         }
     }
 }

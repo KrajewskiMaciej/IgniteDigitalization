@@ -16,17 +16,6 @@ namespace DigitalWars.Server.Controllers
             _authService = authService;
         }
 
-        [HttpPost("request-reset")]
-        [AllowAnonymous]
-        public async Task<IActionResult> RequestPasswordReset([FromBody] ResetPasswordRequest request)
-        {
-            var result = await _authService.InitiatePasswordResetAsync(request.Email);
-            if (!result)
-                return Conflict(CreateError("USER_NOT_FOUND", "userNotFound"));
-
-            return Ok(new { success = true, message = "Link wysłany." });
-        }
-
         [HttpGet("validate-token")]
         [AllowAnonymous]
         public async Task<IActionResult> ValidateToken([FromQuery] string token)
@@ -48,6 +37,17 @@ namespace DigitalWars.Server.Controllers
             {
                 return BadRequest(CreateError("RESET_FAILED", "resetFailed"));
             }
+        }
+
+        [HttpPost("reset-request")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RequestPasswordReset([FromBody] ResetPasswordRequest request)
+        {
+            var result = await _authService.InitiatePasswordResetAsync(request.Email);
+            if (!result)
+                return Conflict(CreateError("USER_NOT_FOUND", "userNotFound"));
+
+            return Ok(new { success = true, message = "Link wysłany." });
         }
     }
 }

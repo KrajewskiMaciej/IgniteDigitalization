@@ -259,9 +259,8 @@ namespace DigitalWars.Server.Services
 
             _logger.LogInformation("=== ExecuteCardEffects - START ===");
 
-            _logger.LogInformation("Co tutaj się znajduję ?", logEntryWithSpecs.GameLogSpecs);
-            _logger.LogInformation("Co tutaj się znajduję ?", logEntryWithSpecs);
-
+            _logger.LogInformation("Co tutaj się znajduję ? {Specs}", logEntryWithSpecs.GameLogSpecs);
+            _logger.LogInformation("Co tutaj się znajduję ? {LogEntry}", logEntryWithSpecs);
             // Zastosuj efekty zdefiniowane w każdej specyfikacji logu
             foreach (var spec in logEntryWithSpecs.GameLogSpecs)
             {
