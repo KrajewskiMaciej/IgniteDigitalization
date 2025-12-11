@@ -23,7 +23,7 @@
             >
               <font-awesome-icon :icon="faGear" class="h-3 mr-2" />
               <button @click="activeView = 'general'" class="text-left w-full">
-                Ustawienia konta
+                {{ t('accountSettings') }}
               </button>
             </li>
             <hr class="border-lgray-accent w-full mx-auto" />
@@ -33,7 +33,7 @@
             >
               <font-awesome-icon :icon="faLock" class="h-3 mr-2" />
               <button @click="activeView = 'changePassword'" class="text-left w-full">
-                Zmień hasło
+                {{ t('changePassword') }}
               </button>
             </li>
             <hr class="border-lgray-accent w-full mx-auto" />
@@ -43,7 +43,7 @@
               :class="{ 'text-accent font-bold': activeView === 'licenses' }"
             >
               <font-awesome-icon :icon="faIdCard" class="h-3 mr-2" />
-              <button @click="activeView = 'licenses'" class="text-left w-full">Licencje</button>
+              <button @click="activeView = 'licenses'" class="text-left w-full">{{ t('licenses') }}</button>
             </li>
             <hr class="border-lgray-accent w-full mx-auto" />
           </ul>
@@ -69,12 +69,14 @@
 
 <script setup lang="ts">
 import { faXmark, faGear, faLock, faIdCard } from '@fortawesome/free-solid-svg-icons'
-import { defineProps, defineEmits, ref } from 'vue'
+import { ref } from 'vue'
 import changePassword from '../auth/changePassword.vue'
 import userLicenses from './userLicenses.vue'
 import basicAdminSettings from './basicAdminSettings.vue'
+import { useI18n } from 'vue-i18n'
 
 const activeView = ref('general')
+const { t } = useI18n();
 
 const props = defineProps({
   isVisible: {

@@ -6,7 +6,7 @@
         @click="openCreateGame"
       >
         <font-awesome-icon :icon="faPlus" class="h-4 text-accent mr-2" />
-        Stwórz nową grę
+        {{ t('createNewGame') }}
       </button>
     </div>
     <div class="flex gap-2">
@@ -16,7 +16,7 @@
         class="border-2 border-lgray-accent py-2 px-4 rounded-md text-center hover:border-accent transition-colors duration-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <font-awesome-icon :icon="faCircleStop" class="h-4 text-accent mr-2" />
-        Zatrzymaj wszystkie gry
+        {{ t('stopAllGames') }}
       </button>
       <button
         @click="handleEndAllGames"
@@ -24,7 +24,7 @@
         class="border-2 border-lgray-accent py-2 px-4 rounded-md text-center hover:border-accent transition-colors duration-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <font-awesome-icon :icon="faPowerOff" class="h-4 text-accent mr-2" />
-        Zakończ wszystkie gry
+        {{ t('endAllGames') }}
       </button>
     </div>
   </div>
@@ -38,6 +38,9 @@ import { useToast } from 'vue-toastification'
 import apiServices from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
 import { useConfirm } from 'primevue/useconfirm'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 // --- DEFINICJA TYPU DLA BŁĘDU API ---
 interface ApiError {
@@ -65,8 +68,8 @@ const handleStopAllGames = () => {
   if (isStoppingGames.value) return
 
   confirm.require({
-    header: 'Zatrzymaj wszystkie gry',
-    message: 'Czy na pewno chcesz zatrzymać wszystkie aktywne gry?',
+    header: t('stopAllGames'),
+    message: t('stopAllGamesConfirmation'),
     accept: () => {
       stopAllGames()
     },
@@ -82,17 +85,13 @@ const stopAllGames = async () => {
     const response = await apiServices.post(apiConfig.games.stopAll, {})
 
     if (response.status === 200 || response.status === 204) {
-      toast.success('Wszystkie gry zostały zatrzymane.')
       emit('update-status')
     } else {
-      toast.error(`Nie udało się zatrzymać gier. Serwer odpowiedział: ${response.status}`)
+      toast.error(t('stopAllGamesError') + ` ${response.status}`);
     }
   } catch (error: unknown) {
-    const apiError = error as ApiError
-    const errorMessage = apiError.response?.data?.message || apiError.message || 'Nieznany błąd'
 
-    console.error('Błąd podczas zatrzymywania gier:', error)
-    toast.error(`Błąd podczas zatrzymywania gier: ${errorMessage}`)
+    toast.error(t('stopAllGamesError') + error);
   } finally {
     isStoppingGames.value = false
   }
@@ -102,9 +101,8 @@ const handleEndAllGames = () => {
   if (isEndingGames.value) return
 
   confirm.require({
-    header: 'Zakończ wszystkie gry',
-    message:
-      'Jesteś pewien, że chesz zakończyć wszystkie aktywne gry? Ta akcja jest nieodwracalna.',
+    header: t('endAllGames'),
+    message: t('endAllGamesConfirmation'),
     accept: () => {
       endAllGames()
     },
@@ -119,17 +117,12 @@ const endAllGames = async () => {
     const response = await apiServices.post(apiConfig.games.endAll, {})
 
     if (response.status === 200 || response.status === 204) {
-      toast.success('Wszystkie gry zostały zakończone.')
       emit('update-status')
     } else {
-      toast.error(`Nie udało się zakończyć gier. Serwer odpowiedział: ${response.status}`)
+      toast.error(t('endAllGamesError') + ` ${response.status}`)
     }
   } catch (error: unknown) {
-    const apiError = error as ApiError
-    const errorMessage = apiError.response?.data?.message || apiError.message || 'Nieznany błąd'
-
-    console.error('Błąd podczas kończenia gier:', error)
-    toast.error(`Błąd podczas kończenia gier: ${errorMessage}`)
+    toast.error(t('endAllGamesError') + ` ${error}`);
   } finally {
     isEndingGames.value = false
   }

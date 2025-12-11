@@ -11,7 +11,7 @@
 
   <form @submit.prevent="handleChangeAccountSettings">
     <div class="mb-4">
-      <label for="username" class="font-bold ml-2 mb-2">Nazwa</label>
+      <label for="username" class="font-bold ml-2 mb-2">{{ t('username') }}</label>
       <input
         id="username"
         v-model="usernameEdit"
@@ -23,7 +23,7 @@
     <hr class="border-lgray-accent mb-4" />
 
     <div class="mb-4">
-      <label for="email" class="font-bold ml-2 mb-2">E-mail</label>
+      <label for="email" class="font-bold ml-2 mb-2">{{ t('email') }}</label>
       <input
         id="email"
         v-model="emailEdit"
@@ -38,7 +38,7 @@
       type="submit"
       class="relative w-full py-4 rounded-lg font-medium transition-all duration-300 overflow-hidden group text-white mb-5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50"
     >
-      <span class="relative z-10">Zapisz zmiany</span>
+      <span class="relative z-10">{{ t('saveChanges') }}</span>
       <div
         class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
       ></div>
@@ -48,7 +48,10 @@
 
 <script setup lang="ts">
 import { faCircleUser } from '@fortawesome/free-solid-svg-icons'
-import { ref, watch, defineProps } from 'vue'
+import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   username: {

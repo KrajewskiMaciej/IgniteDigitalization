@@ -14,7 +14,7 @@
             :icon="game.status === 'During' ? faCircleStop : faCirclePlay"
             class="h-4 text-accent mr-2"
           />
-          {{ game.status === 'During' ? 'Wstrzymaj grę' : 'Wznów grę' }}
+          {{ game.status === 'During' ? t('pauseGame') : t('resumeGame') }}
         </button>
 
         <!-- This button is always available for active/paused games to end them -->
@@ -25,7 +25,7 @@
           @dblclick.stop
         >
           <font-awesome-icon :icon="faPowerOff" class="h-4 mr-2 text-accent" />
-          Zakończ grę
+          {{ t('endGame') }}
         </button>
       </div>
     </div>
@@ -40,6 +40,9 @@ import { useToast } from 'vue-toastification'
 import { useConfirm } from 'primevue/useconfirm'
 import apiService from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 // --- DEFINICJA TYPÓW ---
 type GameStatus = 'During' | 'Paused' | 'End'
@@ -78,10 +81,6 @@ const updateGameStatus = async (id: number, newStatus: GameStatus) => {
       game.value.status = newStatus
     }
 
-    toast.success(
-      (response.data as { message: string }).message ||
-        `Status gry został pomyślnie zaktualizowany.`,
-    )
     emit('update-status', { gameId: id, newStatus: newStatus })
 
     if (newStatus === 'End') {
@@ -90,23 +89,17 @@ const updateGameStatus = async (id: number, newStatus: GameStatus) => {
       }, 750)
     }
   } catch (error: unknown) {
-    const apiError = error as ApiError
-    const errorMessage = apiError.response?.data?.message || 'Wystąpił nieznany błąd.'
-
-    console.error(`Błąd aktualizacji statusu gry ${id}:`, error)
-    toast.error(`Nie udało się zaktualizować statusu gry: ${errorMessage}`)
+    toast.error(t('errorUpdatingGameStatus') + ` ${error}`)
   }
 }
 
 const handleTogglePause = () => {
   const newStatus = game.value.status === 'During' ? 'Paused' : 'During'
-  const action = newStatus === 'Paused' ? 'wstrzymać' : 'wznowić'
+  const action = newStatus === 'Paused' ? t('pause') : t('resume')
 
   confirm.require({
-    message: `Czy na pewno chcesz ${action} grę ?`,
-    header: newStatus === 'Paused' ? 'Wstrzymaj grę' : 'Wznów grę',
-    rejectLabel: 'Anuluj',
-    acceptLabel: 'Potwierdź',
+    message: t('toggleGameStatusConfirmation', { action: action }),
+    header: newStatus === 'Paused' ? t('pauseGame') : t('resumeGame'),
     accept: () => {
       updateGameStatus(gameId, newStatus)
     },
@@ -116,10 +109,8 @@ const handleTogglePause = () => {
 
 const handleEndGame = () => {
   confirm.require({
-    message: `Czy na pewno chcesz zakończyć grę? Tej operacji nie można cofnąć.`,
-    header: 'Zakończ grę',
-    rejectLabel: 'Anuluj',
-    acceptLabel: 'Zakończ',
+    message: t('endGameConfirmation'),
+    header: t('endGame'),
     accept: () => {
       updateGameStatus(gameId, 'End')
     },
@@ -132,8 +123,7 @@ const getGameDetails = async () => {
     const response = await apiService.get<Game>(apiConfig.admin.games.getGames(gameId))
     game.value = response.data
   } catch (error) {
-    console.error('Błąd przy pobieraniu danych gry:', error)
-    toast.error('Nie udało się załadować szczegółów gry.')
+    toast.error(t('errorFetchingGameData') + ` ${error}`)
   }
 }
 

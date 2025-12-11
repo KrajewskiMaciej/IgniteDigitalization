@@ -50,6 +50,31 @@ export const pl = {
   newPasswordPlaceholder: 'Nowe hasło...',
   confirmPasswordPlaceholder: 'Potwierdź hasło...',
   emailOrUsername: 'E-mail lub nazwa użytkownika',
+  accountSettings: 'Ustawienia konta',
+  licenses: 'Licencje',
+
+
+  //Game
+  createNewGame: 'Utwórz nową grę',
+  stopAllGames: 'Zatrzymaj wszystkie gry',
+  stopAllGamesConfirmation: 'Czy na pewno chcesz zatrzymać wszystkie gry?',
+  stopAllGamesError: 'Wystąpił błąd podczas zatrzymywania wszystkich gier. Spróbuj ponownie.',
+  endAllGames: 'Zakończ wszystkie gry',
+  endAllGamesConfirmation: 'Czy na pewno chcesz zakończyć wszystkie gry?',
+  endAllGamesError: 'Wystąpił błąd podczas kończenia wszystkich gier. Spróbuj ponownie.',
+  pauseGame: 'Wstrzymaj grę',
+  resumeGame: 'Wznów grę',
+  endGame: 'Zakończ grę',
+  errorUpdatingGameStatus: 'Wystąpił błąd podczas aktualizacji statusu gry. Spróbuj ponownie.',
+  endGameConfirmation: 'Czy na pewno chcesz zakończyć tę grę?',
+  errorFetchingGameData: 'Wystąpił błąd podczas pobierania danych gry. Spróbuj ponownie.',
+  resume: 'wznowić',
+  pause: 'wstrzymać',
+  changeStatusConfirmation: 'Czy na pewno chcesz zmienić status gry na {status}?',
+  gamesInProgress: 'Gry w toku',
+  gamesPlayed: 'Rozegrane gry',
+  licencesLeft: 'Pozostałe licencje',
+  buyMoreLicences: 'Kup więcej licencji',
 
   //Scan QR
   scanQRCode: 'Skanuj kod QR',
