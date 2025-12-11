@@ -36,6 +36,8 @@ let rightEye: THREE.Object3D | null = null
 let leftPupil: THREE.Object3D | null = null
 let rightPupil: THREE.Object3D | null = null
 let robotHead: THREE.Object3D | null = null
+let faceHappy: THREE.Object3D | null = null
+let faceSad: THREE.Object3D | null = null
 
 const fontPath = '/fonts/Nasalization Rg_Regular.json'
 
@@ -184,6 +186,10 @@ const loadRobot = async () => {
     leftPupil = robot.getObjectByName('LeftPupil')!
     rightPupil = robot.getObjectByName('RightPupil')!
     robotHead = robot.getObjectByName('Head')!
+    faceHappy = robot.getObjectByName('Face')!
+    faceSad = robot.getObjectByName('FaceSad')!
+
+    if (faceSad) faceSad.visible = false
 
     if (robotHead) {
       headStartRotation = {
@@ -642,6 +648,55 @@ onUnmounted(() => {
   controls.dispose()
   if (composer) composer.dispose()
 })
+
+function setEmotion(emotion: 'happy' | 'sad') {
+  if (!faceHappy || !faceSad) return
+
+  const duration = 0.3
+  const steps = 30
+  const stepTime = (duration * 1000) / steps
+  let step = 0
+
+  const setMaterialsOpacity = (object: THREE.Object3D, opacity: number) => {
+    object.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh
+        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+        materials.forEach((mat) => {
+          mat.transparent = true
+          mat.opacity = opacity
+        })
+      }
+    })
+  }
+
+  faceHappy.visible = true
+  faceSad.visible = true
+
+  const fromHappy = emotion === 'sad'
+  
+  const animate = () => {
+    step++
+    const progress = step / steps
+    
+    const happyOpacity = fromHappy ? 1 - progress : progress
+    const sadOpacity = fromHappy ? progress : 1 - progress
+
+    setMaterialsOpacity(faceHappy!, happyOpacity)
+    setMaterialsOpacity(faceSad!, sadOpacity)
+
+    if (step < steps) {
+      setTimeout(animate, stepTime)
+    } else {
+      faceHappy!.visible = emotion === 'happy'
+      faceSad!.visible = emotion === 'sad'
+    }
+  }
+
+  animate()
+}
+
+defineExpose({setEmotion});
 </script>
 
 <style scoped>

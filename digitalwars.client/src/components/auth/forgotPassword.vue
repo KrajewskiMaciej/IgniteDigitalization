@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits } from 'vue'
+import { ref } from 'vue'
 // --- KROK 1: Import enumu POSITION ---
 import { useToast, POSITION } from 'vue-toastification'
 // --- KROK 2: Usunięcie nieużywanego importu 'apiClient' ---
@@ -118,7 +118,7 @@ const isEmailSent = ref(false)
 const canResend = ref(true)
 const countdown = ref(0)
 const toast = useToast()
-const emit = defineEmits(['backToLogin'])
+const emit = defineEmits(['backToLogin', 'error'])
 
 const handleSendEmail = async () => {
   try {
@@ -140,6 +140,8 @@ const handleSendEmail = async () => {
     // --- KROK 4: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
     const status: number = apiError.status
+
+    emit('error');
 
     console.log('Jaki błąd otrzymuje:', apiError.status)
 

@@ -69,7 +69,7 @@ import EditDecisionCards from '@/components/game/EditDecisionCards.vue'
 import EditItems from '@/components/game/EditItems.vue'
 import EditProccesses from '@/components/game/EditProccesses.vue'
 import Button from 'primevue/button'
-import { faMicrochip, faChessPawn, faClone ,faLock } from '@fortawesome/free-solid-svg-icons'
+import { faMicrochip, faChessPawn, faClone, faLock } from '@fortawesome/free-solid-svg-icons'
 import DynamicCheatSheetEdit from '@/components/cheatSheet/DynamicCheatSheetEdit.vue'
 
 const currentView = ref<'items' | 'decisions' | 'processes' | 'enablers'>('decisions')

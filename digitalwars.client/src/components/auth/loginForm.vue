@@ -91,7 +91,7 @@ interface ApiError {
 
 const authStore = useAuthStore()
 const toast = useToast()
-const emit = defineEmits(['login', 'close', 'forgotPassword'])
+const emit = defineEmits(['login', 'close', 'forgotPassword', 'error'])
 
 const showPassword = ref(false)
 const isLoading = ref(false)
@@ -151,7 +151,7 @@ const handleLogin = async () => {
     // Jawne otypowanie błędu
     // --- KROK 5: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
-
+    emit('error');
     if (apiError.response?.data) {
       if (apiError.response.data === 'Invalid credentials') {
         toast.error(t('invalidEmailOrPassword'), {

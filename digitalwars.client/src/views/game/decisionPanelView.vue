@@ -888,7 +888,6 @@ const approveDecision = async (logId: number) => {
     const response = await apiServices.post(apiConfig.player.approveLog(logId), {})
     toast.success('Sugestia została zatwierdzona!')
     console.log(response.data, 'Co otrzymałem po approve ?')
-    await Promise.all([fetchPendingDecisions(), fetchDecisionHistory()])
     console.log(
       'Zaktualizowano listę decyzji po zatwierdzeniu do zatwierdzenia:',
       pendingDecisions.value,
@@ -904,7 +903,6 @@ const rejectDecision = async (logId: number) => {
   try {
     await apiServices.delete(apiConfig.player.rejectLog(logId))
     toast.info('Sugestia została odrzucona.')
-    await fetchPendingDecisions()
   } catch (error: any) {
     toast.error('Wystąpił błąd podczas odrzucania sugestii.')
     console.error('Błąd odrzucania:', error.response?.data || error.message)
@@ -963,6 +961,7 @@ onMounted(async () => {
     signalService.connection.on('HistoryUpdated', () => fetchDecisionHistory())
     signalService.connection.on('PendingUpdated', () => fetchPendingDecisions())
     signalService.connection.on('BoardUpdated', () => fetchRivalPawns())
+    signalService.connection.on('BudgetUpdated', () => fetchTeams())
   } catch (err: any) {
     console.error('Błąd połączenia SignalR: ', err)
   }
@@ -970,6 +969,10 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (gameId) signalService.leaveGameRoomAsAdmin(String(gameId))
+  signalService.connection.off('HistoryUpdated');
+  signalService.connection.off('PendingUpdated');
+  signalService.connection.off('BoardUpdated');
+  signalService.connection.off('BudgetUpdated');
 })
 </script>
 

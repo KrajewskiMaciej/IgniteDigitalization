@@ -4,7 +4,7 @@
     :class="isBigScreen ? 'grid grid-cols-2' : ''"
   >
     <div v-if="isBigScreen">
-      <RobotAuth />
+      <RobotAuth ref="robotRef" />
     </div>
     
     <div 
@@ -57,6 +57,7 @@
             v-if="activeView === 'login'"
             @close="emit('close')"
             @forgotPassword="handleForgotPassword"
+            @error="handleError"
             class="animate-fade-left"
           />
 
@@ -64,12 +65,14 @@
             v-if="activeView === 'register'"
             @close="emit('close')"
             @switchToConfirmEmail="handleSwitchToConfirmEmail"
+            @error="handleError"
             class="animate-fade-right"
           />
 
           <ForgotPassword
             v-if="activeView === 'forgotPassword'"
             @back-to-login="handleBackToLogin"
+            @error="handleError"
             class="animate-fade-right"
           />
 
@@ -101,7 +104,8 @@ const breakpoints = useBreakpoints(breakpointsTailwind)
 const isBigScreen = breakpoints.greater('lg');
 const { t } = useI18n();
 const activeView = ref<'login' | 'register' | 'forgotPassword' | 'confirmEmail'>('login');
-const emailToConfirm = ref<string>('')
+const emailToConfirm = ref<string>('');
+const robotRef = ref<InstanceType<typeof RobotAuth> | null>(null);
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -118,5 +122,13 @@ const handleBackToLogin = () => {
 const handleSwitchToConfirmEmail = (email: string) => {
   activeView.value = 'confirmEmail'
   emailToConfirm.value = email
+}
+
+const handleError = () => {
+   robotRef.value?.setEmotion('sad')
+  
+  setTimeout(() => {
+    robotRef.value?.setEmotion('happy')
+  }, 5000)
 }
 </script>

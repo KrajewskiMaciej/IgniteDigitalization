@@ -156,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineEmits } from 'vue'
+import { ref, computed } from 'vue'
 // --- KROK 1: Import enumu POSITION ---
 import { useToast, POSITION } from 'vue-toastification'
 import passwordStrength from './passwordStrength.vue'
@@ -176,7 +176,7 @@ interface ApiError {
 }
 
 const toast = useToast()
-const emit = defineEmits(['register', 'close', 'switchToConfirmEmail'])
+const emit = defineEmits(['register', 'close', 'switchToConfirmEmail', 'error'])
 
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
@@ -255,6 +255,8 @@ const handleRegister = async () => {
     // Jawne otypowanie błędu jako 'unknown'
     // --- KROK 5: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
+
+    emit('error');
 
     if (apiError.response?.data) {
       if (apiError.response.data === 'Email already exist.') {
