@@ -112,7 +112,7 @@ import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 
-const bigScreen = breakpoints.greater('md');
+const bigScreen = breakpoints.greater('md')
 
 const { t } = useI18n()
 

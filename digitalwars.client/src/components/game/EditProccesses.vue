@@ -320,7 +320,7 @@ const deleteSelectedProcess = async () => {
     acceptLabel: 'Usuń',
     accept: async () => {
       try {
-        await apiServices.delete(apiConfig.processes.deleteProcess(selectedProcess.value!));
+        await apiServices.delete(apiConfig.processes.deleteProcess(selectedProcess.value!))
         processesData.value = processesData.value.filter(
           (process) => process.processId !== processId,
         )
@@ -348,14 +348,13 @@ const saveProcessChanges = async () => {
 
   try {
     if (isAddingNewProcess.value) {
-
-      const response  = await apiServices.post<IProcessResponse>(apiConfig.processes.addProcess, {
+      const response = await apiServices.post<IProcessResponse>(apiConfig.processes.addProcess, {
         deck_Id: selectedDeck.value,
         process_Desc: editedProcess.value.processDesc,
         process_Long_Desc: editedProcess.value.processLongDesc,
         process_Color: editedProcess.value.processColor,
-        process_Weight: 0.15 //Na razie na sztywno przypisana waga może później będziemy obsługiwać
-      });
+        process_Weight: 0.15, //Na razie na sztywno przypisana waga może później będziemy obsługiwać
+      })
 
       const newProcess: Process = {
         ...editedProcess.value,
@@ -364,7 +363,7 @@ const saveProcessChanges = async () => {
       }
       processesData.value.push(newProcess)
 
-      selectedProcess.value = response.data.processId;
+      selectedProcess.value = response.data.processId
 
       toast.success('Nowy proces został dodany')
     } else {
@@ -372,14 +371,16 @@ const saveProcessChanges = async () => {
       const index = processesData.value.findIndex(
         (process) => process.processId === selectedProcess.value,
       )
-      
 
-      const response = await apiServices.put(apiConfig.processes.editProcess(selectedProcess.value!), {
-        process_Desc: editedProcess.value.processDesc,
-        process_Long_Desc: editedProcess.value.processLongDesc,
-        process_Color: editedProcess.value.processColor,
-      });
-      
+      const response = await apiServices.put(
+        apiConfig.processes.editProcess(selectedProcess.value!),
+        {
+          process_Desc: editedProcess.value.processDesc,
+          process_Long_Desc: editedProcess.value.processLongDesc,
+          process_Color: editedProcess.value.processColor,
+        },
+      )
+
       if (index !== -1) {
         processesData.value[index] = {
           ...editedProcess.value,
@@ -387,8 +388,6 @@ const saveProcessChanges = async () => {
           deckId: selectedDeck.value!,
         }
       }
-
-
 
       toast.success('Proces został zaktualizowany')
     }

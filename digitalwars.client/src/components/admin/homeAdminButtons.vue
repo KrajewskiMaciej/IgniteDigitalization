@@ -40,7 +40,7 @@ import apiConfig from '@/services/apiConfig'
 import { useConfirm } from 'primevue/useconfirm'
 import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 // --- DEFINICJA TYPU DLA BŁĘDU API ---
 interface ApiError {
@@ -87,11 +87,10 @@ const stopAllGames = async () => {
     if (response.status === 200 || response.status === 204) {
       emit('update-status')
     } else {
-      toast.error(t('stopAllGamesError') + ` ${response.status}`);
+      toast.error(t('stopAllGamesError') + ` ${response.status}`)
     }
   } catch (error: unknown) {
-
-    toast.error(t('stopAllGamesError') + error);
+    toast.error(t('stopAllGamesError') + error)
   } finally {
     isStoppingGames.value = false
   }
@@ -122,7 +121,7 @@ const endAllGames = async () => {
       toast.error(t('endAllGamesError') + ` ${response.status}`)
     }
   } catch (error: unknown) {
-    toast.error(t('endAllGamesError') + ` ${error}`);
+    toast.error(t('endAllGamesError') + ` ${error}`)
   } finally {
     isEndingGames.value = false
   }

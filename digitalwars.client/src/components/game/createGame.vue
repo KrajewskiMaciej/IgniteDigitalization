@@ -13,7 +13,7 @@
       </button>
 
       <h1 class="text-center text-white font-nasalization text-lg sm:text-xl md:text-2xl mt-1 mb-3">
-        Utwórz nową grę
+        {{ t('createNewGame') }}
       </h1>
       <hr class="my-3 border-surface-700" />
       <div class="flex flex-row justify-center space-x-2">
@@ -33,12 +33,12 @@
         <div v-if="step === 1" :class="direction === 'backwards' ? 'animate-fade-left' : ''">
           <div class="space-y-1 mb-1 sm:mb-2">
             <label for="gameName" class="block font-bold text-left text-xs sm:text-sm"
-              >Nazwa Gry</label
+              >{{ t('gameName') }}</label
             >
             <InputText
               id="gameName"
               v-model="gameName"
-              placeholder="Wprowadź nazwę gry..."
+              :placeholder="t('gameNamePlaceholder')"
               maxlength="25"
               required
               class="w-full"
@@ -46,44 +46,44 @@
           </div>
           <div class="mb-1 sm:mb-2">
             <label for="selectBoard" class="block font-bold text-left text-xs mb-1"
-              >Wybierz planszę</label
+              >{{ t('selectBoard') }}</label
             >
             <Dropdown
               v-model="selectedBoardId"
               :options="data.boards"
               optionLabel="name"
               optionValue="boards_Id"
-              placeholder="Wybierz planszę"
+              :placeholder="t('selectBoardPlaceholder')"
               class="w-full custom-dropdown"
             />
           </div>
           <div class="mb-1 sm:mb-2">
             <label for="selectOpponentBoard" class="block font-bold text-left text-xs mb-1"
-              >Wybierz planszę konkurencji</label
+              >{{ t('selectRivalBoard') }}</label
             >
             <Dropdown
               v-model="selectedOponentBoardId"
               :options="opponentBoardOptions"
               optionLabel="name"
               optionValue="boards_Id"
-              placeholder="Wybierz planszę konkurencji"
+              :placeholder="t('selectRivalBoardPlaceholder')"
               class="w-full"
             />
           </div>
           <div class="mb-1 sm:mb-2">
             <label for="selectDeck" class="block font-bold text-left text-xs mb-1"
-              >Wybierz talię kart</label
+              >{{ t('selectDeck') }}</label
             >
             <Dropdown
               v-model="selectedDeckId"
               :options="data.decks"
               optionLabel="title"
               optionValue="id"
-              placeholder="Wybierz talię kart"
+              :placeholder="t('selectDeckPlaceholder')"
               class="w-full custom-dropdown"
             />
           </div>
-          <p class="block font-bold text-left text-xs mb-2">Wybierz rodzaj rozgrywki</p>
+          <p class="block font-bold text-left text-xs mb-2">{{ t('selectGameType') }}</p>
           <div class="flex gap-2 w-full mb-5">
             <div
               class="flex flex-col items-center justify-center rounded-md w-full h-20 gap-2 cursor-pointer"
@@ -99,7 +99,7 @@
                 class="h-6"
                 :class="selectedGameMode === 'remote' ? 'text-tertiary' : 'text-primary-400'"
               />
-              <h2 class="block font-nasalization font-semibold">Gra zdalna</h2>
+              <h2 class="block font-nasalization font-semibold">{{ t('remoteGame') }}</h2>
             </div>
             <div
               class="flex flex-col items-center justify-center rounded-md w-full h-20 gap-2 cursor-pointer"
@@ -115,11 +115,11 @@
                 class="h-6"
                 :class="selectedGameMode === 'stationary' ? 'text-primary' : 'text-primary-400'"
               />
-              <h2 class="block font-nasalization font-semibold">Gra stacjonarna</h2>
+              <h2 class="block font-nasalization font-semibold">{{ t('stationaryGame') }}</h2>
             </div>
           </div>
           <Button @click="handleNextStep" type="button" class="w-full">
-            <span>Dalej</span>
+            <span>{{ t('next') }}</span>
             <font-awesome-icon :icon="faArrowRight" class="ml-2" />
           </Button>
         </div>
@@ -132,7 +132,7 @@
           <div class="flex flex-row gap-2">
             <div class="flex-1">
               <label for="numberOfTeams" class="block font-bold text-left text-xs sm:text-sm mb-1"
-                >Liczba drużyn:</label
+                >{{ t('numberOfTeams') }}</label
               >
               <InputNumber
                 id="numberOfTeams"
@@ -145,7 +145,7 @@
             </div>
             <div class="flex-1">
               <label for="numberOfBits" class="block font-bold text-left text-xs sm:text-sm mb-1"
-                >Liczba bitów na start</label
+                >{{ t('numberOfBits') }}</label
               >
               <InputNumber
                 id="numberOfBits"
@@ -159,14 +159,14 @@
           </div>
           <div class="mb-6 mt-4">
             <label class="block text-left text-xs sm:text-sm font-bold text-white mb-2"
-              >Wybierz drużynę do edycji:</label
+              >{{ t('selectTeamToEdit') }}</label
             >
             <Dropdown
               v-model="currentlyEditingTeamId"
               :options="teams"
               optionLabel="name"
               optionValue="id"
-              placeholder="Wybierz drużynę"
+              :placeholder="t('selectTeamToEditPlaceholder')"
               class="w-full custom-dropdown"
             >
               <template #value="slotProps">
@@ -197,14 +197,14 @@
             class="p-4 rounded-lg bg-surface-850 border border-surface-700 mb-4"
           >
             <h3 class="font-bold text-center text-lg mb-4 text-white">
-              Edytujesz: <span class="text-primary-400">{{ selectedTeam.name }}</span>
+               {{ t('editing') }} <span class="text-primary-400">{{ selectedTeam.name }}</span>
             </h3>
             <div class="space-y-4">
               <div>
                 <label
                   :for="'editTeamName-' + selectedTeam.id"
                   class="block text-sm font-medium text-gray-300 mb-1"
-                  >Nazwa drużyny</label
+                  >{{ t('teamName') }}</label
                 >
                 <InputText
                   :id="'editTeamName-' + selectedTeam.id"
@@ -216,7 +216,7 @@
                 <label
                   :for="'editTeamColor-' + selectedTeam.id"
                   class="block text-sm font-medium text-gray-300 mb-1"
-                  >Kolor drużyny</label
+                  >{{ t('teamColor') }}</label
                 >
                 <input
                   type="color"
@@ -229,7 +229,7 @@
             <label
               :for="'decision-' + selectedTeam.id"
               class="block text-sm font-medium text-gray-300 mb-2 mt-5 cursor-pointer"
-              >Czy drużyna może podejmować samodzielne decyzje?</label
+              >{{ t('canTeamMakeDecisions') }}</label
             >
             <div class="flex items-center gap-2">
               <label class="relative inline-block w-11 h-6">
@@ -263,21 +263,19 @@
                   <div>
                     <div>
                       <h2 class="font-nasalization mb-1 font-semibold text-orange-500">
-                        Kontrola GM'a
+                        {{ t('gmControl') }}
                       </h2>
                       <span
-                        >Drużyna ma możliwość zasugerowania decyzji ale Game Master musi ją
-                        zakceptować
+                        >{{ t('gmControlDescription') }}</span
                       </span>
                     </div>
                     <hr class="mt-2 border-surface-700" />
                     <div>
                       <h2 class="font-nasalization mb-1 mt-2 font-semibold text-green-500">
-                        Samodzielne decyzje
+                        {{ t('independentDecisions') }}
                       </h2>
                       <span
-                        >Drużyna podejmuje decyzje bezpośrednio z urządzenia i nie potrzebuje
-                        akceptacji decyzji przez Game Mastera</span
+                        >{{ t('independentDecisionsDescription') }}</span
                       >
                     </div>
                   </div>
@@ -288,10 +286,10 @@
           <div class="flex gap-2">
             <Button @click="handlePreviousStep" type="button" severity="secondary" class="w-full">
               <font-awesome-icon :icon="faArrowLeft" class="mr-2" />
-              <span>Wstecz</span>
+              <span>{{ t('previous') }}</span>
             </Button>
             <Button @click="handleNextStep" type="button" class="w-full">
-              <span>Dalej</span>
+              <span>{{ t('next') }}</span>
               <font-awesome-icon :icon="faArrowRight" class="ml-2" />
             </Button>
           </div>
@@ -303,7 +301,7 @@
         >
           <div class="flex justify-between items-center mb-3">
             <h2 class="block text-left text-sm sm:text-base font-bold text-white">
-              Wybierz procesy:
+              {{ t('selectProcessesForGame') }}
             </h2>
             <Button
               @click="toggleAllProcesses"
@@ -313,10 +311,10 @@
             />
           </div>
           <div v-if="isLoadingProcesses" class="text-center text-surface-400">
-            <p>Ładowanie procesów...</p>
+            <p>{{ t('loadingProcesses') }}</p>
           </div>
           <div v-else-if="availableProcesses.length === 0" class="text-center text-surface-400">
-            <p>Brak dostępnych procesów dla wybranej talii.</p>
+            <p>{{ t('noProcessesAvailableForSelectedDeck') }}</p>
           </div>
           <div v-else class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-2">
             <label
@@ -343,9 +341,9 @@
         <div v-if="step === 3" class="flex gap-2 mt-4">
           <Button @click="handlePreviousStep" type="button" severity="secondary" class="w-full">
             <font-awesome-icon :icon="faArrowLeft" class="mr-2" />
-            <span>Wstecz</span>
+            <span>{{ t('previous') }}</span>
           </Button>
-          <Button type="submit" label="Utwórz nową grę" class="w-full" />
+          <Button type="submit" :label="t('createNewGame')" class="w-full" />
         </div>
       </form>
     </div>
@@ -370,6 +368,9 @@ import Button from 'primevue/button'
 import Checkbox from 'primevue/checkbox'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Board {
@@ -478,10 +479,10 @@ const handlePreviousStep = () => {
 
 const validateFirstStep = () => {
   const errors: string[] = []
-  if (!gameName.value.trim()) errors.push('Wprowadź nazwę gry')
-  if (selectedBoardId.value === null) errors.push('Wybierz planszę')
-  if (selectedOponentBoardId.value === null) errors.push('Wybierz planszę konkurencji')
-  if (selectedDeckId.value === null) errors.push('Wybierz talię kart')
+  if (!gameName.value.trim()) errors.push(t('EnterGameName'))
+  if (selectedBoardId.value === null) errors.push(t('selectBoard'))
+  if (selectedOponentBoardId.value === null) errors.push(t('selectRivalBoard'))
+  if (selectedDeckId.value === null) errors.push(t('selectDeck'))
   if (errors.length > 0) {
     toast.error(errors.join('\n'))
     return false
@@ -496,7 +497,10 @@ const fetchBoardsFromAPI = async () => {
   } catch (error) {
     const typedError = error as ApiError
     toast.error(
-      `Nie udało się pobrać plansz: ${typedError.response?.data?.title || typedError.message}`,
+      t('errorFetchingBoards', {
+        error:
+          typedError.response?.data?.title || typedError.message,
+      })
     )
   }
 }
@@ -508,7 +512,10 @@ const fetchDecksFromAPI = async () => {
   } catch (error) {
     const typedError = error as ApiError
     toast.error(
-      `Nie udało się pobrać talii kart: ${typedError.response?.data?.title || typedError.message}`,
+      t('errorFetchingDecks', {
+        error:
+          typedError.response?.data?.title || typedError.message,
+      })
     )
   }
 }
@@ -530,15 +537,15 @@ const handleSubmit = async () => {
     return
   }
   if (teams.value.some((team) => !team.name.trim())) {
-    toast.error(`Nazwy drużyn nie mogą być puste.`)
+    toast.error(t('pleaseEnterTeamNames'))
     return
   }
   if (numberOfBits.value < 1 || numberOfBits.value > 100000) {
-    toast.error('Liczba bitów na start musi być pomiędzy 1 a 100000.')
+    toast.error(t('numberOfBitsMustBeBetween'))
     return
   }
   if (selectedProcessIds.value.length === 0) {
-    toast.error('Wybierz co najmniej jeden proces do gry.')
+    toast.error(t('pleaseSelectAtLeastOneProcess'))
     return
   }
 
@@ -568,7 +575,6 @@ const handleSubmit = async () => {
       apiConfig.games.create,
       gamePayload,
     )
-    toast.success(response.data.message || `Gra "${gamePayload.GameName}" utworzona pomyślnie!`)
     emits('gameCreated')
     closeModal()
   } catch (error) {
@@ -581,7 +587,7 @@ const handleSubmit = async () => {
         ? typedError.response.data.title
         : typedError.response?.data) ||
       typedError.message ||
-      'Nie udało się utworzyć gry.'
+      t('errorCreatingGame')
     toast.error(errorMessage)
   }
 }
@@ -619,7 +625,7 @@ watch(selectedDeckId, async (newDeckId) => {
       const response = await apiService.get<GameProcess[]>(apiConfig.processes.getByDeck(newDeckId))
       availableProcesses.value = response.data
     } catch {
-      toast.error('Nie udało się pobrać procesów dla wybranej talii.')
+      toast.error(t('errorFetchingProcesses'))
     } finally {
       isLoadingProcesses.value = false
     }

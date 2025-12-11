@@ -17,7 +17,7 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faDiagramProject" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Drzewo decyzji</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('decisionTree') }}</h2>
         </div>
         <div class="flex gap-2 bg-surface-800 border border-surface-700 p-2 rounded-lg">
           <Button @click="zoomIn()" outlined rounded size="small" v-tooltip.top="t('zoomIn')">
@@ -114,7 +114,7 @@
               <div>
                 <h3 class="text-white font-bold text-sm mb-2 flex items-center gap-2">
                   <font-awesome-icon :icon="faCircleInfo" class="text-xl text-primary-400" />
-                  Legenda
+                  {{ t('legend') }}
                 </h3>
                 <div class="flex flex-col gap-2">
                   <div class="flex gap-2 items-center">
@@ -123,11 +123,11 @@
                     >
                       X
                     </div>
-                    <span class="text-surface-200 text-sm">Karta Decyzji</span>
+                    <span class="text-surface-200 text-sm">{{ t('decisionCard') }}</span>
                   </div>
                   <div class="flex gap-2 items-center">
                     <div class="text-primary-400 text-lg">{{ `-->` }}</div>
-                    <span class="text-surface-200 text-sm">Przejście między kartami</span>
+                    <span class="text-surface-200 text-sm">{{ t('transitionBetweenCards') }}</span>
                   </div>
                 </div>
               </div>
@@ -278,7 +278,6 @@ const createEdgesFromEnablers = (
         class: 'flow-edge',
       }))
   })
-  console.log('Nowo powstałe krawędzie:', edges.value)
 }
 
 //Pobieranie id talii kart
@@ -287,7 +286,7 @@ const fetchDeckId = async () => {
     const response = await apiServices.get<IGameResponse>(apiConfig.games.getById(gameId.value))
     deckId.value = response.data.deckId
   } catch {
-    toast.error('Wystąpił błąd podczas pobierania id talii kart')
+    toast.error(t('errorFetchingDeckId'))
   }
 }
 
@@ -301,7 +300,7 @@ const fetchTemasInfo = async () => {
     tables.value = response.data
     console.log('Stoły:', tables.value)
   } catch {
-    toast.error(`Wystąpił błąd podczas pobierania informacji o drużynach w grze: ${gameId.value}`)
+    toast.error(t('errorFetchingTeamsInfo'))
   }
 }
 
@@ -314,16 +313,14 @@ const fetchEnablersMap = async () => {
 
     enablers.value = response.data.enablersMap
     cardTypes.value = response.data.cardTypes
-
   } catch {
-    toast.error('Wystąpił błąd podczas pobierania enablerów')
+    toast.error(t('errorFetchingEnablers'))
   }
 }
 
 //Ostatnia zagrana karta z sukcesem przez każdą drużynę
 const fetchAllTeamsEntries = async () => {
-
-  console.log('Czy przy pobieraniu ostatnich zagranych kart mam typy kart?', cardTypes.value);
+  console.log('Czy przy pobieraniu ostatnich zagranych kart mam typy kart?', cardTypes.value)
   const entriesPromises = tables.value.map(async (table) => {
     try {
       const response = await apiServices.get<number>(
@@ -343,19 +340,14 @@ const fetchAllTeamsEntries = async () => {
 
   const results = await Promise.all(entriesPromises)
 
-  console.log('Rezultaty:', results);
-
+  console.log('Rezultaty:', results)
 
   results.forEach((result) => {
     if (!result) return
 
-    console.log('Szukam cardsId:', result.cardsId)
-    console.log('Dostępne cards_Id:', cardTypes.value.map(c => c.cards_Id))
-    console.log('Dostępne card_Id:', cardTypes.value.map(c => c.card_Id))
-
     const card = cardTypes.value.find((card) => card.cards_Id === result.cardsId)
 
-    console.log('Czy znaleziono kartę ?', card);
+    console.log('Czy znaleziono kartę ?', card)
 
     if (card) {
       const cardId = card.card_Id
@@ -372,7 +364,7 @@ const fetchAllTeamsEntries = async () => {
     }
   })
 
-  console.log('Team entries:', tableEntries.value);
+  console.log('Team entries:', tableEntries.value)
 }
 
 const fetchDecisionCards = async () => {
@@ -385,7 +377,7 @@ const fetchDecisionCards = async () => {
 
     console.log('Karty decyzji:', decisionCardsData.value)
   } catch {
-    toast.error('Błąd podczas pobierania kart decyzji')
+    toast.error(t('errorFetchingDecisionCards'))
   }
 }
 
@@ -397,57 +389,55 @@ const fetchItems = async () => {
 
     console.log('Pobrane karty przedmiotów:', itemsData.value)
   } catch {
-    toast.error('Błąd podczas pobierania przedmiotów')
+    toast.error(t('errorFetchingItems'))
   }
 }
 
 const onCheatSheetUpdated = async () => {
   console.log('Event')
-  tableEntries.value = {};
-  await fetchAllTeamsEntries();
+  tableEntries.value = {}
+  await fetchAllTeamsEntries()
 }
 
-watch(tableEntries, (newEntries) => {
-  if (nodes.value.length === 0) return;
-  console.log('[CheatSheet] tableEntries zmienione, aktualizacja węzłów');
-  
-  nodes.value = nodes.value.map((node) => {
-    const cardId = Number(node.id.replace('card-', ''));
-    return {
-      ...node,
-      data: {
-        ...node.data,
-        tables: newEntries[cardId] ?? [],
-      },
-    };
-  });
-}, { deep: true }); 
+watch(
+  tableEntries,
+  (newEntries) => {
+    if (nodes.value.length === 0) return
+    console.log('[CheatSheet] tableEntries zmienione, aktualizacja węzłów')
+
+    nodes.value = nodes.value.map((node) => {
+      const cardId = Number(node.id.replace('card-', ''))
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          tables: newEntries[cardId] ?? [],
+        },
+      }
+    })
+  },
+  { deep: true },
+)
 
 onMounted(async () => {
   //Logika dołączenia do pokojui
-  try{
-    await signalRService.start();
-    await signalRService.joinGameRoomAsAdmin(String(gameId.value));
+  try {
+    await signalRService.start()
+    await signalRService.joinGameRoomAsAdmin(String(gameId.value))
   } catch {
-    console.error("Wystąpił błąd podczas dołączania do pokoju SignalR");
+    console.error('Wystąpił błąd podczas dołączania do pokoju SignalR')
   }
-  signalRService.connection.on('CheatSheetUpdated', () => onCheatSheetUpdated());
+  signalRService.connection.on('CheatSheetUpdated', () => onCheatSheetUpdated())
   await Promise.all([fetchDeckId(), fetchTemasInfo()])
 
-  await Promise.all([
-    fetchEnablersMap(),
-    fetchDecisionCards(),
-    fetchItems(),
-  ])
+  await Promise.all([fetchEnablersMap(), fetchDecisionCards(), fetchItems()])
 
-  await fetchAllTeamsEntries(),
-
-  createNodesFromCards(cardTypes.value)
+  ;(await fetchAllTeamsEntries(), createNodesFromCards(cardTypes.value))
   createEdgesFromEnablers(enablers.value!, cardTypes.value)
 })
 
 onUnmounted(() => {
-  signalRService.connection.off('CheatSheetUpdated');
+  signalRService.connection.off('CheatSheetUpdated')
 })
 </script>
 

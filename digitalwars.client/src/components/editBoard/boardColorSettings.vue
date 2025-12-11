@@ -2,13 +2,13 @@
   <div>
     <!-- Sekcja wyboru kolorów podstawowych -->
     <div class="mt-3 md:mt-5">
-      <label class="block mb-3 text-sm font-medium text-white">Kolory podstawowe</label>
+      <label class="block mb-3 text-sm font-medium text-white">{{ t('basicColors') }}</label>
       <div class="flex flex-col sm:flex-row w-full gap-4">
         <!-- Kolor wypełnienia komórki -->
         <div class="border border-surface-700 py-3 px-4 rounded-lg flex-1 bg-surface-900">
-          <label for="cell-color" class="block mb-2 text-sm text-surface-200-300"
-            >Kolor komórki</label
-          >
+          <label for="cell-color" class="block mb-2 text-sm text-surface-200-300">{{
+            t('cellColor')
+          }}</label>
           <div class="flex items-center gap-3">
             <input
               id="cell-color"
@@ -18,7 +18,7 @@
               @input="(event) => handleColorInput(event, 'cell')"
             />
             <div class="flex flex-col flex-1 min-w-0">
-              <span class="text-xs text-surface-200-400">Wartość HEX:</span>
+              <span class="text-xs text-surface-200-400">{{ t('hexValue') }}:</span>
               <span class="font-mono text-sm text-white truncate">{{ cellColor }}</span>
             </div>
           </div>
@@ -26,9 +26,9 @@
 
         <!-- Kolor obramowania komórki -->
         <div class="border border-surface-700 py-3 px-4 rounded-lg flex-1 bg-surface-900">
-          <label for="border-color" class="block mb-2 text-sm text-surface-200-300"
-            >Kolor obramowania</label
-          >
+          <label for="border-color" class="block mb-2 text-sm text-surface-200-300">{{
+            t('borderColor')
+          }}</label>
           <div class="flex items-center gap-3">
             <input
               id="border-color"
@@ -38,7 +38,7 @@
               @input="(event) => handleColorInput(event, 'border')"
             />
             <div class="flex flex-col flex-1 min-w-0">
-              <span class="text-xs text-surface-200-400">Wartość HEX:</span>
+              <span class="text-xs text-surface-200-400">{{ t('hexValue') }}:</span>
               <span class="font-mono text-sm text-white truncate">{{ borderColor }}</span>
             </div>
           </div>
@@ -48,7 +48,7 @@
 
     <!-- Sekcja kolorów stref na planszy -->
     <div class="mt-8">
-      <label class="block mb-3 text-sm font-medium text-white">Kolory granic planszy</label>
+      <label class="block mb-3 text-sm font-medium text-white">{{ t('borderColors') }}</label>
 
       <!-- Lista istniejących kolorów stref -->
       <div class="border border-surface-700 p-3 rounded-lg mb-4 bg-surface-900">
@@ -99,7 +99,7 @@
             class="w-14 h-14 p-0 bg-transparent cursor-pointer flex-shrink-0"
           />
           <div class="flex flex-col flex-1 min-w-0">
-            <span class="text-xs text-surface-200-400">Nowy kolor:</span>
+            <span class="text-xs text-surface-200-400">{{ t('newColor') }}</span>
             <span class="font-mono text-sm text-white truncate">{{ newColor }}</span>
           </div>
         </div>
@@ -119,6 +119,9 @@ import type { PropType } from 'vue'
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 import { useToast } from 'vue-toastification'
 import Button from 'primevue/button'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const toast = useToast()
 const newColor = ref('#aabbcc')
@@ -164,7 +167,6 @@ const addColor = () => {
   const updatedColors = [...props.borderColors, newColor.value]
   emit('update:borderColors', updatedColors)
   emit('update')
-  toast.success('Dodano nowy kolor granicy!')
 }
 
 const removeColor = (index: number) => {
@@ -174,7 +176,7 @@ const removeColor = (index: number) => {
     emit('update:borderColors', updatedColors)
     emit('update')
   } else {
-    toast.warning('Musi istnieć co najmniej jeden kolor granicy!')
+    toast.warning(t('selectAtLeastOneColor'))
   }
 }
 

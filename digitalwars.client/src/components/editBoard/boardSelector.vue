@@ -1,7 +1,7 @@
 <template>
   <div class="w-full">
     <label for="board-selector" class="block mb-2 text-sm font-medium text-surface-0">
-      {{ activeView === 'add' ? 'Wybierz szablon planszy' : 'Wybierz planszę do edycji' }}
+      {{ activeView === 'add' ? t('selectBoardTemplate') : t('selectBoardToEdit') }}
     </label>
     <div class="flex gap-2 items-start">
       <Dropdown
@@ -11,7 +11,7 @@
         :options="boards"
         optionLabel="name"
         optionValue="boardId"
-        placeholder="Wybierz planszę"
+        :placeholder="t('selectBoardPlaceholder')"
         class="flex-1"
         :showClear="activeView === 'add'"
       >
@@ -40,6 +40,9 @@ import type { PropType } from 'vue'
 import Dropdown from 'primevue/dropdown'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import Button from 'primevue/button'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface Board {
   boardId: number

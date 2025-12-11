@@ -51,13 +51,19 @@
               class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 mr-1.5 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
               type="button"
             >
-              <font-awesome-icon :icon="showPassword ? faEye : faEyeSlash" class="h-4 w-4 sm:h-5 sm:w-5" />
+              <font-awesome-icon
+                :icon="showPassword ? faEye : faEyeSlash"
+                class="h-4 w-4 sm:h-5 sm:w-5"
+              />
             </button>
           </div>
         </div>
 
         <div class="space-y-1.5">
-          <label for="register-confirm-password" class="block font-bold text-xs sm:text-sm text-left">
+          <label
+            for="register-confirm-password"
+            class="block font-bold text-xs sm:text-sm text-left"
+          >
             {{ t('confirmPassword') }}
           </label>
           <div
@@ -75,7 +81,10 @@
               class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 mr-1.5 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
               type="button"
             >
-              <font-awesome-icon :icon="showConfirmPassword ? faEye : faEyeSlash" class="h-4 w-4 sm:h-5 sm:w-5" />
+              <font-awesome-icon
+                :icon="showConfirmPassword ? faEye : faEyeSlash"
+                class="h-4 w-4 sm:h-5 sm:w-5"
+              />
             </button>
           </div>
         </div>
@@ -145,7 +154,9 @@
             : 'bg-tertiary shadow-sm'
         "
       >
-        <span class="relative z-10">{{ isLoading ? t('creatingAccount') : t('createAccount') }}</span>
+        <span class="relative z-10">{{
+          isLoading ? t('creatingAccount') : t('createAccount')
+        }}</span>
         <div
           v-if="isRegisterFormValid"
           class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
@@ -256,7 +267,7 @@ const handleRegister = async () => {
     // --- KROK 5: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
 
-    emit('error');
+    emit('error')
 
     if (apiError.response?.data) {
       if (apiError.response.data === 'Email already exist.') {

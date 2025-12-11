@@ -12,9 +12,8 @@ import * as d3 from 'd3'
 import { useToast } from 'vue-toastification'
 import type { PropType, Ref } from 'vue'
 import type { BoardConfig, Pawn } from '@/interfaces/types'
-const jumpSound = new Audio('/jump.mp3');
-jumpSound.volume = 0.2;
-
+const jumpSound = new Audio('/jump.mp3')
+jumpSound.volume = 0.2
 
 const props = defineProps({
   config: {
@@ -116,7 +115,7 @@ const animatePawnMove = (
   baseScale: number,
   delay: number = 0,
 ) => {
-  jumpSound.play();
+  jumpSound.play()
   pawnGroup
     .transition()
     .delay(delay)
@@ -139,7 +138,10 @@ const drawBoard = (animate = true) => {
 
   const svg = d3.select(board.value)
 
-  const existingPawns = new Map<string | number, d3.Selection<SVGGElement, unknown, null, undefined>>()
+  const existingPawns = new Map<
+    string | number,
+    d3.Selection<SVGGElement, unknown, null, undefined>
+  >()
   svg.selectAll<SVGGElement, unknown>('.pawn-group').each(function () {
     const group = d3.select(this)
     const id = group.attr('data-pawn-id')
@@ -399,6 +401,5 @@ onMounted(() => {
     console.error('Błąd podczas pierwszego rysowania planszy:', error)
     toast.error(`Wystąpił krytyczny błąd podczas rysowania planszy: ${error.message}`)
   }
-  
 })
 </script>

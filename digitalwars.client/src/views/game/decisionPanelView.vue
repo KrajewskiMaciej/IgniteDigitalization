@@ -969,10 +969,10 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (gameId) signalService.leaveGameRoomAsAdmin(String(gameId))
-  signalService.connection.off('HistoryUpdated');
-  signalService.connection.off('PendingUpdated');
-  signalService.connection.off('BoardUpdated');
-  signalService.connection.off('BudgetUpdated');
+  signalService.connection.off('HistoryUpdated')
+  signalService.connection.off('PendingUpdated')
+  signalService.connection.off('BoardUpdated')
+  signalService.connection.off('BudgetUpdated')
 })
 </script>
 

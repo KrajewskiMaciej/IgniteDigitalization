@@ -80,7 +80,12 @@ const mouse = { x: 0, y: 0 }
 const smoothMouse = { x: 0, y: 0 }
 let headStartRotation = { x: 0, y: 0, z: 0 }
 
-const smoothDamp = (current: number, target: number, smoothing: number, deltaTime: number): number => {
+const smoothDamp = (
+  current: number,
+  target: number,
+  smoothing: number,
+  deltaTime: number,
+): number => {
   const factor = 1 - Math.exp(-smoothing * deltaTime)
   return current + (target - current) * factor
 }
@@ -426,7 +431,14 @@ const createPawn = (color: string) => {
 
 const createOrbitingObjects = () => {
   const objects = [
-    { type: 'pawn', color: COLORS.pawnRed, orbitRadius: 2.8, orbitSpeed: 0.18, orbitTilt: 0.4, startAngle: 0 },
+    {
+      type: 'pawn',
+      color: COLORS.pawnRed,
+      orbitRadius: 2.8,
+      orbitSpeed: 0.18,
+      orbitTilt: 0.4,
+      startAngle: 0,
+    },
     {
       type: 'pawn',
       color: COLORS.pawnGreen,
@@ -521,18 +533,40 @@ const updateRobotAnimation = (deltaTime: number, elapsed: number) => {
   const targetBodyRotY = smoothMouse.x * ANIMATION.body.limitY + idleY
   const targetBodyRotX = smoothMouse.y * ANIMATION.body.limitX + idleX
 
-  robot.rotation.y = smoothDamp(robot.rotation.y, targetBodyRotY, ANIMATION.body.smoothing, deltaTime)
-  robot.rotation.x = smoothDamp(robot.rotation.x, targetBodyRotX, ANIMATION.body.smoothing, deltaTime)
+  robot.rotation.y = smoothDamp(
+    robot.rotation.y,
+    targetBodyRotY,
+    ANIMATION.body.smoothing,
+    deltaTime,
+  )
+  robot.rotation.x = smoothDamp(
+    robot.rotation.x,
+    targetBodyRotX,
+    ANIMATION.body.smoothing,
+    deltaTime,
+  )
 
   if (robotHead && headStartRotation) {
-    const headIdleX = Math.sin(elapsed * ANIMATION.idle.speed * 1.2) * ANIMATION.idle.amplitude * 0.5
-    const headIdleY = Math.cos(elapsed * ANIMATION.idle.speed * 0.9) * ANIMATION.idle.amplitude * 0.3
+    const headIdleX =
+      Math.sin(elapsed * ANIMATION.idle.speed * 1.2) * ANIMATION.idle.amplitude * 0.5
+    const headIdleY =
+      Math.cos(elapsed * ANIMATION.idle.speed * 0.9) * ANIMATION.idle.amplitude * 0.3
 
     const targetHeadX = headStartRotation.x - smoothMouse.y * ANIMATION.head.limitX + headIdleX
     const targetHeadY = headStartRotation.y + headIdleY
 
-    robotHead.rotation.x = smoothDamp(robotHead.rotation.x, targetHeadX, ANIMATION.head.smoothing, deltaTime)
-    robotHead.rotation.y = smoothDamp(robotHead.rotation.y, targetHeadY, ANIMATION.head.smoothing, deltaTime)
+    robotHead.rotation.x = smoothDamp(
+      robotHead.rotation.x,
+      targetHeadX,
+      ANIMATION.head.smoothing,
+      deltaTime,
+    )
+    robotHead.rotation.y = smoothDamp(
+      robotHead.rotation.y,
+      targetHeadY,
+      ANIMATION.head.smoothing,
+      deltaTime,
+    )
   }
 }
 
@@ -550,10 +584,30 @@ const updateEyes = (deltaTime: number) => {
     targetY *= ratio
   }
 
-  leftPupil.position.x = smoothDamp(leftPupil.position.x, targetX, ANIMATION.eyes.smoothing, deltaTime)
-  leftPupil.position.y = smoothDamp(leftPupil.position.y, targetY, ANIMATION.eyes.smoothing, deltaTime)
-  rightPupil.position.x = smoothDamp(rightPupil.position.x, targetX, ANIMATION.eyes.smoothing, deltaTime)
-  rightPupil.position.y = smoothDamp(rightPupil.position.y, targetY, ANIMATION.eyes.smoothing, deltaTime)
+  leftPupil.position.x = smoothDamp(
+    leftPupil.position.x,
+    targetX,
+    ANIMATION.eyes.smoothing,
+    deltaTime,
+  )
+  leftPupil.position.y = smoothDamp(
+    leftPupil.position.y,
+    targetY,
+    ANIMATION.eyes.smoothing,
+    deltaTime,
+  )
+  rightPupil.position.x = smoothDamp(
+    rightPupil.position.x,
+    targetX,
+    ANIMATION.eyes.smoothing,
+    deltaTime,
+  )
+  rightPupil.position.y = smoothDamp(
+    rightPupil.position.y,
+    targetY,
+    ANIMATION.eyes.smoothing,
+    deltaTime,
+  )
 }
 
 const onMouseMove = (event: MouseEvent) => {
@@ -674,11 +728,11 @@ function setEmotion(emotion: 'happy' | 'sad') {
   faceSad.visible = true
 
   const fromHappy = emotion === 'sad'
-  
+
   const animate = () => {
     step++
     const progress = step / steps
-    
+
     const happyOpacity = fromHappy ? 1 - progress : progress
     const sadOpacity = fromHappy ? progress : 1 - progress
 
@@ -696,7 +750,7 @@ function setEmotion(emotion: 'happy' | 'sad') {
   animate()
 }
 
-defineExpose({setEmotion});
+defineExpose({ setEmotion })
 </script>
 
 <style scoped>

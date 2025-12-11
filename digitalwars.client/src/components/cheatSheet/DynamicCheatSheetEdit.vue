@@ -3,10 +3,10 @@
     <!-- Nagłówek -->
     <div class="text-center">
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
-        Enablery kart
+        {{ t('cardEnablers') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base">
-        Zobacz jak wygląda ścieżka gry danej talii kart i ją zedytuj
+        {{ t('manageCardEnablersDescription') }}
       </p>
     </div>
 
@@ -16,12 +16,12 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('deckSelection') }}</h2>
         </div>
 
         <div>
           <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            Wybierz talię kart:
+            {{ t('selectDeck') }}
           </label>
           <Dropdown
             id="deck-select"
@@ -46,10 +46,12 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faDiagramProject" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Drzewo decyzji</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('decisionTree') }}</h2>
         </div>
         <div v-if="isEditMode">
-          <span class="font-nasalization font-bold text-4xl text-primary-400">Tryb edycji</span>
+          <span class="font-nasalization font-bold text-4xl text-primary-400">{{
+            t('editMode')
+          }}</span>
         </div>
         <div class="flex gap-2 bg-surface-800 border border-surface-700 p-2 rounded-lg">
           <Button
@@ -165,7 +167,7 @@
       >
         <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
       </div>
-      <p class="text-surface-400 text-sm font-medium">Wybierz talię aby zarządzać enablerami</p>
+      <p class="text-surface-400 text-sm font-medium">{{ t('selectDeckToEditEnablers') }}</p>
     </div>
   </div>
 </template>
@@ -292,16 +294,21 @@ const handleSaveChanges = async () => {
     return
   }
 
-  console.log('Jakie mam zmiany do zrobienia ?', changes);
+  console.log('Jakie mam zmiany do zrobienia ?', changes)
 
   for (const change of changes) {
-    const enablerCardsIds = change.enablers.map((cardId : number) => getCardsId(cardId)).filter((id): id is number => id !== undefined)
+    const enablerCardsIds = change.enablers
+      .map((cardId: number) => getCardsId(cardId))
+      .filter((id): id is number => id !== undefined)
 
     try {
-      await apiServices.put(apiConfig.admin.cheatsheet.editCardsEnablers(change.cardsId),  enablerCardsIds )
+      await apiServices.put(
+        apiConfig.admin.cheatsheet.editCardsEnablers(change.cardsId),
+        enablerCardsIds,
+      )
     } catch {
-      toast.error(`Wystąpił błąd podczas edycji enablera karty ${change.cardId}`);
-      return;
+      toast.error(t('errorSavingEnablerChanges'))
+      return
     }
   }
 
@@ -384,7 +391,6 @@ const createNodesFromCards = (cardTypes: ICardTypes[]) => {
       },
     }))
   } catch {
-    toast.error('Błąd podczas generowania węzłów')
   } finally {
     isCreatingNodes.value = false
   }
@@ -423,7 +429,6 @@ const createEdgesFromEnablers = (
         }))
     })
   } catch {
-    toast.error('Błąd podczas generowania krawędzi pomiędzy węzłami')
   } finally {
     isCreatingEdges.value = false
   }
@@ -436,7 +441,7 @@ async function fetchDecks(): Promise<void> {
     decksData.value = response.data as Deck[]
   } catch (error) {
     console.error('Błąd przy pobieraniu talii:', error)
-    toast.error('Nie udało się pobrać dostępnych talii.')
+    toast.error(t('errorFetchingDecks'))
   } finally {
     isLoadingDecks.value = false
   }
@@ -451,7 +456,7 @@ const fetchEnablersMap = async (deckId: number) => {
     enablers.value = response.data.enablersMap
     cardTypes.value = response.data.cardTypes
   } catch {
-    toast.error('Wystąpił błąd podczas pobierania enablerów')
+    toast.error(t('errorFetchingEnablers'))
   }
 }
 
@@ -460,7 +465,7 @@ const fetchDecisionCards = async (deckId: number) => {
     const response = await apiServices.get<IDecisonCard[]>(apiConfig.admin.deck.cards(deckId))
     decisionCardsData.value = response.data
   } catch {
-    toast.error('Błąd podczas pobierania kart decyzji')
+    toast.error(t('errorFetchingDecisionCards'))
   }
 }
 
@@ -469,7 +474,7 @@ const fetchItems = async (deckId: number) => {
     const response = await apiServices.get<IItemCard[]>(apiConfig.admin.deck.items(deckId))
     itemsData.value = response.data
   } catch {
-    toast.error('Błąd podczas pobierania przedmiotów')
+    toast.error(t('errorFetchingItems'))
   }
 }
 

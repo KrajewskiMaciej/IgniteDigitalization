@@ -1,3 +1,6 @@
+import { error } from 'three'
+import { label } from 'three/src/nodes/TSL.js'
+
 export const en = {
   gameMaster: 'Game Master',
   player: 'Player',
@@ -72,6 +75,39 @@ export const en = {
   gamesCompleted: 'Games completed',
   licencesLeft: 'Licences left',
   buyMoreLicences: 'Buy more licences',
+  gameName: 'Game name',
+  gameNamePlaceholder: 'Game name...',
+  selectBoardPlaceholder: 'Select board...',
+  selectBoard: 'Select board',
+  selectRivalBoard: 'Select rival board',
+  selectRivalBoardPlaceholder: 'Select rival board...',
+  selectDeck: 'Select deck',
+  selectDeckPlaceholder: 'Select deck...',
+  selectGameType: 'Select game type',
+  remoteGame: 'Remote game',
+  stationaryGame: 'Stationary game',
+  next: 'Next',
+  previous: 'Previous',
+  numberOfTeams: 'Number of teams',
+  numberOfBits: 'Number of bits to start with',
+  selectTeamToEdit: 'Select team to edit',
+  selectTeamToEditPlaceholder: 'Select team...',
+  editing: 'You are editing:',
+  teamName: 'Team name',
+  teamColor: 'Team color',
+  canTeamMakeDecisions: 'Can the team make independent decisions?',
+  gmControl: "GM's Control",
+  independentDecisions: 'Independent decisions',
+  gmControlDescription: 'The team can suggest decisions but the Game Master must approve them.',
+  independentDecisionsDescription:
+    'The team makes decisions directly from the device and does not require Game Master approval.',
+  selectProcessesForGame: 'Select processes for the game',
+  loadingProcesses: 'Loading processes...',
+  noProcessesAvailableForSelectedDeck: 'No processes available for the selected deck.',
+  enterGameName: 'Enter game name',
+  pleaseSelectAtLeastOneProcess: 'Please select at least one process for the game.',
+  numberOfBitsMustBeBetween: 'Number of bits to start with must be between 1 and 100000.',
+  pleaseEnterTeamNames: 'Please enter team names.',
 
   //Scan QR
   scanQRCode: 'Scan QR Code',
@@ -100,6 +136,46 @@ export const en = {
   warningNotEnoughBudget: 'You do not have enough bits to play this card.',
   teamHasNotEnoughBits: 'Team {teamName} does not have enough bits to play this card.',
   accept: 'Accept',
+  errorFetchingDeckId: 'An error occurred while fetching the deck ID. Please try again.',
+  errorFetchingTeamsInfo: 'An error occurred while fetching teams info. Please try again.',
+  errorFetchingEnablers: 'An error occurred while fetching enablers. Please try again.',
+  errorFetchingDecisionCards: 'An error occurred while fetching decision cards. Please try again.',
+  errorFetchingItems: 'An error occurred while fetching items. Please try again.',
+  errorFetchingDecks: 'An error occurred while fetching decks. Please try again.',
+  errorSavingEnablerChanges: 'An error occurred while saving enabler changes. Please try again.',
+  errorFetchigBoards: 'An error occurred while fetching boards. Please try again.',
+  errorFetchingProcesses: 'An error occurred while fetching processes. Please try again.',
+  errorCreatingGame: 'An error occurred while creating the game. Please try again.',
+
+  //Warnings
+  selectAtLeastOneColor: 'Select at least one color to add a border color.',
+
+  //Game Board
+  cellColor: 'Cell color',
+  hexValue: 'Hex value',
+  basicColors: 'Basic colors',
+  borderColors: 'Board border colors',
+  newColor: 'New color',
+  borderColor: 'Border color',
+  editBoard: 'Edit board',
+  addNewBoard: 'Add new board',
+  descriptionLeft: 'Description on the left',
+  descriptionRight: 'Description on the right',
+  descriptionDown: 'Description at the bottom',
+  descriptionBottomPlaceholder: 'Enter bottom description...',
+  descriptionLeftPlaceholder: 'Enter left description...',
+  boardName: 'Board name',
+  boardNamePlaceholder: 'Board name...',
+  columns: 'Columns',
+  rows: 'Rows',
+  lablesRight: 'Labels on the right',
+  labelsTop: 'Top labels',
+  newLabelTopPlaceholder: 'New top label...',
+  newLabelRightPlaceholder: 'New right label...',
+  label: 'Label',
+  labelCannotBeEmpty: 'Label cannot be empty!',
+  atLeastObeOneRightLabel: 'At least one right label must exist!',
+  atLeastOneUpLabel: 'At least one top label must exist!',
 
   //Dynamic cheat sheet
   dynamicCheatSheet: 'Dynamic game cheat sheet',
@@ -114,8 +190,20 @@ export const en = {
   editMode: 'Edit mode',
   saveChanges: 'Save changes',
   rejectChanges: 'Reject changes',
+  legend: 'Legend',
+  decisionCard: 'Decision card',
+  transitionBetweenCards: 'Transition between cards',
+  cardEnablers: 'Card enablers',
+  manageCardEnablersDescription:
+    'Manage card enablers that affect the availability of decision cards for teams during the game.',
+  deckSelection: 'Deck selection',
+  decisionTree: 'Decision tree',
+  selectDeckToEditEnablers: 'Select deck to edit card enablers',
 
   //
   suggectCard: 'Suggest Card',
   playCard: 'Play Card',
+
+  //Footer
+  allRightsReserved: 'All rights reserved.',
 }

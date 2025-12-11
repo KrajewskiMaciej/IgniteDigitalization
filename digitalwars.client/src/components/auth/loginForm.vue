@@ -37,7 +37,10 @@
             class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 mr-1.5 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
             type="button"
           >
-            <font-awesome-icon :icon="showPassword ? faEye : faEyeSlash" class="h-4 w-4 sm:h-5 sm:w-5" />
+            <font-awesome-icon
+              :icon="showPassword ? faEye : faEyeSlash"
+              class="h-4 w-4 sm:h-5 sm:w-5"
+            />
           </button>
         </div>
       </div>
@@ -151,7 +154,7 @@ const handleLogin = async () => {
     // Jawne otypowanie błędu
     // --- KROK 5: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
-    emit('error');
+    emit('error')
     if (apiError.response?.data) {
       if (apiError.response.data === 'Invalid credentials') {
         toast.error(t('invalidEmailOrPassword'), {

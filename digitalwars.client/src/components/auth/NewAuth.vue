@@ -1,26 +1,28 @@
 <template>
-  <div 
-    class=" animate-fade absolute inset-0 z-20 w-screen h-screen bg-surface-900 text-surface-0" 
+  <div
+    class="animate-fade absolute inset-0 z-20 w-screen h-screen bg-surface-900 text-surface-0"
     :class="isBigScreen ? 'grid grid-cols-2' : ''"
   >
     <div v-if="isBigScreen">
       <RobotAuth ref="robotRef" />
     </div>
-    
-    <div 
+
+    <div
       class="relative flex justify-center items-center h-full"
       :class="isBigScreen ? 'border-l border-primary-500/30' : ''"
     >
-      <div class="absolute inset-0 bg-gradient-to-br from-primary-500/5 via-transparent to-primary-400/5" />
-      
-     <button
+      <div
+        class="absolute inset-0 bg-gradient-to-br from-primary-500/5 via-transparent to-primary-400/5"
+      />
+
+      <button
         @click="emit('close')"
         class="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full text-surface-0 hover:text-primary-400 hover:bg-surface-700 backdrop-blur-sm transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30"
       >
         <font-awesome-icon :icon="faXmark" class="text-xl" />
       </button>
 
-      <div 
+      <div
         class="relative z-10 w-full max-w-lg px-6 sm:px-8 md:px-12 py-8 overflow-y-auto max-h-screen"
       >
         <div
@@ -101,15 +103,15 @@ import ForgotPassword from './forgotPassword.vue'
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
-const isBigScreen = breakpoints.greater('lg');
-const { t } = useI18n();
-const activeView = ref<'login' | 'register' | 'forgotPassword' | 'confirmEmail'>('login');
-const emailToConfirm = ref<string>('');
-const robotRef = ref<InstanceType<typeof RobotAuth> | null>(null);
+const isBigScreen = breakpoints.greater('lg')
+const { t } = useI18n()
+const activeView = ref<'login' | 'register' | 'forgotPassword' | 'confirmEmail'>('login')
+const emailToConfirm = ref<string>('')
+const robotRef = ref<InstanceType<typeof RobotAuth> | null>(null)
 
 const emit = defineEmits<{
   (e: 'close'): void
-}>();
+}>()
 
 const handleForgotPassword = () => {
   activeView.value = 'forgotPassword'
@@ -125,8 +127,8 @@ const handleSwitchToConfirmEmail = (email: string) => {
 }
 
 const handleError = () => {
-   robotRef.value?.setEmotion('sad')
-  
+  robotRef.value?.setEmotion('sad')
+
   setTimeout(() => {
     robotRef.value?.setEmotion('happy')
   }, 5000)

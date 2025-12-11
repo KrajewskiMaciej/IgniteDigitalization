@@ -3,13 +3,13 @@
     <!-- Opis dolny (pod planszą) -->
     <div class="flex-1">
       <label for="description-down" class="block mb-2 text-sm font-medium text-white">
-        Opis dolny
+        {{ t('bottomDescription') }}
       </label>
       <InputText
         id="description-down"
         :modelValue="descriptionDown"
         @update:modelValue="(value) => handleInput(value, 'down')"
-        placeholder="Wprowadź opis dolny"
+        :placeholder="t('descriptionBottomPlaceholder')"
         class="w-full"
       />
     </div>
@@ -17,13 +17,13 @@
     <!-- Opis lewy (po lewej stronie planszy) -->
     <div class="flex-1">
       <label for="description-left" class="block mb-2 text-sm font-medium text-white">
-        Opis z lewej strony
+        {{ t('leftDescription') }}
       </label>
       <InputText
         id="description-left"
         :modelValue="descriptionLeft"
         @update:modelValue="(value) => handleInput(value, 'left')"
-        placeholder="Wprowadź opis z lewej strony"
+        :placeholder="t('descriptionLeftPlaceholder')"
         class="w-full"
       />
     </div>
@@ -32,6 +32,9 @@
 
 <script setup lang="ts">
 import InputText from 'primevue/inputtext'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 defineProps({
   descriptionDown: {

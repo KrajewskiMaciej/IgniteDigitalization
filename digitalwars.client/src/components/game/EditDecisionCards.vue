@@ -2,9 +2,7 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <!-- Nagłówek -->
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
-        Edycja Kart
-      </h1>
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2"></h1>
       <p class="text-surface-400 text-sm md:text-base">Zarządzaj kartami w talii</p>
     </div>
 
@@ -348,6 +346,9 @@ import ProgressSpinner from 'primevue/progressspinner'
 import apiServices from '@/services/apiServices'
 import type { IFeedback, IFeedbacksResponse } from '@/types/Feedbacks'
 import { truncateString } from '@/composables/truncateString'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Deck {

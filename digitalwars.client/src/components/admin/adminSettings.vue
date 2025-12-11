@@ -43,7 +43,9 @@
               :class="{ 'text-accent font-bold': activeView === 'licenses' }"
             >
               <font-awesome-icon :icon="faIdCard" class="h-3 mr-2" />
-              <button @click="activeView = 'licenses'" class="text-left w-full">{{ t('licenses') }}</button>
+              <button @click="activeView = 'licenses'" class="text-left w-full">
+                {{ t('licenses') }}
+              </button>
             </li>
             <hr class="border-lgray-accent w-full mx-auto" />
           </ul>
@@ -76,7 +78,7 @@ import basicAdminSettings from './basicAdminSettings.vue'
 import { useI18n } from 'vue-i18n'
 
 const activeView = ref('general')
-const { t } = useI18n();
+const { t } = useI18n()
 
 const props = defineProps({
   isVisible: {

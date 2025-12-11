@@ -2,7 +2,7 @@
   <div class="flex flex-col lg:flex-row w-full gap-4 mt-3 md:mt-5">
     <!-- Etykiety górne -->
     <div class="flex-1">
-      <label class="block mb-2 text-sm font-medium text-white">Etykiety górne</label>
+      <label class="block mb-2 text-sm font-medium text-white">{{ t('labelsTop') }}</label>
 
       <!-- Lista istniejących etykiet górnych -->
       <div class="border-2 border-surface-700 px-3 py-3 rounded-lg mb-4 bg-surface-900">
@@ -16,7 +16,7 @@
               :modelValue="label"
               @update:modelValue="(value) => updateLabelUp(index, value)"
               class="flex-1"
-              placeholder="Etykieta"
+              :placeholder="t('label')"
             />
             <!-- Przycisk usuwania etykiety -->
             <Button
@@ -28,7 +28,6 @@
               rounded
               size="small"
               class="flex-shrink-0"
-              :title="`Usuń etykietę ${index + 1}`"
             >
               <font-awesome-icon :icon="faMinus" class="h-3.5" />
             </Button>
@@ -42,7 +41,7 @@
           v-model="newLabelUp"
           @keyup.enter="addLabelUp"
           class="flex-1"
-          placeholder="Nowa etykieta górna"
+          :placeholder="t('newLabelTopPlaceholder')"
         />
         <Button type="button" @click="addLabelUp" class="flex-shrink-0" label="Dodaj">
           <template #icon>
@@ -54,7 +53,7 @@
 
     <!-- Etykiety prawe -->
     <div class="flex-1">
-      <label class="block mb-2 text-sm font-medium text-white">Etykiety prawe</label>
+      <label class="block mb-2 text-sm font-medium text-white">{{ t('labelsRight') }}</label>
 
       <!-- Lista istniejących etykiet prawych -->
       <div class="border-2 border-surface-700 px-3 py-3 rounded-lg mb-4 bg-surface-900">
@@ -68,7 +67,7 @@
               :modelValue="label"
               @update:modelValue="(value) => updateLabelRight(index, value)"
               class="flex-1"
-              placeholder="Etykieta"
+              :placeholder="t('label')"
             />
             <!-- Przycisk usuwania etykiety -->
             <Button
@@ -80,7 +79,6 @@
               rounded
               size="small"
               class="flex-shrink-0"
-              :title="`Usuń etykietę ${index + 1}`"
             >
               <font-awesome-icon :icon="faMinus" class="h-3.5" />
             </Button>
@@ -94,7 +92,7 @@
           v-model="newLabelRight"
           @keyup.enter="addLabelRight"
           class="flex-1"
-          placeholder="Nowa etykieta prawa"
+          :placeholder="t('newLabelRightPlaceholder')"
         />
         <Button type="button" @click="addLabelRight" class="flex-shrink-0" label="Dodaj">
           <template #icon>
@@ -113,6 +111,9 @@ import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 import { useToast } from 'vue-toastification'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const toast = useToast()
 const newLabelUp = ref('')
@@ -139,9 +140,8 @@ const addLabelUp = () => {
     emit('update:labelsUp', updatedLabels)
     newLabelUp.value = ''
     emit('update')
-    toast.success('Dodano etykietę górną!')
   } else {
-    toast.warning('Etykieta nie może być pusta!')
+    toast.warning(t('labelCannotBeEmpty'))
   }
 }
 
@@ -151,9 +151,8 @@ const removeLabelUp = (index: number) => {
     updatedLabels.splice(index, 1)
     emit('update:labelsUp', updatedLabels)
     emit('update')
-    toast.success('Usunięto etykietę górną!')
   } else {
-    toast.warning('Musi istnieć co najmniej jedna etykieta górna!')
+    toast.warning(t('atLeastOneUpLabel'))
   }
 }
 
@@ -171,9 +170,8 @@ const addLabelRight = () => {
     emit('update:labelsRight', updatedLabels)
     newLabelRight.value = ''
     emit('update')
-    toast.success('Dodano etykietę prawą!')
   } else {
-    toast.warning('Etykieta nie może być pusta!')
+    toast.warning(t('labelCannotBeEmpty'))
   }
 }
 
@@ -183,9 +181,8 @@ const removeLabelRight = (index: number) => {
     updatedLabels.splice(index, 1)
     emit('update:labelsRight', updatedLabels)
     emit('update')
-    toast.success('Usunięto etykietę prawą!')
   } else {
-    toast.warning('Musi istnieć co najmniej jedna etykieta prawa!')
+    toast.warning(t('atLeastObeOneRightLabel'))
   }
 }
 

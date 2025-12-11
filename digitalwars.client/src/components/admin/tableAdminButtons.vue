@@ -42,7 +42,7 @@ import apiService from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
 import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 // --- DEFINICJA TYPÓW ---
 type GameStatus = 'During' | 'Paused' | 'End'

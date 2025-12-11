@@ -3,13 +3,13 @@
     <!-- Pole nazwy planszy -->
     <div class="mt-3 md:mt-5">
       <label for="board-name" class="block mb-2 text-sm font-medium text-white">
-        Nazwa planszy
+        {{ t('boardName') }}
       </label>
       <InputText
         id="board-name"
         :modelValue="name"
         @update:modelValue="handleInput"
-        placeholder="Wprowadź nazwę planszy"
+        :placeholder="t('boardNamePlaceholder')"
         class="w-full"
       />
     </div>
@@ -20,14 +20,14 @@
         class="border border-surface-700 px-3 py-2 rounded-lg w-60 text-center text-white bg-surface-900"
       >
         <span class="font-medium"
-          >Kolumny: <span class="text-primary-400">{{ cols }}</span></span
+          >{{ t('columns') }}: <span class="text-primary-400">{{ cols }}</span></span
         >
       </div>
       <div
         class="border border-surface-700 px-3 py-2 rounded-lg w-60 text-center text-white bg-surface-900"
       >
         <span class="font-medium"
-          >Rzędy: <span class="text-primary-400">{{ rows }}</span></span
+          >{{ t('rows') }}: <span class="text-primary-400">{{ rows }}</span></span
         >
       </div>
     </div>
@@ -36,6 +36,9 @@
 
 <script setup lang="ts">
 import InputText from 'primevue/inputtext'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 defineProps({
   name: {

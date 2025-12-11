@@ -1,3 +1,6 @@
+import { all } from 'axios'
+import { label } from 'three/src/nodes/TSL.js'
+
 export const pl = {
   gameMaster: 'Game Master',
   player: 'Gracz',
@@ -53,7 +56,6 @@ export const pl = {
   accountSettings: 'Ustawienia konta',
   licenses: 'Licencje',
 
-
   //Game
   createNewGame: 'Utwórz nową grę',
   stopAllGames: 'Zatrzymaj wszystkie gry',
@@ -75,6 +77,38 @@ export const pl = {
   gamesPlayed: 'Rozegrane gry',
   licencesLeft: 'Pozostałe licencje',
   buyMoreLicences: 'Kup więcej licencji',
+  gameNamePlaceholder: 'Nazwa gry...',
+  selectBoardPlaceholder: 'Wybierz planszę...',
+  selectDeckPlaceholder: 'Wybierz talię kart...',
+  selectGameType: 'Wybierz typ rozgrywki',
+  remoteGame: 'Gra zdalna',
+  stationaryGame: 'Gra stacjonarna',
+  next: 'Dalej',
+  previous: 'Wstecz',
+  numberOfTeams: 'Liczba drużyn',
+  numberOfBits: 'Liczba bitów na start',
+  selectTeamToEdit: 'Wybierz drużynę do edycji',
+  selectTeamToEditPlaceholder: 'Wybierz drużynę...',
+  editing: 'Edytujesz:',
+  teamName: 'Nazwa drużyny',
+  teanColor: 'Kolor drużyny',
+  canTeamMakeDecisions: 'Czy drużyna może podejmować samodzielne decyzje?',
+  gmControl: "Kontrola GM'a",
+  independentDecisions: 'Samodzielne decyzje',
+  gmControlDescription:
+    'Drużyna ma możliwość zasugerowania decyzji ale Game Master musi ją zaakceptować',
+  independentDecisionsDescription:
+    'Drużyna podejmuje decyzje bezpośrednio z urządzenia i nie potrzebuje akceptacji decyzji przez Game Mastera',
+  selectProcessesForGame: 'Wybierz procesy dla gry',
+  loadingProcesses: 'Ładowanie procesów...',
+  noProcessesAvailableForSelectedDeck: 'Brak dostępnych procesów dla wybranej talii.',
+  enterGameName: 'Wprowadź nazwę gry',
+  selectBoard: 'Wybierz planszę',
+  selectRivalBoard: 'Wybierz planszę konkurencji',
+  selectDeck: 'Wybierz talię kart',
+  pleaseEnterTeamNames: 'Proszę wprowadzić nazwy drużyn.',
+  numberOfBitsMustBeBetween: 'Liczba bitów na start musi być pomiędzy 1 a 100000.',
+  pleaseSelectAtLeastOneProcess: 'Proszę wybrać co najmniej jeden proces do gry.',
 
   //Scan QR
   scanQRCode: 'Skanuj kod QR',
@@ -95,6 +129,7 @@ export const pl = {
   moderatePassword: 'Umiarkowane hasło',
   goodPassword: 'Dobre hasło',
   strongPassword: 'Silne hasło',
+
   //Erorr
   errorServerUnavailable: 'Serwer jest niedostępny. Spróbuj ponownie później.',
   errorBoardDeleteConflict: 'Nie można usunąć planszy, ponieważ jest powiązana z istniejącą grą.',
@@ -102,6 +137,53 @@ export const pl = {
   teamHasNotEnoughBits:
     'Drużyna {teamName} nie ma wystarczającej ilości bitów, aby zagrać tę kartę.',
   accept: 'Akceptuj',
+  errorFetchingDeckId: 'Wystąpił błąd podczas pobierania identyfikatora talii. Spróbuj ponownie.',
+  errorFetchingTeamsInfo:
+    'Wystąpił błąd podczas pobierania informacji o zespołach. Spróbuj ponownie.',
+  errorFetchingEnablers:
+    'Wystąpił błąd podczas pobierania informacji o aktywatorach. Spróbuj ponownie.',
+  errorFetchingDecisionCards: 'Wystąpił błąd podczas pobierania kart decyzji. Spróbuj ponownie.',
+  errorFetchingItems: 'Wystąpił błąd podczas pobierania przedmiotów. Spróbuj ponownie.',
+  errorFetchingDecks: 'Wystąpił błąd podczas pobierania talii. Spróbuj ponownie.',
+  errorSavingEnablerChanges:
+    'Wystąpił błąd podczas zapisywania zmian aktywatorów kart. Spróbuj ponownie.',
+  errorFetchigBoards: 'Wystąpił błąd podczas pobierania plansz. Spróbuj ponownie.',
+  errorFetchingProcesses: 'Wystąpił błąd podczas pobierania procesów. Spróbuj ponownie.',
+  errorCreatingGame: 'Wystąpił błąd podczas tworzenia gry. Spróbuj ponownie.',
+
+  //Decision cards
+
+  //Warnings
+  selectAtLeastOneColor: 'Wybierz co najmniej jeden kolor granicy planszy.',
+
+  //Game Board
+  cellColor: 'Kolor komórki',
+  basicColors: 'Podstawowe kolory',
+  hexValue: 'Wartość szesnastkowa',
+  borderColor: 'Kolor obramowania',
+  borderColors: 'Kolory granic planszy',
+  newColor: 'Nowy kolor',
+  editBoard: 'Edytuj planszę',
+  addNewBoard: 'Dodaj nową planszę',
+  descriptionDown: 'Opis poniżej planszy',
+  descriptionLeft: 'Opis po lewej stronie planszy',
+  descriptionBottomPlaceholder: 'Wprowadź opis poniżej planszy...',
+  descriptionLeftPlaceholder: 'Wprowadź opis po lewej stronie planszy...',
+  boardName: 'Nazwa planszy',
+  boardNamePlaceholder: 'Nazwa planszy...',
+  columns: 'Kolumny',
+  rows: 'Wiersze',
+  lablesRight: 'Etykiety po prawej stronie',
+  lablesUp: 'Etykiety u góry',
+  newLabelTopPlaceholder: 'Nowa etykieta górna...',
+  newLabelRightPlaceholder: 'Nowa etykieta prawa...',
+  label: 'Etykieta',
+  labelCannotBeEmpty: 'Etykieta nie może być pusta!',
+  atLeastObeOneRightLabel: 'Musi istnieć co najmniej jedna etykieta prawa!',
+  atLeastOneUpLabel: 'Musi istnieć co najmniej jedna etykieta górna!',
+  selectBoardTemplate: 'Wybierz szablon planszy',
+  selectBoardToEdit: 'Wybierz planszę do edycji',
+  selectRivalBoardPlaceholder: 'Wybierz planszę konkurencji...',
 
   //Dynamic cheat sheet
   dynamicCheatSheet: 'Dynamiczna ściąga gry',
@@ -116,7 +198,19 @@ export const pl = {
   editMode: 'Tryb edycji',
   saveChanges: 'Zapisz zmiany',
   rejectChanges: 'Odrzuć zmiany',
+  legend: 'Legenda',
+  decisionCard: 'Karta decyzji',
+  transitionBetweenCards: 'Przejście między kartami',
+  cardEnablers: 'Aktywatory kart',
+  manageCardEnablersDescription:
+    'Zarządzaj aktywatorami kart, które wpływają na dostępność kart decyzji dla zespołów podczas gry.',
+  deckSelection: 'Wybór talii',
+  decisionTree: 'Drzewo decyzyji',
+  selectDeckToEditEnablers: 'Wybierz talię, aby edytować aktywatory kart',
 
   suggectCard: 'Zasugeruj kartę',
   playCard: 'Zagraj kartę',
+
+  //Footer
+  allRightsReserved: 'Wszelkie prawa zastrzeżone.',
 }

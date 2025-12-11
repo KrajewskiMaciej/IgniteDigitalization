@@ -1,9 +1,12 @@
 <template>
   <div class="w-full h-full animate-fade-right">
     <div class="flex justify-center items-center">
-      <font-awesome-icon :icon="faEnvelopeOpen" class="mb-3 sm:mb-4 text-5xl sm:text-6xl text-accent" />
+      <font-awesome-icon
+        :icon="faEnvelopeOpen"
+        class="mb-3 sm:mb-4 text-5xl sm:text-6xl text-accent"
+      />
     </div>
-    
+
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-3 sm:mb-4 text-center">
       {{ t('registrationSuccessful') }}
     </h2>
@@ -20,7 +23,7 @@
       <p>{{ t('weHaveSentVerificationLink') }}</p>
       <p class="text-xs sm:text-sm text-gray-400">{{ t('checkSpamFolder') }}</p>
     </div>
-    
+
     <div class="flex justify-center items-center">
       <button
         @click="emit('backToLogin')"

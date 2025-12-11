@@ -55,7 +55,10 @@
 
   <div v-else class="w-full h-full animate-fade-right">
     <div class="flex justify-center items-center">
-      <font-awesome-icon :icon="faEnvelopeCircleCheck" class="mb-3 sm:mb-4 text-5xl sm:text-6xl text-accent" />
+      <font-awesome-icon
+        :icon="faEnvelopeCircleCheck"
+        class="mb-3 sm:mb-4 text-5xl sm:text-6xl text-accent"
+      />
     </div>
 
     <h2 class="text-lg sm:text-xl md:text-2xl font-nasalization mb-3 sm:mb-4 text-center">
@@ -141,7 +144,7 @@ const handleSendEmail = async () => {
     const apiError = error as ApiError
     const status: number = apiError.status
 
-    emit('error');
+    emit('error')
 
     console.log('Jaki błąd otrzymuje:', apiError.status)
 

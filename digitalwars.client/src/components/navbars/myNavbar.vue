@@ -13,11 +13,10 @@ import logo from '@/assets/logos/ITM_poziom_biale.png'
 import { useBreakpoints } from '@vueuse/core'
 import { ref } from 'vue'
 
-const clickCount = ref<number>(0);
-
+const clickCount = ref<number>(0)
 
 const emit = defineEmits<{
-  (e: 'open-video'):void
+  (e: 'open-video'): void
 }>()
 
 const onClickDigitalWarsLogo = () => {
@@ -25,7 +24,7 @@ const onClickDigitalWarsLogo = () => {
 
   if (clickCount.value === 10) {
     clickCount.value = 0
-    emit('open-video');
+    emit('open-video')
   }
 
   setTimeout(() => {
