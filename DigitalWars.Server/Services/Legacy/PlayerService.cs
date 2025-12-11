@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.SignalR;
+using backend.Hubs;
 
 namespace backend.Services
 {
@@ -58,8 +59,8 @@ namespace backend.Services
                     gls.Games_Logs.Is_Approved == true &&
                     gls.Games_Logs.Status == true
                 )
-                
-                    
+
+
                 .GroupBy(gls => gls.Games_Processes!.Processes_Id)
                 .Select(group => new
                 {

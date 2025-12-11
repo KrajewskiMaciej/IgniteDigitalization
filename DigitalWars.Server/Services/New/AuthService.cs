@@ -4,11 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using backend.Dtos;
+using DigitalWars.Server.Dtos;
 using BCrypt.Net;
+using backend.Services;
 
 
-namespace backend.Services
+namespace DigitalWars.Server.Services
 {
     public interface IAuthService
     {
@@ -62,7 +63,7 @@ namespace backend.Services
             if (await _context.Users.AnyAsync(u => u.Email == email))
             {
                 // Zamiast "throw", zwracamy obiekt błędu
-                return new ErrorResponseDto { ErrorCode = "EmailExist", Message = "Ten Email już istnieje." };
+                return new ErrorResponseDto { ErrorCode = "EMAIL_EXIST", Message = "emailExist" };
             }
 
             var user = new User
@@ -118,7 +119,7 @@ namespace backend.Services
             {
                 return false;
             }
-        
+
             user.Link_Token = Guid.NewGuid().ToString();
             user.Token_Expire_Date = DateTime.UtcNow.AddMinutes(15);
             await _context.SaveChangesAsync();

@@ -1,11 +1,18 @@
 using backend.Data;
 using backend.Initializers;
 using backend.Services;
-using backend.Settings;
+using DigitalWars.Server.Services;
+using DigitalWars.Server.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using QuestPDF.Infrastructure;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc;
+using backend.Hubs;
+
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -47,12 +54,12 @@ builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("F
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IProvisioningService, ProvisioningService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<backend.Services.IAuthService, backend.Services.AuthService>();
+builder.Services.AddScoped<backend.Services.IPlayerService, backend.Services.PlayerService>();
+builder.Services.AddScoped<backend.Services.IGameService, backend.Services.GameService>();
 builder.Services.AddScoped<IBoardService, BoardService>();
-builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IPlayerQueryService, PlayerQueryService>();
-builder.Services.AddScoped<IPlayerActionService, PlayerActionService>();
+builder.Services.AddScoped<backend.Services.IPlayerActionService, backend.Services.PlayerActionService>();
 builder.Services.AddScoped<ICheatsheetService, CheatsheetService>();
 builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx =>
 {
@@ -60,6 +67,12 @@ builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx =>
     return new BackgroundTaskQueue(100);
 });
 builder.Services.AddHostedService<QueuedHostedService>();
+
+// SERWISY DO NOWYCH ENDPOINTÓW
+builder.Services.AddScoped<DigitalWars.Server.Services.IPlayerService, DigitalWars.Server.Services.PlayerService>();
+builder.Services.AddScoped<DigitalWars.Server.Services.IAuthService, DigitalWars.Server.Services.AuthService>();
+builder.Services.AddScoped<DigitalWars.Server.Services.IPlayerActionService, DigitalWars.Server.Services.PlayerActionService>();
+builder.Services.AddScoped<DigitalWars.Server.Services.IGameService, DigitalWars.Server.Services.GameService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -91,9 +104,38 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 startupLogger.LogInformation("[API] Zarejestrowano serwisy aplikacji: EmailService, JwtService, GameService itd.");
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+});
+
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddSwaggerGen(options =>
+{
+    // Dodaj opis dla każdej wersji API
+    var provider = builder.Services.BuildServiceProvider()
+        .GetRequiredService<IApiVersionDescriptionProvider>();
+
+    foreach (var description in provider.ApiVersionDescriptions)
+    {
+        options.SwaggerDoc(description.GroupName, new Microsoft.OpenApi.Models.OpenApiInfo()
+        {
+            Title = $"DigitalWars API {description.ApiVersion}",
+            Version = description.ApiVersion.ToString(),
+            Description = "Dokumentacja API z wersjonowaniem"
+        });
+    }
+});
 
 
 var app = builder.Build();
@@ -109,7 +151,15 @@ if (app.Environment.IsDevelopment())
 {
     // Konfiguracja dla LOKALNEGO TESTOWANIA
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
+                description.GroupName.ToUpperInvariant());
+        }
+    });
 
     // Użyj CORS, aby pozwolić na komunikację z serwerem deweloperskim Vue
     app.UseCors(policy => policy

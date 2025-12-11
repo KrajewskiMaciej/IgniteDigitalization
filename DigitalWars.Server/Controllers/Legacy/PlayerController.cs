@@ -10,6 +10,7 @@ using System.Linq;
 using System.Collections.Generic;
 using backend.Exceptions;
 using Microsoft.AspNetCore.SignalR;
+using backend.Hubs;
 
 namespace backend.Controllers
 {

@@ -1,4 +1,4 @@
-namespace backend.Settings
+namespace DigitalWars.Server.Settings
 {
     public class FrontendSettings
     {

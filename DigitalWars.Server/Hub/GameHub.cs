@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace backend.Services
+namespace backend.Hubs
 {
     public class GameHub : Hub
     {
@@ -9,7 +9,7 @@ namespace backend.Services
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, $"game-{gameId}");
         }
-    
+
         // Metoda, którą klient wywołuje, aby opuścić pokój
         public async Task LeaveGameRoomAsAdmin(string gameId)
         {
