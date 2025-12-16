@@ -30,7 +30,7 @@
                   : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
               "
             >
-              <span class="relative z-10">Karty</span>
+              <span class="relative z-10">{{ t('cards') }}</span>
               <div
                 v-if="mobileView !== 'cards'"
                 class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
@@ -46,7 +46,7 @@
                   : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
               "
             >
-              <span class="relative z-10">Plansza</span>
+              <span class="relative z-10">{{ t('yourBoard') }}</span>
               <div
                 v-if="mobileView !== 'board'"
                 class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
@@ -62,7 +62,7 @@
                   : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
               "
             >
-              <span class="relative z-10">Rynek</span>
+              <span class="relative z-10">{{ t('market') }}</span>
               <div
                 v-if="mobileView !== 'market'"
                 class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
@@ -101,7 +101,7 @@
                       : 'bg-surface-800 text-surface-300 border border-primary-500/30'
                   "
                 >
-                  Decyzje
+                  {{ t('decisions') }}
                 </button>
                 <button
                   @click="showingDecisionCards = false"
@@ -112,7 +112,7 @@
                       : 'bg-surface-800 text-surface-300 border border-primary-500/30'
                   "
                 >
-                  Przedmioty
+                  {{ t('items') }}
                 </button>
               </div>
 
@@ -132,7 +132,7 @@
                   />
                 </template>
                 <template #fallback>
-                  <div class="text-center text-surface-300">Ładowanie karuzeli kart...</div>
+                  <div class="text-center text-surface-300">{{ t('loadingCards') }}</div>
                 </template>
               </Suspense>
             </div>
@@ -185,7 +185,7 @@
                     : 'bg-surface-800 text-surface-300 border border-primary-500/30'
                 "
               >
-                Decyzje
+                {{ t('decisions') }}
               </button>
               <button
                 @click="showingDecisionCards = false"
@@ -196,7 +196,7 @@
                     : 'bg-surface-800 text-surface-300 border border-primary-500/30'
                 "
               >
-                Przedmioty
+                {{ t('items') }}
               </button>
             </div>
 
@@ -216,7 +216,7 @@
                 />
               </template>
               <template #fallback>
-                <div class="text-center text-surface-300">Ładowanie karuzeli kart...</div>
+                <div class="text-center text-surface-300">{{ t('loadingCards') }}</div>
               </template>
             </Suspense>
           </div>
@@ -235,7 +235,7 @@
                       : 'bg-surface-800 text-surface-300 border border-primary-500/30'
                   "
                 >
-                  Twoja plansza
+                  {{ t('yourBoard') }}
                 </button>
                 <button
                   @click="currentBoard = 'market'"
@@ -246,7 +246,7 @@
                       : 'bg-surface-800 text-surface-300 border border-primary-500/30'
                   "
                 >
-                  Plansza rynku
+                  {{ t('rivalBoard') }}
                 </button>
               </div>
 
@@ -255,13 +255,13 @@
                   @click="leftOpen = !leftOpen"
                   class="px-6 py-3 rounded-xl font-semibold bg-surface-800 text-surface-0 border border-primary-500/30 hover:border-primary-500/50 transition-all duration-300"
                 >
-                  {{ leftOpen ? 'Ukryj' : 'Pokaż' }} karty
+                  {{ leftOpen ? t('hide') : t('show') }} {{ t('cards') }}
                 </button>
                 <button
                   @click="rightOpen = !rightOpen"
                   class="px-6 py-3 rounded-xl font-semibold bg-surface-800 text-surface-0 border border-primary-500/30 hover:border-primary-500/50 transition-all duration-300"
                 >
-                  {{ rightOpen ? 'Ukryj' : 'Pokaż' }} menu
+                  {{ rightOpen ? t('hide') : t('show') }} {{ t('menu') }}
                 </button>
               </div>
             </div>
@@ -351,6 +351,9 @@ import type { BoardConfig, GameData, Pawn, RawPawnData, GameStatusError } from '
 import { useBreakpoints } from '@vueuse/core'
 import { faCommentDots } from '@fortawesome/free-solid-svg-icons'
 import { onClickOutside } from '@vueuse/core'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const chatRef = ref<HTMLElement | null>(null)
 
@@ -593,9 +596,6 @@ watch(
   { immediate: true },
 )
 
-onMounted(() => {
-  console.log('PlayerView zamontowany.')
-})
 
 onUnmounted(() => {
   if (gameData.value?.gameId) {

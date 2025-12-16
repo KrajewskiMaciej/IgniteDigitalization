@@ -66,6 +66,16 @@ export const pl = {
   language: 'Język',
   accountLanguage: 'Język konta',
 
+
+  //Player
+  yourBoard: 'Twoja plansza',
+  rivalBoard: 'Plansza konkurencji',
+  market: 'Rynek',
+  hide: 'Ukryj',
+  show: 'Pokaż',
+  cards: 'Karty',
+  menu: 'Menu',
+
   //Game
   createNewGame: 'Utwórz nową grę',
   stopAllGames: 'Zatrzymaj wszystkie gry',

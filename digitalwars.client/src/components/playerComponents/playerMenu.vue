@@ -3,7 +3,7 @@
     <!-- Góra: bity + etap -->
     <div class="flex justify-between items-center mb-2">
       <div class="text-xl font-bold text-green-600">
-        {{ t('numberOfBits') }} {{ currentBudget }}
+        {{ t('bits') }}: {{ currentBudget }}
       </div>
       <div class="text-md font-semibold text-primary-400">{{ t('stage') }}</div>
     </div>
@@ -50,7 +50,7 @@
               </div>
 
               <div class="font-semibold text-sm">
-                <span class="text-surface-400">Karta {{ decision.cardId }}</span>
+                <span class="text-surface-400">{{ t('cardId') }} {{ decision.cardId }}</span>
                 <span class="mx-1">→</span>
                 <span class="text-white">{{ decision.choice }}</span>
               </div>

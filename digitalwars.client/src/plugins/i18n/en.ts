@@ -67,6 +67,16 @@ export const en = {
   language: 'Language',
   accountLanguage: 'Account Language',
 
+
+  //Player
+  yourBoard: 'Your Board',
+  rivalBoard: 'Rival Board',
+  market: 'Market',
+  hide: 'Hide',
+  show: 'Show',
+  cards: 'Cards',
+  menu: 'Menu',
+
   //Game
   createNewGame: 'Create New Game',
   stopAllGames: 'Stop all games',
@@ -176,7 +186,7 @@ export const en = {
   adminPanel: 'Admin panel',
 
   //Independent team modal
-  canMake: 'can make',
+  canMake: ' can make ',
   independentTeamTitle: 'Independent Team',
   independentTeamInfo: 'Decisions made by this team will be executed without Game Master approval.',
   modalWillCloseAutomatically: 'The modal will close automatically',
@@ -187,7 +197,7 @@ export const en = {
   dependentTeamTitle: 'Dependent Team',
   dependentTeamInfo:
     'Decisions made by this team must be approved by the Game Master before execution.',
-  cannotMake: 'cannot make',
+  cannotMake: ' cannot make ',
 
   //Tables
   tableWithoutName: 'Table without a name',
