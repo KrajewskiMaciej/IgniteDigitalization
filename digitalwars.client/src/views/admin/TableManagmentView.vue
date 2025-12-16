@@ -1,30 +1,28 @@
 <template>
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
-    <!-- Nagłówek -->
     <div class="text-center">
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
-        Zarządzanie Stołami
+        {{ t('tableManagementTitle') }}
       </h1>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
-      <!-- Sekcja wyboru drużyny -->
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faUsers" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór drużyny</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('teamSelection') }}</h2>
         </div>
 
         <div v-if="loading.teams" class="text-center py-8">
           <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-          <p class="text-surface-400 mt-3">Ładowanie drużyn...</p>
+          <p class="text-surface-400 mt-3">{{ t('loadingTeams') }}</p>
         </div>
 
         <div v-else>
           <label for="team-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            Wybierz drużynę:
+            {{ t('selectTeamLabel') }}
           </label>
           <Dropdown
             id="team-select"
@@ -32,49 +30,52 @@
             :options="teams"
             optionLabel="teamName"
             optionValue="teamId"
-            placeholder="Wybierz drużynę..."
+            :placeholder="t('selectTeamPlaceholder')"
             class="w-full"
           >
             <template #option="slotProps">
               <div class="flex items-center justify-between w-full">
                 <span>{{ slotProps.option.teamName }}</span>
-                <span class="text-green-400">{{ slotProps.option.teamBud }} bitów</span>
+                <span class="text-green-400"
+                  >{{ slotProps.option.teamBud }} {{ t('bits') }}</span
+                >
               </div>
             </template>
           </Dropdown>
         </div>
       </div>
 
-      <!-- Grid z dwiema sekcjami -->
       <div v-if="selectedTeamId" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Sekcja zarządzania budżetem -->
         <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
           <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
             <div class="bg-green-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faCoins" class="h-6 text-green-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">Budżet drużyny</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('teamBudget') }}</h2>
           </div>
 
           <div v-if="selectedTeam" class="space-y-5">
-            <!-- Aktualny budżet -->
             <div class="bg-surface-800 rounded-lg p-4 border border-surface-700">
-              <p class="text-sm text-surface-400 mb-1">Aktualny budżet:</p>
-              <p class="text-3xl font-bold text-green-400">{{ selectedTeam.teamBud }} bitów</p>
+              <p class="text-sm text-surface-400 mb-1">{{ t('currentBudget') }}</p>
+              <p class="text-3xl font-bold text-green-400">
+                {{ selectedTeam.teamBud }} {{ t('bits') }}
+              </p>
             </div>
 
-            <!-- Formularz edycji budżetu -->
             <form @submit.prevent="saveBudget" class="space-y-4">
               <div>
-                <label for="budget-input" class="block mb-2 text-sm font-semibold text-gray-300">
-                  Nowy budżet:
+                <label
+                  for="budget-input"
+                  class="block mb-2 text-sm font-semibold text-gray-300"
+                >
+                  {{ t('newBudget') }}
                 </label>
                 <InputNumber
                   id="budget-input"
                   v-model="budgetInputValue"
                   :min="20"
                   :step="5"
-                  placeholder="Wprowadź nowy budżet..."
+                  :placeholder="t('enterNewBudgetPlaceholder')"
                   showButtons
                   class="w-full"
                   inputClass="text-center text-lg font-bold"
@@ -86,7 +87,7 @@
                   type="submit"
                   :disabled="isSavingBudget"
                   :loading="isSavingBudget"
-                  :label="isSavingBudget ? 'Zapisywanie...' : 'Zapisz Budżet'"
+                  :label="isSavingBudget ? t('saving') : t('saveBudget')"
                   size="large"
                   class="w-full"
                 />
@@ -95,24 +96,25 @@
           </div>
         </div>
 
-        <!-- Sekcja zarządzania kartami -->
         <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
           <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
             <div class="bg-blue-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faLock" class="h-6 text-blue-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">Odblokuj kartę</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-white">
+              {{ t('unlockCardHeader') }}
+            </h2>
           </div>
 
           <div class="space-y-5">
             <div v-if="loading.cards" class="text-center py-8">
               <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-              <p class="text-surface-400 mt-3">Ładowanie kart...</p>
+              <p class="text-surface-400 mt-3">{{ t('loadingCards') }}</p>
             </div>
 
             <div v-else-if="decisionCards.length > 0">
               <label for="card-select" class="block mb-2 text-sm font-semibold text-gray-300">
-                Wybierz kartę do odblokowania:
+                {{ t('selectCardToUnlockLabel') }}
               </label>
               <Dropdown
                 id="card-select"
@@ -120,13 +122,15 @@
                 :options="decisionCards"
                 optionLabel="title"
                 optionValue="id"
-                placeholder="Wybierz kartę..."
+                :placeholder="t('selectCardPlaceholder')"
                 class="w-full"
               >
                 <template #value="slotProps">
                   <div v-if="slotProps.value" class="flex items-center gap-2">
                     <span class="text-blue-400">#{{ slotProps.value }}</span>
-                    <span>{{ decisionCards.find((c) => c.id === slotProps.value)?.title }}</span>
+                    <span>{{
+                      decisionCards.find((c) => c.id === slotProps.value)?.title
+                    }}</span>
                   </div>
                   <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
                 </template>
@@ -138,22 +142,20 @@
                 </template>
               </Dropdown>
 
-              <!-- Opis karty -->
               <div
                 v-if="selectedCard"
                 class="mt-4 bg-surface-800 rounded-lg p-4 border border-surface-700"
               >
-                <p class="text-sm text-surface-400 mb-2">Opis karty:</p>
+                <p class="text-sm text-surface-400 mb-2">{{ t('cardDescriptionLabel') }}</p>
                 <p class="text-sm text-gray-300">{{ selectedCard.description }}</p>
               </div>
 
-              <!-- Przycisk odblokowania -->
               <div class="flex justify-center mt-5">
                 <Button
                   @click="handleUnlockCard"
                   :disabled="!selectedCardId || isUnlockingCard"
                   :loading="isUnlockingCard"
-                  :label="isUnlockingCard ? 'Odblokowywanie...' : 'Odblokuj Kartę'"
+                  :label="isUnlockingCard ? t('unlocking') : t('unlockCardButton')"
                   size="large"
                   class="w-full"
                 />
@@ -166,13 +168,12 @@
               >
                 <font-awesome-icon :icon="faLock" class="h-8 text-surface-600" />
               </div>
-              <p class="text-surface-400 text-sm">Nie znaleziono kart dla wybranej drużyny</p>
+              <p class="text-surface-400 text-sm">{{ t('noCardsFoundForTeam') }}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Placeholder gdy brak wybranej drużyny -->
       <div
         v-if="!selectedTeamId"
         class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-surface-900/50"
@@ -183,7 +184,7 @@
           <font-awesome-icon :icon="faUsers" class="h-10 text-surface-600" />
         </div>
         <p class="text-surface-400 text-sm font-medium">
-          Wybierz drużynę aby zarządzać jej budżetem i kartami
+          {{ t('selectTeamToManage') }}
         </p>
       </div>
     </div>
@@ -199,9 +200,11 @@ import Dropdown from 'primevue/dropdown'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
-
+import { useI18n } from 'vue-i18n'
 import apiService from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
+
+const { t } = useI18n()
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Team {
@@ -259,7 +262,7 @@ const fetchTeams = async () => {
     const response = await apiService.get(apiConfig.player.getTeamsManagement(gameId))
     teams.value = response.data as Team[]
   } catch (error) {
-    toast.error('Nie udało się pobrać listy drużyn.')
+    toast.error(t('errorFetchingTeams') + error)
     console.error('Błąd podczas pobierania drużyn:', error)
   } finally {
     loading.teams = false
@@ -272,7 +275,7 @@ const fetchDecisionCards = async (teamId: number) => {
     const selectedTeam = teams.value.find((team) => team.teamId === teamId)
 
     if (!selectedTeam) {
-      toast.error('Nie można odnaleźć wybranej drużyny.')
+      toast.error(t('noTeamSelected'))
       loading.cards = false
       return
     }
@@ -292,7 +295,7 @@ const fetchDecisionCards = async (teamId: number) => {
       )
     }
   } catch (error) {
-    toast.error('Nie udało się pobrać listy kart decyzji.')
+    toast.error(t('errorFetchingDecks') + error)
     console.error('Błąd podczas pobierania kart decyzji:', error)
   } finally {
     loading.cards = false
@@ -301,7 +304,7 @@ const fetchDecisionCards = async (teamId: number) => {
 
 const saveBudget = async () => {
   if (!selectedTeam.value) {
-    toast.warning('Najpierw wybierz drużynę.')
+    toast.warning(t('noTeamSelected'))
     return
   }
 
@@ -312,10 +315,9 @@ const saveBudget = async () => {
     await apiService.put(apiConfig.player.updateTeamBudget(gameId, teamId), {
       newBudget: budgetInputValue.value,
     })
-    toast.success(`Zapisano nowy budżet dla drużyny "${teamName}".`)
     await fetchTeams()
   } catch (error: any) {
-    toast.error(`Błąd podczas zapisywania budżetu dla "${teamName}".`)
+    toast.error(t('errorSavingBudgetForTeam', { teamName }) + error)
     console.error('Błąd podczas aktualizacji budżetu:', error)
   } finally {
     isSavingBudget.value = false
@@ -338,16 +340,12 @@ const handleUnlockCard = async () => {
       teamId: selectedTeamId.value,
     }
     const response = await apiService.post(apiConfig.player.unlockCard(gameId), payload)
-    toast.success(
-      (response.data as { message: string }).message ||
-        `Pomyślnie odblokowano kartę "${cardName}" dla drużyny ${teamName}.`,
-    )
     selectedCardId.value = null
   } catch (error: any) {
     if (error?.response?.status === 409) {
-      toast.warning(error.response.data.message || 'Ta karta jest już odblokowana.')
+      toast.warning(error.response.data.message || t('cardAlreadyUnlocked'))
     } else {
-      toast.error('Wystąpił błąd podczas odblokowywania karty.')
+      toast.error(t('errorUnlockingCardForTeam', { teamName }) + error );
     }
     console.error('Błąd podczas akcji na karcie:', error)
   } finally {
@@ -374,7 +372,7 @@ watch(selectedTeamId, (newTeamId) => {
 // --- CYKL ŻYCIA KOMPONENTU ---
 onMounted(() => {
   if (isNaN(gameId)) {
-    toast.error('Błąd: Nieprawidłowy ID gry w adresie URL!')
+    toast.error(t('errorInvalidGameId'))
     loading.teams = false
     return
   }

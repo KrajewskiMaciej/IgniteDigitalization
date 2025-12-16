@@ -2,9 +2,9 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <div class="text-center mb-2">
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
-        Materiały pomocnicze
+        {{ t('supportMaterials') }}
       </h1>
-      <p class="text-surface-400 text-sm md:text-base">Dokumenty i narzędzia do zarządzania grą</p>
+      <p class="text-surface-400 text-sm md:text-base">{{ t('supportMaterialsDescription') }}</p>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
@@ -17,7 +17,7 @@
             <div class="bg-red-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faFilePdf" class="h-6 text-red-500" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">Dokumenty PDF</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('pdfDocuments') }}</h2>
           </div>
           <div>
             <button>
@@ -33,7 +33,7 @@
         <div v-show="showFilesSection" class="space-y-4">
           <div>
             <label for="pdf-select" class="block mb-2.5 text-sm font-semibold text-gray-300">
-              Wybierz dokument:
+              {{ t('selectDocument') }}
             </label>
             <Dropdown
               id="pdf-select"
@@ -41,7 +41,7 @@
               :options="availablePDFs"
               optionLabel="name"
               optionValue="path"
-              placeholder="Wybierz PDF..."
+              :placeholder="t('selectPdfPlaceholder')"
               class="w-full"
             >
               <template #value="slotProps">
@@ -61,9 +61,14 @@
           </div>
 
           <div class="grid grid-cols-2 gap-3">
-            <Button @click="openPDF" :disabled="!selectedPDF" label="Podgląd" class="w-full">
+            <Button
+              @click="openPDF"
+              :disabled="!selectedPDF"
+              :label="t('preview')"
+              class="w-full"
+            >
               <font-awesome-icon :icon="faEye" class="h-4 mr-2" />
-              <span>Podgląd</span>
+              <span>{{ t('preview') }}</span>
             </Button>
 
             <Button
@@ -74,20 +79,20 @@
               class="w-full"
             >
               <font-awesome-icon :icon="faUpRightFromSquare" class="h-4 mr-2" />
-              <span>Nowa karta</span>
+              <span>{{ t('newTab') }}</span>
             </Button>
           </div>
 
           <div v-if="pdfWindows.length > 0" class="pt-4 border-t border-surface-700">
             <div class="flex items-center justify-between mb-3">
               <span class="text-sm font-semibold text-primary-400">
-                Otwarte dokumenty ({{ pdfWindows.length }}):
+                {{ t('openDocuments') }} ({{ pdfWindows.length }}):
               </span>
               <Button
                 @click="closeAllPDFs"
                 severity="danger"
                 outlined
-                label="Zamknij wszystkie"
+                :label="t('closeAll')"
                 text
                 size="small"
                 class="h-auto py-1"
@@ -105,7 +110,10 @@
               >
                 <div class="flex items-center gap-3 flex-1 min-w-0">
                   <div class="bg-red-500/20 p-1.5 rounded">
-                    <font-awesome-icon :icon="faFilePdf" class="h-4 text-red-500 flex-shrink-0" />
+                    <font-awesome-icon
+                      :icon="faFilePdf"
+                      class="h-4 text-red-500 flex-shrink-0"
+                    />
                   </div>
                   <span class="text-sm font-medium text-white truncate">
                     {{ availablePDFs.find((p) => p.path === window.path)?.name }}
@@ -118,7 +126,7 @@
                   text
                   rounded
                   size="small"
-                  v-tooltip.top="'Zamknij'"
+                  v-tooltip.top="t('close')"
                 >
                   <template #icon>
                     <font-awesome-icon :icon="faMinus" class="h-4" />
@@ -137,13 +145,12 @@
             >
               <font-awesome-icon :icon="faFileCircleQuestion" class="h-10 text-surface-600" />
             </div>
-            <p class="text-surface-400 text-sm font-medium">Brak otwartych dokumentów</p>
-            <p class="text-gray-500 text-xs mt-1">Wybierz PDF i kliknij "Podgląd"</p>
+            <p class="text-surface-400 text-sm font-medium">{{ t('noOpenDocuments') }}</p>
+            <p class="text-gray-500 text-xs mt-1">{{ t('selectPdfInstruction') }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Sekcja 2: Otwarte PDF-y w TabView -->
       <div v-if="pdfWindows.length > 0">
         <div
           class="border-2 border-surface-700 rounded-xl overflow-hidden bg-surface-900 shadow-2xl"
@@ -170,7 +177,6 @@
         </div>
       </div>
 
-      <!-- Sekcja 3: Drzewo decyzji -->
       <div
         class="border border-surface-700 rounded-xl p-5 bg-gradient-to-br from-surface-900 to-surface-800 shadow-2xl"
       >
@@ -179,7 +185,7 @@
             <div class="bg-primary-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faDiagramProject" class="h-6 text-primary-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">Drzewo decyzji</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('decisionTree') }}</h2>
           </div>
           <div class="flex gap-2">
             <Button
@@ -187,7 +193,7 @@
               outlined
               rounded
               size="small"
-              v-tooltip.top="isZoomed ? 'Pomniejsz' : 'Powiększ'"
+              v-tooltip.top="isZoomed ? t('zoomOut') : t('zoomIn')"
             >
               <template #icon>
                 <font-awesome-icon
@@ -201,7 +207,7 @@
               outlined
               rounded
               size="small"
-              v-tooltip.top="'Pobierz obraz'"
+              v-tooltip.top="t('downloadImage')"
             >
               <template #icon>
                 <font-awesome-icon :icon="faDownload" class="h-4" />
@@ -217,9 +223,11 @@
               class="border-2 border-surface-700 rounded-lg transition-all duration-300 hover:border-primary-400 hover:shadow-2xl hover:shadow-primary-500/20 bg-surface-900 p-2"
               :class="[isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in']"
               :style="
-                isZoomed ? { width: '100%', minWidth: '100%' } : { width: '50%', height: 'auto' }
+                isZoomed
+                  ? { width: '100%', minWidth: '100%' }
+                  : { width: '50%', height: 'auto' }
               "
-              alt="Drzewo decyzji"
+              :alt="t('decisionTree')"
               @click="toggleImageSize"
             />
           </div>
@@ -250,6 +258,9 @@ import Button from 'primevue/button'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import drzewko from '@/assets/viewPNGs/DrzewoDecyzji.png'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface PdfInfo {
   name: string

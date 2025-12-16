@@ -4,15 +4,15 @@
       <h1
         class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2 text-center mt-2"
       >
-        Gry w sesji
+        {{ t('gamesInSession') }}
       </h1>
       <homeAdminButtons @open-create-game="showCreateGame = true" />
       <hr class="mt-2 border-lgray-accent" />
 
-      <div v-if="loadingGames" class="text-center py-4 text-surface-400">Ładowanie gier...</div>
+      <div v-if="loadingGames" class="text-center py-4 text-surface-400">{{ t('loadingGamesInSession') }}</div>
       <div v-else-if="fetchError" class="text-center py-4 text-red-500">{{ fetchError }}</div>
       <div v-else-if="activeGames.length === 0" class="text-center py-4 text-surface-400">
-        Brak aktywnych gier. Utwórz nową, aby zacząć.
+        {{ t('noActiveGames') }}
       </div>
       <div v-else class="overflow-auto px-2 pb-4">
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-6 auto-rows-min">
@@ -40,7 +40,9 @@ import { useToast } from 'vue-toastification'
 import gameCard from '@/components/game/gameCard.vue'
 import homeAdminButtons from '@/components/admin/homeAdminButtons.vue'
 import CreateGame from '@/components/game/createGame.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 // FIX: Usunięto rozszerzenia .js z importów
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
@@ -96,6 +98,7 @@ const fetchActiveGames = async () => {
       error.response?.data?.message || error.message || 'Wystąpił nieoczekiwany błąd.'
     fetchError.value = `Nie udało się pobrać gier: ${errorMessage}`
     console.error('Błąd pobierania aktywnych gier:', error)
+    toast.error(t('errorFetchingGames'))
   } finally {
     loadingGames.value = false
   }
@@ -104,9 +107,6 @@ const fetchActiveGames = async () => {
 // FIX: Dodano typ dla parametru funkcji
 const handleGameCreated = (creationResponse: GameCreationResponse) => {
   fetchActiveGames() // Odśwież listę gier po dodaniu nowej
-  if (creationResponse) {
-    toast.success(creationResponse.message || 'Nowa gra została pomyślnie dodana!')
-  }
 }
 
 // FIX: Uproszczona i w pełni otypowana funkcja
@@ -118,16 +118,12 @@ const handleUpdateGameStatus = async (payload: { gameId: number; newStatus: stri
     const apiPayload = { status: newStatus }
     const response = await apiService.put(apiConfig.games.updateStatus(gameId), apiPayload)
 
-    toast.success(
-      (response.data as { message: string }).message ||
-        `Status gry został pomyślnie zaktualizowany.`,
-    )
 
     // Najprostsze i najbezpieczniejsze podejście: odśwież całą listę
     await fetchActiveGames()
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || 'Błąd serwera.'
-    toast.error(`Aktualizacja statusu nie powiodła się: ${errorMessage}`)
+    toast.error(t('errorUpdatingGameStatus'))
     console.error(`Błąd aktualizacji statusu gry ${gameId}:`, error)
   }
 }

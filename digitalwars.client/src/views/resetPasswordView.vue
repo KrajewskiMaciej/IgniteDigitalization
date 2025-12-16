@@ -6,7 +6,7 @@
         class="bg-surface-900 text-white rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
       >
         <div v-if="isTokenValid">
-          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">Zmień hasło</h2>
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">{{ t('changePassword') }}</h2>
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
@@ -15,7 +15,7 @@
               for="register-password"
               class="block font-medium text-xs sm:text-sm text-left mb-1.5"
             >
-              Nowe hasło
+              {{ t('newPassword') }}
             </label>
             <div
               class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-lg transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent mb-3"
@@ -47,7 +47,7 @@
               for="register-confirm-password"
               class="block font-medium text-xs sm:text-sm text-left mb-1.5"
             >
-              Potwierdź nowe hasło
+              {{ t('confirmNewPassword') }}
             </label>
             <div
               class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-lg transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent mb-4"
@@ -81,7 +81,7 @@
                     class="w-1.5 h-1.5 rounded-full"
                     :class="passwordRequirements.length ? 'bg-green-400' : 'bg-gray-500'"
                   ></span>
-                  Co najmniej 8 znaków
+                  {{ t('passwordRequirementLength') }}
                 </li>
                 <li
                   :class="passwordRequirements.uppercase ? 'text-green-400' : 'text-gray-500'"
@@ -91,7 +91,7 @@
                     class="w-1.5 h-1.5 rounded-full"
                     :class="passwordRequirements.uppercase ? 'bg-green-400' : 'bg-gray-500'"
                   ></span>
-                  Co najmniej jedna duża litera
+                  {{ t('passwordRequirementUppercase') }}
                 </li>
                 <li
                   :class="passwordRequirements.lowercase ? 'text-green-400' : 'text-gray-500'"
@@ -101,7 +101,7 @@
                     class="w-1.5 h-1.5 rounded-full"
                     :class="passwordRequirements.lowercase ? 'bg-green-400' : 'bg-gray-500'"
                   ></span>
-                  Co najmniej jedna mała litera
+                  {{ t('passwordRequirementLowercase') }}
                 </li>
                 <li
                   :class="passwordRequirements.special ? 'text-green-400' : 'text-gray-500'"
@@ -111,7 +111,7 @@
                     class="w-1.5 h-1.5 rounded-full"
                     :class="passwordRequirements.special ? 'bg-green-400' : 'bg-gray-500'"
                   ></span>
-                  Co najmniej jeden znak specjalny
+                  {{ t('passwordRequirementSpecialChar') }}
                 </li>
                 <li
                   :class="passwordRequirements.digit ? 'text-green-400' : 'text-gray-500'"
@@ -121,7 +121,7 @@
                     class="w-1.5 h-1.5 rounded-full"
                     :class="passwordRequirements.digit ? 'bg-green-400' : 'bg-gray-500'"
                   ></span>
-                  Co najmniej jedna cyfra
+                  {{ t('passwordRequirementNumber') }}
                 </li>
               </ul>
             </div>
@@ -136,7 +136,7 @@
                   : 'bg-tertiary shadow-sm'
               "
             >
-              <span class="relative z-10">{{ isLoading ? 'Zmiana hasła...' : 'Zmień hasło' }}</span>
+              <span class="relative z-10">{{ isLoading ? t('changingPassword') : t('changePassword') }}</span>
               <div
                 v-if="allPasswordRequirementsMet"
                 class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
@@ -156,10 +156,9 @@
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
           <div class="text-center text-sm sm:text-base text-gray-300 space-y-3">
-            <p>Wygląda na to, że twój link do resetowania hasła wygasł.</p>
+            <p>{{ t('linkExpiredMessage') }}</p>
             <p>
-              Powróć do strony logowania i wybierz opcję "Zapomniałem hasła" żeby otrzymać nowy
-              link.
+              {{ t('toGetNewResetLink') }}
             </p>
           </div>
 
@@ -167,7 +166,7 @@
             @click="handleReturnToLogin"
             class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all duration-300 overflow-hidden group text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 mt-6"
           >
-            <span class="relative z-10">Powrót do logowania</span>
+            <span class="relative z-10">{{ t('backToLogin') }}</span>
             <div
               class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
             ></div>
@@ -187,6 +186,9 @@ import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 import { useRouter } from 'vue-router'
 import apiConfig from '@/services/apiConfig.js'
 import apiService from '@/services/apiServices.js'
+import {useI18n} from "vue-i18n";
+
+const { t } = useI18n()
 
 // --- KROK 2: Definicje interfejsów dla odpowiedzi API ---
 interface ValidateTokenResponse {
@@ -218,7 +220,7 @@ onMounted(async () => {
     isTokenValid.value = res.data.valid
   } catch (err) {
     isTokenValid.value = false
-    toast.error('Token wygasł lub jest nieprawidłowy.', {
+    toast.error(t('linkExpired'), {
       position: POSITION.TOP_CENTER, // <-- KROK 5: Użycie POSITION
     })
   }
@@ -263,7 +265,7 @@ const handleReturnToLogin = () => {
 const handleChangePassword = async () => {
   toast.clear()
   if (changePasswordData.value.password !== changePasswordData.value.confirmPassword) {
-    toast.error('Hasła się nie zgadzają!', {
+    toast.warning(t('passwordsDoNotMatch'), {
       position: POSITION.TOP_CENTER, // <-- KROK 5: Użycie POSITION
     })
     return
@@ -277,15 +279,11 @@ const handleChangePassword = async () => {
     })
 
     if (response.data.success) {
-      toast.success('Pomyślnie zmieniono hasło!', {
-        position: POSITION.TOP_CENTER, // <-- KROK 5: Użycie POSITION
-      })
       router.push('/')
     }
   } catch (error: any) {
-    // <-- KROK 6: Otypowanie błędu
     console.error('❌ Wystąpił błąd:', error.response?.data || error.message)
-    toast.error('Wystąpił błąd! Spróbuj ponownie', {
+    toast.error(t('errorServerUnavailable'), {
       position: POSITION.TOP_CENTER, // <-- KROK 5: Użycie POSITION
     })
   } finally {

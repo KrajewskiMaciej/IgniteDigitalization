@@ -4,7 +4,7 @@
       <h1
         class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2 text-center mt-2"
       >
-        Stoły
+        {{ t('tables') }}
       </h1>
       <tableButtons />
       <hr class="my-4 border-lgray-accent" />
@@ -23,7 +23,7 @@
         </template>
         <template v-else>
           <div class="text-center text-gray-300 mt-4 xl:col-span-3">
-            Brak aktywnej gry lub nieprawidłowy identyfikator gry.
+            {{ t('noActiveGameOrInvalidGameId') }}
           </div>
         </template>
       </div>
@@ -40,6 +40,9 @@ import { useRoute } from 'vue-router'
 import apiServices from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
 import tableButtons from '@/components/admin/tableAdminButtons.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Table {

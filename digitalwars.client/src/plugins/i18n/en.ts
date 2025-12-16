@@ -1,3 +1,4 @@
+import { error } from "three";
 
 export const en = {
   gameMaster: 'Game Master',
@@ -51,6 +52,16 @@ export const en = {
   emailOrUsername: 'Email or Username',
   accountSettings: 'Account settings',
   licenses: 'Licenses',
+  accountActive: 'Account active',
+  accountIsActiveYouCanUseTheApp: 'Account is active. You can use the app.',
+  returnToLoginPageAndSignIn: 'Return to login page and sign in.',
+  automaticRedirectIn: 'Automatic redirect in',
+  linkExpired: 'Link expired',
+  linkExpiredMessage: 'It seems that the link you are using has expired or is invalid. Try resetting your password again.',
+  toGetNewResetLink: 'To get a new password reset link, please log in again.',
+  newPassword: 'New password',
+  confirmNewPassword: 'Confirm new password',
+  changingPassword: 'Changing password...',
   
 
   //Game
@@ -125,6 +136,24 @@ export const en = {
   noDecisionHistory: 'No decision history.',
   newEvent: 'New Event',
   result: 'Result',
+  noActiveGameOrInvalidGameId: 'No active game or invalid game ID.',
+  supportMaterials: 'Support materials',
+  supportMaterialsDescription: 'Documents and tools for game management',
+  pdfDocuments: 'PDF Documents',
+  selectDocument: 'Select document:',
+  selectPdfPlaceholder: 'Select PDF...',
+  preview: 'Preview',
+  newTab: 'New tab',
+  openDocuments: 'Open documents',
+  closeAll: 'Close all',
+  close: 'Close',
+  noOpenDocuments: 'No open documents',
+  selectPdfInstruction: 'Select PDF and click "Preview"',
+  downloadImage: 'Download image',
+  enablers: 'Enablers',
+  gamesInSession: 'Games in session',
+  loadingGamesInSession: 'Loading games in session...',
+  noActiveGames: 'No active games.',
 
   //Sidebar
   activeGames: 'Active Games',
@@ -215,7 +244,32 @@ export const en = {
   errorSavingItem: 'An error occurred while saving the item. Please try again.',
   errorDeletingProcess: 'An error occurred while deleting the process. Please try again.',
   errorSavingProcess: 'An error occurred while saving the process. Please try again.',
-  
+  errorSavingBoard: 'An error occurred while saving the board. Please try again.',
+  errorDeletingBoard: 'An error occurred while deleting the board. Please try again.',
+  errorGeneratingCardPdf: 'An error occurred while generating card PDF. Please try again.',
+  errorGeneratingBoardPdf: 'An error occurred while generating board PDF. Please try again.',
+  errorFetchingGames: 'An error occurred while fetching games. Please try again.',
+  errorFetchingTeams: 'An error occurred while fetching teams. Please try again.',
+  noTeamSelected: 'No team selected.',
+  errorSavingBudgetForTeam: 'An error occurred while saving budget for team {teamName}. Please try again.',
+  errorUnlockingCardForTeam: 'An error occurred while unlocking card for team {teamName}. Please try again.',
+  errorInvalidGameId: 'Invalid game ID. Please try again.',
+  errorFetchingDecsionHistory: 'An error occurred while fetching decision history. Please try again.',
+  errorFetchingSuggestions: 'An error occurred while fetching suggestions. Please try again.',
+  noDeckId: 'No deck ID. Please try again.',
+  errorFetchingGameEvents: 'An error occurred while fetching game events. Please try again.',
+  errorFetchingRivalBoard: 'An error occurred while fetching rival board data. Please try again.',
+  errorFetchingPawns: 'An error occurred while fetching pawns. Please try again.',
+  errorApprovingSuggestion: 'An error occurred while approving the suggestion. Please try again.',
+  errorRejectingSuggestion: 'An error occurred while rejecting the suggestion. Please try again.',
+  errorApplyingEvent: 'An error occurred while applying the event. Please try again.',
+  errorLoadingTeamData: 'An error occurred while loading key team data.',
+  errorFetchingCardsAndItems: 'Error fetching cards and items.',
+  missingActionData: 'Missing key data (team, card/item) to perform the action.',
+  teamNoBoardId: 'Team "{teamName}" does not have an assigned board ID.',
+  actionExecutionError: 'An error occurred while executing the action.',
+  suggestionRejected: 'Suggestion has been rejected.',
+  criticalGameIdError: 'Critical error: Missing or invalid game ID!',
 
 
   //Decision Cards
@@ -241,6 +295,35 @@ export const en = {
   selectDeckToEditDecisionCards: 'Select deck to edit decision cards',
   cardEdit: 'Edit card',
   editDecisionCards: 'Edit decision card',
+  decisionCards: 'Decision cards',
+
+
+
+  //Decision Panel
+  decisionPanel: 'Decision Panel',
+  manageDecisionsAndItemsForTables: 'Manage decisions and items for tables',
+  actionManagment: 'Action management',
+  events: 'Events',
+  selectEvent: 'Select event',
+  selectEventPlaceholder: 'Select event...',
+  description: 'Description',
+  cost: 'Cost',
+  selectTable: 'Select table',
+  selectTablePlaceholder: 'Select table...',
+  useItem: 'Use item',
+  applyEvent: 'Apply event',
+  history: 'History',
+  toApprove: 'To approve',
+  loadingSuggestions: 'Loading suggestions...',
+  noDecisionsToApprove: 'No decisions to approve.',
+  suggestsCard: 'Suggests card',
+  awaits: 'Awaits',
+  cardId: 'Card ID',
+  approve: 'Approve',
+  reject: 'Reject',
+  eventDescription: 'Event description',
+  manageDecisionsAndItemsForTeam: 'Manage decisions and items for team',
+  noFeedbackDescription: 'No feedback description.',  
 
 
   //Items
@@ -256,6 +339,7 @@ export const en = {
   selectItemPlaceholder: 'Select item...',
   itemsEdition: 'Items edition',
   selectDeckToEditItems: 'Select deck to edit items',
+  items: 'Items',
 
   //Processes
   manageProcessesInTheDeck: 'Manage processes in the deck',
@@ -281,10 +365,32 @@ export const en = {
   processDeletionConfirmation: 'Are you sure you want to delete the process?',
   processDeletion: 'Delete process',
 
+  //Team Management
+  tableManagementTitle: 'Table Management',
+  teamSelection: 'Team selection',
+  loadingTeams: 'Loading teams...',
+  selectTeamLabel: 'Select team:',
+  selectTeamPlaceholder: 'Select team...',
+  bits: 'bits',
+  teamBudget: 'Team budget',
+  currentBudget: 'Current budget:',
+  newBudget: 'New budget:',
+  enterNewBudgetPlaceholder: 'Enter new budget...',
+  saveBudget: 'Save budget',
+  unlockCardHeader: 'Unlock card',
+  selectCardToUnlockLabel: 'Select card to unlock:',
+  cardDescriptionLabel: 'Card description:',
+  unlocking: 'Unlocking...',
+  unlockCardButton: 'Unlock card',
+  noCardsFoundForTeam: 'No cards found for selected team',
+  selectTeamToManage: 'Select a team to manage its budget and cards',
+
   //Warnings
   selectAtLeastOneColor: 'Select at least one color to add a border color.',
   noItemSelected: 'No item selected.',
   noCardSelected: 'No card selected.',
+  selectBothBoards: 'Select both boards before generating PDF.',
+  cardAlreadyUnlocked: 'This card is already unlocked for this team.',
 
   //Game Board
   cellColor: 'Cell color',
@@ -312,6 +418,35 @@ export const en = {
   labelCannotBeEmpty: 'Label cannot be empty!',
   atLeastObeOneRightLabel: 'At least one right label must exist!',
   atLeastOneUpLabel: 'At least one top label must exist!',
+  addBoard: 'Add board',
+  gameBoardPreview: 'Game board preview',
+  noBoardSelected: 'No board selected.',
+  noBoardsToEditAddNewBoard: 'No boards to edit, add a new board.',
+  boardNameCaonnotBeEmpty: 'Board name cannot be empty!',
+  allLabelsMustBeFilled: 'All labels must be filled!',
+  selectedBoard: 'Selected board',
+  deleteBoardConfirmation: 'Are you sure you want to delete the board "{boardName}"?',
+  deleteBoard: 'Delete board',
+  defaultDescriptionDown: 'Bottom description',
+  descriptionDownEmptyWarning: 'Bottom description cannot be empty. Default value set.',
+  defaultDescriptionLeft: 'Left description',
+  descriptionLeftEmptyWarning: 'Left description cannot be empty. Default value set.',
+
+  //Export to pdf
+  gameExportToPdf: 'Export game to PDF',
+  generatePdfDescription: 'Generate PDF files with cards and boards',
+  cardExport: 'Card export',
+  generating: 'Generating...',
+  generateCardPdf: 'Generate card PDF',
+  boardExport: 'Board export',
+  tableBoard: 'Table board:',
+  selectTableBoardPlaceholder: 'Select table board...',
+  opponentBoard: 'Opponent board:',
+  selectOpponentBoardPlaceholder: 'Select opponent board...',
+  selectedBoards: 'Selected boards:',
+  tableLabel: 'Table:',
+  opponentLabel: 'Opponent:',
+  generateBoardPdf: 'Generate board PDF',
 
   //Dynamic cheat sheet
   dynamicCheatSheet: 'Dynamic game cheat sheet',

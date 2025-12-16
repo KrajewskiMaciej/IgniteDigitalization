@@ -3,10 +3,10 @@
     <!-- Nagłówek -->
     <div class="text-center">
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
-        Panel Decyzji
+        {{ t('decisionPanel') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base">
-        Zarządzaj decyzjami i przedmiotami dla drużyn
+        {{ t('manageDecisionsAndItemsForTables') }}
       </p>
     </div>
 
@@ -20,13 +20,13 @@
               <div class="bg-primary-500/20 p-3 rounded-lg">
                 <font-awesome-icon :icon="faGamepad" class="h-6 text-primary-400" />
               </div>
-              <h2 class="text-xl md:text-2xl font-bold text-white">Zarządzanie akcjami</h2>
+              <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('actionManagment') }}</h2>
             </div>
 
             <!-- Przełącznik kart/przedmiotów -->
             <div class="flex gap-3 mb-5">
               <Button
-                :label="'Decyzje'"
+                :label="t('decisions')"
                 @click="actionMode = 'cards'"
                 :severity="actionMode === 'cards' ? undefined : 'secondary'"
                 class="flex-1"
@@ -34,7 +34,7 @@
               >
               </Button>
               <Button
-                :label="'Przedmioty'"
+                :label="t('items')"
                 @click="actionMode = 'items'"
                 :severity="actionMode === 'items' ? undefined : 'secondary'"
                 class="flex-1"
@@ -42,7 +42,7 @@
               >
               </Button>
               <Button
-                :label="'Zdarzenia'"
+                :label="t('events')"
                 @click="actionMode = 'events'"
                 :severity="actionMode === 'events' ? undefined : 'secondary'"
                 class="flex-1"
@@ -53,13 +53,13 @@
 
             <!-- Wybór stołu -->
             <div v-if="!teamId && (actionMode === 'cards' || actionMode === 'items')" class="mb-4">
-              <label class="block mb-2 text-sm font-semibold text-gray-300">Wybierz stół:</label>
+              <label class="block mb-2 text-sm font-semibold text-gray-300">{{ t('selectTable') }}</label>
               <Dropdown
                 v-model="selectedTableId"
                 :options="tables"
                 optionLabel="teamName"
                 optionValue="teamId"
-                placeholder="Wybierz stół..."
+                :placeholder="t('selectTablePlaceholder')"
                 class="w-full"
               >
                 <template #option="slotProps">
@@ -71,21 +71,19 @@
                       ></div>
                       <span>{{ slotProps.option.teamName }}</span>
                     </div>
-                    <span class="text-green-400">{{ slotProps.option.teamBud }} bitów</span>
+                    <span class="text-green-400">{{ slotProps.option.teamBud }} {{ t('bits') }}</span>
                   </div>
                 </template>
               </Dropdown>
             </div>
-
-            <!-- Wybór karty -->
             <div v-if="actionMode === 'cards'" class="mb-4">
-              <label class="block mb-2 text-sm font-semibold text-gray-300">Wybierz kartę:</label>
+              <label class="block mb-2 text-sm font-semibold text-gray-300">{{ t('selectCard') }}</label>
               <Dropdown
                 v-model="selectedCardId"
                 :options="cards"
                 optionLabel="title"
                 optionValue="id"
-                placeholder="Wybierz kartę..."
+                :placeholder="t('selectCardPlaceholder')"
                 class="w-full"
                 :disabled="loading.cards"
               >
@@ -108,14 +106,14 @@
             <!-- Wybór przedmiotu -->
             <div v-if="actionMode === 'items'" class="mb-4">
               <label class="block mb-2 text-sm font-semibold text-gray-300">
-                Wybierz przedmiot:
+                {{ t('selectItem') }}
               </label>
               <Dropdown
                 v-model="selectedItemId"
                 :options="items"
                 optionLabel="title"
                 optionValue="id"
-                placeholder="Wybierz przedmiot..."
+                :placeholder="t('selectItemPlaceholder')"
                 class="w-full"
                 :disabled="loading.items"
               >
@@ -149,14 +147,14 @@
 
             <div v-if="actionMode === 'events'" class="mb-4">
               <label class="block mb-2 text-sm font-semibold text-gray-300">
-                Wybierz zdarzenie:
+                {{ t('selectEvent') }}
               </label>
               <Dropdown
                 v-model="selectedPendingEventIndex"
                 :options="availableEvents"
                 optionLabel="shortDesc"
                 optionValue="eventId"
-                placeholder="Wybierz zdarzenie..."
+                :placeholder="t('selectEventPlaceholder')"
                 class="w-full"
               >
                 <template #value="slotProps">
@@ -177,15 +175,15 @@
               "
               class="bg-surface-800 rounded-lg p-4 border border-surface-700 mb-4"
             >
-              <p class="text-sm text-surface-400 mb-1">Opis:</p>
+              <p class="text-sm text-surface-400 mb-1">{{ t('description') }}</p>
               <p class="text-sm text-gray-300">
                 {{ actionMode === 'cards' ? selectedCard?.description : selectedItem?.description }}
               </p>
               <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-700">
-                <span class="text-sm text-surface-400">Koszt:</span>
+                <span class="text-sm text-surface-400">{{ t('cost') }}:</span>
                 <span class="text-lg font-bold text-green-400">
                   {{ (actionMode === 'cards' ? selectedCard?.cost : selectedItem?.cost) || 0 }}
-                  bitów
+                  {{ t('bits') }}
                 </span>
               </div>
             </div>
@@ -194,7 +192,7 @@
               v-if="selectedEvent && selectedEvent.eventId && actionMode === 'events'"
               class="bg-surface-800 rounded-lg p-4 border border-surface-700 mb-4"
             >
-              <p class="text-sm text-surface-400 mb-1">Opis zdarzenia:</p>
+              <p class="text-sm text-surface-400 mb-1">{{ t('eventDescription') }}</p>
               <p class="text-sm text-gray-300">{{ selectedEvent.longDesc }}</p>
             </div>
 
@@ -208,10 +206,10 @@
             >
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-surface-400">Budżet drużyny:</p>
+                  <p class="text-sm text-surface-400">{{ t('teamBudget') }}:</p>
                   <p class="text-sm font-semibold text-white">{{ selectedTeam?.teamName }}</p>
                 </div>
-                <span class="text-2xl font-bold text-green-400">{{ currentBits }} bitów</span>
+                <span class="text-2xl font-bold text-green-400">{{ currentBits }} {{ t('bits') }}</span>
               </div>
             </div>
 
@@ -221,7 +219,7 @@
                 v-if="actionMode === 'cards'"
                 :disabled="!selectedCardId || !selectedTableId"
                 @click="playCard"
-                :label="'Zagraj kartę'"
+                :label="t('playCard')"
                 size="large"
                 class="w-full"
               >
@@ -230,7 +228,7 @@
                 v-if="actionMode === 'items'"
                 :disabled="!selectedItemId || !selectedTableId"
                 @click="giveItem"
-                :label="'Użyj przedmiot'"
+                :label="t('useItem')"
                 size="large"
                 class="w-full"
               >
@@ -239,7 +237,7 @@
                 v-if="actionMode === 'events'"
                 :disabled="!selectedPendingEventIndex"
                 @click="applySelectedEvent"
-                :label="'Zastosuj zdarzenie'"
+                :label="t('applyEvent')"
                 size="large"
                 class="w-full"
               >
@@ -259,13 +257,13 @@
             <div class="bg-yellow-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faClock" class="h-6 text-yellow-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">Panel decyzji</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('decisionPanel') }}</h2>
           </div>
 
           <!-- Przełącznik widoku decyzji -->
           <div class="flex gap-3 mb-5">
             <Button
-              :label="'Do zatwierdzenia'"
+              :label="t('toApprove')"
               :severity="decisionMode === 'pending' ? undefined : 'secondary'"
               @click="decisionMode = 'pending'"
               class="flex-1"
@@ -276,7 +274,7 @@
               </template>
             </Button>
             <Button
-              :label="'Historia'"
+              :label="t('history')"
               :severity="decisionMode === 'history' ? undefined : 'secondary'"
               @click="decisionMode = 'history'"
               class="flex-1"
@@ -295,7 +293,7 @@
           >
             <div v-if="loadingPending" class="text-center py-8">
               <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-              <p class="text-surface-400 mt-3">Ładowanie sugestii...</p>
+              <p class="text-surface-400 mt-3">{{ t('loadingSuggestions') }}</p>
             </div>
 
             <div
@@ -307,7 +305,7 @@
               >
                 <font-awesome-icon :icon="faClock" class="h-8 text-surface-600" />
               </div>
-              <p class="text-surface-400 text-sm font-medium">Brak decyzji do zatwierdzenia</p>
+              <p class="text-surface-400 text-sm font-medium">{{ t('noDecisionsToApprove') }}</p>
             </div>
 
             <div
@@ -318,12 +316,12 @@
               <div class="flex items-start justify-between mb-2">
                 <div>
                   <p class="text-white font-semibold">{{ entry.tableName }}</p>
-                  <p class="text-sm text-surface-400">sugeruje kartę</p>
+                  <p class="text-sm text-surface-400">{{ t('suggestsCard') }}</p>
                 </div>
                 <span
                   class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-semibold rounded"
                 >
-                  Oczekuje
+                  {{ t('awaits') }}
                 </span>
               </div>
               <div class="mb-2">
@@ -331,7 +329,7 @@
                   {{ entry.cardTitle }}
                 </p>
                 <p class="text-xs text-gray-500 mt-1">
-                  ID karty: <span class="font-semibold text-surface-400">{{ entry.cardId }}</span>
+                  {{ t('cardId') }} <span class="font-semibold text-surface-400">{{ entry.cardId }}</span>
                 </p>
               </div>
               <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
@@ -339,7 +337,7 @@
               <div class="flex gap-2 mt-4">
                 <Button
                   @click="approveDecision(entry.logId)"
-                  :label="'Zatwierdź'"
+                  :label="t('approve')"
                   severity="success"
                   size="small"
                   class="flex-1"
@@ -350,7 +348,7 @@
                 </Button>
                 <Button
                   @click="rejectDecision(entry.logId)"
-                  :label="'Odrzuć'"
+                  :label="t('reject')"
                   severity="danger"
                   size="small"
                   class="flex-1"
@@ -367,7 +365,7 @@
           <div v-else class="space-y-3 max-h-[75vh] overflow-y-auto custom-scrollbar">
             <div v-if="loadingHistory" class="text-center py-8">
               <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-              <p class="text-surface-400 mt-3">Ładowanie historii...</p>
+              <p class="text-surface-400 mt-3">{{ t('loadingDecisionHistory') }}</p>
             </div>
 
             <div
@@ -379,7 +377,7 @@
               >
                 <font-awesome-icon :icon="faHistory" class="h-8 text-surface-600" />
               </div>
-              <p class="text-surface-400 text-sm font-medium">Brak decyzji w historii</p>
+              <p class="text-surface-400 text-sm font-medium">{{ t('noDecisionHistory') }}</p>
             </div>
 
             <div v-for="(entry, index) in decisions" :key="index">
@@ -389,7 +387,7 @@
               >
                 <div class="flex items-center gap-2 mb-2">
                   <font-awesome-icon :icon="faBolt" class="h-5 text-blue-400" />
-                  <h3 class="font-bold text-lg text-blue-300">Nowe Wydarzenie</h3>
+                  <h3 class="font-bold text-lg text-blue-300">{{ t('newEvent') }}</h3>
                 </div>
                 <p class="text-white mt-2">{{ entry.feedbackDescription }}</p>
                 <p class="text-xs text-gray-500 mt-2">{{ formatDate(entry.timestamp) }}</p>
@@ -409,7 +407,7 @@
                 <div class="flex items-start justify-between mb-2">
                   <div>
                     <p class="text-white font-semibold">{{ entry.tableName }}</p>
-                    <p class="text-sm text-surface-400">Karta ID: {{ entry.cardId }}</p>
+                    <p class="text-sm text-surface-400">{{ t('cardId') }}: {{ entry.cardId }}</p>
                   </div>
                   <span
                     class="px-2 py-1 text-xs font-semibold rounded"
@@ -451,7 +449,6 @@ import {
 import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
-
 import GameBoard from '@/components/game/gameBoard.vue'
 import apiConfig from '@/services/apiConfig'
 import apiServices from '@/services/apiServices'
@@ -639,7 +636,7 @@ const fetchGameDetails = async () => {
     const response = await apiServices.get<GameDetails>(apiConfig.games.getById(gameId))
     deckId.value = response.data.deckId
   } catch (error: any) {
-    toast.error('Nie udało się pobrać szczegółów gry.')
+    toast.error(t('errorFetchingGameData') + error)
     console.error('Błąd pobierania szczegółów gry:', error.response?.data || error.message)
   }
 }
@@ -662,7 +659,7 @@ const fetchDecisionHistory = async () => {
       eventAppliedId: log.gameEventId,
     }))
   } catch (error: any) {
-    toast.error('Wystąpił błąd podczas ładowania historii decyzji.')
+    toast.error(t('errorFetchingDecisionHistory'))
     console.error('Błąd ładowania historii:', error.response?.data || error.message)
   } finally {
     loadingHistory.value = false
@@ -684,9 +681,8 @@ const fetchPendingDecisions = async () => {
       tableName: log.teamName,
     }))
 
-    console.log('Pobrane decyzje oczekujące:', pendingDecisions.value)
   } catch (error: any) {
-    toast.error('Błąd podczas pobierania sugestii.')
+    toast.error(t('errorFetchingSuggestions') + error)
     console.error('Błąd pobierania sugestii:', error.response?.data || error.message)
   } finally {
     loadingPending.value = false
@@ -699,9 +695,8 @@ const fetchTeams = async () => {
     const response = await apiServices.get(apiConfig.player.getTeamsManagement(gameId))
     tables.value = response.data as Team[]
 
-    console.log('Pobrane drużyny:', tables.value)
   } catch (error: any) {
-    toast.error('Błąd pobierania drużyn.')
+    toast.error(t('errorFetchingTeams') + error)
     console.error('Błąd pobierania drużyn:', error.response?.data || error.message)
   }
 }
@@ -735,7 +730,7 @@ const fetchAvailableCardsForTeam = async () => {
 
     items.value = [...softwareCards, ...hardwareCards]
   } catch (error: any) {
-    toast.error('Błąd pobierania dostępnych kart i przedmiotów.')
+    toast.error(t('errorFetchingDecisionCards') + t('errorFetchingItems'))
     console.error('Błąd pobierania kart:', error.response?.data || error.message)
   } finally {
     loading.cards = false
@@ -745,7 +740,7 @@ const fetchAvailableCardsForTeam = async () => {
 
 const fetchGameEvents = async (currentDeckId: number) => {
   if (!currentDeckId) {
-    toast.error('Brak ID talii, nie można pobrać zdarzeń.')
+    toast.error(t('noDeckId'))
     return
   }
   try {
@@ -756,7 +751,7 @@ const fetchGameEvents = async (currentDeckId: number) => {
       ...(response.data as GameEvent[]),
     ]
   } catch (error: any) {
-    toast.error('Nie udało się pobrać listy zdarzeń.')
+    toast.error(t('errorFetchingGameEvents'))
     console.error('Błąd pobierania zdarzeń:', error.response?.data || error.message)
   }
 }
@@ -783,7 +778,7 @@ const fetchRivalBoard = async () => {
       await fetchRivalPawns()
     }
   } catch (error: any) {
-    toast.error('Wystąpił błąd podczas ładowania danych planszy rywala.')
+    toast.error(t('errorFetchingRivalBoard') + error)
     console.error('Błąd w fetchRivalBoard:', error.response?.data || error.message)
   }
 }
@@ -802,7 +797,7 @@ const fetchRivalPawns = async () => {
       name: p.teamName,
     }))
   } catch (err: any) {
-    console.error('Błąd pobierania pionków rywala:', err.response?.data || err.message)
+    console.error(t('errorFetchingPawns'), err.response?.data || err.message)
   }
 }
 
@@ -855,8 +850,6 @@ async function executeAction(isCard: boolean) {
       payload,
     )
 
-    toast.success(response.data?.message || 'Akcja przetworzona pomyślnie.')
-
     const teamToUpdate = tables.value.find((t) => t.teamId === team.teamId)
     if (teamToUpdate) {
       teamToUpdate.teamBud = response.data.newTeamBudget
@@ -886,7 +879,6 @@ const approveDecision = async (logId: number) => {
   console.log('Jaki log jest do zatwierdzenia  ?', logId)
   try {
     const response = await apiServices.post(apiConfig.player.approveLog(logId), {})
-    toast.success('Sugestia została zatwierdzona!')
     console.log(response.data, 'Co otrzymałem po approve ?')
     console.log(
       'Zaktualizowano listę decyzji po zatwierdzeniu do zatwierdzenia:',
@@ -894,7 +886,7 @@ const approveDecision = async (logId: number) => {
     )
     console.log('Pobrana historia decyzji:', decisions.value)
   } catch (error: any) {
-    toast.error('Wystąpił błąd podczas zatwierdzania sugestii.')
+    toast.error(t('errorApprovingSuggestion') + error)
     console.error('Błąd zatwierdzania:', error.response?.data || error.message)
   }
 }
@@ -902,9 +894,8 @@ const approveDecision = async (logId: number) => {
 const rejectDecision = async (logId: number) => {
   try {
     await apiServices.delete(apiConfig.player.rejectLog(logId))
-    toast.info('Sugestia została odrzucona.')
   } catch (error: any) {
-    toast.error('Wystąpił błąd podczas odrzucania sugestii.')
+    toast.error(t('errorRejectingSuggestion') + error)
     console.error('Błąd odrzucania:', error.response?.data || error.message)
   }
 }
@@ -918,9 +909,8 @@ async function applySelectedEvent() {
     await apiServices.post(apiConfig.player.applyEvent(gameId), {
       eventId: selectedPendingEventIndex.value,
     })
-    toast.success('Zdarzenie zostało aktywowane!')
   } catch (error: any) {
-    toast.error('Błąd podczas aktywacji zdarzenia.')
+    toast.error(t('errorApplyingEvent') + error)
     console.error('Błąd aktywacji zdarzenia:', error.response?.data || error.message)
   }
 }
@@ -941,7 +931,7 @@ onMounted(async () => {
       fetchRivalBoard(),
     ])
   } else {
-    toast.error('Nie udało się pobrać ID talii. Niektóre funkcje mogą nie działać.')
+    toast.error(t('noDeckId'))
     await Promise.all([
       fetchTeams(),
       fetchDecisionHistory(),

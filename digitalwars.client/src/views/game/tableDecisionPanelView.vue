@@ -2,10 +2,10 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <div class="text-center">
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
-        Panel Decyzji
+        {{ t('decisionPanel') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base mb-3">
-        Zarządzaj decyzjami i przedmiotami dla drużyny
+        {{ t('manageDecisionsAndItemsForTeam') }}
       </p>
       <div
         class="inline-flex gap-3 items-center px-6 py-3 bg-surface-900 border border-surface-700 rounded-xl shadow-lg"
@@ -28,19 +28,19 @@
               <div class="bg-primary-500/20 p-3 rounded-lg">
                 <font-awesome-icon :icon="faGamepad" class="h-6 text-primary-400" />
               </div>
-              <h2 class="text-xl md:text-2xl font-bold text-white">Zarządzanie akcjami</h2>
+              <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('actionManagment') }}</h2>
             </div>
 
             <div class="flex gap-3 mb-5">
               <Button
-                :label="'Decyzje'"
+                :label="t('decisions')"
                 @click="actionMode = 'cards'"
                 :severity="actionMode === 'cards' ? undefined : 'secondary'"
                 class="flex-1"
                 outlined
               />
               <Button
-                :label="'Przedmioty'"
+                :label="t('items')"
                 @click="actionMode = 'items'"
                 :severity="actionMode === 'items' ? undefined : 'secondary'"
                 class="flex-1"
@@ -49,13 +49,13 @@
             </div>
 
             <div v-if="actionMode === 'cards'" class="mb-4">
-              <label class="block mb-2 text-sm font-semibold text-gray-300">Wybierz kartę:</label>
+              <label class="block mb-2 text-sm font-semibold text-gray-300">{{ t('selectCard') }}</label>
               <Dropdown
                 v-model="selectedCardId"
                 :options="cards"
                 optionLabel="title"
                 optionValue="id"
-                placeholder="Wybierz kartę..."
+                :placeholder="t('selectCardPlaceholder')"
                 class="w-full"
                 :disabled="loading.cards"
               >
@@ -77,14 +77,14 @@
 
             <div v-if="actionMode === 'items'" class="mb-4">
               <label class="block mb-2 text-sm font-semibold text-gray-300">
-                Wybierz przedmiot:
+                {{ t('selectItem') }}
               </label>
               <Dropdown
                 v-model="selectedItemId"
                 :options="items"
                 optionLabel="title"
                 optionValue="id"
-                placeholder="Wybierz przedmiot..."
+                :placeholder="t('selectItemPlaceholder')"
                 class="w-full"
                 :disabled="loading.items"
               >
@@ -122,15 +122,15 @@
               "
               class="bg-surface-800 rounded-lg p-4 border border-surface-700 mb-4"
             >
-              <p class="text-sm text-surface-400 mb-1">Opis:</p>
+              <p class="text-sm text-surface-400 mb-1">{{ t('description') }}:</p>
               <p class="text-sm text-gray-300">
                 {{ actionMode === 'cards' ? selectedCard?.description : selectedItem?.description }}
               </p>
               <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-700">
-                <span class="text-sm text-surface-400">Koszt:</span>
+                <span class="text-sm text-surface-400">{{ t('cost') }}:</span>
                 <span class="text-lg font-bold text-green-400">
                   {{ (actionMode === 'cards' ? selectedCard?.cost : selectedItem?.cost) || 0 }}
-                  bitów
+                  {{ t('bits') }}
                 </span>
               </div>
             </div>
@@ -141,10 +141,10 @@
             >
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-surface-400">Budżet drużyny:</p>
+                  <p class="text-sm text-surface-400">{{ t('teamBudget') }}:</p>
                   <p class="text-sm font-semibold text-white">{{ teamData.teamName }}</p>
                 </div>
-                <span class="text-2xl font-bold text-green-400">{{ teamData.teamBud }} bitów</span>
+                <span class="text-2xl font-bold text-green-400">{{ teamData.teamBud }} {{ t('bits') }}</span>
               </div>
             </div>
 
@@ -153,7 +153,7 @@
                 v-if="actionMode === 'cards'"
                 :disabled="!selectedCardId"
                 @click="playCard"
-                :label="'Zagraj kartę'"
+                :label="t('playCard')"
                 size="large"
                 class="w-full"
               />
@@ -161,7 +161,7 @@
                 v-if="actionMode === 'items'"
                 :disabled="!selectedItemId"
                 @click="giveItem"
-                :label="'Użyj przedmiot'"
+                :label="t('useItem')"
                 size="large"
                 class="w-full"
               />
@@ -178,12 +178,12 @@
             <div class="bg-yellow-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faClock" class="h-6 text-yellow-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">Panel decyzji</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('decisionPanel') }}</h2>
           </div>
 
           <div class="flex gap-3 mb-5">
             <Button
-              :label="'Do zatwierdzenia'"
+              :label="t('toApprove')"
               :severity="decisionMode === 'pending' ? undefined : 'secondary'"
               @click="decisionMode = 'pending'"
               class="flex-1"
@@ -194,7 +194,7 @@
               </template>
             </Button>
             <Button
-              :label="'Historia'"
+              :label="t('history')"
               :severity="decisionMode === 'history' ? undefined : 'secondary'"
               @click="decisionMode = 'history'"
               class="flex-1"
@@ -212,7 +212,7 @@
           >
             <div v-if="loading.pending" class="text-center py-8">
               <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-              <p class="text-surface-400 mt-3">Ładowanie sugestii...</p>
+              <p class="text-surface-400 mt-3">{{ t('loadingSuggestions') }}</p>
             </div>
 
             <div
@@ -224,7 +224,7 @@
               >
                 <font-awesome-icon :icon="faClock" class="h-8 text-surface-600" />
               </div>
-              <p class="text-surface-400 text-sm font-medium">Brak decyzji do zatwierdzenia</p>
+              <p class="text-surface-400 text-sm font-medium">{{ t('noDecisionsToApprove') }}</p>
             </div>
 
             <div
@@ -235,12 +235,12 @@
               <div class="flex items-start justify-between mb-2">
                 <div>
                   <p class="text-white font-semibold">{{ entry.tableName }}</p>
-                  <p class="text-sm text-surface-400">sugeruje kartę</p>
+                  <p class="text-sm text-surface-400">{{ t('suggectCard') }}</p>
                 </div>
                 <span
                   class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-semibold rounded"
                 >
-                  Oczekuje
+                  {{ t('awaits') }}
                 </span>
               </div>
               <div class="mb-2">
@@ -248,7 +248,7 @@
                   {{ entry.cardTitle }}
                 </p>
                 <p class="text-xs text-gray-500 mt-1">
-                  ID karty: <span class="font-semibold text-surface-400">{{ entry.cardId }}</span>
+                  {{ t('cardId') }}: <span class="font-semibold text-surface-400">{{ entry.cardId }}</span>
                 </p>
               </div>
               <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
@@ -256,7 +256,7 @@
               <div class="flex gap-2 mt-4">
                 <Button
                   @click="approveDecision(entry.logId)"
-                  :label="'Zatwierdź'"
+                  :label="t('approve')"
                   severity="success"
                   size="small"
                   class="flex-1"
@@ -267,7 +267,7 @@
                 </Button>
                 <Button
                   @click="rejectDecision(entry.logId)"
-                  :label="'Odrzuć'"
+                  :label="t('reject')"
                   severity="danger"
                   size="small"
                   class="flex-1"
@@ -283,7 +283,7 @@
           <div v-else class="space-y-3 max-h-[75vh] overflow-y-auto custom-scrollbar">
             <div v-if="loading.history" class="text-center py-8">
               <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-              <p class="text-surface-400 mt-3">Ładowanie historii...</p>
+              <p class="text-surface-400 mt-3">{{ t('loadingHistory') }}</p>
             </div>
 
             <div
@@ -295,7 +295,7 @@
               >
                 <font-awesome-icon :icon="faHistory" class="h-8 text-surface-600" />
               </div>
-              <p class="text-surface-400 text-sm font-medium">Brak decyzji w historii</p>
+              <p class="text-surface-400 text-sm font-medium">{{ t('noDecisionHistory') }}</p>
             </div>
 
             <div v-for="(entry, index) in decisions" :key="index">
@@ -305,7 +305,7 @@
               >
                 <div class="flex items-center gap-2 mb-2">
                   <font-awesome-icon :icon="faBolt" class="h-5 text-blue-400" />
-                  <h3 class="font-bold text-lg text-blue-300">Nowe Wydarzenie</h3>
+                  <h3 class="font-bold text-lg text-blue-300">{{ t('newEvent') }}</h3>
                 </div>
                 <p class="text-white mt-2">{{ entry.feedbackDescription }}</p>
                 <p class="text-xs text-gray-500 mt-2">{{ formatDate(entry.timestamp) }}</p>
@@ -325,7 +325,7 @@
                 <div class="flex items-start justify-between mb-2">
                   <div>
                     <p class="text-white font-semibold">{{ entry.tableName }}</p>
-                    <p class="text-sm text-surface-400">Karta ID: {{ entry.cardId }}</p>
+                    <p class="text-sm text-surface-400">{{ t('cardId') }}: {{ entry.cardId }}</p>
                   </div>
                   <span
                     class="px-2 py-1 text-xs font-semibold rounded"
@@ -340,7 +340,7 @@
                 </div>
                 <p class="text-lg font-bold text-primary-400 mb-2">{{ entry.cardTitle }}</p>
                 <p class="text-sm text-gray-300 mb-2">
-                  {{ entry.feedbackDescription || 'Brak opisu feedbacku.' }}
+                  {{ entry.feedbackDescription || t('noFeedbackDescription') }}
                 </p>
                 <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
               </div>
@@ -564,7 +564,7 @@ const fetchAllDataForTeam = async () => {
       fetchGameEvents(teamData.value.deckId),
     ])
   } catch (error) {
-    toast.error('Wystąpił błąd podczas ładowania kluczowych danych drużyny.')
+    toast.error(t('errorLoadingTeamData'))
     console.error('Błąd w fetchAllDataForTeam:', error)
   } finally {
     Object.keys(loading).forEach((k) => (loading[k as keyof typeof loading] = false))
@@ -598,7 +598,7 @@ const fetchAvailableCardsAndItems = async () => {
 
     items.value = [...softwareCards, ...hardwareCards]
   } catch (error) {
-    toast.error('Błąd pobierania kart i przedmiotów.')
+    toast.error(t('errorFetchingCardsAndItems'))
     console.error('Błąd pobierania kart:', error)
   }
 }
@@ -632,7 +632,8 @@ const fetchDecisionHistory = async () => {
       )
     }
   } catch (error) {
-    toast.error('Błąd ładowania historii decyzji.')
+    // Używam klucza z literówką "Decsion", bo tak jest w Twoim pliku pl.ts
+    toast.error(t('errorFetchingDecsionHistory'))
   }
 }
 
@@ -644,7 +645,7 @@ const fetchPendingDecisions = async () => {
     pendingDecisions.value = response.data
     console.log('Pobrane decyzje do akceptacji:', pendingDecisions.value)
   } catch (error) {
-    toast.error('Błąd pobierania sugestii.')
+    toast.error(t('errorFetchingSuggestions'))
   }
 }
 
@@ -690,12 +691,12 @@ const executeCardOrItemAction = async (isCard: boolean) => {
   const team = teamData.value
 
   if (!entity || !team) {
-    toast.error('Brak kluczowych danych (drużyna, karta/przedmiot), aby wykonać akcję.')
+    toast.error(t('missingActionData'))
     return
   }
 
   if (!team.boardId || team.boardId === 0) {
-    toast.error(`Drużyna "${team.teamName}" nie ma przypisanego ID planszy.`)
+    toast.error(t('teamNoBoardId', { teamName: team.teamName }))
     return
   }
 
@@ -734,7 +735,8 @@ const executeCardOrItemAction = async (isCard: boolean) => {
       payload,
     )
 
-    toast.success(response.data?.message || 'Akcja przetworzona pomyślnie.')
+    // Usunięty toast.success zgodnie z instrukcją
+    // toast.success(response.data?.message || 'Akcja przetworzona pomyślnie.')
 
     if (teamData.value) {
       teamData.value.teamBud = response.data.newTeamBudget
@@ -746,7 +748,7 @@ const executeCardOrItemAction = async (isCard: boolean) => {
       toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }))
       return
     }
-    toast.error(error.response?.data?.message || 'Wystąpił błąd podczas wykonywania akcji.')
+    toast.error(error.response?.data?.message || t('actionExecutionError'))
     console.error('Błąd akcji karty/przedmiotu:', error.response?.data || error.message)
   }
 
@@ -763,18 +765,18 @@ const giveItem = () => executeCardOrItemAction(false)
 const approveDecision = async (logId: number) => {
   try {
     await apiServices.post(apiConfig.player.approveLog(logId), {})
-    toast.success('Sugestia została zatwierdzona!')
+    // Usunięty toast.success zgodnie z instrukcją
   } catch (error) {
-    toast.error('Wystąpił błąd podczas zatwierdzania sugestii.')
+    toast.error(t('errorApprovingSuggestion'))
   }
 }
 
 const rejectDecision = async (logId: number) => {
   try {
     await apiServices.delete(apiConfig.player.rejectLog(logId))
-    toast.info('Sugestia została odrzucona.')
+    toast.info(t('suggestionRejected'))
   } catch (error) {
-    toast.error('Wystąpił błąd podczas odrzucania sugestii.')
+    toast.error(t('errorRejectingSuggestion'))
   }
 }
 
@@ -783,7 +785,7 @@ const formatDate = (timestamp: string) => new Date(timestamp).toLocaleString('pl
 onMounted(async () => {
   const gameIdNum = Number(props.gameId)
   if (isNaN(gameIdNum)) {
-    toast.error('Błąd krytyczny: Brak lub nieprawidłowe ID gry!')
+    toast.error(t('criticalGameIdError'))
     return
   }
 

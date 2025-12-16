@@ -5,7 +5,7 @@
         class="flex gap-4 bg-surface-800/80 px-8 py-4 rounded-xl shadow-md border border-surface-700/60 backdrop-blur-sm"
       >
         <Button
-          :label="'Karty Decyzji'"
+          :label="t('decisionCards')"
           @click="currentView = 'decisions'"
           outlined
           size="large"
@@ -17,7 +17,7 @@
         </Button>
 
         <Button
-          :label="'Przedmioty'"
+          :label="t('items')"
           @click="currentView = 'items'"
           outlined
           size="large"
@@ -29,7 +29,7 @@
         </Button>
 
         <Button
-          :label="'Procesy'"
+          :label="t('processes')"
           @click="currentView = 'processes'"
           outlined
           size="large"
@@ -41,7 +41,7 @@
         </Button>
 
         <Button
-          :label="'Enablery'"
+          :label="t('enablers')"
           @click="currentView = 'enablers'"
           outlined
           size="large"
@@ -71,6 +71,9 @@ import EditProccesses from '@/components/game/EditProccesses.vue'
 import Button from 'primevue/button'
 import { faMicrochip, faChessPawn, faClone, faLock } from '@fortawesome/free-solid-svg-icons'
 import DynamicCheatSheetEdit from '@/components/cheatSheet/DynamicCheatSheetEdit.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const currentView = ref<'items' | 'decisions' | 'processes' | 'enablers'>('decisions')
 </script>

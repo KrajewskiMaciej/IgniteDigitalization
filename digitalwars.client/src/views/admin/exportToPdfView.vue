@@ -1,27 +1,25 @@
 <template>
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
-    <!-- Nagłówek -->
     <div class="text-center">
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
-        Eksport gry do PDF
+        {{ t('gameExportToPdf') }}
       </h1>
-      <p class="text-surface-400 text-sm md:text-base">Generuj pliki PDF z kartami i planszami</p>
+      <p class="text-surface-400 text-sm md:text-base">{{ t('generatePdfDescription') }}</p>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
-      <!-- Sekcja 1: Eksport talii kart -->
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-700">
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faFileExport" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Eksport kart</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('cardExport') }}</h2>
         </div>
 
         <div class="space-y-4">
           <div>
             <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
-              Wybierz talię kart:
+              {{ t('selectDeck') }}
             </label>
             <Dropdown
               id="deck-select"
@@ -29,7 +27,7 @@
               :options="decksData"
               optionLabel="title"
               optionValue="id"
-              placeholder="Wybierz talię..."
+              :placeholder="t('selectDeckPlaceholder')"
               class="w-full"
               :disabled="isLoading"
             >
@@ -47,26 +45,26 @@
               <template #icon>
                 <font-awesome-icon :icon="faFileExport" class="h-4" />
               </template>
-              <span class="ml-2">{{ isLoading ? 'Generowanie...' : 'Generuj PDF z kartami' }}</span>
+              <span class="ml-2">{{
+                isLoading ? t('generating') : t('generateCardPdf')
+              }}</span>
             </Button>
           </div>
         </div>
       </div>
 
-      <!-- Sekcja 2: Eksport plansz -->
       <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-700">
           <div class="bg-green-400/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faFileExport" class="h-6 text-green-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Eksport plansz</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('boardExport') }}</h2>
         </div>
 
         <div class="space-y-4">
-          <!-- Plansza stołu -->
           <div>
             <label for="board-select" class="block mb-2 text-sm font-semibold text-gray-300">
-              Plansza stołu:
+              {{ t('tableBoard') }}
             </label>
             <Dropdown
               id="board-select"
@@ -74,20 +72,19 @@
               :options="boardsData"
               optionLabel="name"
               optionValue="boards_Id"
-              placeholder="Wybierz planszę stołu..."
+              :placeholder="t('selectTableBoardPlaceholder')"
               class="w-full"
               :disabled="isLoading"
             >
             </Dropdown>
           </div>
 
-          <!-- Plansza konkurencji -->
           <div>
             <label
               for="opponent-board-select"
               class="block mb-2 text-sm font-semibold text-gray-300"
             >
-              Plansza konkurencji:
+              {{ t('opponentBoard') }}
             </label>
             <Dropdown
               id="opponent-board-select"
@@ -95,14 +92,13 @@
               :options="boardsData"
               optionLabel="name"
               optionValue="boards_Id"
-              placeholder="Wybierz planszę konkurencji..."
+              :placeholder="t('selectOpponentBoardPlaceholder')"
               class="w-full"
               :disabled="isLoading"
             >
             </Dropdown>
           </div>
 
-          <!-- Informacja o wybranych planszach -->
           <div
             v-if="selectedBoard && selectedOpponentBoard"
             class="bg-surface-800 border border-surface-600 rounded-lg p-4"
@@ -114,18 +110,20 @@
                     <font-awesome-icon :icon="faChessBoard" class="text-green-400" />
                   </div>
                   <div>
-                    <p class="text-sm text-gray-300 mb-2">Wybrano plansze:</p>
+                    <p class="text-sm text-gray-300 mb-2">{{ t('selectedBoards') }}</p>
                   </div>
                 </div>
                 <ul class="space-y-1 text-sm">
                   <li class="flex items-center gap-2 text-white">
                     <span class="w-2 h-2 bg-green-400 rounded-full"></span>
-                    <span class="font-medium">Stół:</span>
-                    <span>{{ boardsData.find((b) => b.boards_Id === selectedBoard)?.name }}</span>
+                    <span class="font-medium">{{ t('tableLabel') }}</span>
+                    <span>{{
+                      boardsData.find((b) => b.boards_Id === selectedBoard)?.name
+                    }}</span>
                   </li>
                   <li class="flex items-center gap-2 text-white">
                     <span class="w-2 h-2 bg-green-400 rounded-full"></span>
-                    <span class="font-medium">Konkurencja:</span>
+                    <span class="font-medium">{{ t('opponentLabel') }}</span>
                     <span>{{
                       boardsData.find((b) => b.boards_Id === selectedOpponentBoard)?.name
                     }}</span>
@@ -148,7 +146,7 @@
                 <font-awesome-icon :icon="faFileExport" class="h-4" />
               </template>
               <span class="ml-2">{{
-                isLoading ? 'Generowanie...' : 'Generuj PDF z planszami'
+                isLoading ? t('generating') : t('generateBoardPdf')
               }}</span>
             </Button>
           </div>
@@ -164,9 +162,11 @@ import { useToast } from 'vue-toastification'
 import { faFileExport, faChessBoard } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
-
+import { useI18n } from 'vue-i18n'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
+
+const { t } = useI18n()
 
 interface Deck {
   id: number
@@ -216,7 +216,7 @@ const downloadFileFromResponse = (response: any, defaultFileName: string) => {
 
 const exportDeckToPDF = async () => {
   if (!isFormDeckValid.value) {
-    toast.error('Proszę wybrać talię kart.')
+    toast.warning(t('selectDeck'))
     return
   }
   isLoading.value = true
@@ -224,9 +224,8 @@ const exportDeckToPDF = async () => {
     const url = apiConfig.admin.export.cards(selectedDeck.value!)
     const response = await apiService.getFile(url)
     downloadFileFromResponse(response, 'DigitalWars - Karty.pdf')
-    toast.success('PDF z kartami został pomyślnie wygenerowany.')
   } catch (error: any) {
-    toast.error('Wystąpił błąd podczas generowania PDF z kartami.')
+    toast.error(t('errorGeneratingCardPdf') + error)
     console.error('Błąd generowania PDF z kartami:', error.response?.data || error.message)
   } finally {
     isLoading.value = false
@@ -235,7 +234,7 @@ const exportDeckToPDF = async () => {
 
 const exportBoardsToPDF = async () => {
   if (!isFormBoardsValid.value) {
-    toast.error('Proszę wybrać obie plansze przed wygenerowaniem PDF.')
+    toast.error(t('selectBothBoards'))
     return
   }
 
@@ -244,9 +243,8 @@ const exportBoardsToPDF = async () => {
     const url = apiConfig.admin.export.boards(selectedBoard.value!, selectedOpponentBoard.value!)
     const response = await apiService.getFile(url)
     downloadFileFromResponse(response, 'DigitalWars - Plansze.pdf')
-    toast.success('PDF z planszami został pomyślnie wygenerowany.')
   } catch (error: any) {
-    toast.error('Wystąpił błąd podczas generowania PDF z planszami.')
+    toast.error(t('errorGeneratingBoardPdf') + error)
     console.error('Błąd generowania PDF z planszami:', error.response?.data || error.message)
   } finally {
     isLoading.value = false
@@ -258,7 +256,7 @@ const fetchBoardsFromAPI = async () => {
     const response = await apiService.get(apiConfig.boards.getAll)
     boardsData.value = response.data as Board[]
   } catch (error: any) {
-    toast.error(`Nie udało się pobrać plansz: ${error.message}`)
+    toast.error(t('errorFetchigBoards') + error)
   }
 }
 
@@ -267,7 +265,7 @@ const fetchDecksFromAPI = async () => {
     const response = await apiService.get(apiConfig.admin.deck.getAll)
     decksData.value = response.data as Deck[]
   } catch (error: any) {
-    toast.error(`Nie udało się pobrać talii kart: ${error.message}`)
+    toast.error(t('errorFetchingDecks') + error)
   }
 }
 

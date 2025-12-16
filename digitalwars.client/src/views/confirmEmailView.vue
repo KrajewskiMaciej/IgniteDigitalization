@@ -11,16 +11,16 @@
             class="text-5xl sm:text-6xl text-accent mb-4 block mx-auto"
           />
 
-          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">Konto aktywne</h2>
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">{{ t('accountActive') }}</h2>
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
           <div class="text-center text-sm sm:text-base text-gray-300 space-y-3">
-            <p>Twoje konto jest już aktywne i możesz z niego korzystać.</p>
-            <p>Wróć do strony logowania i zaloguj się na swoje konto.</p>
+            <p>{{ t('accountIsActiveYouCanUseTheApp') }}</p>
+            <p>{{ t('returnToLoginPageAndSignIn') }}</p>
             <p class="text-gray-400">
-              Automatyczne przekierowanie za
-              <span class="text-accent font-bold text-lg">{{ time }}s</span>
+              {{ t('automaticRedirectIn') }}
+              <span class="text-accent font-bold text-lg">{{ time }}{{ t('seconds') }}</span>
             </p>
           </div>
 
@@ -28,7 +28,7 @@
             @click="handleReturnToLogin"
             class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all duration-300 overflow-hidden group text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 mt-6"
           >
-            <span class="relative z-10">Zaloguj się</span>
+            <span class="relative z-10">{{ t('signIn') }}</span>
             <div
               class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
             ></div>
@@ -41,20 +41,20 @@
             class="text-5xl sm:text-6xl text-red-500 mb-4 block mx-auto"
           />
 
-          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">Link wygasł</h2>
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">{{ t('linkExpired') }}</h2>
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
           <div class="text-center text-sm sm:text-base text-gray-300 space-y-3">
-            <p>Wygląda na to, że twój link aktywacyjny wygasł lub jest nieprawidłowy.</p>
-            <p>Aby otrzymać nowy link aktywacyjny zaloguj się na nowo.</p>
+            <p>{{ t('linkExpiredMessage') }}</p>
+            <p>{{ t('toGetNewResetLink') }}</p>
           </div>
 
           <button
             @click="handleReturnToLogin"
             class="relative w-full py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all duration-300 overflow-hidden group text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 mt-6"
           >
-            <span class="relative z-10">Powrót do logowania</span>
+            <span class="relative z-10">{{ t('backToLogin') }}</span>
             <div
               class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
             ></div>
@@ -72,6 +72,9 @@ import { onMounted, ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import apiConfig from '@/services/apiConfig.js'
 import apiService from '@/services/apiServices.js'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 // --- POPRAWKA: Definicja interfejsu dla odpowiedzi API ---
 interface ConfirmEmailResponse {
