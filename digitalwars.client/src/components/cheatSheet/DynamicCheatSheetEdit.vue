@@ -29,6 +29,7 @@
             :options="decksData"
             optionLabel="title"
             optionValue="id"
+            showClear
             placeholder="Wybierz talię..."
             class="w-full"
             :disabled="isLoadingDecks"
@@ -218,7 +219,7 @@ const { fitView, zoomIn, zoomOut } = useVueFlow()
 const { t } = useI18n()
 const toast = useToast()
 
-const selectedDeckId = ref<number>()
+const selectedDeckId = defineModel<number | undefined>();
 const decksData = ref<Deck[]>([])
 const isLoadingDecks = ref<boolean>(false)
 const currentLayout = useStorage<'TB' | 'LR'>('prefferedLayour', 'TB')

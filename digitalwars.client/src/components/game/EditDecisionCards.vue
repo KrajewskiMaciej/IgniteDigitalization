@@ -55,6 +55,7 @@
             id="deck-select"
             v-model="selectedDeckId"
             :options="decksData"
+            showClear
             optionLabel="title"
             optionValue="id"
             :placeholder="t('selectDeckPlaceholder')"
@@ -365,7 +366,7 @@ interface Card {
 
 // --- ZMIENNE REAKTYWNE ---
 const toast = useToast()
-const selectedDeckId = ref<number | undefined>(undefined)
+const selectedDeckId = defineModel<number | undefined>();
 const selectedCardId = ref<number | undefined>(undefined)
 const selectedFeedbackId = ref<number | undefined>(undefined)
 const feedbacksData = ref<IFeedback[]>([])

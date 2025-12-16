@@ -28,6 +28,7 @@
             id="deck-select"
             v-model="selectedDeckId"
             :options="decksData"
+            showClear
             optionLabel="title"
             optionValue="id"
             :placeholder="t('selectDeckPlaceholder')"
@@ -210,7 +211,7 @@ interface Item {
 
 const toast = useToast()
 
-const selectedDeckId = ref<number | undefined>(undefined)
+const selectedDeckId = defineModel<number | undefined>();
 const selectedItem = ref<number | undefined>(undefined)
 
 // --- Stan komponentu z jawnymi typami ---

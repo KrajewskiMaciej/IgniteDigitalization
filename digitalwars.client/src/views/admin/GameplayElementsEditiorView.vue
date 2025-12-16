@@ -55,10 +55,10 @@
     </div>
 
     <div class="mt-6">
-      <EditDecisionCards v-if="currentView === 'decisions'" />
-      <EditItems v-else-if="currentView === 'items'" />
-      <EditProccesses v-else-if="currentView === 'processes'" />
-      <DynamicCheatSheetEdit v-else-if="currentView === 'enablers'" />
+      <EditDecisionCards v-model="selectedDeckId" v-if="currentView === 'decisions'" />
+      <EditItems v-model="selectedDeckId" v-else-if="currentView === 'items'" />
+      <EditProccesses v-model="selectedDeckId" v-else-if="currentView === 'processes'" />
+      <DynamicCheatSheetEdit v-model="selectedDeckId" v-else-if="currentView === 'enablers'" />
     </div>
   </div>
 </template>
@@ -76,4 +76,5 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 const currentView = ref<'items' | 'decisions' | 'processes' | 'enablers'>('decisions')
+const selectedDeckId = ref<number | undefined>(undefined);
 </script>

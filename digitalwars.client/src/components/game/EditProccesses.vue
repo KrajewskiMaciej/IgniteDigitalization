@@ -25,6 +25,7 @@
           <Dropdown
             id="deck-select"
             v-model="selectedDeck"
+            showClear
             :options="decksData"
             optionLabel="title"
             optionValue="id"
@@ -270,7 +271,7 @@ interface Process {
 }
 
 // --- REACTIVE DATA ---
-const selectedDeck = ref<number | null>(null)
+const selectedDeck = defineModel<number | undefined>();
 const decksData = ref<Deck[]>([])
 
 const processesData = ref<Process[]>([])
