@@ -2,8 +2,8 @@
   <div class="h-full w-full max-w-md mx-auto flex flex-col">
     <!-- Góra: bity + etap -->
     <div class="flex justify-between items-center mb-2">
-      <div class="text-xl font-bold text-green-600">Bity: {{ currentBudget }}</div>
-      <div class="text-md font-semibold text-primary-400">Etap:</div>
+      <div class="text-xl font-bold text-green-600">{{ t('numberOfBits') }} {{ currentBudget }}</div>
+      <div class="text-md font-semibold text-primary-400">{{ t('stage') }}</div>
     </div>
 
     <div
@@ -12,14 +12,14 @@
 
     <!-- Tabela decyzji -->
     <div class="flex flex-col flex-grow pt-3 overflow-hidden">
-      <h2 class="text-lg font-semibold mb-2 text-white">Decyzje</h2>
+      <h2 class="text-lg font-semibold mb-2 text-white">{{ t('decisions') }}</h2>
 
       <!-- Lista -->
       <div class="overflow-y-auto custom-scrollbar pr-2 flex-grow">
-        <div v-if="isLoading" class="text-center text-gray-500">Ładowanie historii...</div>
+        <div v-if="isLoading" class="text-center text-gray-500">{{ t('loadingDecisionHistory') }}</div>
         <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
         <div v-else-if="gameLogEntries.length === 0" class="text-center text-surface-400">
-          Brak historii decyzji.
+          {{ t('noDecisionHistory') }}
         </div>
         <ul v-else class="space-y-3 text-sm">
           <li v-for="(decision, index) in gameLogEntries" :key="index">
@@ -27,7 +27,7 @@
               v-if="decision.isEventNotification"
               class="border-2 border-blue-400 rounded-lg p-3 bg-blue-900/60 text-center"
             >
-              <h4 class="font-bold text-blue-300 text-sm mb-1">Nowe Wydarzenie</h4>
+              <h4 class="font-bold text-blue-300 text-sm mb-1">{{ t('newEvent') }}</h4>
               <p class="text-white text-xs leading-relaxed">{{ decision.description }}</p>
             </div>
 
@@ -53,7 +53,7 @@
 
               <div class="border-t border-gray-600 pt-2">
                 <div class="flex items-center gap-2 mb-1">
-                  <span class="text-surface-400 text-xs">Wynik:</span>
+                  <span class="text-surface-400 text-xs">{{ t('result') }}:</span>
                   <span
                     class="font-bold text-sm"
                     :class="{
@@ -80,7 +80,10 @@
 import apiConfig from '@/services/apiConfig'
 import apiServices from '@/services/apiServices'
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
-import signalrService from '@/services/signalService'
+import { useI18n } from 'vue-i18n'
+
+
+const { t } = useI18n(); 
 
 // --- DEFINICJE INTERFEJSÓW ---
 // Interfejs dla danych przychodzących z API

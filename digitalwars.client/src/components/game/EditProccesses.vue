@@ -3,9 +3,9 @@
     <!-- Nagłówek -->
     <div class="text-center">
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
-        Edycja Procesów
+        {{ t('editProcesses') }}
       </h1>
-      <p class="text-surface-400 text-sm md:text-base">Zarządzaj procesami w talii kart</p>
+      <p class="text-surface-400 text-sm md:text-base">{{ t('manageProcessesInTheDeck') }}</p>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
@@ -15,12 +15,12 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('deckSelection') }}</h2>
         </div>
 
         <div>
           <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            Wybierz talię kart:
+            {{ t('selectDeck') }}
           </label>
           <Dropdown
             id="deck-select"
@@ -28,7 +28,7 @@
             :options="decksData"
             optionLabel="title"
             optionValue="id"
-            placeholder="Wybierz talię..."
+            :placeholder="t('selectDeckPlaceholder')"
             class="w-full"
           >
           </Dropdown>
@@ -44,12 +44,12 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faChessPawn" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Procesy</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('processes') }}</h2>
         </div>
 
         <div>
           <label for="process-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            Wybierz proces:
+            {{ t('selectProcess') }}
           </label>
 
           <div class="flex gap-2">
@@ -59,7 +59,7 @@
               :options="processesData"
               optionLabel="processDesc"
               optionValue="processId"
-              placeholder="Wybierz proces..."
+              :placeholder="t('selectProcessPlaceholder')"
               class="flex-1"
             >
               <template #value="slotProps">
@@ -93,7 +93,7 @@
               @click="addNewProcess"
               severity="success"
               rounded
-              v-tooltip.top="'Dodaj nowy proces'"
+              v-tooltip.top="t('addNewProcess')"
             >
               <template #icon>
                 <font-awesome-icon :icon="faPlus" class="h-4" />
@@ -106,7 +106,7 @@
               :disabled="!selectedProcess"
               severity="danger"
               rounded
-              v-tooltip.top="'Usuń wybrany proces'"
+              v-tooltip.top="t('deleteProcess')"
             >
               <template #icon>
                 <font-awesome-icon :icon="faTrash" class="h-4" />
@@ -126,7 +126,7 @@
             <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
           </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">
-            {{ isAddingNewProcess ? 'Nowy proces' : 'Edycja procesu' }}
+            {{ isAddingNewProcess ? t('newProcess') : t('processEdition') }}
           </h2>
         </div>
 
@@ -134,12 +134,12 @@
           <!-- Skrót procesu -->
           <div>
             <label for="process-short" class="block mb-2 text-sm font-semibold text-gray-300">
-              Skrót procesu:
+              {{ t('processName') }}
             </label>
             <InputText
               id="process-short"
               v-model="editedProcess.processDesc"
-              placeholder="Wprowadź skrót proces..."
+              :placeholder="t('processNamePlaceholder')"
               class="w-full"
               :minlength="2"
               :maxlength="25"
@@ -149,14 +149,14 @@
           <!-- Opis procesu -->
           <div>
             <label for="process-long" class="block mb-2 text-sm font-semibold text-gray-300">
-              Opis procesu:
+              {{ t('processDescription') }}
             </label>
             <Textarea
               id="process-long"
               v-model="editedProcess.processLongDesc"
               rows="3"
               :maxlength="75"
-              placeholder="Szczegółowy opis procesu..."
+              :placeholder="t('processDescriptionPlaceholder')"
               class="w-full"
             />
           </div>
@@ -174,9 +174,9 @@
 
                 <div class="text-center">
                   <label class="block mb-2 text-sm font-semibold text-gray-300"
-                    >Kolor procesu:</label
+                    >{{ t('processColor') }}</label
                   >
-                  <p class="text-primary-400 text-sm mb-3">(Kliknij na pionek aby zmienić kolor)</p>
+                  <p class="text-primary-400 text-sm mb-3">{{ isAddingNewProcess ? t('clickToSelectColor') : t('clickToEditColor') }}</p>
                 </div>
 
                 <div
@@ -187,7 +187,7 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                  <span class="text-sm text-surface-400">Aktualny kolor:</span>
+                  <span class="text-sm text-surface-400">{{ t('selectedColor') }}</span>
                   <span class="text-white text-sm">{{
                     editedProcess.processColor.toUpperCase()
                   }}</span>
@@ -201,7 +201,7 @@
             <Button
               type="submit"
               :disabled="!isProcessValid"
-              :label="isAddingNewProcess ? 'Dodaj Nowy Proces' : 'Zapisz Zmiany'"
+              :label="isAddingNewProcess ? t('addNewProcess') : t('saveChanges')"
               size="large"
               class="w-full"
             >
@@ -220,7 +220,7 @@
         >
           <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
         </div>
-        <p class="text-surface-400 text-sm font-medium">Wybierz talię aby zarządzać procesami</p>
+        <p class="text-surface-400 text-sm font-medium">{{ t('selectDeckToEditProcesses') }}</p>
       </div>
     </div>
   </div>
@@ -244,7 +244,9 @@ import { useConfirm } from 'primevue/useconfirm'
 import apiConfig from '@/services/apiConfig'
 import apiServices from '@/services/apiServices'
 import pawnPreview from '@/components/game/PawnPreview.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const toast = useToast()
 const confirm = useConfirm()
 
@@ -288,10 +290,7 @@ const openColorPicker = () => {
 }
 
 const addNewProcess = () => {
-  if (!selectedDeck.value) {
-    toast.error('Najpierw wybierz talię kart')
-    return
-  }
+
 
   editedProcess.value = {
     processDesc: '',
@@ -308,16 +307,10 @@ const deleteSelectedProcess = async () => {
   const processId = selectedProcess.value
   const processToDelete = processesData.value.find((process) => process.processId === processId)
 
-  if (!processToDelete) {
-    toast.error('Nie znaleziono procesu do usunięcia')
-    return
-  }
 
   confirm.require({
-    message: `Czy na pewno chcesz usunąć proces "${processToDelete.processDesc}"?`,
-    header: 'Potwierdzenie usunięcia',
-    rejectLabel: 'Anuluj',
-    acceptLabel: 'Usuń',
+    message: `${t('processDeletionConfirmation')} "${processToDelete?.processDesc}"`,
+    header: t('processDeletion'),
     accept: async () => {
       try {
         await apiServices.delete(apiConfig.processes.deleteProcess(selectedProcess.value!))
@@ -331,10 +324,9 @@ const deleteSelectedProcess = async () => {
           processColor: '#6B7280',
         }
 
-        toast.success('Proces został pomyślnie usunięty')
       } catch (error) {
         console.error('Błąd przy usuwaniu procesu:', error)
-        toast.error('Błąd podczas usuwania procesu')
+        toast.error(t('errorDeletingProcess') + error);
       }
     },
   })
@@ -388,14 +380,12 @@ const saveProcessChanges = async () => {
           deckId: selectedDeck.value!,
         }
       }
-
-      toast.success('Proces został zaktualizowany')
     }
 
     isAddingNewProcess.value = false
   } catch (error) {
     console.error('Błąd przy zapisie procesu:', error)
-    toast.error('Błąd podczas zapisywania procesu')
+    toast.error(t('errorSavingProcess') + error);
   }
 }
 
@@ -422,7 +412,7 @@ watch(selectedDeck, async (newDeck) => {
       processesData.value = response.data
     } catch (error) {
       console.error('Błąd przy pobieraniu procesów:', error)
-      toast.error('Błąd podczas pobierania procesów')
+      toast.error(t('errorFetchingProcesses') + error); 
     }
   }
 })
@@ -455,7 +445,7 @@ onMounted(async () => {
     decksData.value = response.data
   } catch (error) {
     console.error('Błąd przy pobieraniu talii:', error)
-    toast.error('Błąd podczas pobierania talii kart')
+    toast.error(t('errorFetchingDecks') + error);
   }
 })
 </script>

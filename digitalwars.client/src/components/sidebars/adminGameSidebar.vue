@@ -17,7 +17,6 @@
 
     <nav class="flex-1 px-2 py-2">
       <ul class="space-y-2">
-        <!-- Strona główna -->
         <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
@@ -27,11 +26,10 @@
             :class="isSideBarOpen ? '' : 'justify-center'"
           >
             <font-awesome-icon :icon="faTable" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Stoły</span>
+            <span v-if="isSideBarOpen">{{ t('tables') }}</span>
           </RouterLink>
         </li>
 
-        <!--Moduł zarzadzania rynkiem-->
         <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
@@ -41,11 +39,10 @@
             :class="isSideBarOpen ? '' : 'justify-center'"
           >
             <font-awesome-icon :icon="faUsers" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Moduł zarządzania rynkiem</span>
+            <span v-if="isSideBarOpen">{{ t('marketManagementModule') }}</span>
           </RouterLink>
         </li>
 
-        <!--Moduł zarządzania stołem-->
         <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
@@ -55,11 +52,10 @@
             :class="isSideBarOpen ? '' : 'justify-center'"
           >
             <font-awesome-icon :icon="faUsersGear" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Panel zarządzania stołem</span>
+            <span v-if="isSideBarOpen">{{ t('tableManagementPanel') }}</span>
           </RouterLink>
         </li>
 
-        <!-- Statystyki -->
         <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
           @click="handleGameStats"
@@ -74,7 +70,7 @@
                 class="h-4 text-accent"
                 :class="isSideBarOpen ? 'mr-4' : 'mr-0'"
               />
-              <span v-if="isSideBarOpen">Statystyki stołów</span>
+              <span v-if="isSideBarOpen">{{ t('tableStatistics') }}</span>
             </div>
             <font-awesome-icon
               v-if="isSideBarOpen"
@@ -88,47 +84,36 @@
               :to="{ path: `/admin/game/${gameId}/statistics`, query: { stat: 'positions' } }"
               class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
               @click.stop
-              >Pozycje końcowe</RouterLink
             >
+              {{ t('finalPositions') }}
+            </RouterLink>
 
             <RouterLink
               :to="{ path: `/admin/game/${gameId}/statistics`, query: { stat: 'success' } }"
               class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
               @click.stop
-              >Skuteczność decyzji</RouterLink
             >
+              {{ t('decisionEffectiveness') }}
+            </RouterLink>
 
             <RouterLink
               :to="{ path: `/admin/game/${gameId}/statistics`, query: { stat: 'bits' } }"
               class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
               @click.stop
-              >Średnie zużycie bitów na rundę</RouterLink
             >
+              {{ t('averageBitsPerRound') }}
+            </RouterLink>
 
             <RouterLink
               :to="{ path: `/admin/game/${gameId}/statistics`, query: { stat: 'progress' } }"
               class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
               @click.stop
-              >Ranking drużyn na przestrzeni rund</RouterLink
             >
+              {{ t('teamRankingOverRounds') }}
+            </RouterLink>
           </div>
         </li>
 
-        <!-- Chat, narazie nie ma więc zakomentowuje i nie wiem czy ma być po stronie admina -->
-        <!-- <li
-          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
-        >
-          <RouterLink
-            :to="`/admin/game/${gameId}`"
-            class="flex items-center gap-4 px-4 py-3 rounded-md"
-            :class="isSideBarOpen ? '' : 'justify-center'"
-          >
-            <font-awesome-icon :icon="faPenToSquare" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Chat</span>
-          </RouterLink>
-        </li> -->
-
-        <!-- CheatSheet -->
         <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
@@ -138,7 +123,7 @@
             :class="isSideBarOpen ? '' : 'justify-center'"
           >
             <font-awesome-icon :icon="faFile" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Ściąga mistrza gry</span>
+            <span v-if="isSideBarOpen">{{ t('gameMasterCheatSheet') }}</span>
           </RouterLink>
         </li>
 
@@ -151,25 +136,10 @@
             :class="isSideBarOpen ? '' : 'justify-center'"
           >
             <font-awesome-icon :icon="faFile" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Dynamiczna Ściąga mistrza gry</span>
+            <span v-if="isSideBarOpen">{{ t('dynamicGameMasterCheatSheet') }}</span>
           </RouterLink>
         </li>
 
-        <!-- Generuj grę, nie ma tego więc zakomentowuje -->
-        <!-- <li
-          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
-        >
-          <RouterLink
-            to="/"
-            class="flex items-center gap-4 px-4 py-3 rounded-md"
-            :class="isSideBarOpen ? '' : 'justify-center'"
-          >
-            <font-awesome-icon :icon="faFileSignature" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Wygeneruj grę</span>
-          </RouterLink>
-        </li> -->
-
-        <!-- Powrót do admina -->
         <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
@@ -179,7 +149,7 @@
             :class="isSideBarOpen ? '' : 'justify-center'"
           >
             <font-awesome-icon :icon="faArrowLeft" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Panel administratora</span>
+            <span v-if="isSideBarOpen">{{ t('adminPanel') }}</span>
           </RouterLink>
         </li>
       </ul>
@@ -201,7 +171,10 @@ import {
   faTable,
   faUsersGear,
 } from '@fortawesome/free-solid-svg-icons'
+import { useI18n } from "vue-i18n";
 
+
+const { t } = useI18n()
 const isSideBarOpen = ref(true)
 const isGameManagerDropdownOpen = ref(false)
 const isGameStatsDropdownOpen = ref(false)

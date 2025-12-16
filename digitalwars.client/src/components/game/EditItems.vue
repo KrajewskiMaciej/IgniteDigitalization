@@ -3,9 +3,9 @@
     <!-- Nagłówek -->
     <div class="text-center">
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
-        Edycja Przedmiotów
+        {{ t('editItems') }}
       </h1>
-      <p class="text-surface-400 text-sm md:text-base">Zarządzaj przedmiotami w talii kart</p>
+      <p class="text-surface-400 text-sm md:text-base">{{ t('manageItemsInTheDeck') }}</p>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
@@ -16,13 +16,13 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('deckSelection') }}</h2>
         </div>
 
         <!-- Wybór talii -->
         <div>
           <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            Wybierz talię kart:
+            {{ t('selectDeck') }}
           </label>
           <Dropdown
             id="deck-select"
@@ -30,7 +30,7 @@
             :options="decksData"
             optionLabel="title"
             optionValue="id"
-            placeholder="Wybierz talię..."
+            :placeholder="t('selectDeckPlaceholder')"
             class="w-full"
             :disabled="isLoadingDecks"
           />
@@ -44,20 +44,20 @@
           <!-- Pole inputa -->
           <div class="md:col-span-3 flex flex-col">
             <label for="deck-name" class="mb-2 text-sm font-semibold text-gray-300">
-              Nazwa talii
+              {{ t('deckName') }}
             </label>
 
             <InputText
               id="deck-name"
               v-model="deckName"
               class="w-full"
-              placeholder="Wpisz nową nazwę talii..."
+              :placeholder="t('deckNamePlaceholder')"
             />
           </div>
 
           <!-- Przycisk -->
           <div class="flex items-end">
-            <Button label="Zmień nazwę" class="w-full" @click="handleSaveDeckName" />
+            <Button :label="t('changeName')" class="w-full" @click="handleSaveDeckName" />
           </div>
         </div>
       </div>
@@ -71,17 +71,17 @@
           <div class="bg-green-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faMicrochip" class="h-6 text-green-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Przedmioty</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('items') }}</h2>
         </div>
 
         <div v-if="isLoadingItems" class="text-center py-8">
           <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-          <p class="text-surface-400 mt-3">Ładowanie przedmiotów...</p>
+          <p class="text-surface-400 mt-3">{{ t('loadingItems') }}</p>
         </div>
 
         <div v-else>
           <label for="item-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            Wybierz przedmiot:
+            {{ t('selectItem') }}:
           </label>
           <Dropdown
             id="item-select"
@@ -89,7 +89,7 @@
             :options="itemsData"
             optionLabel="shortDesc"
             optionValue="id"
-            placeholder="Wybierz przedmiot..."
+            :placeholder="t('selectItemPlaceholder')"
             class="w-full"
           >
             <template #value="slotProps">
@@ -118,19 +118,19 @@
           <div class="bg-blue-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Edycja przedmiotu</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('itemsEdition') }}</h2>
         </div>
 
         <form @submit.prevent="handleSaveItem" class="space-y-5">
           <!-- Tytuł przedmiotu -->
           <div>
             <label for="item-title" class="block mb-2 text-sm font-semibold text-gray-300">
-              Tytuł przedmiotu:
+              {{ t('itemName') }}
             </label>
             <InputText
               id="item-title"
               v-model="currentItem.shortDesc"
-              placeholder="Wprowadź tytuł przedmiotu..."
+              :placeholder="t('itemNamePlaceholder')"
               class="w-full"
             />
           </div>
@@ -138,13 +138,13 @@
           <!-- Opis przedmiotu -->
           <div>
             <label for="item-description" class="block mb-2 text-sm font-semibold text-gray-300">
-              Opis przedmiotu:
+              {{ t('itemDescription') }}
             </label>
             <Textarea
               id="item-description"
               v-model="currentItem.longDesc"
               rows="8"
-              placeholder="Szczegółowy opis przedmiotu..."
+              :placeholder="t('itemDescriptionPlaceholder')"
               class="w-full"
             />
           </div>
@@ -155,7 +155,7 @@
               type="submit"
               :disabled="isSaving"
               :loading="isSaving"
-              :label="isSaving ? 'Zapisywanie...' : 'Zapisz Zmiany'"
+              :label="isSaving ? t('saving') : t('saveChanges')"
               size="large"
               class="w-full"
             >
@@ -174,7 +174,7 @@
         >
           <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
         </div>
-        <p class="text-surface-400 text-sm font-medium">Wybierz talię aby zarządzać przedmiotami</p>
+        <p class="text-surface-400 text-sm font-medium">{{ t('selectDeckToEditItems') }}</p>
       </div>
     </div>
   </div>
@@ -189,9 +189,11 @@ import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
-
+import { useI18n } from 'vue-i18n'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
+
+const { t } = useI18n()
 
 // --- Definicje interfejsów ---
 interface Deck {
@@ -223,7 +225,7 @@ const isSaving = ref(false)
 
 const handleSaveDeckName = async () => {
   if (deckName.value.trim() === '') {
-    toast.warning('Nazwa talii kart nie może być pusta')
+    toast.warning(t('deckNameCannotBeEmpty'))
     return
   }
   try {
@@ -238,7 +240,7 @@ const handleSaveDeckName = async () => {
       deck.title = deckName.value
     }
   } catch (error) {
-    toast.error('Błąd podczas aktualizacji nazwy talii')
+    toast.error(t('errorSavingDeckName') + error)
   }
 }
 
@@ -249,7 +251,7 @@ const fetchDecks = async () => {
     const response = await apiService.get(apiConfig.admin.deck.getAll)
     decksData.value = response.data as Deck[]
   } catch (error) {
-    toast.error('Nie udało się pobrać listy talii.')
+    toast.error(t('errorFetchingDecks') + error)
     console.error('Błąd pobierania talii:', error)
   } finally {
     isLoadingDecks.value = false
@@ -263,7 +265,7 @@ const fetchItemsForDeck = async (deckId: number) => {
     const response = await apiService.get(apiConfig.admin.deck.items(deckId))
     itemsData.value = response.data as Item[]
   } catch (error) {
-    toast.error('Nie udało się pobrać listy przedmiotów dla wybranej talii.')
+    toast.error(t('errorFetchingItems') + error)
     console.error('Błąd pobierania przedmiotów:', error)
   } finally {
     isLoadingItems.value = false
@@ -273,7 +275,7 @@ const fetchItemsForDeck = async (deckId: number) => {
 // --- Logika zapisu ---
 const handleSaveItem = async () => {
   if (!currentItem.value) {
-    toast.warning('Brak przedmiotu do zapisania.')
+    toast.warning(t('noItemSelected'))
     return
   }
   isSaving.value = true
@@ -289,16 +291,13 @@ const handleSaveItem = async () => {
     if (index !== -1) {
       itemsData.value[index] = { ...currentItem.value }
     }
-
-    toast.success('Przedmiot został pomyślnie zaktualizowany.')
   } catch (error: unknown) {
     let errorMessage = 'Wystąpił nieoczekiwany błąd.'
     if (typeof error === 'object' && error !== null && 'response' in error) {
       const err = error as { response?: { data?: { message?: string } } }
       errorMessage = err.response?.data?.message || 'Wystąpił błąd serwera.'
     }
-    toast.error(`Zapis nie powiódł się: ${errorMessage}`)
-    console.error('Błąd zapisu przedmiotu:', error)
+    toast.error(t('errorSavingItem') + ' ' + errorMessage)
   } finally {
     isSaving.value = false
   }

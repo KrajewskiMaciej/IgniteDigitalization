@@ -12,7 +12,7 @@
       <div class="flex items-center min-w-0 flex-1 mr-2 overflow-hidden">
         <div class="min-w-0 flex-1">
           <h3 class="text-base font-bold break-words truncate" :style="{ color: props.color }">
-            {{ table.name || 'Stół bez nazwy' }}
+            {{ table.name || t('tableWithoutName') }}
           </h3>
         </div>
       </div>
@@ -26,7 +26,7 @@
         :style="{ borderColor: props.color + '40' }"
       >
         <font-awesome-icon :icon="faQrcode" class="h-3.5" :style="{ color: props.color }" />
-        <span>Pokaż QR</span>
+        <span>{{ t('showQRCode') }}</span>
       </button>
     </div>
 
@@ -38,7 +38,7 @@
       :style="{ backgroundColor: props.color, color: '#000' }"
     >
       <font-awesome-icon :icon="faMagnifyingGlass" class="h-3.5" />
-      <span>Otwórz stół</span>
+      <span>{{ t('openTable') }}</span>
     </RouterLink>
   </div>
 
@@ -69,7 +69,7 @@
         <!-- Nazwa drużyny -->
         <div class="mb-6">
           <h2 class="text-3xl font-bold text-center mb-2" :style="{ color: props.color }">
-            {{ table.name || 'Stół' }}
+            {{ table.name || t('table') }}
           </h2>
           <div
             class="h-1 w-24 mx-auto rounded-full"
@@ -87,13 +87,13 @@
         <!-- Token -->
         <div class="text-center space-y-3">
           <div class="inline-block px-4 py-2 rounded-lg border border-surface-700">
-            <p class="text-xs text-surface-400 mb-1">Token drużyny</p>
+            <p class="text-xs text-surface-400 mb-1">{{ t('teamToken') }}</p>
             <p class="text-6xl font-bold tracking-wider">
               {{ table.token }}
             </p>
           </div>
 
-          <p class="text-xs text-surface-400 pt-2">Zeskanuj kod QR lub użyj tokenu aby dołączyć</p>
+          <p class="text-xs text-surface-400 pt-2">{{ t('scanQrCodeToJoinTable') }}</p>
         </div>
       </div>
     </div>
@@ -106,6 +106,10 @@ import { faMagnifyingGlass, faQrcode, faXmark } from '@fortawesome/free-solid-sv
 import { RouterLink, useRouter } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
 import type { PropType } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+
+const { t } = useI18n();
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Table {

@@ -65,29 +65,28 @@ import type { BoardConfig } from '@/interfaces/types'
 const posX = ref(0)
 const posY = ref(0)
 
-
 const currentPawns = computed(() => [
   {
     id: 1, // Unikalne ID
     x: posX.value,
     y: posY.value,
     color: '#0000ff', // Kolor pionka
-    name: 'Mój Pionek'
+    name: 'Mój Pionek',
   },
-    {
+  {
     id: 2, // Unikalne ID
     x: posX.value,
     y: posY.value,
     color: '#00ffff', // Kolor pionka
-    name: 'Mój Pionek'
+    name: 'Mój Pionek',
   },
-    {
+  {
     id: 3, // Unikalne ID
     x: posX.value,
     y: posY.value,
     color: '#000fff', // Kolor pionka
-    name: 'Mój Pionek'
-  }
+    name: 'Mój Pionek',
+  },
 ])
 
 // KROK 2: Użyj interfejsu i popraw nazwy pól oraz dodaj brakujące 'boardId'

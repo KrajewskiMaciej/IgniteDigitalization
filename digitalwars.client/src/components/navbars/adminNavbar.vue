@@ -27,7 +27,7 @@
           @click="isVisible = true"
           class="flex items-center w-full px-4 py-2 text-sm text-white hover:text-gray-500"
         >
-          <span>Ustawienia konta</span>
+          <span>{{ t('accountSettings') }}</span>
           <font-awesome-icon :icon="faGear" class="ml-2" />
         </button>
         <hr class="border-lgray-accent w-[90%]" />
@@ -35,7 +35,7 @@
           @click="logout"
           class="flex items-center w-full px-4 py-2 text-sm text-white hover:text-red-600"
         >
-          <span>Wyloguj się</span>
+          <span>{{ t('logout') }}</span>
           <font-awesome-icon :icon="faRightFromBracket" class="ml-2" />
         </button>
       </div>
@@ -63,6 +63,9 @@ import { useAuthStore } from '@/stores/auth'
 import adminSettings from '../admin/adminSettings.vue'
 import apiServices from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface User {

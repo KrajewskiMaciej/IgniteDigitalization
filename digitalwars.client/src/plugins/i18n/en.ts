@@ -1,5 +1,3 @@
-import { error } from 'three'
-import { label } from 'three/src/nodes/TSL.js'
 
 export const en = {
   gameMaster: 'Game Master',
@@ -53,6 +51,7 @@ export const en = {
   emailOrUsername: 'Email or Username',
   accountSettings: 'Account settings',
   licenses: 'Licenses',
+  
 
   //Game
   createNewGame: 'Create New Game',
@@ -96,7 +95,7 @@ export const en = {
   teamName: 'Team name',
   teamColor: 'Team color',
   canTeamMakeDecisions: 'Can the team make independent decisions?',
-  gmControl: "GM's Control",
+  gmControl: "GM Control",
   independentDecisions: 'Independent decisions',
   gmControlDescription: 'The team can suggest decisions but the Game Master must approve them.',
   independentDecisionsDescription:
@@ -108,6 +107,66 @@ export const en = {
   pleaseSelectAtLeastOneProcess: 'Please select at least one process for the game.',
   numberOfBitsMustBeBetween: 'Number of bits to start with must be between 1 and 100000.',
   pleaseEnterTeamNames: 'Please enter team names.',
+  selectAll: 'Select all',
+  deselectAll: 'Deselect all',
+  team: 'Team',
+  selectCard: 'Select card',
+  selectCardPlaceholder: 'Select card...',
+  deckNameCannotBeEmpty: 'Deck name cannot be empty!',
+  openGame: 'Open Game',
+  gamePaused: 'Game Paused',
+  gameInProgress: 'Game In Progress',
+  gameEnded: 'Game Ended',
+  confirmGameAction: 'Are you sure you want to {action} the game "{gameName}"?',
+  noCardAvailableInThisCategory: 'No card available in this category.',
+  stage: 'Stage',
+  decisions: 'Decisions',
+  loadingDecisionHistory: 'Loading decision history...',
+  noDecisionHistory: 'No decision history.',
+  newEvent: 'New Event',
+  result: 'Result',
+
+  //Sidebar
+  activeGames: 'Active Games',
+  gamesStatistics: 'Games Statistics',
+  decisionEffectiveness: 'Decision effectiveness',
+  averageBitsPerRound: 'Average bits per round',
+  standardDeviation: 'Standard deviation',
+  editGameplayElements: 'Edit gameplay elements',
+  gameMasterCheatSheet: 'Game Master cheat sheet',
+  generateGameToPdf: 'Export game to PDF',
+  marketManagementModule: 'Market management module',
+  tableManagementPanel: 'Table management panel',
+  tableStatistics: 'Table statistics',
+  finalPositions: 'Final positions',
+  teamRankingOverRounds: 'Team ranking over rounds',
+  dynamicGameMasterCheatSheet: 'Dynamic Game Master cheat sheet',
+  adminPanel: 'Admin panel',
+
+
+  //Independent team modal
+  canMake: 'can make',
+  independentTeamTitle: 'Independent Team',
+  independentTeamInfo: 'Decisions made by this team will be executed without Game Master approval.',
+  modalWillCloseAutomatically: 'The modal will close automatically',
+  in: 'in',
+  seconds: 'seconds',
+
+  //Not independent team modal
+  dependentTeamTitle: 'Dependent Team',
+  dependentTeamInfo: 'Decisions made by this team must be approved by the Game Master before execution.',
+  cannotMake: 'cannot make',
+
+  //Tables
+  tableWithoutName: 'Table without a name',
+  showQRCode: 'Show QR Code',
+  openTable: 'Open table',
+  table: 'Table',
+  teamToken: 'Team token',
+  scanQrCodeToJoinTable: 'Scan QR code to join the table',
+
+  //Settings
+  logout: 'Logout',
 
   //Scan QR
   scanQRCode: 'Scan QR Code',
@@ -141,14 +200,91 @@ export const en = {
   errorFetchingEnablers: 'An error occurred while fetching enablers. Please try again.',
   errorFetchingDecisionCards: 'An error occurred while fetching decision cards. Please try again.',
   errorFetchingItems: 'An error occurred while fetching items. Please try again.',
-  errorFetchingDecks: 'An error occurred while fetching decks. Please try again.',
+  errorFetchingDecks: 'An error occurred while fetching decks. ',
   errorSavingEnablerChanges: 'An error occurred while saving enabler changes. Please try again.',
-  errorFetchigBoards: 'An error occurred while fetching boards. Please try again.',
-  errorFetchingProcesses: 'An error occurred while fetching processes. Please try again.',
+  errorFetchigBoards: 'An error occurred while fetching boards.',
+  errorFetchingProcesses: 'An error occurred while fetching processes.',
   errorCreatingGame: 'An error occurred while creating the game. Please try again.',
+  errorFetchingFeedbacks: 'An error occurred while fetching feedbacks.',
+  fileSuccessfullyUploadedAndDeckCreated: 'File was successfully uploaded and the deck was created.',
+  errorUploadingDeckFile: 'An error occurred while uploading the deck file. Please try again.',
+  errorDownloadingCardsTemplate: 'An error occurred while downloading the cards template. Please try again.',
+  errorSavingDeckName: 'An error occurred while saving the deck name. Please try again.',
+  errorSavingCard: 'An error occurred while saving the card. Please try again.',
+  errorSavingFeedback: 'An error occurred while saving the feedback. Please try again.',
+  errorSavingItem: 'An error occurred while saving the item. Please try again.',
+  errorDeletingProcess: 'An error occurred while deleting the process. Please try again.',
+  errorSavingProcess: 'An error occurred while saving the process. Please try again.',
+  
+
+
+  //Decision Cards
+  manageCardsInTheDeck: 'Manage decision cards in the deck',
+  loadDeckFromExcel: 'Load deck from Excel file',
+  downloadCardTemplate: 'Download card template',
+  deckName: 'Deck name',
+  deckNamePlaceholder: 'Deck name...',
+  changeName: 'Change name',
+  loadingCards: 'Loading cards...',
+  cardName: 'Card name',
+  cardNamePlaceholder: 'Card name...',
+  cardDescription: 'Card description',
+  cardDescriptionPlaceholder: 'Card description...',
+  saveCard: 'Save card',
+  saving: 'Saving...',
+  feedbackEdit: 'Edit feedback',
+  selectFeedback: 'Select feedback',
+  selectFeedbackPlaceholder: 'Select feedback...',
+  feedbackDescription: 'Feedback description',
+  feedbackDescriptionPlaceholder: 'Feedback description...',
+  saveFeedback: 'Save feedback',
+  selectDeckToEditDecisionCards: 'Select deck to edit decision cards',
+  cardEdit: 'Edit card',
+  editDecisionCards: 'Edit decision card',
+
+
+  //Items
+  manageItemsInTheDeck: 'Manage items in the deck',
+  editItems: 'Edit items',
+  itemName: 'Item name',
+  itemNamePlaceholder: 'Item name...',
+  itemDescription: 'Item description',
+  itemDescriptionPlaceholder: 'Item description...',
+  saveItem: 'Save item',
+  loadingItems: 'Loading items...',
+  selectItem: 'Select item',
+  selectItemPlaceholder: 'Select item...',
+  itemsEdition: 'Items edition',
+  selectDeckToEditItems: 'Select deck to edit items',
+
+  //Processes
+  manageProcessesInTheDeck: 'Manage processes in the deck',
+  editProcesses: 'Edit processes',
+  processName: 'Process name',
+  processNamePlaceholder: 'Process name...',
+  processDescription: 'Process description',
+  processDescriptionPlaceholder: 'Process description...',
+  saveProcess: 'Save process',
+  processes: 'Processes',
+  addNewProcess: 'Add new process',
+  deleteProcess: 'Delete process',
+  selectProcess: 'Select process',
+  selectProcessPlaceholder: 'Select process...',
+  processesEdition: 'Processes edition',
+  selectDeckToEditProcesses: 'Select deck to edit processes',
+  processEdition: 'Process edition',
+  newProcess: 'New process',
+  processColor: 'Process color',
+  clickToEditColor: 'Click to edit color',
+  clickToSelectColor: 'Click to select color',
+  selectedColor: 'Selected color',
+  processDeletionConfirmation: 'Are you sure you want to delete the process?',
+  processDeletion: 'Delete process',
 
   //Warnings
   selectAtLeastOneColor: 'Select at least one color to add a border color.',
+  noItemSelected: 'No item selected.',
+  noCardSelected: 'No card selected.',
 
   //Game Board
   cellColor: 'Cell color',

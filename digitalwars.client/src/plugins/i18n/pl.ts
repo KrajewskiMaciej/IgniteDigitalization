@@ -1,5 +1,3 @@
-import { all } from 'axios'
-import { label } from 'three/src/nodes/TSL.js'
 
 export const pl = {
   gameMaster: 'Game Master',
@@ -109,6 +107,66 @@ export const pl = {
   pleaseEnterTeamNames: 'Proszę wprowadzić nazwy drużyn.',
   numberOfBitsMustBeBetween: 'Liczba bitów na start musi być pomiędzy 1 a 100000.',
   pleaseSelectAtLeastOneProcess: 'Proszę wybrać co najmniej jeden proces do gry.',
+  selectAll: 'Zaznacz wszystkie',
+  deselectAll: 'Odznacz wszystkie',
+  team: 'Drużyna',
+  openGame: 'Otwórz grę',
+  gamePaused: 'Gra wstrzymana',
+  gameInProgress: 'Gra w toku',
+  gameEnded: 'Gra zakończona',
+  confirmGameAction: 'Czy na pewno chcesz {action} grę "{gameName}"?',
+  noCardAvailableInThisCategory: 'Brak dostępnych kart w tej kategorii.',
+  stage: 'Etap',
+  decisions: 'Decyzje',
+  loadingDecisionHistory: 'Ładowanie historii decyzji...',
+  noDecisionHistory: 'Brak historii decyzji.',
+  newEvent: 'Nowe wydarzenie',
+  result: 'Rezultat',
+
+  //Sidebar
+  activeGames: 'Aktywne gry',
+  gamesStatistics: 'Statystyki gier',
+  decisionEffectiveness: 'Skuteczność decyzji',
+  averageBitsPerRound: 'Średnie zużycie bitów na rundę',
+  standardDeviation: 'Odchylenie standardowe',
+  editGameplayElements: 'Edycja elementów rozgrywki',
+  editBoard: 'Edycja planszy',
+  gameMasterCheatSheet: 'Ściąga mistrza gry',
+  generateGameToPdf: 'Generowanie gry do PDF',
+  marketManagementModule: 'Moduł zarządzania rynkiem',
+  tableManagementPanel: 'Panel zarządzania stołem',
+  tableStatistics: 'Statystyki stołów',
+  finalPositions: 'Pozycje końcowe',
+  teamRankingOverRounds: 'Ranking drużyn na przestrzeni rund',
+  dynamicGameMasterCheatSheet: 'Dynamiczna ściąga mistrza gry',
+  adminPanel: 'Panel administratora',
+
+
+  //Independent team modal
+  canMake: 'może podejmować',
+  independentTeamTitle: 'Samodzielna drużyna',
+  independentTeamInfo: 'Podjęte decyzje tej drużyny będą wykonywane bez akceptacji Game Mastera.',
+  modalWillCloseAutomatically: 'Okno zamknie się automatycznie',
+  in: 'za',
+  seconds: 'sekund',
+
+  //Not independent team modal
+  dependentTeamTitle: 'Drużyna zależna',
+  dependentTeamInfo: 'Decyzje tej drużyny muszą być zatwierdzone przez Game Mastera przed ich wykonaniem.',
+  cannotMake: 'nie może podejmować',
+
+
+  //Tables
+  tableWithoutName: 'Stół bez nazwy',
+  showQRCode: 'Pokaż kod QR',
+  openTable: 'Otwórz stół',
+  table: 'Stół',
+  teamToken: 'Token drużyny',
+  scanQrCodeToJoinTable: 'Zeskanuj kod QR, aby dołączyć do stołu',
+
+  //Settings
+  logout: 'Wyloguj się',
+
 
   //Scan QR
   scanQRCode: 'Skanuj kod QR',
@@ -150,11 +208,91 @@ export const pl = {
   errorFetchigBoards: 'Wystąpił błąd podczas pobierania plansz. Spróbuj ponownie.',
   errorFetchingProcesses: 'Wystąpił błąd podczas pobierania procesów. Spróbuj ponownie.',
   errorCreatingGame: 'Wystąpił błąd podczas tworzenia gry. Spróbuj ponownie.',
+  errorFetchingFeedbacks: 'Wystąpił błąd podczas pobierania feedbacków',
+  errorUploadingDeckFile: 'Wystąpił błąd podczas przesyłania pliku talii. Spróbuj ponownie.',
+  errorDownloadingCardsTemplate: 'Wystąpił błąd podczas pobierania szablonu kart. Spróbuj ponownie.',
+  errorSavingDeckName: 'Wystąpił błąd podczas zapisywania nazwy talii. Spróbuj ponownie.',
+  errorSavingCard: 'Wystąpił błąd podczas zapisywania karty. Spróbuj ponownie.',
+  errorSavingFeedback: 'Wystąpił błąd podczas zapisywania feedbacku. Spróbuj ponownie.',
+  errorSavingItem: 'Wystąpił błąd podczas zapisywania przedmiotu. Spróbuj ponownie.',
+  errorDeletingProcess: 'Wystąpił błąd podczas usuwania procesu. Spróbuj ponownie.',
+  errorSavingProcess: 'Wystąpił błąd podczas zapisywania procesu. Spróbuj ponownie.',
 
   //Decision cards
+  manageCardsInTheDeck: 'Zarządzaj kartami decyzji w talii kart',
+  loadDeckFromExcel: 'Wczytaj talię kart z pliku Excel',
+  downloadCardTemplate: 'Pobierz szablon kart',
+  deckName: 'Nazwa talii kart',
+  deckNamePlaceholder: 'Nazwa talii kart...',
+  changeName: 'Zmień nazwę',
+  loadingCards: 'Ładowanie kart...',
+  selectCard: 'Wybierz kartę',
+  selectCardPlaceholder: 'Wybierz kartę...',
+  cardName: 'Nazwa karty',
+  cardNamePlaceholder: 'Nazwa karty...',
+  cardDescription: 'Opis karty',
+  cardDescriptionPlaceholder: 'Opis karty...',
+  saveCard: 'Zapisz kartę',
+  saving: 'Zapisywanie...',
+  feedbackEdit: 'Edycja feedbecku',
+  selectFeedback: 'Wybierz feedback',
+  selectFeedbackPlaceholder: 'Wybierz feedback...',
+  feedbackDescription: 'Opis feedbacku',
+  feedbackDescriptionPlaceholder: 'Opis feedbacku...',
+  saveFeedback: 'Zapisz feedback',
+  selectDeckToEditDecisionCards: 'Wybierz talię kart aby zarządzać kartami decyzji',
+  cardEdit: 'Edycja karty',
+  fileSuccessfullyUploadedAndDeckCreated: 'Plik został pomyślnie przesłany, a talia kart została utworzona.',
+  deckNameCannotBeEmpty: 'Nazwa talii kart nie może być pusta!',
+  editDecisionCards: 'Edytuj karty decyzji',
+
+  //Items
+  manageItemsInTheGame: 'Zarządzaj przedmiotami w grze',
+  editItems: 'Edytuj przedmioty',
+  itemName: 'Nazwa przedmiotu',
+  itemNamePlaceholder: 'Nazwa przedmiotu...',
+  itemDescription: 'Opis przedmiotu',
+  items: 'Przedmioty',
+  itemDescriptionPlaceholder: 'Opis przedmiotu...',
+  saveItem: 'Zapisz przedmiot',
+  loadingItems: 'Ładowanie przedmiotów...',
+  selectItem: 'Wybierz przedmiot',
+  selectItemPlaceholder: 'Wybierz przedmiot...',
+  itemEdition: 'Edycja przedmiotu',
+  itemsEdition: 'Edycja przedmiotów',
+  selectDeckToEditItems: 'Wybierz talię kart aby edytować przedmioty',
+
+
+  //Processes
+  manageProcessesInTheDeck: 'Zarządzaj procesami w talii kart',
+  editProcesses: 'Edytuj procesy',
+  processName: 'Nazwa procesu',
+  processNamePlaceholder: 'Nazwa procesu...',
+  processDescription: 'Opis procesu',
+  processes: 'Procesy',
+  processDescriptionPlaceholder: 'Opis procesu...',
+  saveProcess: 'Zapisz proces',
+  addNewProcess: 'Dodaj nowy proces',
+  deleteProcess: 'Usuń proces',
+  selectProcess: 'Wybierz proces',
+  selectProcessPlaceholder: 'Wybierz proces...',
+  newProcess: 'Nowy proces',
+  processEdition: 'Edycja procesu',
+  selectDeckToEditProcesses: 'Wybierz talię kart aby edytować procesy',
+  processColor: 'Kolor procesu',
+  clickToEditColor: 'Kliknij, aby edytować kolor',
+  clickToSelectColor: 'Kliknij, aby wybrać kolor',
+  selectedColor: 'Wybrany kolor',
+  processDeletionConfirmation: 'Czy na pewno chcesz usunąć proces? ',
+  processDeletion: 'Usunięcie procesu',
+
+
 
   //Warnings
   selectAtLeastOneColor: 'Wybierz co najmniej jeden kolor granicy planszy.',
+  noItemSelected: 'Nie wybrano przedmiotu.',
+  noCardSelected: 'Nie wybrano karty.',
+
 
   //Game Board
   cellColor: 'Kolor komórki',
@@ -163,7 +301,6 @@ export const pl = {
   borderColor: 'Kolor obramowania',
   borderColors: 'Kolory granic planszy',
   newColor: 'Nowy kolor',
-  editBoard: 'Edytuj planszę',
   addNewBoard: 'Dodaj nową planszę',
   descriptionDown: 'Opis poniżej planszy',
   descriptionLeft: 'Opis po lewej stronie planszy',

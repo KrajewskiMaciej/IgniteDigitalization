@@ -35,7 +35,7 @@
           class="h-3.5"
           :style="{ color: props.color }"
         />
-        <span>{{ game.status === 'During' ? 'Wstrzymaj' : 'Wznów' }}</span>
+        <span>{{ game.status === 'During' ? t('pauseGame') : t('resumeGame') }}</span>
       </button>
 
       <button
@@ -44,7 +44,7 @@
         class="flex-1 flex items-center justify-center gap-1.5 border border-red-500 bg-surface-800 py-1.5 px-2 rounded-md hover:border-red-500 hover:bg-red-500/10 hover:scale-105 transition-all duration-300 text-xs font-medium"
       >
         <font-awesome-icon :icon="faPowerOff" class="h-3.5 text-red-500" />
-        <span class="text-red-500">Zakończ</span>
+        <span class="text-red-500">{{ t('endGame') }}</span>
       </button>
     </div>
 
@@ -56,7 +56,7 @@
       :style="{ backgroundColor: props.color, color: '#000' }"
     >
       <font-awesome-icon :icon="faMagnifyingGlass" class="h-3.5" />
-      <span>Otwórz grę</span>
+      <span>{{ t('openGame') }}</span>
     </RouterLink>
   </div>
 </template>
@@ -70,7 +70,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { RouterLink, useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
+import {useI18n} from "vue-i18n";
 
+
+const { t } = useI18n()
 const router = useRouter()
 const confirm = useConfirm()
 
@@ -88,11 +91,11 @@ const props = defineProps({
 const emit = defineEmits(['update-status'])
 
 const handleStatusChange = (gameId: any, newStatus: any) => {
-  const action = newStatus === 'Paused' ? 'wstrzymać' : 'wznowić'
+  const action = newStatus === 'Paused' ? t('pause') : t('resume')
 
   confirm.require({
-    header: `${newStatus === 'Paused' ? 'Wstrzymaj' : 'Wznów'} grę`,
-    message: `Czy na pewno chcesz ${action} grę "${props.game.name}"?`,
+    header: `${newStatus === 'Paused' ? t('pauseGame') : t('resumeGame')}`,
+    message: t('confirmGameAction', { action, gameName: props.game.name }),
     accept: () => {
       emit('update-status', { gameId, newStatus })
     },
@@ -104,8 +107,8 @@ const handleStatusChange = (gameId: any, newStatus: any) => {
 
 const handleEndGame = (gameId: any) => {
   confirm.require({
-    header: 'Zakończ grę',
-    message: `Czy na pewno chcesz ZAKOŃCZYĆ grę "${props.game.name}"? Tej operacji NIE MOŻNA cofnąć.`,
+    header: t('endGame'),
+    message: t('confirmGameAction', { action: t('end'), gameName: props.game.name }),
     accept: () => {
       emit('update-status', { gameId, newStatus: 'End' })
     },
@@ -119,17 +122,17 @@ const getStatus = (status: string) => {
   switch (status) {
     case 'During':
       return {
-        text: 'W trakcie',
+        text: t('gamesInProgress'),
         color: 'bg-green-500',
       }
     case 'Paused':
       return {
-        text: 'Wstrzymana',
+        text: t('gamePaused'),
         color: 'bg-yellow-500',
       }
     case 'End':
       return {
-        text: 'Zakończona',
+        text: t('gameEnded'),
         color: 'bg-red-500',
       }
     default:

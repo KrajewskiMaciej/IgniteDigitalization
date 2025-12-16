@@ -247,7 +247,7 @@
                 ></span>
               </label>
               <span class="text-sm">{{
-                selectedTeam.isAbleToMakeDecisions ? 'Samodzielne decyzje' : 'Kontrola Game Mastera'
+                selectedTeam.isAbleToMakeDecisions ? t('independentDecisions') : t('gmControl')
               }}</span>
               <div class="relative">
                 <font-awesome-icon
@@ -305,7 +305,7 @@
             </h2>
             <Button
               @click="toggleAllProcesses"
-              :label="allProcessesSelected ? 'Odznacz wszystkie' : 'Zaznacz wszystkie'"
+              :label="allProcessesSelected ? t('deselectAll') : t('selectAll')"
               size="small"
               outlined
             />
@@ -456,7 +456,7 @@ const updateTeamsArray = (count: number) => {
     const existingTeam = teams.value.find((t) => t.id === i)
     newTeams.push({
       id: i,
-      name: existingTeam?.name || `Drużyna ${i + 1}`,
+      name: existingTeam?.name || `${t('team')} ${i + 1}`,
       colour: existingTeam?.colour || defaultColors[i % defaultColors.length],
       isAbleToMakeDecisions: existingTeam?.isAbleToMakeDecisions ?? false,
     })
@@ -537,15 +537,15 @@ const handleSubmit = async () => {
     return
   }
   if (teams.value.some((team) => !team.name.trim())) {
-    toast.error(t('pleaseEnterTeamNames'))
+    toast.warning(t('pleaseEnterTeamNames'))
     return
   }
   if (numberOfBits.value < 1 || numberOfBits.value > 100000) {
-    toast.error(t('numberOfBitsMustBeBetween'))
+    toast.warning(t('numberOfBitsMustBeBetween'))
     return
   }
   if (selectedProcessIds.value.length === 0) {
-    toast.error(t('pleaseSelectAtLeastOneProcess'))
+    toast.warning(t('pleaseSelectAtLeastOneProcess'))
     return
   }
 

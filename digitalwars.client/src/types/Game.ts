@@ -43,5 +43,5 @@ export interface IItemCard {
 export interface IPendingEnablerChange {
   cardId: number
   cardsId: number
-  enablers: number[]  
+  enablers: number[]
 }

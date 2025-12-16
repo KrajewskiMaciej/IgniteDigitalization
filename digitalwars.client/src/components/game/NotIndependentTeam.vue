@@ -9,16 +9,16 @@
     >
       <!-- Treść główna -->
       <div class="flex flex-col justify-center items-center text-center px-2">
-        <h1 class="text-white font-nasalization text-xl md:text-2xl mb-4">Kontrola Game Mastera</h1>
+        <h1 class="text-white font-nasalization text-xl md:text-2xl mb-4">{{ t('dependentTeamTitle') }}</h1>
 
         <p class="text-base text-gray-200">
           <span class="text-primary-400 font-semibold">{{ teamName }}</span>
-          <span class="text-red-400 font-bold"> nie może </span>
-          <span> podejmować samodzielnych decyzji.</span>
+          <span class="text-red-400 font-bold"> {{ t('cannotMake') }} </span>
+          <span> {{ t('independentDecisions') }}</span>
         </p>
 
         <p class="font-bold text-surface-200 mt-2 text-sm md:text-base">
-          Wszystkie decyzje wymagają akceptacji Game Mastera.
+          {{ t('dependentTeamInfo') }}
         </p>
       </div>
 
@@ -27,8 +27,8 @@
       <!-- Progres -->
       <div class="space-y-2 px-2">
         <div class="flex items-center justify-between text-xs text-surface-400">
-          <span>Okno zamknie się automatycznie</span>
-          <span>za {{ secondsLeft }} s</span>
+          <span>{{ t('modalWillCloseAutomatically') }}</span>
+          <span>{{ t('in') }} {{ secondsLeft }} {{ t('seconds') }}</span>
         </div>
 
         <div class="w-full h-2 bg-surface-900 rounded-full overflow-hidden">
@@ -50,6 +50,10 @@
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
 import Button from 'primevue/button'
+import { useI18n } from 'vue-i18n';
+
+
+const { t } = useI18n();
 
 const props = defineProps<{
   isVisible: boolean

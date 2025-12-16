@@ -2,8 +2,8 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <!-- Nagłówek -->
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2"></h1>
-      <p class="text-surface-400 text-sm md:text-base">Zarządzaj kartami w talii</p>
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">{{ t('editDecisionCards') }}</h1>
+      <p class="text-surface-400 text-sm md:text-base">{{ t('manageCardsInTheDeck') }}</p>
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
@@ -21,14 +21,14 @@
             @click="triggerFileInput"
             severity="success"
             size="large"
-            label="Wczytaj talię z pliku Excel"
+            :label="t('loadDeckFromExcel')"
           >
             <template #icon>
               <font-awesome-icon :icon="faFileExcel" class="mr-2" />
             </template>
           </Button>
 
-          <Button @click="handleDownloadTemplate" size="large" label="Pobierz szablon kart">
+          <Button @click="handleDownloadTemplate" size="large" :label="t('downloadCardTemplate')">
             <template #icon>
               <font-awesome-icon :icon="faDownload" class="mr-2" />
             </template>
@@ -43,13 +43,13 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">Wybór talii</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('deckSelection') }}</h2>
         </div>
 
         <!-- Wybór talii -->
         <div>
           <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            Wybierz talię kart:
+            {{ t('selectDeck') }}
           </label>
           <Dropdown
             id="deck-select"
@@ -57,7 +57,7 @@
             :options="decksData"
             optionLabel="title"
             optionValue="id"
-            placeholder="Wybierz talię..."
+            :placeholder="t('selectDeckPlaceholder')"
             class="w-full"
             :disabled="isLoadingDecks"
           />
@@ -71,20 +71,20 @@
           <!-- Pole inputa -->
           <div class="md:col-span-3 flex flex-col">
             <label for="deck-name" class="mb-2 text-sm font-semibold text-gray-300">
-              Nazwa talii
+              {{ t('deckName') }}
             </label>
 
             <InputText
               id="deck-name"
               v-model="deckName"
               class="w-full"
-              placeholder="Wpisz nową nazwę talii..."
+              :placeholder="t('deckNamePlaceholder')"
             />
           </div>
 
           <!-- Przycisk -->
           <div class="flex items-end">
-            <Button label="Zmień nazwę" class="w-full" @click="handleSaveDeckName" />
+            <Button :label="t('changeName')" class="w-full" @click="handleSaveDeckName" />
           </div>
         </div>
       </div>
@@ -97,18 +97,18 @@
             <div class="bg-blue-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">Edycja karty</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('cardEdit') }}</h2>
           </div>
 
           <div v-if="isLoadingCards" class="text-center py-8">
             <ProgressSpinner style="width: 3rem; height: 3rem" strokeWidth="4" />
-            <p class="text-surface-400 mt-3">Ładowanie kart...</p>
+            <p class="text-surface-400 mt-3">{{ t('loadingCards') }}</p>
           </div>
 
           <div v-else class="space-y-5">
             <div>
               <label for="card-select" class="block mb-2 text-sm font-semibold text-gray-300">
-                Wybierz kartę:
+                  {{ t('selectCard') }}
               </label>
               <Dropdown
                 id="card-select"
@@ -116,7 +116,7 @@
                 :options="cardsData"
                 optionLabel="title"
                 optionValue="id"
-                placeholder="Wybierz kartę..."
+                :placeholder="t('selectCardPlaceholder')"
                 class="w-full"
               >
                 <template #value="slotProps">
@@ -139,12 +139,12 @@
               <!-- Tytuł karty -->
               <div>
                 <label for="title" class="block mb-2 text-sm font-semibold text-gray-300">
-                  Tytuł karty:
+                  {{ t('cardName') }}
                 </label>
                 <InputText
                   id="title"
                   v-model="currentCard.title"
-                  placeholder="Wprowadź tytuł karty..."
+                  :placeholder="t('cardNamePlaceholder')"
                   class="w-full"
                 />
               </div>
@@ -152,13 +152,13 @@
               <!-- Opis karty -->
               <div>
                 <label for="description" class="block mb-2 text-sm font-semibold text-gray-300">
-                  Opis karty:
+                  {{ t('cardDescription') }}
                 </label>
                 <Textarea
                   id="description"
                   v-model="currentCard.description"
                   rows="12"
-                  placeholder="Szczegółowy opis karty..."
+                  :placeholder="t('cardDescriptionPlaceholder')"
                   class="w-full"
                 />
               </div>
@@ -169,7 +169,7 @@
                   type="submit"
                   :disabled="isSavingCard"
                   :loading="isSavingCard"
-                  :label="isSavingCard ? 'Zapisywanie...' : 'Zapisz Kartę'"
+                  :label="isSavingCard ? t('saving') : t('saveCard')"
                   size="large"
                   class="w-full"
                 />
@@ -187,13 +187,13 @@
             <div class="bg-primary-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faComment" class="h-6 text-primary-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">Edycja feedbacku</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('feedbackEdit') }}</h2>
           </div>
 
           <div class="space-y-5">
             <div>
               <label for="feedback-select" class="block mb-2 text-sm font-semibold text-gray-300">
-                Wybierz feedback:
+                {{ t('selectFeedback') }}
               </label>
               <Dropdown
                 id="feedback-select"
@@ -201,7 +201,7 @@
                 :options="feedbacksData"
                 optionLabel="feedbacks_Long_Description"
                 optionValue="feedbacks_Id"
-                placeholder="Wybierz feedback..."
+                :placeholder="t('selectFeedbackPlaceholder')"
                 class="w-full"
               >
                 <template #value="slotProps">
@@ -281,13 +281,13 @@
                   for="feedbackDescription"
                   class="block mb-2 text-sm font-semibold text-gray-300"
                 >
-                  Opis feedbacku:
+                  {{ t('feedbackDescription') }}
                 </label>
                 <Textarea
                   id="feedbackDescription"
                   v-model="selectedFeedback.feedbacks_Long_Description"
                   rows="8"
-                  placeholder="Szczegółowy opis feedbacku..."
+                  :placeholder="t('feedbackDescriptionPlaceholder')"
                   class="w-full"
                 />
               </div>
@@ -298,7 +298,7 @@
                   type="submit"
                   :disabled="isSavingFeedback"
                   :loading="isSavingFeedback"
-                  :label="isSavingFeedback ? 'Zapisywanie...' : 'Zapisz Feedback'"
+                  :label="isSavingFeedback ? t('saving') : t('saveFeedback')"
                   size="large"
                   class="w-full"
                 />
@@ -318,7 +318,7 @@
         >
           <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
         </div>
-        <p class="text-surface-400 text-sm font-medium">Wybierz talię aby zarządzać kartami</p>
+        <p class="text-surface-400 text-sm font-medium">{{ t('selectDeckToEditDecisionCards') }}</p>
       </div>
     </div>
   </div>
@@ -412,8 +412,7 @@ const fetchFeedbacks = async () => {
 
     feedbacksData.value = mapped
   } catch (error) {
-    toast.error('Wystąpił błąd podczas pobierania feedbacków dla karty')
-    console.error('Błąd pobierania feedbacków:', error)
+    toast.error(t('errorFetchingFeedbacks'));
   }
 }
 
@@ -431,11 +430,10 @@ async function handleFileChange(event: Event): Promise<void> {
       headers: { 'Content-Type': 'multipart/form-data' },
       withCredentials: true,
     })
-    toast.success('Plik został pomyślnie wczytany i talia została utworzona.')
+    toast.success(t('fileSuccessfullyUploadedAndDeckCreated'));
     await fetchDecks()
   } catch (error: any) {
-    toast.error(`Błąd przy wysyłaniu pliku: ${error.response?.data?.message || error.message}`)
-    console.error('Błąd przy wysyłaniu pliku:', error)
+    toast.error(t('errorUploadingDeckFile') + error.message);
   }
 }
 
@@ -456,13 +454,13 @@ const handleDownloadTemplate = async () => {
     window.URL.revokeObjectURL(url)
   } catch (error) {
     console.error('Błąd przy pobieraniu szablonu kart:', error)
-    toast.error('Nie udało się pobrać szablonu kart.')
+    toast.error(t('errorDownloadingCardsTemplate') + error);
   }
 }
 
 const handleSaveDeckName = async () => {
   if (deckName.value.trim() === '') {
-    toast.warning('Nazwa talii kart nie może być pusta')
+    toast.warning(t('deckNameCannotBeEmpty'))
     return
   }
   try {
@@ -470,14 +468,12 @@ const handleSaveDeckName = async () => {
       decks_Id: selectedDeckId.value,
       decks_Name: deckName.value,
     })
-
-    console.log('Odpowiedź:', response)
     const deck = decksData.value.find((deck) => deck.id === selectedDeckId.value)
     if (deck) {
       deck.title = deckName.value
     }
   } catch (error) {
-    toast.error('Błąd podczas aktualizacji nazwy talii')
+    toast.error(t('errorSavingDeckName'))
   }
 }
 
@@ -498,8 +494,8 @@ async function saveCard(): Promise<void> {
       cardToUpdated.description = currentCard.value.description
     }
   } catch (error) {
-    toast.error('Nie udało się zapisać karty')
-    console.error('Błąd zapisu karty:', error)
+    toast.error(t('errorSavingCard') + error);
+    console.error(t('errorSavingCard'), error)
   } finally {
     isSavingCard.value = false
   }
@@ -517,7 +513,7 @@ async function saveFeedback(): Promise<void> {
       negativeDescription: negativeDescription,
     })
   } catch (error) {
-    toast.error('Nie udało się zapisać feedbacku')
+    toast.error(t('errorSavingFeedback') + error);
     console.error('Błąd zapisu feedbacku:', error)
   } finally {
     isSavingFeedback.value = false
@@ -531,7 +527,7 @@ async function fetchDecks(): Promise<void> {
     decksData.value = response.data as Deck[]
   } catch (error) {
     console.error('Błąd przy pobieraniu talii:', error)
-    toast.error('Nie udało się pobrać dostępnych talii.')
+    toast.error(t('errorFetchingDecks') + error);
   } finally {
     isLoadingDecks.value = false
   }
@@ -554,14 +550,13 @@ watch(selectedDeckId, async (newDeckId) => {
     cardsData.value = response.data as Card[]
   } catch (error) {
     console.error('Błąd przy pobieraniu kart z talii:', error)
-    toast.error('Nie udało się pobrać kart dla wybranej talii.')
+    toast.error(t('errorFetchingDecisionCards' ) + error);
     cardsData.value = []
   } finally {
     isLoadingCards.value = false
   }
 
   const deck = decksData.value.find((deck) => deck.id === newDeckId)
-  console.log('Znaleziona talia kart:', deck)
   if (deck) {
     deckName.value = deck.title
   }

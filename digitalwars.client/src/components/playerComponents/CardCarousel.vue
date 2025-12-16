@@ -1,12 +1,9 @@
 <template>
   <div class="w-full max-w-xl mx-auto mt-10">
-    <div v-if="loading" class="text-center text-white">Ładowanie kart...</div>
-    <div v-else-if="fetchError" class="text-center text-red-500">
-      Błąd ładowania kart: {{ fetchError }}
-    </div>
+    <div v-if="loading" class="text-center text-white">{{ t('loadingCards') }}</div>
 
     <div v-else-if="!displayCards || displayCards.length === 0" class="text-center text-white">
-      Brak dostępnych kart w tej kategorii.
+      {{ t('noCardAvailableInThisCategory') }}
     </div>
 
     <div v-else class="relative">
@@ -19,7 +16,7 @@
             class="w-full py-4 px-4 bg-surface-0 backdrop-blur-sm rounded-t-2xl text-center text-surface-900 text-lg font-semibold transition-all duration-300 cursor-pointer flex items-center justify-between"
           >
             <span class="flex-1">
-              {{ selectedCard ? `${selectedCard.id}: ${selectedCard.title}` : 'Wybierz kartę' }}
+              {{ selectedCard ? `${selectedCard.id}: ${selectedCard.title}` : t('selectCard') }}
             </span>
             <font-awesome-icon
               :icon="isDropdownOpen ? faChevronUp : faChevronDown"
@@ -121,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, watchEffect, onMounted, defineExpose } from 'vue'
+import { ref, computed, watch, watchEffect, onMounted } from 'vue'
 import {
   faChevronLeft,
   faChevronRight,
@@ -134,6 +131,7 @@ import { useToast } from 'vue-toastification'
 import { useSwipe } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
+
 
 const { t } = useI18n()
 
@@ -287,7 +285,7 @@ const prevCard = () => {
 
 const sendCardSelection = async () => {
   if (!selectedCard.value) {
-    toast.warning('Nie wybrano żadnej karty.')
+    toast.warning(t('noCardSelected'))
     return
   }
   const { id: cardId, cost, enablers } = selectedCard.value
@@ -317,7 +315,7 @@ const sendCardSelection = async () => {
     if (err.response?.data?.errorCode === 'NotEnoughBudget') {
       toast.warning(t('warningNotEnoughBudget'))
     } else {
-      toast.error(err.response?.data?.message ?? 'Wystąpił błąd podczas komunikacji z serwerem.')
+      toast.error(err.response?.data?.message ?? t('errorServerUnavailable'))
       console.error('Błąd podczas zagrywania karty:', err)
     }
   }

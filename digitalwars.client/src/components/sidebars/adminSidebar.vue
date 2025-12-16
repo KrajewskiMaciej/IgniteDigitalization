@@ -26,7 +26,7 @@
             :class="isSideBarOpen ? '' : 'justify-center'"
           >
             <font-awesome-icon :icon="faGamepad" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Aktywne gry</span>
+            <span v-if="isSideBarOpen">{{ t('activeGames') }}</span>
           </RouterLink>
         </li>
 
@@ -44,7 +44,7 @@
                 class="h-4 text-accent"
                 :class="isSideBarOpen ? 'mr-4' : 'mr-0'"
               />
-              <span v-if="isSideBarOpen">Statystyki gier</span>
+              <span v-if="isSideBarOpen">{{ t('gamesStatistics') }}</span>
             </div>
 
             <div v-if="isSideBarOpen">
@@ -61,21 +61,21 @@
               class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
               @click.stop
             >
-              Skuteczność decyzji
+              {{ t('decisionEffectiveness') }}
             </RouterLink>
             <RouterLink
               :to="{ path: '/admin/statistics', query: { stat: 'bits' } }"
               class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
               @click.stop
             >
-              Średnie zużycie bitów na rundę
+              {{ t('averageBitsPerRound') }}
             </RouterLink>
             <RouterLink
               :to="{ path: '/admin/statistics', query: { stat: 'deviation' } }"
               class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
               @click.stop
             >
-              Odchylenie standardowe
+              {{ t('standardDeviation') }}
             </RouterLink>
           </div>
         </li>
@@ -89,7 +89,7 @@
             to="/admin/editGameplayElements"
           >
             <font-awesome-icon :icon="faPenToSquare" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Edycja elementów rozgrywki</span>
+            <span v-if="isSideBarOpen">{{ t('editGameplayElements') }}</span>
           </RouterLink>
         </li>
 
@@ -102,7 +102,7 @@
             to="/admin/editBoard"
           >
             <font-awesome-icon :icon="faChessBoard" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Edycja planszy</span>
+            <span v-if="isSideBarOpen">{{ t('editBoard') }}</span>
           </RouterLink>
         </li>
 
@@ -115,7 +115,7 @@
             :class="isSideBarOpen ? '' : 'justify-center'"
           >
             <font-awesome-icon :icon="faFile" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Ściąga mistrza gry</span>
+            <span v-if="isSideBarOpen">{{ t('gameMasterCheatSheet') }}</span>
           </RouterLink>
         </li>
 
@@ -128,7 +128,7 @@
             :class="isSideBarOpen ? '' : 'justify-center'"
           >
             <font-awesome-icon :icon="faFilePdf" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">Generowanie gry do PDF</span>
+            <span v-if="isSideBarOpen">{{ t('generateGameToPdf') }}</span>
           </RouterLink>
         </li>
       </ul>
@@ -151,7 +151,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
+
+const { t } = useI18n();
 const isSideBarOpen = ref(true)
 const isStatsDropdownOpen = ref(false)
 
