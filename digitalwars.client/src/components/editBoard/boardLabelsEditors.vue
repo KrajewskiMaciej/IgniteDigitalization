@@ -94,7 +94,7 @@
           class="flex-1"
           :placeholder="t('newLabelRightPlaceholder')"
         />
-        <Button type="button" @click="addLabelRight" class="flex-shrink-0" label="Dodaj">
+        <Button type="button" @click="addLabelRight" class="flex-shrink-0" :label="t('addLabel')">
           <template #icon>
             <font-awesome-icon :icon="faPlus" class="h-4 mr-2" />
           </template>

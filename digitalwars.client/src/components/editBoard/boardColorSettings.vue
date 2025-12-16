@@ -67,7 +67,7 @@
               @input="(event) => handleBorderColorUpdate(event, index)"
             />
             <div class="flex flex-col flex-1 min-w-0">
-              <span class="text-xs text-surface-200-400">Strefa {{ index + 1 }}</span>
+              <span class="text-xs text-surface-200-400">{{ t('zone') }} {{ index + 1 }}</span>
               <span class="font-mono text-xs text-white truncate">{{ color }}</span>
             </div>
             <!-- Przycisk usuwania -->
@@ -103,7 +103,7 @@
             <span class="font-mono text-sm text-white truncate">{{ newColor }}</span>
           </div>
         </div>
-        <Button type="button" @click="addColor" class="sm:w-auto" label="Dodaj kolor">
+        <Button type="button" @click="addColor" class="sm:w-auto" :label="t('addColor')">
           <template #icon>
             <font-awesome-icon :icon="faPlus" class="mr-1" />
           </template>

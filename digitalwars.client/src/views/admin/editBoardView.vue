@@ -10,7 +10,7 @@
             @click="activeView = 'add'"
             outlined
             :severity="activeView === 'add' ? undefined : 'secondary'"
-            label="Dodaj nową planszę"
+            :label="t('addNewBoard')"
             class="w-60"
           >
             <template #icon>
@@ -22,7 +22,7 @@
             @click="activeView = 'edit'"
             :severity="activeView === 'edit' ? undefined : 'secondary'"
             outlined
-            label="Edytuj planszę"
+            :label="t('editBoard')"
             class="w-60"
           >
             <template #icon>
@@ -160,11 +160,11 @@ const data = reactive<{ boards: ApiBoard[] }>({
 // Funkcja zwracająca domyślny, czysty obiekt BoardConfig
 const getDefaultFormData = (): BoardConfig => ({
   boardId: 0,
-  name: 'Nowa plansza',
-  labelsUp: ['Etykieta 1', 'Etykieta 2', 'Etykieta 3', 'Etykieta 4'],
-  labelsRight: ['Etykieta A', 'Etykieta B', 'Etykieta C', 'Etykieta D'],
-  descriptionDown: 'Opis dolny',
-  descriptionLeft: 'Opis lewy',
+  name: t('newBoard'),
+  labelsUp: [t('label1'), t('label2'), t('label3'), t('label4')],
+  labelsRight: [t('labelA'), t('labelB'), t('labelC'), t('labelD')],
+  descriptionDown: t('bottomDescription'),
+  descriptionLeft: t('leftDescription'),
   rows: 8,
   cols: 8,
   cellColor: '#ffffff',

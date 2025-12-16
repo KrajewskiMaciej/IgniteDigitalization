@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center justify-center mb-6">
-    <h2 class="text-2xl font-nasalization">Ustawienia konta</h2>
+    <h2 class="text-2xl font-nasalization">{{ t('accountSettings') }}</h2>
   </div>
 
   <div class="flex justify-center mb-6">
