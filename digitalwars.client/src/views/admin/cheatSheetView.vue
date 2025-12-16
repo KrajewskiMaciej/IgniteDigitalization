@@ -61,12 +61,7 @@
           </div>
 
           <div class="grid grid-cols-2 gap-3">
-            <Button
-              @click="openPDF"
-              :disabled="!selectedPDF"
-              :label="t('preview')"
-              class="w-full"
-            >
+            <Button @click="openPDF" :disabled="!selectedPDF" :label="t('preview')" class="w-full">
               <font-awesome-icon :icon="faEye" class="h-4 mr-2" />
               <span>{{ t('preview') }}</span>
             </Button>
@@ -110,10 +105,7 @@
               >
                 <div class="flex items-center gap-3 flex-1 min-w-0">
                   <div class="bg-red-500/20 p-1.5 rounded">
-                    <font-awesome-icon
-                      :icon="faFilePdf"
-                      class="h-4 text-red-500 flex-shrink-0"
-                    />
+                    <font-awesome-icon :icon="faFilePdf" class="h-4 text-red-500 flex-shrink-0" />
                   </div>
                   <span class="text-sm font-medium text-white truncate">
                     {{ availablePDFs.find((p) => p.path === window.path)?.name }}
@@ -223,9 +215,7 @@
               class="border-2 border-surface-700 rounded-lg transition-all duration-300 hover:border-primary-400 hover:shadow-2xl hover:shadow-primary-500/20 bg-surface-900 p-2"
               :class="[isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in']"
               :style="
-                isZoomed
-                  ? { width: '100%', minWidth: '100%' }
-                  : { width: '50%', height: 'auto' }
+                isZoomed ? { width: '100%', minWidth: '100%' } : { width: '50%', height: 'auto' }
               "
               :alt="t('decisionTree')"
               @click="toggleImageSize"

@@ -1,4 +1,3 @@
-
 export const pl = {
   gameMaster: 'Game Master',
   player: 'Gracz',
@@ -58,24 +57,14 @@ export const pl = {
   returnToLoginPageAndSignIn: 'Wróć do strony logowania i zaloguj się.',
   automaticRedirectIn: 'Automatyczne przekierowanie za',
   linkExpired: 'Link wygasł',
-  linkExpiredMessage: 'Wygląda na to, że link, z którego korzystasz, wygasł lub jest nieprawidłowy. Spróbuj ponownie zresetować hasło.',
+  linkExpiredMessage:
+    'Wygląda na to, że link, z którego korzystasz, wygasł lub jest nieprawidłowy. Spróbuj ponownie zresetować hasło.',
   toGetNewResetLink: 'Aby otrzymać nowy link do resetowania hasła, zaloguj się ponownie.',
   newPassword: 'Nowe hasło',
   confirmNewPassword: 'Potwierdź nowe hasło',
   changingPassword: 'Zmiana hasła...',
-  zone: 'Strefa',
-  addLabel: 'Dodaj etykietę',
-  newBoard: 'Nowa plansza',
-  label1: 'Etykieta 1',
-  label2: 'Etykieta 2',
-  label3: 'Etykieta 3',
-  label4: 'Etykieta 4',
-  labelA: 'Etykieta A',
-  labelB: 'Etykieta B',
-  labelC: 'Etykieta C',
-  labelD: 'Etykieta D',
-  bottomDescription: 'Opis dolny',
-  leftDescription: 'Opis lewy',
+  language: 'Język',
+  accountLanguage: 'Język konta',
 
   //Game
   createNewGame: 'Utwórz nową grę',
@@ -182,7 +171,6 @@ export const pl = {
   dynamicGameMasterCheatSheet: 'Dynamiczna ściąga mistrza gry',
   adminPanel: 'Panel administratora',
 
-
   //Independent team modal
   canMake: 'może podejmować',
   independentTeamTitle: 'Samodzielna drużyna',
@@ -193,9 +181,9 @@ export const pl = {
 
   //Not independent team modal
   dependentTeamTitle: 'Drużyna zależna',
-  dependentTeamInfo: 'Decyzje tej drużyny muszą być zatwierdzone przez Game Mastera przed ich wykonaniem.',
+  dependentTeamInfo:
+    'Decyzje tej drużyny muszą być zatwierdzone przez Game Mastera przed ich wykonaniem.',
   cannotMake: 'nie może podejmować',
-
 
   //Tables
   tableWithoutName: 'Stół bez nazwy',
@@ -207,7 +195,6 @@ export const pl = {
 
   //Settings
   logout: 'Wyloguj się',
-
 
   //Scan QR
   scanQRCode: 'Skanuj kod QR',
@@ -251,7 +238,8 @@ export const pl = {
   errorCreatingGame: 'Wystąpił błąd podczas tworzenia gry. Spróbuj ponownie.',
   errorFetchingFeedbacks: 'Wystąpił błąd podczas pobierania feedbacków',
   errorUploadingDeckFile: 'Wystąpił błąd podczas przesyłania pliku talii. Spróbuj ponownie.',
-  errorDownloadingCardsTemplate: 'Wystąpił błąd podczas pobierania szablonu kart. Spróbuj ponownie.',
+  errorDownloadingCardsTemplate:
+    'Wystąpił błąd podczas pobierania szablonu kart. Spróbuj ponownie.',
   errorSavingDeckName: 'Wystąpił błąd podczas zapisywania nazwy talii. Spróbuj ponownie.',
   errorSavingCard: 'Wystąpił błąd podczas zapisywania karty. Spróbuj ponownie.',
   errorSavingFeedback: 'Wystąpił błąd podczas zapisywania feedbacku. Spróbuj ponownie.',
@@ -265,14 +253,18 @@ export const pl = {
   errorFetchingGames: 'Wystąpił błąd podczas pobierania gier. Spróbuj ponownie.',
   errorFetchingTeams: 'Wystąpił błąd podczas pobierania drużyn. Spróbuj ponownie.',
   noTeamSelected: 'Nie wybrano drużyny.',
-  errorSavingBudgetForTeam: 'Wystąpił błąd podczas zapisywania budżetu dla drużyny {teamName}. Spróbuj ponownie.',
-  errorUnlockingCardForTeam: 'Wystąpił błąd podczas odblokowywania karty dla drużyny {teamName}. Spróbuj ponownie.',
+  errorSavingBudgetForTeam:
+    'Wystąpił błąd podczas zapisywania budżetu dla drużyny {teamName}. Spróbuj ponownie.',
+  errorUnlockingCardForTeam:
+    'Wystąpił błąd podczas odblokowywania karty dla drużyny {teamName}. Spróbuj ponownie.',
   errorInvalidGameId: 'Nieprawidłowy identyfikator gry. Spróbuj ponownie.',
-  errorFetchingDecsionHistory: 'Wystąpił błąd podczas pobierania historii decyzji. Spróbuj ponownie.',
+  errorFetchingDecsionHistory:
+    'Wystąpił błąd podczas pobierania historii decyzji. Spróbuj ponownie.',
   errorFetchingSuggestions: 'Wystąpił błąd podczas pobierania sugestii. Spróbuj ponownie.',
   noDeckId: 'Brak identyfikatora talii. Spróbuj ponownie.',
   errorFetchingGameEvents: 'Wystąpił błąd podczas pobierania zdarzeń gry. Spróbuj ponownie.',
-  errorFetchingRivalBoard: 'Wystąpił błąd podczas pobierania danych planszy rywala. Spróbuj ponownie.',
+  errorFetchingRivalBoard:
+    'Wystąpił błąd podczas pobierania danych planszy rywala. Spróbuj ponownie.',
   errorFetchingPawns: 'Wystąpił błąd podczas pobierania pionków. Spróbuj ponownie.',
   errorApprovingSuggestion: 'Wystąpił błąd podczas zatwierdzania sugestii. Spróbuj ponownie.',
   errorRejectingSuggestion: 'Wystąpił błąd podczas odrzucania sugestii. Spróbuj ponownie.',
@@ -283,8 +275,7 @@ export const pl = {
   teamNoBoardId: 'Drużyna "{teamName}" nie ma przypisanego ID planszy.',
   actionExecutionError: 'Wystąpił błąd podczas wykonywania akcji.',
   suggestionRejected: 'Sugestia została odrzucona.',
-  criticalGameIdError: 'Błąd krytyczny: Brak lub nieprawidłowe ID gry!',  
-  
+  criticalGameIdError: 'Błąd krytyczny: Brak lub nieprawidłowe ID gry!',
 
   //Decision cards
   manageCardsInTheDeck: 'Zarządzaj kartami decyzji w talii kart',
@@ -310,11 +301,11 @@ export const pl = {
   saveFeedback: 'Zapisz feedback',
   selectDeckToEditDecisionCards: 'Wybierz talię kart aby zarządzać kartami decyzji',
   cardEdit: 'Edycja karty',
-  fileSuccessfullyUploadedAndDeckCreated: 'Plik został pomyślnie przesłany, a talia kart została utworzona.',
+  fileSuccessfullyUploadedAndDeckCreated:
+    'Plik został pomyślnie przesłany, a talia kart została utworzona.',
   deckNameCannotBeEmpty: 'Nazwa talii kart nie może być pusta!',
   editDecisionCards: 'Edytuj karty decyzji',
   decisionCards: 'Karty decyzji',
-
 
   //Decision Panel
   decisionPanel: 'Panel decyzyjny',
@@ -359,7 +350,6 @@ export const pl = {
   selectDeckToEditItems: 'Wybierz talię kart aby edytować przedmioty',
   useItem: 'Użyj przedmiotu',
 
-
   //Processes
   manageProcessesInTheDeck: 'Zarządzaj procesami w talii kart',
   editProcesses: 'Edytuj procesy',
@@ -401,9 +391,6 @@ export const pl = {
   unlockCardButton: 'Odblokuj kartę',
   noCardsFoundForTeam: 'Nie znaleziono kart dla wybranej drużyny',
   selectTeamToManage: 'Wybierz drużynę, aby zarządzać jej budżetem i kartami',
-  
-
-
 
   //Warnings
   selectAtLeastOneColor: 'Wybierz co najmniej jeden kolor granicy planszy.',
@@ -411,7 +398,6 @@ export const pl = {
   noCardSelected: 'Nie wybrano karty.',
   selectBothBoards: 'Wybierz obie plansze, przed generowaniem PDF.',
   cardAlreadyUnlocked: 'Ta karta jest już odblokowana dla tej drużyny.',
-
 
   //Game Board
   cellColor: 'Kolor komórki',
@@ -453,6 +439,19 @@ export const pl = {
   descriptionDownEmptyWarning: 'Opis dolny nie może być pusty. Ustawiono wartość domyślną.',
   defaultDescriptionLeft: 'Opis lewy',
   descriptionLeftEmptyWarning: 'Opis lewy nie może być pusty. Ustawiono wartość domyślną.',
+  zone: 'Strefa',
+  addLabel: 'Dodaj etykietę',
+  newBoard: 'Nowa plansza',
+  label1: 'Etykieta 1',
+  label2: 'Etykieta 2',
+  label3: 'Etykieta 3',
+  label4: 'Etykieta 4',
+  labelA: 'Etykieta A',
+  labelB: 'Etykieta B',
+  labelC: 'Etykieta C',
+  labelD: 'Etykieta D',
+  bottomDescription: 'Opis dolny',
+  leftDescription: 'Opis lewy',
 
   //Export to pdf
   gameExportToPdf: 'Eksport gry do PDF',

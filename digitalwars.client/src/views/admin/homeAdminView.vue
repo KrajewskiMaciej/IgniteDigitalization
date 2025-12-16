@@ -9,7 +9,9 @@
       <homeAdminButtons @open-create-game="showCreateGame = true" />
       <hr class="mt-2 border-lgray-accent" />
 
-      <div v-if="loadingGames" class="text-center py-4 text-surface-400">{{ t('loadingGamesInSession') }}</div>
+      <div v-if="loadingGames" class="text-center py-4 text-surface-400">
+        {{ t('loadingGamesInSession') }}
+      </div>
       <div v-else-if="fetchError" class="text-center py-4 text-red-500">{{ fetchError }}</div>
       <div v-else-if="activeGames.length === 0" class="text-center py-4 text-surface-400">
         {{ t('noActiveGames') }}
@@ -117,7 +119,6 @@ const handleUpdateGameStatus = async (payload: { gameId: number; newStatus: stri
     // FIX: Wysyłanie danych w ciele żądania jako obiekt
     const apiPayload = { status: newStatus }
     const response = await apiService.put(apiConfig.games.updateStatus(gameId), apiPayload)
-
 
     // Najprostsze i najbezpieczniejsze podejście: odśwież całą listę
     await fetchActiveGames()

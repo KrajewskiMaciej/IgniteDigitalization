@@ -6,7 +6,9 @@
         class="bg-surface-900 text-white rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
       >
         <div v-if="isTokenValid">
-          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">{{ t('changePassword') }}</h2>
+          <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">
+            {{ t('changePassword') }}
+          </h2>
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
@@ -136,7 +138,9 @@
                   : 'bg-tertiary shadow-sm'
               "
             >
-              <span class="relative z-10">{{ isLoading ? t('changingPassword') : t('changePassword') }}</span>
+              <span class="relative z-10">{{
+                isLoading ? t('changingPassword') : t('changePassword')
+              }}</span>
               <div
                 v-if="allPasswordRequirementsMet"
                 class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
@@ -186,7 +190,7 @@ import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 import { useRouter } from 'vue-router'
 import apiConfig from '@/services/apiConfig.js'
 import apiService from '@/services/apiServices.js'
-import {useI18n} from "vue-i18n";
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

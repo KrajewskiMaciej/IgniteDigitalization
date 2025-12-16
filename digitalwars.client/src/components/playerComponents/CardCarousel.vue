@@ -132,7 +132,6 @@ import { useSwipe } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-
 const { t } = useI18n()
 
 // --- DEFINICJE INTERFEJSÓW ---

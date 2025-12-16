@@ -174,10 +174,12 @@
                 />
 
                 <div class="text-center">
-                  <label class="block mb-2 text-sm font-semibold text-gray-300"
-                    >{{ t('processColor') }}</label
-                  >
-                  <p class="text-primary-400 text-sm mb-3">{{ isAddingNewProcess ? t('clickToSelectColor') : t('clickToEditColor') }}</p>
+                  <label class="block mb-2 text-sm font-semibold text-gray-300">{{
+                    t('processColor')
+                  }}</label>
+                  <p class="text-primary-400 text-sm mb-3">
+                    {{ isAddingNewProcess ? t('clickToSelectColor') : t('clickToEditColor') }}
+                  </p>
                 </div>
 
                 <div
@@ -271,7 +273,7 @@ interface Process {
 }
 
 // --- REACTIVE DATA ---
-const selectedDeck = defineModel<number | undefined>();
+const selectedDeck = defineModel<number | undefined>()
 const decksData = ref<Deck[]>([])
 
 const processesData = ref<Process[]>([])
@@ -291,8 +293,6 @@ const openColorPicker = () => {
 }
 
 const addNewProcess = () => {
-
-
   editedProcess.value = {
     processDesc: '',
     processLongDesc: '',
@@ -307,7 +307,6 @@ const deleteSelectedProcess = async () => {
 
   const processId = selectedProcess.value
   const processToDelete = processesData.value.find((process) => process.processId === processId)
-
 
   confirm.require({
     message: `${t('processDeletionConfirmation')} "${processToDelete?.processDesc}"`,
@@ -324,10 +323,9 @@ const deleteSelectedProcess = async () => {
           processLongDesc: '',
           processColor: '#6B7280',
         }
-
       } catch (error) {
         console.error('Błąd przy usuwaniu procesu:', error)
-        toast.error(t('errorDeletingProcess') + error);
+        toast.error(t('errorDeletingProcess') + error)
       }
     },
   })
@@ -386,7 +384,7 @@ const saveProcessChanges = async () => {
     isAddingNewProcess.value = false
   } catch (error) {
     console.error('Błąd przy zapisie procesu:', error)
-    toast.error(t('errorSavingProcess') + error);
+    toast.error(t('errorSavingProcess') + error)
   }
 }
 
@@ -413,7 +411,7 @@ watch(selectedDeck, async (newDeck) => {
       processesData.value = response.data
     } catch (error) {
       console.error('Błąd przy pobieraniu procesów:', error)
-      toast.error(t('errorFetchingProcesses') + error); 
+      toast.error(t('errorFetchingProcesses') + error)
     }
   }
 })
@@ -446,7 +444,7 @@ onMounted(async () => {
     decksData.value = response.data
   } catch (error) {
     console.error('Błąd przy pobieraniu talii:', error)
-    toast.error(t('errorFetchingDecks') + error);
+    toast.error(t('errorFetchingDecks') + error)
   }
 })
 </script>

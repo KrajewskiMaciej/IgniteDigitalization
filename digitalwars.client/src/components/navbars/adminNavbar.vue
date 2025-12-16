@@ -65,7 +65,7 @@ import apiServices from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
 import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface User {

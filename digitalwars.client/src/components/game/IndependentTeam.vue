@@ -17,7 +17,8 @@
           {{ t('team') }}
           <span class="text-primary-400 font-semibold">{{ teamName }}</span>
           {{ t('canMake') }}
-          <span class="text-green-400 font-bold">{{ t('independentDecisions') }}</span>.
+          <span class="text-green-400 font-bold">{{ t('independentDecisions') }}</span
+          >.
         </p>
 
         <p class="font-bold text-surface-200 mt-2 text-sm md:text-base">
@@ -53,9 +54,9 @@
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
 import Button from 'primevue/button'
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 const props = defineProps<{
   isVisible: boolean

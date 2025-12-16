@@ -21,7 +21,7 @@
               class="w-full flex items-center hover:text-accent ml-2"
               :class="{ 'text-accent font-bold': activeView === 'general' }"
             >
-              <font-awesome-icon :icon="faGear" class="h-3 mr-2" />
+              <font-awesome-icon :icon="faGear" class="text-md mr-2" />
               <button @click="activeView = 'general'" class="text-left w-full">
                 {{ t('accountSettings') }}
               </button>
@@ -31,7 +31,7 @@
               class="w-full flex items-center hover:text-accent ml-2"
               :class="{ 'text-accent font-bold': activeView === 'changePassword' }"
             >
-              <font-awesome-icon :icon="faLock" class="h-3 mr-2" />
+              <font-awesome-icon :icon="faLock" class="text-md mr-2" />
               <button @click="activeView = 'changePassword'" class="text-left w-full">
                 {{ t('changePassword') }}
               </button>
@@ -42,9 +42,19 @@
               class="w-full flex items-center hover:text-accent ml-2"
               :class="{ 'text-accent font-bold': activeView === 'licenses' }"
             >
-              <font-awesome-icon :icon="faIdCard" class="h-3 mr-2" />
+              <font-awesome-icon :icon="faIdCard" class="text-md mr-2" />
               <button @click="activeView = 'licenses'" class="text-left w-full">
                 {{ t('licenses') }}
+              </button>
+            </li>
+            <hr class="border-lgray-accent w-full mx-auto" />
+            <li
+              class="w-full flex items-center hover:text-accent ml-2"
+              :class="{ 'text-accent font-bold': activeView === 'licenses' }"
+            >
+              <font-awesome-icon :icon="faEarthEurope" class="text-md mr-2" />
+              <button @click="activeView = 'language'" class="text-left w-full">
+                {{ t('language') }}
               </button>
             </li>
             <hr class="border-lgray-accent w-full mx-auto" />
@@ -64,20 +74,31 @@
         <section v-if="activeView === 'licenses'">
           <userLicenses />
         </section>
+
+        <section v-if="activeView === 'language'">
+          <UserLanguage />
+        </section>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { faXmark, faGear, faLock, faIdCard } from '@fortawesome/free-solid-svg-icons'
+import {
+  faXmark,
+  faGear,
+  faLock,
+  faIdCard,
+  faEarthEurope,
+  faE,
+} from '@fortawesome/free-solid-svg-icons'
 import { ref } from 'vue'
 import changePassword from '../auth/changePassword.vue'
 import userLicenses from './userLicenses.vue'
 import basicAdminSettings from './basicAdminSettings.vue'
 import { useI18n } from 'vue-i18n'
-
-const activeView = ref('general')
+import UserLanguage from './UserLanguage.vue'
+const activeView = ref<'general' | 'changePassword' | 'licenses' | 'language'>('general')
 const { t } = useI18n()
 
 const props = defineProps({

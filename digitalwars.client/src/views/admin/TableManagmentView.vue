@@ -36,9 +36,7 @@
             <template #option="slotProps">
               <div class="flex items-center justify-between w-full">
                 <span>{{ slotProps.option.teamName }}</span>
-                <span class="text-green-400"
-                  >{{ slotProps.option.teamBud }} {{ t('bits') }}</span
-                >
+                <span class="text-green-400">{{ slotProps.option.teamBud }} {{ t('bits') }}</span>
               </div>
             </template>
           </Dropdown>
@@ -64,10 +62,7 @@
 
             <form @submit.prevent="saveBudget" class="space-y-4">
               <div>
-                <label
-                  for="budget-input"
-                  class="block mb-2 text-sm font-semibold text-gray-300"
-                >
+                <label for="budget-input" class="block mb-2 text-sm font-semibold text-gray-300">
                   {{ t('newBudget') }}
                 </label>
                 <InputNumber
@@ -128,9 +123,7 @@
                 <template #value="slotProps">
                   <div v-if="slotProps.value" class="flex items-center gap-2">
                     <span class="text-blue-400">#{{ slotProps.value }}</span>
-                    <span>{{
-                      decisionCards.find((c) => c.id === slotProps.value)?.title
-                    }}</span>
+                    <span>{{ decisionCards.find((c) => c.id === slotProps.value)?.title }}</span>
                   </div>
                   <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
                 </template>
@@ -345,7 +338,7 @@ const handleUnlockCard = async () => {
     if (error?.response?.status === 409) {
       toast.warning(error.response.data.message || t('cardAlreadyUnlocked'))
     } else {
-      toast.error(t('errorUnlockingCardForTeam', { teamName }) + error );
+      toast.error(t('errorUnlockingCardForTeam', { teamName }) + error)
     }
     console.error('Błąd podczas akcji na karcie:', error)
   } finally {

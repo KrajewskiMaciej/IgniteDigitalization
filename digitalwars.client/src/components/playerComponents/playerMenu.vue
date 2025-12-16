@@ -2,7 +2,9 @@
   <div class="h-full w-full max-w-md mx-auto flex flex-col">
     <!-- Góra: bity + etap -->
     <div class="flex justify-between items-center mb-2">
-      <div class="text-xl font-bold text-green-600">{{ t('numberOfBits') }} {{ currentBudget }}</div>
+      <div class="text-xl font-bold text-green-600">
+        {{ t('numberOfBits') }} {{ currentBudget }}
+      </div>
       <div class="text-md font-semibold text-primary-400">{{ t('stage') }}</div>
     </div>
 
@@ -16,7 +18,9 @@
 
       <!-- Lista -->
       <div class="overflow-y-auto custom-scrollbar pr-2 flex-grow">
-        <div v-if="isLoading" class="text-center text-gray-500">{{ t('loadingDecisionHistory') }}</div>
+        <div v-if="isLoading" class="text-center text-gray-500">
+          {{ t('loadingDecisionHistory') }}
+        </div>
         <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
         <div v-else-if="gameLogEntries.length === 0" class="text-center text-surface-400">
           {{ t('noDecisionHistory') }}
@@ -82,8 +86,7 @@ import apiServices from '@/services/apiServices'
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-
-const { t } = useI18n(); 
+const { t } = useI18n()
 
 // --- DEFINICJE INTERFEJSÓW ---
 // Interfejs dla danych przychodzących z API

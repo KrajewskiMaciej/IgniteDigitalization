@@ -219,7 +219,7 @@ const { fitView, zoomIn, zoomOut } = useVueFlow()
 const { t } = useI18n()
 const toast = useToast()
 
-const selectedDeckId = defineModel<number | undefined>();
+const selectedDeckId = defineModel<number | undefined>()
 const decksData = ref<Deck[]>([])
 const isLoadingDecks = ref<boolean>(false)
 const currentLayout = useStorage<'TB' | 'LR'>('prefferedLayour', 'TB')

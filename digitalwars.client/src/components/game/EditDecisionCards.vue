@@ -2,7 +2,9 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <!-- Nagłówek -->
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">{{ t('editDecisionCards') }}</h1>
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+        {{ t('editDecisionCards') }}
+      </h1>
       <p class="text-surface-400 text-sm md:text-base">{{ t('manageCardsInTheDeck') }}</p>
     </div>
 
@@ -109,7 +111,7 @@
           <div v-else class="space-y-5">
             <div>
               <label for="card-select" class="block mb-2 text-sm font-semibold text-gray-300">
-                  {{ t('selectCard') }}
+                {{ t('selectCard') }}
               </label>
               <Dropdown
                 id="card-select"
@@ -366,7 +368,7 @@ interface Card {
 
 // --- ZMIENNE REAKTYWNE ---
 const toast = useToast()
-const selectedDeckId = defineModel<number | undefined>();
+const selectedDeckId = defineModel<number | undefined>()
 const selectedCardId = ref<number | undefined>(undefined)
 const selectedFeedbackId = ref<number | undefined>(undefined)
 const feedbacksData = ref<IFeedback[]>([])
@@ -413,7 +415,7 @@ const fetchFeedbacks = async () => {
 
     feedbacksData.value = mapped
   } catch (error) {
-    toast.error(t('errorFetchingFeedbacks'));
+    toast.error(t('errorFetchingFeedbacks'))
   }
 }
 
@@ -431,10 +433,10 @@ async function handleFileChange(event: Event): Promise<void> {
       headers: { 'Content-Type': 'multipart/form-data' },
       withCredentials: true,
     })
-    toast.success(t('fileSuccessfullyUploadedAndDeckCreated'));
+    toast.success(t('fileSuccessfullyUploadedAndDeckCreated'))
     await fetchDecks()
   } catch (error: any) {
-    toast.error(t('errorUploadingDeckFile') + error.message);
+    toast.error(t('errorUploadingDeckFile') + error.message)
   }
 }
 
@@ -455,7 +457,7 @@ const handleDownloadTemplate = async () => {
     window.URL.revokeObjectURL(url)
   } catch (error) {
     console.error('Błąd przy pobieraniu szablonu kart:', error)
-    toast.error(t('errorDownloadingCardsTemplate') + error);
+    toast.error(t('errorDownloadingCardsTemplate') + error)
   }
 }
 
@@ -495,7 +497,7 @@ async function saveCard(): Promise<void> {
       cardToUpdated.description = currentCard.value.description
     }
   } catch (error) {
-    toast.error(t('errorSavingCard') + error);
+    toast.error(t('errorSavingCard') + error)
     console.error(t('errorSavingCard'), error)
   } finally {
     isSavingCard.value = false
@@ -514,7 +516,7 @@ async function saveFeedback(): Promise<void> {
       negativeDescription: negativeDescription,
     })
   } catch (error) {
-    toast.error(t('errorSavingFeedback') + error);
+    toast.error(t('errorSavingFeedback') + error)
     console.error('Błąd zapisu feedbacku:', error)
   } finally {
     isSavingFeedback.value = false
@@ -528,7 +530,7 @@ async function fetchDecks(): Promise<void> {
     decksData.value = response.data as Deck[]
   } catch (error) {
     console.error('Błąd przy pobieraniu talii:', error)
-    toast.error(t('errorFetchingDecks') + error);
+    toast.error(t('errorFetchingDecks') + error)
   } finally {
     isLoadingDecks.value = false
   }
@@ -551,7 +553,7 @@ watch(selectedDeckId, async (newDeckId) => {
     cardsData.value = response.data as Card[]
   } catch (error) {
     console.error('Błąd przy pobieraniu kart z talii:', error)
-    toast.error(t('errorFetchingDecisionCards' ) + error);
+    toast.error(t('errorFetchingDecisionCards') + error)
     cardsData.value = []
   } finally {
     isLoadingCards.value = false

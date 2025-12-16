@@ -1,4 +1,4 @@
-import { error } from "three";
+import { error } from 'three'
 
 export const en = {
   gameMaster: 'Game Master',
@@ -57,12 +57,15 @@ export const en = {
   returnToLoginPageAndSignIn: 'Return to login page and sign in.',
   automaticRedirectIn: 'Automatic redirect in',
   linkExpired: 'Link expired',
-  linkExpiredMessage: 'It seems that the link you are using has expired or is invalid. Try resetting your password again.',
+  linkExpiredMessage:
+    'It seems that the link you are using has expired or is invalid. Try resetting your password again.',
   toGetNewResetLink: 'To get a new password reset link, please log in again.',
   newPassword: 'New password',
   confirmNewPassword: 'Confirm new password',
   changingPassword: 'Changing password...',
-  
+  confirmPasswordPlaceholder: 'Confirm password...',
+  language: 'Language',
+  accountLanguage: 'Account Language',
 
   //Game
   createNewGame: 'Create New Game',
@@ -106,7 +109,7 @@ export const en = {
   teamName: 'Team name',
   teamColor: 'Team color',
   canTeamMakeDecisions: 'Can the team make independent decisions?',
-  gmControl: "GM Control",
+  gmControl: 'GM Control',
   independentDecisions: 'Independent decisions',
   gmControlDescription: 'The team can suggest decisions but the Game Master must approve them.',
   independentDecisionsDescription:
@@ -172,7 +175,6 @@ export const en = {
   dynamicGameMasterCheatSheet: 'Dynamic Game Master cheat sheet',
   adminPanel: 'Admin panel',
 
-
   //Independent team modal
   canMake: 'can make',
   independentTeamTitle: 'Independent Team',
@@ -183,7 +185,8 @@ export const en = {
 
   //Not independent team modal
   dependentTeamTitle: 'Dependent Team',
-  dependentTeamInfo: 'Decisions made by this team must be approved by the Game Master before execution.',
+  dependentTeamInfo:
+    'Decisions made by this team must be approved by the Game Master before execution.',
   cannotMake: 'cannot make',
 
   //Tables
@@ -235,9 +238,11 @@ export const en = {
   errorFetchingProcesses: 'An error occurred while fetching processes.',
   errorCreatingGame: 'An error occurred while creating the game. Please try again.',
   errorFetchingFeedbacks: 'An error occurred while fetching feedbacks.',
-  fileSuccessfullyUploadedAndDeckCreated: 'File was successfully uploaded and the deck was created.',
+  fileSuccessfullyUploadedAndDeckCreated:
+    'File was successfully uploaded and the deck was created.',
   errorUploadingDeckFile: 'An error occurred while uploading the deck file. Please try again.',
-  errorDownloadingCardsTemplate: 'An error occurred while downloading the cards template. Please try again.',
+  errorDownloadingCardsTemplate:
+    'An error occurred while downloading the cards template. Please try again.',
   errorSavingDeckName: 'An error occurred while saving the deck name. Please try again.',
   errorSavingCard: 'An error occurred while saving the card. Please try again.',
   errorSavingFeedback: 'An error occurred while saving the feedback. Please try again.',
@@ -251,10 +256,13 @@ export const en = {
   errorFetchingGames: 'An error occurred while fetching games. Please try again.',
   errorFetchingTeams: 'An error occurred while fetching teams. Please try again.',
   noTeamSelected: 'No team selected.',
-  errorSavingBudgetForTeam: 'An error occurred while saving budget for team {teamName}. Please try again.',
-  errorUnlockingCardForTeam: 'An error occurred while unlocking card for team {teamName}. Please try again.',
+  errorSavingBudgetForTeam:
+    'An error occurred while saving budget for team {teamName}. Please try again.',
+  errorUnlockingCardForTeam:
+    'An error occurred while unlocking card for team {teamName}. Please try again.',
   errorInvalidGameId: 'Invalid game ID. Please try again.',
-  errorFetchingDecsionHistory: 'An error occurred while fetching decision history. Please try again.',
+  errorFetchingDecsionHistory:
+    'An error occurred while fetching decision history. Please try again.',
   errorFetchingSuggestions: 'An error occurred while fetching suggestions. Please try again.',
   noDeckId: 'No deck ID. Please try again.',
   errorFetchingGameEvents: 'An error occurred while fetching game events. Please try again.',
@@ -270,7 +278,6 @@ export const en = {
   actionExecutionError: 'An error occurred while executing the action.',
   suggestionRejected: 'Suggestion has been rejected.',
   criticalGameIdError: 'Critical error: Missing or invalid game ID!',
-
 
   //Decision Cards
   manageCardsInTheDeck: 'Manage decision cards in the deck',
@@ -297,8 +304,6 @@ export const en = {
   editDecisionCards: 'Edit decision card',
   decisionCards: 'Decision cards',
 
-
-
   //Decision Panel
   decisionPanel: 'Decision Panel',
   manageDecisionsAndItemsForTables: 'Manage decisions and items for tables',
@@ -323,8 +328,7 @@ export const en = {
   reject: 'Reject',
   eventDescription: 'Event description',
   manageDecisionsAndItemsForTeam: 'Manage decisions and items for team',
-  noFeedbackDescription: 'No feedback description.',  
-
+  noFeedbackDescription: 'No feedback description.',
 
   //Items
   manageItemsInTheDeck: 'Manage items in the deck',
@@ -448,7 +452,6 @@ export const en = {
   labelB: 'Label B',
   labelC: 'Label C',
   labelD: 'Label D',
-
 
   //Export to pdf
   gameExportToPdf: 'Export game to PDF',

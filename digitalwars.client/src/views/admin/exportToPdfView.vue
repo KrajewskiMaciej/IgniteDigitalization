@@ -45,9 +45,7 @@
               <template #icon>
                 <font-awesome-icon :icon="faFileExport" class="h-4" />
               </template>
-              <span class="ml-2">{{
-                isLoading ? t('generating') : t('generateCardPdf')
-              }}</span>
+              <span class="ml-2">{{ isLoading ? t('generating') : t('generateCardPdf') }}</span>
             </Button>
           </div>
         </div>
@@ -117,9 +115,7 @@
                   <li class="flex items-center gap-2 text-white">
                     <span class="w-2 h-2 bg-green-400 rounded-full"></span>
                     <span class="font-medium">{{ t('tableLabel') }}</span>
-                    <span>{{
-                      boardsData.find((b) => b.boards_Id === selectedBoard)?.name
-                    }}</span>
+                    <span>{{ boardsData.find((b) => b.boards_Id === selectedBoard)?.name }}</span>
                   </li>
                   <li class="flex items-center gap-2 text-white">
                     <span class="w-2 h-2 bg-green-400 rounded-full"></span>
@@ -145,9 +141,7 @@
               <template #icon>
                 <font-awesome-icon :icon="faFileExport" class="h-4" />
               </template>
-              <span class="ml-2">{{
-                isLoading ? t('generating') : t('generateBoardPdf')
-              }}</span>
+              <span class="ml-2">{{ isLoading ? t('generating') : t('generateBoardPdf') }}</span>
             </Button>
           </div>
         </div>

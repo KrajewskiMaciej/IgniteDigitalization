@@ -108,8 +108,7 @@ import QrcodeVue from 'qrcode.vue'
 import type { PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-
-const { t } = useI18n();
+const { t } = useI18n()
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Table {

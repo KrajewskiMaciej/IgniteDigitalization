@@ -431,7 +431,6 @@ onMounted(async () => {
   await Promise.all([fetchDeckId(), fetchTemasInfo()])
 
   await Promise.all([fetchEnablersMap(), fetchDecisionCards(), fetchItems()])
-
   ;(await fetchAllTeamsEntries(), createNodesFromCards(cardTypes.value))
   createEdgesFromEnablers(enablers.value!, cardTypes.value)
 })

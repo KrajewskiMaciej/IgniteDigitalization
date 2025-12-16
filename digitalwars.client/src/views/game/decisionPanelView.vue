@@ -53,7 +53,9 @@
 
             <!-- Wybór stołu -->
             <div v-if="!teamId && (actionMode === 'cards' || actionMode === 'items')" class="mb-4">
-              <label class="block mb-2 text-sm font-semibold text-gray-300">{{ t('selectTable') }}</label>
+              <label class="block mb-2 text-sm font-semibold text-gray-300">{{
+                t('selectTable')
+              }}</label>
               <Dropdown
                 v-model="selectedTableId"
                 :options="tables"
@@ -71,13 +73,17 @@
                       ></div>
                       <span>{{ slotProps.option.teamName }}</span>
                     </div>
-                    <span class="text-green-400">{{ slotProps.option.teamBud }} {{ t('bits') }}</span>
+                    <span class="text-green-400"
+                      >{{ slotProps.option.teamBud }} {{ t('bits') }}</span
+                    >
                   </div>
                 </template>
               </Dropdown>
             </div>
             <div v-if="actionMode === 'cards'" class="mb-4">
-              <label class="block mb-2 text-sm font-semibold text-gray-300">{{ t('selectCard') }}</label>
+              <label class="block mb-2 text-sm font-semibold text-gray-300">{{
+                t('selectCard')
+              }}</label>
               <Dropdown
                 v-model="selectedCardId"
                 :options="cards"
@@ -209,7 +215,9 @@
                   <p class="text-sm text-surface-400">{{ t('teamBudget') }}:</p>
                   <p class="text-sm font-semibold text-white">{{ selectedTeam?.teamName }}</p>
                 </div>
-                <span class="text-2xl font-bold text-green-400">{{ currentBits }} {{ t('bits') }}</span>
+                <span class="text-2xl font-bold text-green-400"
+                  >{{ currentBits }} {{ t('bits') }}</span
+                >
               </div>
             </div>
 
@@ -329,7 +337,8 @@
                   {{ entry.cardTitle }}
                 </p>
                 <p class="text-xs text-gray-500 mt-1">
-                  {{ t('cardId') }} <span class="font-semibold text-surface-400">{{ entry.cardId }}</span>
+                  {{ t('cardId') }}
+                  <span class="font-semibold text-surface-400">{{ entry.cardId }}</span>
                 </p>
               </div>
               <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
@@ -680,7 +689,6 @@ const fetchPendingDecisions = async () => {
       tableId: log.teamId,
       tableName: log.teamName,
     }))
-
   } catch (error: any) {
     toast.error(t('errorFetchingSuggestions') + error)
     console.error('Błąd pobierania sugestii:', error.response?.data || error.message)
@@ -694,7 +702,6 @@ const fetchTeams = async () => {
   try {
     const response = await apiServices.get(apiConfig.player.getTeamsManagement(gameId))
     tables.value = response.data as Team[]
-
   } catch (error: any) {
     toast.error(t('errorFetchingTeams') + error)
     console.error('Błąd pobierania drużyn:', error.response?.data || error.message)

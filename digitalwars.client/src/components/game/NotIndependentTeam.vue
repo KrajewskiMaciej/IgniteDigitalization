@@ -9,7 +9,9 @@
     >
       <!-- Treść główna -->
       <div class="flex flex-col justify-center items-center text-center px-2">
-        <h1 class="text-white font-nasalization text-xl md:text-2xl mb-4">{{ t('dependentTeamTitle') }}</h1>
+        <h1 class="text-white font-nasalization text-xl md:text-2xl mb-4">
+          {{ t('dependentTeamTitle') }}
+        </h1>
 
         <p class="text-base text-gray-200">
           <span class="text-primary-400 font-semibold">{{ teamName }}</span>
@@ -50,10 +52,9 @@
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
 import Button from 'primevue/button'
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
 
-
-const { t } = useI18n();
+const { t } = useI18n()
 
 const props = defineProps<{
   isVisible: boolean

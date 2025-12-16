@@ -70,8 +70,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { RouterLink, useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
-import {useI18n} from "vue-i18n";
-
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const router = useRouter()

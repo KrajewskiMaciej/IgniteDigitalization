@@ -153,8 +153,7 @@ import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
-
-const { t } = useI18n();
+const { t } = useI18n()
 const isSideBarOpen = ref(true)
 const isStatsDropdownOpen = ref(false)
 

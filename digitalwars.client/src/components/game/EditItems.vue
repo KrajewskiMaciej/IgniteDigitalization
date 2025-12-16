@@ -211,7 +211,7 @@ interface Item {
 
 const toast = useToast()
 
-const selectedDeckId = defineModel<number | undefined>();
+const selectedDeckId = defineModel<number | undefined>()
 const selectedItem = ref<number | undefined>(undefined)
 
 // --- Stan komponentu z jawnymi typami ---
