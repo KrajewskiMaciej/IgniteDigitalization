@@ -11,7 +11,7 @@ pipelines:
             - git config --global user.name "Bitbucket Pipeline"
             - git fetch --unshallow || true
             - git fetch origin preview
-            - git checkout -b preview origin/preview
+            - git checkout -b preview FETCH_HEAD
             - git merge $BITBUCKET_COMMIT --no-edit
             - git push origin preview
 
