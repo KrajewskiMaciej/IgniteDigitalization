@@ -42,7 +42,7 @@ pipelines:
           name: Deploy to Azure Web App
           deployment: production
           script:
-            - pipe: atlassian/azure-web-apps-deploy:3.0.0
+            - pipe: microsoft/azure-web-apps-deploy:1.0.5
               variables:
                 AZURE_APP_NAME: $AZURE_WEBAPP_NAME
                 AZURE_APP_USERNAME: $AZURE_DEPLOY_USER
