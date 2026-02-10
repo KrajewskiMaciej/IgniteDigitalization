@@ -15,11 +15,9 @@ pipelines:
       # KROK 2: BUILD & PACKAGE (Połączone budowanie Frontu i Backendu)
       - step:
           name: Build All & Package
-          # Zwiększamy rozmiar kontenera, bo budujemy wszystko naraz
           size: 2x 
           script:
             # 1. Instalacja Node.js 20 (Wymagane przez Vite 7+)
-            # Obraz .NET SDK nie ma Node'a, więc musimy go dodać
             - apt-get update && apt-get install -y curl zip
             - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
             - apt-get install -y nodejs
@@ -28,12 +26,9 @@ pipelines:
             - cd DigitalWars.Server
             - dotnet restore
 
-            # 3. Publikacja (To magiczna linijka)
-            # dotnet publish automatycznie wykryje projekt .esproj,
-            # zainstaluje npm install, zbuduje frontend i wrzuci go do wwwroot!
+            # 3. Publikacja
             - dotnet publish DigitalWars.Server.csproj -c Release -o ../deployment
 
-            # Wychodzimy z folderu serwera
             - cd ..
 
             # 4. Pakowanie gotowej aplikacji
@@ -47,7 +42,7 @@ pipelines:
           name: Deploy to Azure Web App
           deployment: production
           script:
-            - pipe: atlassian/azure-web-apps-deploy:3.0.3
+            - pipe: atlassian/azure-web-apps-deploy:1.2.4
               variables:
                 AZURE_APP_NAME: $AZURE_WEBAPP_NAME
                 AZURE_APP_USERNAME: $AZURE_DEPLOY_USER
