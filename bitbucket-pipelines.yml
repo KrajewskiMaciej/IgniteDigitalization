@@ -5,15 +5,12 @@ pipelines:
     live:
       # KROK 1: GIT - Backup i synchronizacja
       - step:
-          name: Backup current live → preview
+          name: Backup previous live → preview
           script:
             - git config --global user.email "pipeline@bitbucket"
             - git config --global user.name "Bitbucket Pipeline"
             - git fetch --unshallow || true
-            - git fetch origin preview
-            - git checkout -b preview FETCH_HEAD
-            - git merge $BITBUCKET_COMMIT --no-edit
-            - git push origin preview
+            - git push origin HEAD~1:refs/heads/preview --force
 
       # KROK 2: FRONTEND - Budowanie
       - step:
@@ -33,26 +30,28 @@ pipelines:
       - step:
           name: Build Backend & Package
           script:
-            # Publikacja backendu do folderu 'deployment'
+            # 1. Instalujemy Node.js, bo projekt .esproj go wymaga (nawet przy samym publishu)
+            - apt-get update && apt-get install -y nodejs npm
+
+            # 2. Wchodzimy do folderu serwera
             - cd DigitalWars.Server
             - dotnet restore
-            - dotnet publish -c Release -o ../deployment
+
+            # 3. ZMIANA: Wskazujemy konkretny plik .csproj zamiast domyślnego .sln
+            # Dzięki temu flaga -o ../deployment zadziała poprawnie
+            - dotnet publish DigitalWars.Server.csproj -c Release -o ../deployment
             - cd ..
 
-            # Przenoszenie frontendu do folderu wwwroot backendu
-            # Tworzymy folder wwwroot jeśli nie istnieje
+            # 4. Przenoszenie frontendu (to zostaje bez zmian)
             - mkdir -p deployment/wwwroot
-            # Kopiujemy zawartość dist do wwwroot
             - cp -r digitalwars.client/dist/* deployment/wwwroot/
 
-            # Instalacja ZIP i pakowanie
-            - apt-get update && apt-get install -y zip
+            # 5. Pakowanie
+            - apt-get install -y zip
             - cd deployment
-            # Ważne: pakujemy zawartość folderu deployment (kropka), a nie sam folder
             - zip -r ../app.zip .
           artifacts:
             - app.zip
-
       # KROK 4: DEPLOY - Wysyłka na Azure
       - step:
           name: Deploy to Azure Web App
