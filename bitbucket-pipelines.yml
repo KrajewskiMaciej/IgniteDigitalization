@@ -40,9 +40,4 @@ pipelines:
           script:
             - az login --service-principal -u $AZURE_APP_ID -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
 
-            - az webapp deploy \
-                --resource-group $AZURE_RESOURCE_GROUP \
-                --name $AZURE_WEBAPP_NAME \
-                --src-path app.zip \
-                --type zip \
-                --clean true
+            - az webapp deploy --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_WEBAPP_NAME --src-path app.zip --type zip --clean true
