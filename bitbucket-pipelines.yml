@@ -1,0 +1,66 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+pipelines:
+  branches:
+    live:
+      # KROK 1: GIT - Backup i synchronizacja
+      - step:
+          name: Backup current live → preview
+          script:
+            - git config --global user.email "pipeline@bitbucket"
+            - git config --global user.name "Bitbucket Pipeline"
+            - git fetch --unshallow || true
+            - git fetch origin preview
+            - git checkout preview
+            - git merge origin/live --no-edit
+            - git push origin preview
+
+      # KROK 2: FRONTEND - Budowanie
+      - step:
+          name: Build Frontend
+          image: node:20
+          caches:
+            - node
+          script:
+            - cd digitalwars.client
+            - npm ci
+            - npm run build
+          artifacts:
+            # Przekazujemy folder dist do następnego kroku
+            - digitalwars.client/dist/**
+
+      # KROK 3: BACKEND - Budowanie i Pakowanie całości
+      - step:
+          name: Build Backend & Package
+          script:
+            # Publikacja backendu do folderu 'deployment'
+            - cd DigitalWars.Server
+            - dotnet restore
+            - dotnet publish -c Release -o ../deployment
+            - cd ..
+
+            # Przenoszenie frontendu do folderu wwwroot backendu
+            # Tworzymy folder wwwroot jeśli nie istnieje
+            - mkdir -p deployment/wwwroot
+            # Kopiujemy zawartość dist do wwwroot
+            - cp -r digitalwars.client/dist/* deployment/wwwroot/
+
+            # Instalacja ZIP i pakowanie
+            - apt-get update && apt-get install -y zip
+            - cd deployment
+            # Ważne: pakujemy zawartość folderu deployment (kropka), a nie sam folder
+            - zip -r ../app.zip .
+          artifacts:
+            - app.zip
+
+      # KROK 4: DEPLOY - Wysyłka na Azure
+      - step:
+          name: Deploy to Azure Web App
+          deployment: production
+          script:
+            - pipe: atlassian/azure-web-apps-deploy:1.0.3
+              variables:
+                AZURE_APP_NAME: $AZURE_WEBAPP_NAME
+                AZURE_APP_USERNAME: $AZURE_DEPLOY_USER
+                AZURE_APP_PASSWORD: $AZURE_DEPLOY_PASSWORD
+                ZIP_FILE: 'app.zip'
