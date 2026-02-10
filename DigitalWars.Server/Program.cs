@@ -208,7 +208,7 @@ app.MapControllers();
 app.MapHub<GameHub>("/api/gameHub");
 
 // Przekieruj wszystkie niepasujące do API ścieżki do frontendu (dla Vue Router)
-app.MapFallbackToFile("/index.html");
+app.MapFallbackToFile("/index.html").AllowAnonymous;
 
 logger.LogInformation("[API] Konfiguracja Migracji");
 // Automatyczne migracje i inicjalizacja bazy danych przy starcie
