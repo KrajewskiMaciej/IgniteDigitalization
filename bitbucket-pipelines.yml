@@ -11,8 +11,8 @@ pipelines:
             - git config --global user.name "Bitbucket Pipeline"
             - git fetch --unshallow || true
             - git fetch origin preview
-            - git checkout preview
-            - git merge origin/live --no-edit
+            - git checkout -b preview origin/preview
+            - git merge $BITBUCKET_COMMIT --no-edit
             - git push origin preview
 
       # KROK 2: FRONTEND - Budowanie
