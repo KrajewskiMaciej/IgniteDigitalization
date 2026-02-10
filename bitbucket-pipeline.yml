@@ -1,0 +1,46 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+pipelines:
+  branches:
+    main:
+      - step:
+          name: Build Frontend
+          image: node:20
+          caches:
+            - node
+          script:
+            - cd digitalwars.client
+            - npm ci
+            - npm run build
+            - cd ..
+            - mkdir -p deploy/frontend
+            - cp -r digitalwars.client/dist/* deploy/frontend/
+          artifacts:
+            - deploy/**
+
+      - step:
+          name: Build Backend
+          script:
+            - cd DigitalWars.Server
+            - dotnet restore
+            - dotnet publish -c Release -o ../deploy/backend
+            - cd ..
+          artifacts:
+            - deploy/**
+
+      - step:
+          name: Deploy to Azure Web App
+          deployment: production
+          script:
+            - apt-get update && apt-get install -y zip curl
+
+            - cd deploy
+            - zip -r app.zip backend frontend
+            - cd ..
+
+            - >
+              curl -X POST \
+                -H "Content-Type: application/zip" \
+                --data-binary @deploy/app.zip \
+                "https://${AZURE_WEBAPP_NAME}.scm.azurewebsites.net/api/zipdeploy" \
+                -u "$AZURE_PUBLISH_PROFILE"
