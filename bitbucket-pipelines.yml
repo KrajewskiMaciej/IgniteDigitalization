@@ -3,61 +3,51 @@ image: mcr.microsoft.com/dotnet/sdk:8.0
 pipelines:
   branches:
     live:
-      # KROK 1: GIT - Backup i synchronizacja
+      # KROK 1: BACKUP 
       - step:
-          name: Backup previous live → preview
+          name: Backup previous live -> preview
           script:
             - git config --global user.email "pipeline@bitbucket"
             - git config --global user.name "Bitbucket Pipeline"
             - git fetch --unshallow || true
             - git push origin HEAD~1:refs/heads/preview --force
 
-      # KROK 2: FRONTEND - Budowanie
+      # KROK 2: BUILD & PACKAGE (Połączone budowanie Frontu i Backendu)
       - step:
-          name: Build Frontend
-          image: node:20
-          caches:
-            - node
+          name: Build All & Package
+          # Zwiększamy rozmiar kontenera, bo budujemy wszystko naraz
+          size: 2x 
           script:
-            - cd digitalwars.client
-            - npm ci
-            - npm run build
-          artifacts:
-            # Przekazujemy folder dist do następnego kroku
-            - digitalwars.client/dist/**
+            # 1. Instalacja Node.js 20 (Wymagane przez Vite 7+)
+            # Obraz .NET SDK nie ma Node'a, więc musimy go dodać
+            - apt-get update && apt-get install -y curl zip
+            - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+            - apt-get install -y nodejs
 
-      # KROK 3: BACKEND - Budowanie i Pakowanie całości
-      - step:
-          name: Build Backend & Package
-          script:
-            # 1. Instalujemy Node.js, bo projekt .esproj go wymaga (nawet przy samym publishu)
-            - apt-get update && apt-get install -y nodejs npm
-
-            # 2. Wchodzimy do folderu serwera
+            # 2. Przywracanie zależności .NET
             - cd DigitalWars.Server
             - dotnet restore
 
-            # 3. ZMIANA: Wskazujemy konkretny plik .csproj zamiast domyślnego .sln
-            # Dzięki temu flaga -o ../deployment zadziała poprawnie
+            # 3. Publikacja (To magiczna linijka)
+            # dotnet publish automatycznie wykryje projekt .esproj,
+            # zainstaluje npm install, zbuduje frontend i wrzuci go do wwwroot!
             - dotnet publish DigitalWars.Server.csproj -c Release -o ../deployment
+
+            # Wychodzimy z folderu serwera
             - cd ..
 
-            # 4. Przenoszenie frontendu (to zostaje bez zmian)
-            - mkdir -p deployment/wwwroot
-            - cp -r digitalwars.client/dist/* deployment/wwwroot/
-
-            # 5. Pakowanie
-            - apt-get install -y zip
+            # 4. Pakowanie gotowej aplikacji
             - cd deployment
             - zip -r ../app.zip .
           artifacts:
             - app.zip
-      # KROK 4: DEPLOY - Wysyłka na Azure
+
+      # KROK 3: DEPLOY
       - step:
           name: Deploy to Azure Web App
           deployment: production
           script:
-            - pipe: atlassian/azure-web-apps-deploy:1.2.4
+            - pipe: atlassian/azure-web-apps-deploy:3.0.3
               variables:
                 AZURE_APP_NAME: $AZURE_WEBAPP_NAME
                 AZURE_APP_USERNAME: $AZURE_DEPLOY_USER
