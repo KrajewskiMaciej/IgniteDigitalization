@@ -3,59 +3,46 @@ image: mcr.microsoft.com/dotnet/sdk:8.0
 pipelines:
   branches:
     live:
-      # KROK 1: BACKUP 
       - step:
-          name: Backup previous live -> preview
+          name: Backup live → preview
           script:
             - git config --global user.email "pipeline@bitbucket"
             - git config --global user.name "Bitbucket Pipeline"
             - git fetch --unshallow || true
-            - git push origin HEAD~1:refs/heads/preview --force
+            - git push origin origin/live~1:preview --force
 
-      # KROK 2: BUILD & PACKAGE (Połączone budowanie Frontu i Backendu)
+
       - step:
-          name: Build All & Package
-          size: 2x 
+          name: Build & Package
+          size: 2x
+          caches:
+            - dotnetcore
+            - node
           script:
-            # 1. Instalacja Node.js 20 (Wymagane przez Vite 7+)
-            - apt-get update && apt-get install -y curl zip
+            - apt-get update && apt-get install -y zip
             - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
             - apt-get install -y nodejs
 
-            # 2. Przywracanie zależności .NET
             - cd DigitalWars.Server
             - dotnet restore
-
-            # 3. Publikacja
-            - dotnet publish DigitalWars.Server.csproj -c Release -o ../deployment
-
+            - dotnet publish -c Release -o ../deployment
             - cd ..
 
-            # 4. Pakowanie gotowej aplikacji
             - cd deployment
             - zip -r ../app.zip .
           artifacts:
             - app.zip
 
-      # KROK 3: DEPLOY (Metoda Manualna: Stop -> Deploy -> Start)
       - step:
-          name: Deploy with Azure CLI
-          # Używamy oficjalnego, zawsze aktualnego obrazu Microsoftu
+          name: Deploy
           image: mcr.microsoft.com/azure-cli
           deployment: production
           script:
-            # 1. Logowanie (Service Principal)
-            - echo "Logowanie do Azure..."
             - az login --service-principal -u $AZURE_APP_ID -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
 
-            # 2. Zatrzymanie aplikacji
-            - echo "Zatrzymywanie aplikacji $AZURE_WEBAPP_NAME..."
-            - az webapp stop --name $AZURE_WEBAPP_NAME --resource-group $AZURE_RESOURCE_GROUP
-
-            # 3. Deploy (Wgrywamy plik ZIP)
-            - echo "Wysyłanie plików..."
-            - az webapp deploy --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_WEBAPP_NAME --src-path app.zip --type zip --clean true
-
-            # 4. Ponowne uruchomienie
-            - echo "Uruchamianie aplikacji..."
-            - az webapp start --name $AZURE_WEBAPP_NAME --resource-group $AZURE_RESOURCE_GROUP
+            - az webapp deploy \
+                --resource-group $AZURE_RESOURCE_GROUP \
+                --name $AZURE_WEBAPP_NAME \
+                --src-path app.zip \
+                --type zip \
+                --clean true
