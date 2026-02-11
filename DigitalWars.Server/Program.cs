@@ -22,10 +22,11 @@ QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --- 1. KONFIGURACJA DLA AZURE (Forwarded Headers) ---
+// Musi być skonfigurowane przed buildem, aby aplikacja ufała nagłówkom HTTPS z proxy Azure
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    // Azure używa proxy, więc musimy wyczyścić znane sieci, by akceptował nagłówki
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
@@ -34,68 +35,43 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
-var loggerFactory = LoggerFactory.Create(config =>
-{
-    config.AddConsole();
-});
+var loggerFactory = LoggerFactory.Create(config => { config.AddConsole(); });
 var startupLogger = loggerFactory.CreateLogger("Startup");
 startupLogger.LogInformation("[API] Rozpoczynam konfigurację aplikacji DigitalWars...");
 
-
-// Konfiguracja bazy danych z użyciem Connection String
+// Konfiguracja bazy danych
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-// Używamy konkretnej wersji zamiast AutoDetect, aby uniknąć timeout'ów przy starcie (np. w Azure)
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 21));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, serverVersion,
-        // Dodajemy logikę ponawiania połączenia w przypadku tymczasowych problemów
         mySqlOptions => mySqlOptions.EnableRetryOnFailure(
             maxRetryCount: 5,
             maxRetryDelay: TimeSpan.FromSeconds(10),
             errorNumbersToAdd: null
         )));
 
-startupLogger.LogInformation("[API] Konfiguruję połączenie z bazą danych: {ConnectionString}", connectionString);
-
-
 // Konfiguracja CORS
-var allowedOrigins = builder.Configuration
-    .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>() ?? Array.Empty<string>();
-
-if (builder.Environment.IsDevelopment() && allowedOrigins.Length == 0)
-{
-    allowedOrigins = new[] { "http://localhost:9000" };
-}
-
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        if (allowedOrigins.Length > 0)
-        {
-            policy.WithOrigins(allowedOrigins)
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
-        }
-        else
-        {
-            policy.AllowAnyHeader().AllowAnyMethod();
-        }
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .SetIsOriginAllowed(_ => true); // Kluczowe dla Azure, gdy adresy frontendu/backendu się różnią
     });
 });
 
-// Rejestracja serwisów (bez zmian)
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            // Opcjonalnie: ignoruj cykliczne referencje, co jest częstym problemem w EF
-            // options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-        });
+// Rejestracja serwisów
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
+
+// Rejestracja wszystkich serwisów (Email, Jwt, Game itd.) - bez zmian
 builder.Services.Configure<backend.Services.EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("FrontendSettings"));
 builder.Services.AddScoped<backend.Services.IEmailService, backend.Services.EmailService>();
@@ -108,34 +84,26 @@ builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IPlayerQueryService, PlayerQueryService>();
 builder.Services.AddScoped<backend.Services.IPlayerActionService, backend.Services.PlayerActionService>();
 builder.Services.AddScoped<ICheatsheetService, CheatsheetService>();
-builder.Services.AddSingleton<backend.Services.IBackgroundTaskQueue>(ctx =>
-{
-    // Ustaw pojemność kolejki, np. 100
-    return new backend.Services.BackgroundTaskQueue(100);
-});
+builder.Services.AddSingleton<backend.Services.IBackgroundTaskQueue>(ctx => new backend.Services.BackgroundTaskQueue(100));
 builder.Services.AddHostedService<QueuedHostedService>();
 
-// SERWISY DO NOWYCH ENDPOINTÓW
+// Serwisy DigitalWars.Server
 builder.Services.AddScoped<DigitalWars.Server.Services.IPlayerService, DigitalWars.Server.Services.PlayerService>();
 builder.Services.AddScoped<DigitalWars.Server.Services.IAuthService, DigitalWars.Server.Services.AuthService>();
 builder.Services.AddScoped<DigitalWars.Server.Services.IPlayerActionService, DigitalWars.Server.Services.PlayerActionService>();
 builder.Services.AddScoped<DigitalWars.Server.Services.IGameService, DigitalWars.Server.Services.GameService>();
 builder.Services.AddScoped<DigitalWars.Server.Services.JwtService>();
-builder.Services.Configure<DigitalWars.Server.Services.EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<DigitalWars.Server.Services.IEmailService, DigitalWars.Server.Services.EmailService>();
-builder.Services.AddSingleton<DigitalWars.Server.Services.IBackgroundTaskQueue>(ctx =>
-{
-    // Ustaw pojemność kolejki, np. 100
-    return new DigitalWars.Server.Services.BackgroundTaskQueue(100);
-});
+builder.Services.AddSingleton<DigitalWars.Server.Services.IBackgroundTaskQueue>(ctx => new DigitalWars.Server.Services.BackgroundTaskQueue(100));
 builder.Services.AddScoped<DigitalWars.Server.Services.IProvisioningService, DigitalWars.Server.Services.ProvisioningService>();
 
+// --- 2. KONFIGURACJA AUTH & COOKIES ---
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
         options.Cookie.Name = "itm.auth.cookie";
         options.Cookie.HttpOnly = true;
-        // Używaj bezpiecznych ciasteczek na produkcji
+        // Na Azure SameAsRequest jest bezpieczniejszy przy proxy
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
@@ -146,21 +114,22 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return Task.CompletedTask;
-            },
-            OnRedirectToAccessDenied = context =>
-            {
-                context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                return Task.CompletedTask;
             }
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireAssertion(context =>
+            context.User.Identity != null &&
+            context.User.Identity.IsAuthenticated &&
+            !context.User.HasClaim(c => c.Type == "Teams_Id")
+        ));
+});
+
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
-
-startupLogger.LogInformation("[API] Zarejestrowano serwisy aplikacji: EmailService, JwtService, GameService itd.");
-
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -176,88 +145,61 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureOptions<DigitalWars.Server.Settings.ConfigureSwaggerOptions>();
 
-// 1. Konfiguracja Autoryzacji
-builder.Services.AddAuthorization(options =>
-{
-    // Polityka dla Admina: Użytkownik musi być zalogowany I NIE MOŻE mieć claima "Teams_Id"
-    // (zakładamy, że tylko tokeny drużynowe mają ten claim, a tokeny Userów/Adminów nie)
-    options.AddPolicy("AdminOnly", policy =>
-        policy.RequireAssertion(context =>
-            context.User.Identity != null &&
-            context.User.Identity.IsAuthenticated &&
-            !context.User.HasClaim(c => c.Type == "Teams_Id")
-        ));
-});
-
 var app = builder.Build();
 
+// --- 3. KOLEJNOŚĆ MIDDLEWARE (Krytyczna dla Azure) ---
+
+// 1. Zawsze pierwsze - obsługa nagłówków z proxy Azure
 app.UseForwardedHeaders();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
-
 logger.LogInformation("[API] Środowisko aplikacji: {Environment}", app.Environment.EnvironmentName);
-
-
-// --- Konfiguracja zależna od środowiska ---
-logger.LogInformation("[API] Konfiguracja Zależności");
-var serveFrontend = builder.Configuration.GetValue<bool>("FrontendSettings:ServeStaticFiles");
 
 if (app.Environment.IsDevelopment())
 {
-    // Konfiguracja dla LOKALNEGO TESTOWANIA
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
         var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
         foreach (var description in provider.ApiVersionDescriptions)
         {
-            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
-                description.GroupName.ToUpperInvariant());
+            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
         }
     });
-
-    // Użyj CORS, aby pozwolić na komunikację z serwerem deweloperskim Vue
     app.UseCors("CorsPolicy");
 }
 else
 {
-    // Konfiguracja dla PUBLIKACJI NA AZURE (i innych środowisk produkcyjnych)
-    logger.LogInformation("[API] Konfiguracja Zależności dla: Plików statycznych i Przekierowania HTTPS");
-    app.UseHttpsRedirection();
-
+    // Produkcja na Azure
     app.UseCors("CorsPolicy");
 
+    // UWAGA: Jeśli w portalu Azure masz "HTTPS Only: On", poniższa linia może być zbędna 
+    // i czasami powoduje błąd 400. Jeśli problem wróci, zakomentuj ją.
+    app.UseHttpsRedirection();
+
+    var serveFrontend = builder.Configuration.GetValue<bool>("FrontendSettings:ServeStaticFiles");
     if (serveFrontend)
     {
         app.UseDefaultFiles();
-
         var provider = new FileExtensionContentTypeProvider();
         provider.Mappings[".glb"] = "model/gltf-binary";
         provider.Mappings[".gltf"] = "model/gltf+json";
-
-        app.UseStaticFiles(new StaticFileOptions
-        {
-            ContentTypeProvider = provider
-        });
+        app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = provider });
     }
 }
 
-logger.LogInformation("[API] Konfiguracja Autoryzacji i Autentykacji");
 app.UseAuthentication();
 app.UseAuthorization();
 
-logger.LogInformation("[API] Konfiguracja Przekierowań");
 app.MapControllers();
 app.MapHub<GameHub>("/api/gameHub");
 
-// Przekieruj wszystkie niepasujące do API ścieżki do frontendu (dla Vue Router)
-if (serveFrontend)
+if (builder.Configuration.GetValue<bool>("FrontendSettings:ServeStaticFiles"))
 {
     app.MapFallbackToFile("/index.html").AllowAnonymous();
 }
 
-logger.LogInformation("[API] Konfiguracja Migracji");
-// Automatyczne migracje i inicjalizacja bazy danych przy starcie
+// Migracje i Inicjalizacja
 using (var scope = app.Services.CreateScope())
 {
     try
@@ -265,23 +207,15 @@ using (var scope = app.Services.CreateScope())
         logger.LogInformation("[API] Rozpoczynam migrację bazy danych...");
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var provisioningService = scope.ServiceProvider.GetRequiredService<backend.Services.IProvisioningService>();
-
-
-        logger.LogInformation("[API] Tworzę scope i pobieram serwisy...");
-
         context.Database.Migrate();
-        logger.LogInformation("[API] Migracja zakończona.");
-
         DbInitializer.Initialize(context, provisioningService);
-        logger.LogInformation("[API] Inicjalizacja zakończona.");
+        logger.LogInformation("[API] Inicjalizacja bazy zakończona pomyślnie.");
     }
     catch (Exception ex)
     {
         logger.LogError(ex, "[API] Błąd podczas migracji lub inicjalizacji.");
     }
-
 }
 
 logger.LogInformation("[API] Aplikacja DigitalWars została uruchomiona");
-
 app.Run();
