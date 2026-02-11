@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 
 [ApiController]
 [Route("api/test")]
+[AllowAnonymous]
 public class TestController : ControllerBase
 {
     [HttpGet]

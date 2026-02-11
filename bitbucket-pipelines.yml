@@ -3,76 +3,53 @@ image: mcr.microsoft.com/dotnet/sdk:8.0
 pipelines:
   branches:
     live:
-
-      # BACKUP poprzedniej wersji
       - step:
           name: Backup live → preview
           script:
-            - git config --global user.email "pipeline@bitbucket"
-            - git config --global user.name "Bitbucket Pipeline"
-            - git fetch --unshallow || true
             - git fetch --all
             - git push origin origin/live~1:preview --force
 
-      # BUILD BACKEND
-      - step:
-          name: Build Backend
-          size: 2x
-          caches:
-            - dotnetcore
-          script:
-            - set -e
-            - apt-get update && apt-get install -y zip
+      - parallel:
+          # --- PROCES BACKEND ---
+          - step:
+              name: Build & Deploy Backend
+              size: 2x
+              caches:
+                - dotnetcore
+              script:
+                - apt-get update && apt-get install -y zip
+                # Publikacja do folderu 'out'
+                - dotnet publish DigitalWars.Server/DigitalWars.Server.csproj -c Release -o ./publish-backend
+                # Pakowanie zawartości 'out' do głównego katalogu
+                - cd publish-backend && zip -r ../app-backend.zip . && cd ..
+                # Deploy przy użyciu pipe
+                - pipe: microsoft/azure-web-apps-deploy:1.0.3
+                  variables:
+                    AZURE_APP_ID: $AZURE_APP_ID
+                    AZURE_PASSWORD: $AZURE_PASSWORD
+                    AZURE_TENANT_ID: $AZURE_TENANT_ID
+                    AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
+                    AZURE_APP_NAME: $AZURE_WEBAPP_BACKEND
+                    ZIP_FILE: "app-backend.zip"
 
-            - cd DigitalWars.Server
-            - dotnet restore
-            - dotnet publish -c Release -o ../deployment-backend
-            - cd ..
-
-            - cd deployment-backend
-            - zip -r ../app-backend.zip .
-            - cd ..
-          artifacts:
-            - app-backend.zip
-
-      # BUILD FRONTEND
-      - step:
-          name: Build Frontend
-          caches:
-            - node
-          script:
-            - set -e
-            - apt-get update && apt-get install -y zip
-            - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-            - apt-get install -y nodejs
-
-            - cd digitalwars.client
-
-            # Build frontendu
-            - export VITE_API_URL="$VITE_API_URL"
-            - npm ci
-            - npm run build
-
-            - test -d dist
-
-            # Pakowanie frontendu
-            - cd dist
-            - zip -r ../../app-frontend.zip .
-            - cd ../..
-          artifacts:
-            - app-frontend.zip
-
-      # DEPLOY BACKEND + FRONTEND
-      - step:
-          name: Deploy backend & frontend
-          image: mcr.microsoft.com/azure-cli
-          deployment: production
-          script:
-            - az login --service-principal -u $AZURE_APP_ID -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
-
-            # BACKEND DEPLOY
-            - az webapp deployment source config-zip --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_WEBAPP_BACKEND --src app-backend.zip
-
-
-            # FRONTEND DEPLOY
-            - az webapp deployment source config-zip --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_WEBAPP_FRONTEND --src app-frontend.zip
+          # --- PROCES FRONTEND ---
+          - step:
+              name: Build & Deploy Frontend
+              caches:
+                - node
+              script:
+                - curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs
+                - cd digitalwars.client
+                - npm ci
+                - npm run build
+                # Pakowanie zawartości folderu dist do głównego katalogu (..)
+                - cd dist && zip -r ../../app-frontend.zip . && cd ../..
+                # Deploy przy użyciu pipe
+                - pipe: microsoft/azure-web-apps-deploy:1.0.3
+                  variables:
+                    AZURE_APP_ID: $AZURE_APP_ID
+                    AZURE_PASSWORD: $AZURE_PASSWORD
+                    AZURE_TENANT_ID: $AZURE_TENANT_ID
+                    AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
+                    AZURE_APP_NAME: $AZURE_WEBAPP_FRONTEND
+                    ZIP_FILE: "app-frontend.zip"
