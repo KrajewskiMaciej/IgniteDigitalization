@@ -31,10 +31,20 @@ var startupLogger = loggerFactory.CreateLogger("Startup");
 startupLogger.LogInformation("[API] Rozpoczynam konfigurację aplikacji DigitalWars...");
 
 
-// Konfiguracja bazy danych z użyciem Connection String (działa lokalnie i w Azure)
+// Konfiguracja bazy danych z użyciem Connection String
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Używamy konkretnej wersji zamiast AutoDetect, aby uniknąć timeout'ów przy starcie (np. w Azure)
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 21));
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseMySql(connectionString, serverVersion,
+        // Dodajemy logikę ponawiania połączenia w przypadku tymczasowych problemów
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null
+        )));
 
 startupLogger.LogInformation("[API] Konfiguruję połączenie z bazą danych: {ConnectionString}", connectionString);
 
@@ -248,11 +258,13 @@ logger.LogInformation("[API] Konfiguracja Migracji");
 // Automatyczne migracje i inicjalizacja bazy danych przy starcie
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var provisioningService = scope.ServiceProvider.GetRequiredService<backend.Services.IProvisioningService>();
     try
     {
         logger.LogInformation("[API] Rozpoczynam migrację bazy danych...");
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var provisioningService = scope.ServiceProvider.GetRequiredService<backend.Services.IProvisioningService>();
+
+
         logger.LogInformation("[API] Tworzę scope i pobieram serwisy...");
 
         context.Database.Migrate();
