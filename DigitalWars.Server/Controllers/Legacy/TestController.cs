@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-
+using Asp.Versioning;
 
 [ApiController]
 [Route("api/test")]
+[ApiVersion("1.0")]
 [AllowAnonymous]
 public class TestController : ControllerBase
 {

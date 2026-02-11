@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using backend.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -164,9 +166,8 @@ builder.Services.AddApiVersioning(options =>
     options.DefaultApiVersion = new ApiVersion(1, 0);
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
-});
-
-builder.Services.AddVersionedApiExplorer(options =>
+})
+.AddApiExplorer(options =>
 {
     options.GroupNameFormat = "'v'VVV";
     options.SubstituteApiVersionInUrl = true;
