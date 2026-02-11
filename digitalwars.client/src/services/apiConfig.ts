@@ -1,4 +1,13 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+
+let apiUrl = import.meta.env.VITE_API_URL || '/api'
+
+// Zabezpieczenie: Jeśli URL został podany bez protokołu (np. w zmiennych środowiskowych pipeline), dodajemy https://
+if (apiUrl && !apiUrl.startsWith('http') && !apiUrl.startsWith('/')) {
+  apiUrl = `https://${apiUrl}`
+}
+
+const API_BASE_URL = apiUrl
+
 
 const endpoints = {
   auth: {
