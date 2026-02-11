@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using DigitalWars.Server.Dtos;
 using Microsoft.AspNetCore.Authorization;
+using Asp.Versioning;
 
 namespace DigitalWars.Server.Controllers
 {

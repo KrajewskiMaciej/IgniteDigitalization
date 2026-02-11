@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using backend.Hubs;
 using Microsoft.AspNetCore.Authorization;
+using Asp.Versioning;
 
 namespace DigitalWars.Server.Controllers
 {

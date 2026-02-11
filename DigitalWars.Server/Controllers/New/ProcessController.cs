@@ -2,6 +2,7 @@ using backend.Data;
 using backend.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Asp.Versioning;
 
 namespace DigitalWars.Server.Controllers
 {

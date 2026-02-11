@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using DigitalWars.Server.PdfGeneration;
 using QuestPDF.Fluent;
 using Microsoft.AspNetCore.Authorization;
+using Asp.Versioning;
 
 namespace DigitalWars.Server.Controllers
 {
