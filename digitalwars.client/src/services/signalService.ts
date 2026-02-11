@@ -2,13 +2,12 @@
 import * as signalR from '@microsoft/signalr'
 
 // Pobierz URL huba z zmiennych środowiskowych lub użyj domyślnego.
-const HUB_URL =
-  import.meta.env.MODE === 'production' ? '/api/gameHub' : `${import.meta.env.VITE_API_URL}/gameHub`
+const HUB_URL = `${import.meta.env.VITE_API_URL || '/api'}/gameHub`
 
 console.log('SignalR: Używany HUB_URL:', HUB_URL)
 
 const connection = new signalR.HubConnectionBuilder()
-  .withUrl(HUB_URL)
+  .withUrl(HUB_URL, { withCredentials: true })
   .withAutomaticReconnect()
   .build()
 

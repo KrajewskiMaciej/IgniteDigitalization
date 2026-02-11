@@ -49,6 +49,7 @@ pipelines:
             - cd digitalwars.client
 
             # Build frontendu
+            - export VITE_API_URL="$VITE_API_URL"
             - npm ci
             - npm run build
 

@@ -39,8 +39,33 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 startupLogger.LogInformation("[API] Konfiguruję połączenie z bazą danych: {ConnectionString}", connectionString);
 
 
-// Konfiguracja CORS - potrzebna TYLKO do testowania lokalnego
-builder.Services.AddCors();
+// Konfiguracja CORS
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? Array.Empty<string>();
+
+if (builder.Environment.IsDevelopment() && allowedOrigins.Length == 0)
+{
+    allowedOrigins = new[] { "http://localhost:9000" };
+}
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        if (allowedOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        }
+        else
+        {
+            policy.AllowAnyHeader().AllowAnyMethod();
+        }
+    });
+});
 
 // Rejestracja serwisów (bez zmian)
 builder.Services.AddControllers()
@@ -93,7 +118,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SecurePolicy = builder.Environment.IsProduction()
             ? CookieSecurePolicy.Always
             : CookieSecurePolicy.None;
-        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SameSite = builder.Environment.IsProduction()
+            ? SameSiteMode.None
+            : SameSiteMode.Lax;
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
         options.Events = new CookieAuthenticationEvents
@@ -161,6 +188,8 @@ logger.LogInformation("[API] Środowisko aplikacji: {Environment}", app.Environm
 
 // --- Konfiguracja zależna od środowiska ---
 logger.LogInformation("[API] Konfiguracja Zależności");
+var serveFrontend = builder.Configuration.GetValue<bool>("FrontendSettings:ServeStaticFiles");
+
 if (app.Environment.IsDevelopment())
 {
     // Konfiguracja dla LOKALNEGO TESTOWANIA
@@ -176,27 +205,29 @@ if (app.Environment.IsDevelopment())
     });
 
     // Użyj CORS, aby pozwolić na komunikację z serwerem deweloperskim Vue
-    app.UseCors(policy => policy
-        .WithOrigins("http://localhost:9000") // Adres Twojego frontendu w trybie dev
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials());
+    app.UseCors("CorsPolicy");
 }
 else
 {
     // Konfiguracja dla PUBLIKACJI NA AZURE (i innych środowisk produkcyjnych)
     logger.LogInformation("[API] Konfiguracja Zależności dla: Plików statycznych i Przekierowania HTTPS");
     app.UseHttpsRedirection();
-    app.UseDefaultFiles();
 
-    var provider = new FileExtensionContentTypeProvider();
-    provider.Mappings[".glb"] = "model/gltf-binary";
-    provider.Mappings[".gltf"] = "model/gltf+json";
+    app.UseCors("CorsPolicy");
 
-    app.UseStaticFiles(new StaticFileOptions
+    if (serveFrontend)
     {
-        ContentTypeProvider = provider
-    });
+        app.UseDefaultFiles();
+
+        var provider = new FileExtensionContentTypeProvider();
+        provider.Mappings[".glb"] = "model/gltf-binary";
+        provider.Mappings[".gltf"] = "model/gltf+json";
+
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            ContentTypeProvider = provider
+        });
+    }
 }
 
 logger.LogInformation("[API] Konfiguracja Autoryzacji i Autentykacji");
@@ -208,7 +239,10 @@ app.MapControllers();
 app.MapHub<GameHub>("/api/gameHub");
 
 // Przekieruj wszystkie niepasujące do API ścieżki do frontendu (dla Vue Router)
-app.MapFallbackToFile("/index.html").AllowAnonymous();
+if (serveFrontend)
+{
+    app.MapFallbackToFile("/index.html").AllowAnonymous();
+}
 
 logger.LogInformation("[API] Konfiguracja Migracji");
 // Automatyczne migracje i inicjalizacja bazy danych przy starcie
