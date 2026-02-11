@@ -35,7 +35,6 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyHeader()
               .AllowAnyMethod()
-              .SetIsOriginAllowed(_ => true) // Akceptuj każdy adres (frontend)
               .AllowCredentials();          // Wymagane, aby Cookies mogły przechodzić
     });
 });
