@@ -19,7 +19,7 @@ export default defineConfig({
     strictPort: true,
   },
   build: {
-    outDir: '../DigitalWars.Server/wwwroot',
+    outDir: 'dist',
     emptyOutDir: true,
   },
 })
