@@ -4,44 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <SpaRoot>..\digitalwars.client</SpaRoot>
-    <SpaDist>$(SpaRoot)dist\</SpaDist>
-    <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
-    <SpaProxyServerUrl>https://localhost:61536</SpaProxyServerUrl>
   </PropertyGroup>
-
-  <Target Name="BuildFrontend" BeforeTargets="Publish">
-    <Message Importance="high" Text="Budowanie frontendu Vue..." />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
-  </Target>
-
-  <Target Name="CopyFrontendToWwwroot" AfterTargets="BuildFrontend">
-    <ItemGroup>
-      <DistFiles Include="$(SpaDist)**\*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(DistFiles)" DestinationFolder="wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" />
-  </Target>
-
-  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
-
-    <ItemGroup>
-      <DistFiles Include="$(SpaRoot)\dist\**" />
-      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
-        <RelativePath>wwwroot\%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      </ResolvedFileToPublish>
-    </ItemGroup>
-  </Target>
-  <ItemGroup>
-    <ProjectReference Include="..\digitalwars.client\digitalwars.client.esproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    
-    </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
@@ -70,9 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\digitalwars.client\digitalwars.client.esproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
 
     <None Update="Initializers\DigitalWars_UserInitialization.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
