@@ -38,7 +38,6 @@ pipelines:
       # BUILD FRONTEND
       - step:
           name: Build Frontend
-          size: 2x
           caches:
             - node
           script:
