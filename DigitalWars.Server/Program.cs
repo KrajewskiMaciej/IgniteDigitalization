@@ -14,10 +14,19 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc;
 using backend.Hubs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // Azure używa proxy, więc musimy wyczyścić znane sieci, by akceptował nagłówki
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -125,12 +134,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "itm.auth.cookie";
         options.Cookie.HttpOnly = true;
         // Używaj bezpiecznych ciasteczek na produkcji
-        options.Cookie.SecurePolicy = builder.Environment.IsProduction()
-            ? CookieSecurePolicy.Always
-            : CookieSecurePolicy.None;
-        options.Cookie.SameSite = builder.Environment.IsProduction()
-            ? SameSiteMode.None
-            : SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
         options.Events = new CookieAuthenticationEvents
@@ -181,15 +186,11 @@ builder.Services.AddAuthorization(options =>
             context.User.Identity.IsAuthenticated &&
             !context.User.HasClaim(c => c.Type == "Teams_Id")
         ));
-
-    // Polityka domyślna (TeamAccess): Wystarczy, że jest zalogowany (Admin LUB Team)
-    // To będzie domyślne [Authorize]
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
 });
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
