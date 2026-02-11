@@ -46,26 +46,13 @@ pipelines:
             - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
             - apt-get install -y nodejs
 
-            # DIAGNOSTYKA — pokaż katalogi repo
-            - echo "Lista katalogów w repo:"
-            - ls -la
-
-            # Wejście do katalogu frontendu
-            - echo "Próba wejścia do katalogu frontendu..."
-            - cd digitalwars.client || (echo "❌ Katalog digitalwars.client nie istnieje!" && exit 1)
-
-            - echo "Pliki frontendu:"
-            - ls -la
+            - cd digitalwars.client
 
             # Build frontendu
             - npm ci
             - npm run build
 
-            # Sprawdzenie czy powstał katalog dist
-            - echo "Sprawdzam katalog dist:"
-            - ls -la
-
-            - test -d dist || (echo "❌ Brak katalogu dist — build frontendu się nie powiódł!" && exit 1)
+            - test -d dist
 
             # Pakowanie frontendu
             - cd dist
@@ -83,7 +70,8 @@ pipelines:
             - az login --service-principal -u $AZURE_APP_ID -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
 
             # BACKEND DEPLOY
-            - az webapp deploy --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_WEBAPP_BACKEND --src-path app-backend.zip --type zip --clean true
+            - az webapp deployment source config-zip --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_WEBAPP_BACKEND --src app-backend.zip
+
 
             # FRONTEND DEPLOY
-            - az webapp deploy --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_WEBAPP_FRONTEND --src-path app-frontend.zip --type zip --clean true
+            - az webapp deployment source config-zip --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_WEBAPP_FRONTEND --src app-frontend.zip
