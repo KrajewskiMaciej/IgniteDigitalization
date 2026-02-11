@@ -35,7 +35,9 @@ namespace backend.Services
                 .Where(gl => gl.Games_Id == gameId && gl.Teams_Id == teamId && gl.Status == true && gl.Cards_Id.HasValue)
                 .Select(gl => gl.Cards_Id!.Value)
                 .Distinct()
-                .ToHashSetAsync();
+                .ToListAsync();
+
+            var playedCardInternalIdsSet = new HashSet<int>(playedCardInternalIds);
 
             //Karty które czekają na zatwierdzenie admina
             var pendingCardInternalIds = await _context.GameLogs
@@ -43,10 +45,12 @@ namespace backend.Services
                 .Where(gl => gl.Games_Id == gameId && gl.Teams_Id == teamId && gl.Cards_Id.HasValue && gl.Is_Approved == false)
                 .Select(gl => gl.Cards_Id!.Value)
                 .Distinct()
-                .ToHashSetAsync();
+                .ToListAsync();
 
-            var blockedCardInternalIds = new HashSet<int>(playedCardInternalIds);
-            blockedCardInternalIds.UnionWith(pendingCardInternalIds);
+            var pendingCardInternalIdsSet = new HashSet<int>(pendingCardInternalIds);
+
+            var blockedCardInternalIds = new HashSet<int>(playedCardInternalIdsSet);
+            blockedCardInternalIds.UnionWith(pendingCardInternalIdsSet);
 
             // Krok 2: Pobierz WEWNĘTRZNE ID kart, które zostały specjalnie odblokowane dla tej drużyny w tej grze.
             var teamSpecificUnlockedCardIds = await _context.CardEnablers
@@ -54,7 +58,9 @@ namespace backend.Services
                 .Where(ce => ce.Games_Id == gameId && ce.Teams_Id == teamId)
                 .Select(ce => ce.Cards_Id)
                 .Distinct()
-                .ToHashSetAsync();
+                .ToListAsync();
+
+            var teamSpecificUnlockedCardIdsSet = new HashSet<int>(teamSpecificUnlockedCardIds);
 
             // Krok 3: Stwórz mapę GLOBALNYCH zależności (gdzie Games_Id jest null).
             var enablersMap = await _context.CardEnablers
@@ -62,7 +68,7 @@ namespace backend.Services
                 .Where(ce => ce.Games_Id == null && ce.Enablers_Id.HasValue)
                 .Include(ce => ce.Enablers)
                 .Where(ce => ce.Enablers != null)
-                .Where(ce => !playedCardInternalIds.Contains(ce.Enablers_Id!.Value))
+                .Where(ce => !playedCardInternalIdsSet.Contains(ce.Enablers_Id!.Value))
                 .GroupBy(ce => ce.Cards_Id)
                 .Select(g => new
                 {
@@ -84,7 +90,7 @@ namespace backend.Services
                     Title = d.Decisions_Short_Desc,
                     Description = d.Decisions_Long_Desc,
                     Cost = d.Decisions_Cost_Bits,
-                    Enablers = teamSpecificUnlockedCardIds.Contains(d.Cards_Id)
+                    Enablers = teamSpecificUnlockedCardIdsSet.Contains(d.Cards_Id)
                                 ? new List<int>()
                                 : (enablersMap.ContainsKey(d.Cards_Id) ? enablersMap[d.Cards_Id] : new List<int>())
                 }).ToListAsync();
