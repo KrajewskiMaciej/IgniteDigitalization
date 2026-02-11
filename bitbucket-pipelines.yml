@@ -14,37 +14,65 @@ pipelines:
             - git fetch --all
             - git push origin origin/live~1:preview --force
 
-      # BUILD BACKEND + FRONTEND
+      # BUILD BACKEND
       - step:
-          name: Build backend & frontend
+          name: Build Backend
           size: 2x
           caches:
             - dotnetcore
-            - node
           script:
+            - set -e
             - apt-get update && apt-get install -y zip
-            - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-            - apt-get install -y nodejs
 
-            # BACKEND
             - cd DigitalWars.Server
             - dotnet restore
             - dotnet publish -c Release -o ../deployment-backend
             - cd ..
+
             - cd deployment-backend
             - zip -r ../app-backend.zip .
             - cd ..
+          artifacts:
+            - app-backend.zip
 
-            # FRONTEND
-            - cd digitalwars.client
+      # BUILD FRONTEND
+      - step:
+          name: Build Frontend
+          size: 2x
+          caches:
+            - node
+          script:
+            - set -e
+            - apt-get update && apt-get install -y zip
+            - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+            - apt-get install -y nodejs
+
+            # DIAGNOSTYKA — pokaż katalogi repo
+            - echo "Lista katalogów w repo:"
+            - ls -la
+
+            # Wejście do katalogu frontendu
+            - echo "Próba wejścia do katalogu frontendu..."
+            - cd digitalwars.client || (echo "❌ Katalog digitalwars.client nie istnieje!" && exit 1)
+
+            - echo "Pliki frontendu:"
+            - ls -la
+
+            # Build frontendu
             - npm ci
             - npm run build
+
+            # Sprawdzenie czy powstał katalog dist
+            - echo "Sprawdzam katalog dist:"
+            - ls -la
+
+            - test -d dist || (echo "❌ Brak katalogu dist — build frontendu się nie powiódł!" && exit 1)
+
+            # Pakowanie frontendu
             - cd dist
             - zip -r ../../app-frontend.zip .
             - cd ../..
-
           artifacts:
-            - app-backend.zip
             - app-frontend.zip
 
       # DEPLOY BACKEND + FRONTEND
