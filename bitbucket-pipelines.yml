@@ -42,9 +42,10 @@ pipelines:
                 - cd digitalwars.client
                 - npm ci
                 - npm run build
-                # Pakowanie zawartości folderu dist do głównego katalogu (..)
-                - cd dist && zip -r ../../app-frontend.zip . && cd ../..
-                # Deploy przy użyciu pipe
+                # Pakujemy zawartość folderu dist, ale plik zip tworzymy w głównym folderze (ROOT)
+                - zip -r ../app-frontend.zip ./dist/*
+                - cd ..
+                # Teraz jesteśmy w głównym folderze, gdzie jest app-frontend.zip
                 - pipe: microsoft/azure-web-apps-deploy:1.0.3
                   variables:
                     AZURE_APP_ID: $AZURE_APP_ID
