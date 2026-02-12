@@ -17,10 +17,9 @@ pipelines:
               caches:
                 - dotnetcore
               script:
-                - apt-get update && apt-get install -y zip
                 - dotnet publish DigitalWars.Server/DigitalWars.Server.csproj -c Release -o ./publish-backend
-                # Pakujemy zawartość folderu do pliku w głównym katalogu
-                - cd publish-backend && zip -r ../app-backend.zip . && cd ..
+                # Pakujemy zawartość folderu do pliku w głównym katalogu (używamy pwsh zamiast apt install zip)
+                - pwsh -Command "Compress-Archive -Path ./publish-backend/* -DestinationPath ./app-backend.zip"
                 - pipe: microsoft/azure-web-apps-deploy:1.0.3
                   variables:
                     AZURE_APP_ID: $AZURE_APP_ID
@@ -33,12 +32,12 @@ pipelines:
           # --- PROCES FRONTEND ---
           - step:
               name: Build & Deploy Frontend
+              image: node:20
               caches:
                 - node
               script:
-                # 1. Instalacja Node.js ORAZ zip (niezbędne w tym osobnym kroku)
+                # 1. Instalacja zip (Node jest już w obrazie)
                 - apt-get update && apt-get install -y zip
-                - curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs
                 # 2. Build
                 - cd digitalwars.client
                 - npm ci

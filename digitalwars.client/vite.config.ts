@@ -15,6 +15,7 @@ export default defineConfig({
   },
   server: {
     port: 9000,
+    cors: true,
     //https: true,
     strictPort: true,
   },
