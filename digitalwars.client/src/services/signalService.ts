@@ -2,7 +2,11 @@
 import * as signalR from '@microsoft/signalr'
 
 // Pobierz URL huba z zmiennych środowiskowych lub użyj domyślnego.
-const HUB_URL = `${import.meta.env.VITE_API_URL || '/api'}/gameHub`
+let baseUrl = import.meta.env.VITE_API_URL || '/api'
+if (!baseUrl.startsWith('http') && !baseUrl.startsWith('/')) {
+  baseUrl = `https://${baseUrl}`
+}
+const HUB_URL = `${baseUrl}/gameHub`
 
 console.log('SignalR: Używany HUB_URL:', HUB_URL)
 

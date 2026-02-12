@@ -35,7 +35,8 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();          // Wymagane, aby Cookies mogły przechodzić
+              .AllowCredentials()
+              .SetIsOriginAllowed(_ => true); // Pozwala na dowolne origin z uwzględnieniem credentials
     });
 });
 
