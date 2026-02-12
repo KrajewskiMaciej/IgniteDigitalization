@@ -31,12 +31,13 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 // --- 2. MAKSYMALNIE OTWARTY CORS ---
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy", policy =>
+    // Używamy AddDefaultPolicy zamiast nazwanej polityki, aby działała automatycznie bez podawania nazwy w UseCors
+    options.AddDefaultPolicy(policy =>
     {
         policy.AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials()
-              .SetIsOriginAllowed(_ => true); // Pozwala na dowolne origin z uwzględnieniem credentials
+              .AllowCredentials() // Wymagane dla ciasteczek
+              .SetIsOriginAllowed(_ => true); // Pozwala na dowolne origin (http/https)
     });
 });
 
@@ -92,8 +93,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.Name = "itm.auth.cookie";
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-        options.Cookie.SameSite = SameSiteMode.Lax; // Lax pozwala na łatwiejsze współdzielenie sesji
+        // ZMIANA: SameSite=None i Secure=Always są wymagane dla Cross-Site (Frontend i Backend na różnych subdomenach)
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
         options.Events = new CookieAuthenticationEvents
@@ -128,7 +130,15 @@ var app = builder.Build();
 // --- 4. MIDDLEWARE (Kolejność "Otwarta") ---
 
 app.UseForwardedHeaders(); // Rozpoznawanie HTTPS na Azure
-app.UseCors("CorsPolicy");   // CORS przed wszystkim innym
+
+// DEBUG: Sprawdźmy, czy request w ogóle wchodzi do aplikacji i dodajmy nagłówek diagnostyczny
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-App-Version", "FixedCorsv2");
+    await next();
+});
+
+app.UseCors(); // CORS (domyślna polityka z AddDefaultPolicy)
 
 if (app.Environment.IsDevelopment())
 {
