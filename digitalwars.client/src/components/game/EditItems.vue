@@ -10,7 +10,7 @@
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
       <!-- Sekcja wyboru talii -->
-      <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+      <div class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl">
         <!-- Nagłówek -->
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
           <div class="bg-primary-500/20 p-3 rounded-lg">
@@ -40,7 +40,7 @@
         <!-- Edycja nazwy -->
         <div
           v-if="deckName"
-          class="mt-6 p-4 bg-surface-800 border border-surface-700 rounded-lg grid grid-cols-4 gap-4"
+          class="mt-6 p-4 bg-secondary border border-surface-700 rounded-lg grid grid-cols-4 gap-4"
         >
           <!-- Pole inputa -->
           <div class="md:col-span-3 flex flex-col">
@@ -66,7 +66,7 @@
       <!-- Sekcja wyboru przedmiotu -->
       <div
         v-if="selectedDeckId"
-        class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
+        class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl"
       >
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
           <div class="bg-green-500/20 p-3 rounded-lg">
@@ -113,7 +113,7 @@
       <!-- Sekcja edycji przedmiotu -->
       <div
         v-if="selectedItem && currentItem"
-        class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl"
+        class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl"
       >
         <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
           <div class="bg-blue-500/20 p-3 rounded-lg">
@@ -168,10 +168,10 @@
       <!-- Placeholder gdy brak wybranej talii -->
       <div
         v-if="!selectedDeckId"
-        class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-surface-900/50"
+        class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-secondary/50"
       >
         <div
-          class="bg-surface-800/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-3"
+          class="bg-secondary/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-3"
         >
           <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
         </div>

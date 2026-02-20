@@ -55,11 +55,11 @@ const router = createRouter({
           name: 'admin-home',
           component: homeAdmin,
         },
-        {
-          path: 'statistics',
-          name: 'admin-statistics',
-          component: statisticsView,
-        },
+        // {
+        //   path: 'statistics',
+        //   name: 'admin-statistics',
+        //   component: statisticsView,
+        // },
         {
           path: 'editBoard',
           name: 'edit-board',

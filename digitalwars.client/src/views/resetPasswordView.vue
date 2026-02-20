@@ -1,9 +1,9 @@
 <template>
-  <div class="bg-surface-800 min-h-screen">
+  <div class="bg-secondary min-h-screen">
     <div class="fixed inset-0 flex items-center justify-center z-50 p-4">
       <div class="absolute inset-0 bg-black/40 transition-opacity duration-300"></div>
       <div
-        class="bg-surface-900 text-white rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
+        class="bg-secondary text-white rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
       >
         <div v-if="isTokenValid">
           <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">

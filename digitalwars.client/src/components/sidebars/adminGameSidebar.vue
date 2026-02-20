@@ -56,7 +56,7 @@
           </RouterLink>
         </li>
 
-        <li
+        <!-- <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
           @click="handleGameStats"
         >
@@ -82,7 +82,7 @@
           <div v-show="isGameStatsDropdownOpen" class="flex flex-col py-1 space-y-1">
             <RouterLink
               :to="{ path: `/admin/game/${gameId}/statistics`, query: { stat: 'positions' } }"
-              class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
+              class="px-4 py-2 hover:bg-secondary rounded-md transition-all duration-200"
               @click.stop
             >
               {{ t('finalPositions') }}
@@ -90,7 +90,7 @@
 
             <RouterLink
               :to="{ path: `/admin/game/${gameId}/statistics`, query: { stat: 'success' } }"
-              class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
+              class="px-4 py-2 hover:bg-secondary rounded-md transition-all duration-200"
               @click.stop
             >
               {{ t('decisionEffectiveness') }}
@@ -98,7 +98,7 @@
 
             <RouterLink
               :to="{ path: `/admin/game/${gameId}/statistics`, query: { stat: 'bits' } }"
-              class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
+              class="px-4 py-2 hover:bg-secondary rounded-md transition-all duration-200"
               @click.stop
             >
               {{ t('averageBitsPerRound') }}
@@ -106,26 +106,13 @@
 
             <RouterLink
               :to="{ path: `/admin/game/${gameId}/statistics`, query: { stat: 'progress' } }"
-              class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
+              class="px-4 py-2 hover:bg-secondary rounded-md transition-all duration-200"
               @click.stop
             >
               {{ t('teamRankingOverRounds') }}
             </RouterLink>
           </div>
-        </li>
-
-        <li
-          class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
-        >
-          <RouterLink
-            :to="`/admin/game/${gameId}/cheatSheet`"
-            class="flex items-center gap-4 px-4 py-3 rounded-md"
-            :class="isSideBarOpen ? '' : 'justify-center'"
-          >
-            <font-awesome-icon :icon="faFile" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">{{ t('gameMasterCheatSheet') }}</span>
-          </RouterLink>
-        </li>
+        </li> -->
 
         <li
           class="border-2 border-lgray-accent rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"

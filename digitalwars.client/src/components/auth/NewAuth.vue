@@ -1,66 +1,66 @@
 <template>
+  <!-- Tło z efektem rozmycia -->
   <div
-    class="animate-fade absolute inset-0 z-20 w-screen h-screen bg-surface-900 text-surface-0"
-    :class="isBigScreen ? 'grid grid-cols-2' : ''"
+    class="animate-fade fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
   >
-    <div v-if="isBigScreen">
-      <RobotAuth ref="robotRef" />
-    </div>
-
+    <!-- Główny Kontener -->
     <div
-      class="relative flex justify-center items-center h-full"
-      :class="isBigScreen ? 'border-l border-primary-500/30' : ''"
+      class="relative w-full max-w-lg bg-gradient-to-br from-surface-900 to-surface-950 text-white rounded-2xl border border-primary-500/30 shadow-2xl shadow-primary-500/20 flex flex-col max-h-[95vh] overflow-hidden"
     >
-      <div
-        class="absolute inset-0 bg-gradient-to-br from-primary-500/5 via-transparent to-primary-400/5"
-      />
-
+      <!-- Przycisk Zamknij -->
       <button
         @click="emit('close')"
-        class="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full text-surface-0 hover:text-primary-400 hover:bg-surface-700 backdrop-blur-sm transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30"
+        class="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full text-surface-400 hover:text-primary-400 hover:bg-secondary transition-all duration-200"
       >
         <font-awesome-icon :icon="faXmark" class="text-xl" />
       </button>
 
-      <div
-        class="relative z-10 w-full max-w-lg px-6 sm:px-8 md:px-12 py-8 overflow-y-auto max-h-screen"
-      >
+      <!-- Scrollowalna treść -->
+      <div class="px-6 sm:px-10 py-10 overflow-y-auto">
+        
+        <!-- Przełącznik widoków (Login / Register) -->
         <div
           v-if="activeView === 'login' || activeView === 'register'"
-          class="flex items-center gap-2 p-1.5 mb-8 bg-surface-800/80 rounded-full backdrop-blur-sm border border-surface-700"
+          class="flex items-center gap-2 p-1.5 mb-8 bg-secondary/80 rounded-xl border border-surface-700/50"
         >
           <button
             @click="activeView = 'login'"
-            class="flex-1 py-3 sm:py-3.5 px-4 sm:px-6 rounded-full transition-all duration-300 text-sm sm:text-base font-medium relative overflow-hidden"
+            class="flex-1 py-2.5 rounded-lg transition-all duration-300 text-sm font-semibold"
             :class="
               activeView === 'login'
-                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/40'
-                : 'text-surface-400 hover:text-surface-200 hover:bg-surface-700/50'
+                ? 'bg-primary-600 text-white shadow-md shadow-primary-900/40'
+                : 'text-surface-400 hover:text-surface-200 hover:bg-secondary'
             "
           >
-            <span class="relative z-10">{{ t('signIn') }}</span>
+            {{ t('signIn') }}
           </button>
 
           <button
             @click="activeView = 'register'"
-            class="flex-1 py-3 sm:py-3.5 px-4 sm:px-6 rounded-full transition-all duration-300 text-sm sm:text-base font-medium relative overflow-hidden"
+            class="flex-1 py-2.5 rounded-lg transition-all duration-300 text-sm font-semibold"
             :class="
               activeView === 'register'
-                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/40'
-                : 'text-surface-400 hover:text-surface-200 hover:bg-surface-700/50'
+                ? 'bg-primary-600 text-white shadow-md shadow-primary-900/40'
+                : 'text-surface-400 hover:text-surface-200 hover:bg-secondary'
             "
           >
-            <span class="relative z-10">{{ t('signUp') }}</span>
+            {{ t('signUp') }}
           </button>
         </div>
 
-        <div>
+        <!-- Linia dekoracyjna -->
+        <div v-if="activeView === 'login' || activeView === 'register'" 
+             class="h-px bg-gradient-to-r from-transparent via-primary-500/30 to-transparent mb-8">
+        </div>
+
+        <!-- Formularze -->
+        <div class="relative">
           <LoginForm
             v-if="activeView === 'login'"
             @close="emit('close')"
             @forgotPassword="handleForgotPassword"
             @error="handleError"
-            class="animate-fade-left"
+            class="animate-fade-in"
           />
 
           <RegisterForm
@@ -68,21 +68,21 @@
             @close="emit('close')"
             @switchToConfirmEmail="handleSwitchToConfirmEmail"
             @error="handleError"
-            class="animate-fade-right"
+            class="animate-fade-in"
           />
 
           <ForgotPassword
             v-if="activeView === 'forgotPassword'"
             @back-to-login="handleBackToLogin"
             @error="handleError"
-            class="animate-fade-right"
+            class="animate-fade-in"
           />
 
           <ConfirmEmail
             v-if="activeView === 'confirmEmail'"
             :email="emailToConfirm"
             @back-to-login="handleBackToLogin"
-            class="animate-fade-left"
+            class="animate-fade-in"
           />
         </div>
       </div>

@@ -18,7 +18,7 @@
     <div class="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
       <div class="flex justify-start">
         <div
-          class="bg-surface-700 text-white rounded-2xl rounded-bl-md px-4 py-2 max-w-xs break-words"
+          class="bg-secondary text-white rounded-2xl rounded-bl-md px-4 py-2 max-w-xs break-words"
         >
           Cześć! Jestem Twoim asystentem AI 🤖. Mogę pomóc Ci w grze, odpowiedzieć na pytania. Każda
           podpowiedź kosztuje <b>10 Bitów 💰</b>. Jak mogę Ci pomóc?
@@ -137,7 +137,7 @@ const emit = defineEmits(['closeChat'])
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #a78bfa;
+  background: theme('colors.secondary');
   border-radius: 0.25rem;
   border: 0.1rem solid transparent;
   background-clip: content-box;

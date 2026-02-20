@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
-using DigitalWars.Server.Settings;
+using backend.Server.Settings;
 
 namespace backend.Services
 {

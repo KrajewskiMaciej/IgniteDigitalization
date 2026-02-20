@@ -1,7 +1,7 @@
 <template>
   <footer>
     <div
-      class="text-center text-white w-full bg-surface-850 text-xs py-2 border-t border-surface-700"
+      class="bg-secondary text-center text-white w-full text-xs py-2 border-t border-surface-700"
     >
       Copyright
       <font-awesome-icon :icon="faCopyright" class="h-3 text-white" />

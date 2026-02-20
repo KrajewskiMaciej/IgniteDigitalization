@@ -7,7 +7,7 @@
   >
     <div class="relative w-full h-full max-w-[300px] max-h-[300px] mx-auto">
       <div
-        class="absolute inset-0 rounded-xl border-2 border-surface-700 group-hover:border-primary-400 transition-colors duration-300 bg-surface-0 dark:bg-surface-900 shadow-lg"
+        class="absolute inset-0 rounded-xl border-2 border-surface-700 group-hover:border-primary-400 transition-colors duration-300 bg-secondary dark:bg-secondary shadow-lg"
       ></div>
 
       <!-- SVG z pionkiem -->

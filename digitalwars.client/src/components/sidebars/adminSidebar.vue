@@ -30,7 +30,7 @@
           </RouterLink>
         </li>
 
-        <li
+        <!-- <li
           class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
           @click="handleStats"
         >
@@ -58,27 +58,27 @@
           <div v-show="isStatsDropdownOpen" class="flex flex-col py-1 space-y-1">
             <RouterLink
               :to="{ path: '/admin/statistics', query: { stat: 'results' } }"
-              class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
+              class="px-4 py-2 hover:bg-secondary rounded-md transition-all duration-200"
               @click.stop
             >
               {{ t('decisionEffectiveness') }}
             </RouterLink>
             <RouterLink
               :to="{ path: '/admin/statistics', query: { stat: 'bits' } }"
-              class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
+              class="px-4 py-2 hover:bg-secondary rounded-md transition-all duration-200"
               @click.stop
             >
               {{ t('averageBitsPerRound') }}
             </RouterLink>
             <RouterLink
               :to="{ path: '/admin/statistics', query: { stat: 'deviation' } }"
-              class="px-4 py-2 hover:bg-[#1c2942] rounded-md transition-all duration-200"
+              class="px-4 py-2 hover:bg-secondary rounded-md transition-all duration-200"
               @click.stop
             >
               {{ t('standardDeviation') }}
             </RouterLink>
           </div>
-        </li>
+        </li> -->
 
         <li
           class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"

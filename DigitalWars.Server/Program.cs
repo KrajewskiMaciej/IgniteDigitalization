@@ -1,169 +1,95 @@
 using backend.Data;
-using backend.Initializers;
 using backend.Services;
-using DigitalWars.Server.Services;
-using DigitalWars.Server.Settings;
+using backend.Initializers;
+using backend.Server.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using QuestPDF.Infrastructure;
-using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc;
 using backend.Hubs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
-using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. KONFIGURACJA SIECIOWA (AZURE) ---
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-{
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.KnownNetworks.Clear();
-    options.KnownProxies.Clear();
-});
-
-// --- 2. MAKSYMALNIE OTWARTY CORS ---
-builder.Services.AddCors(options =>
-{
-    // Używamy AddDefaultPolicy zamiast nazwanej polityki, aby działała automatycznie bez podawania nazwy w UseCors
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials() // Wymagane dla ciasteczek
-              .SetIsOriginAllowed(_ => true); // Pozwala na dowolne origin (http/https)
-    });
-});
-
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
-
-var loggerFactory = LoggerFactory.Create(config => { config.AddConsole(); });
-var startupLogger = loggerFactory.CreateLogger("Startup");
-startupLogger.LogInformation("[API] Start konfiguracji...");
-
-// Baza danych
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var serverVersion = new MySqlServerVersion(new Version(8, 0, 21));
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, serverVersion,
-        mySqlOptions => mySqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null)));
-
+// --- 1. INFRASTRUKTURA ---
+builder.Services.AddSignalR();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-// Rejestracja serwisów (Email, Jwt, Game itd.)
-builder.Services.Configure<backend.Services.EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+// --- 2. MAKSYMALNIE OTWARTY CORS ---
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.SetIsOriginAllowed(origin => true) // Przyjmij każde połączenie
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Pozwól na ciasteczka
+    });
+});
+
+// --- 3. BAZA DANYCH ---
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// --- 4. SETTINGS ---
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("FrontendSettings"));
-builder.Services.AddScoped<backend.Services.IEmailService, backend.Services.EmailService>();
-builder.Services.AddScoped<backend.Services.JwtService>();
-builder.Services.AddScoped<backend.Services.IProvisioningService, backend.Services.ProvisioningService>();
-builder.Services.AddScoped<backend.Services.IAuthService, backend.Services.AuthService>();
-builder.Services.AddScoped<backend.Services.IPlayerService, backend.Services.PlayerService>();
-builder.Services.AddScoped<backend.Services.IGameService, backend.Services.GameService>();
+
+// --- 5. SERWISY (Zarejestrowane raz, czysto) ---
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IProvisioningService, ProvisioningService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPlayerService, PlayerService>();
+builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IPlayerQueryService, PlayerQueryService>();
-builder.Services.AddScoped<backend.Services.IPlayerActionService, backend.Services.PlayerActionService>();
+builder.Services.AddScoped<IPlayerActionService, PlayerActionService>();
 builder.Services.AddScoped<ICheatsheetService, CheatsheetService>();
-builder.Services.AddSingleton<backend.Services.IBackgroundTaskQueue>(ctx => new backend.Services.BackgroundTaskQueue(100));
+
+builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx => new BackgroundTaskQueue(100));
 builder.Services.AddHostedService<QueuedHostedService>();
 
-// Serwisy DigitalWars.Server
-builder.Services.AddScoped<DigitalWars.Server.Services.IPlayerService, DigitalWars.Server.Services.PlayerService>();
-builder.Services.AddScoped<DigitalWars.Server.Services.IAuthService, DigitalWars.Server.Services.AuthService>();
-builder.Services.AddScoped<DigitalWars.Server.Services.IPlayerActionService, DigitalWars.Server.Services.PlayerActionService>();
-builder.Services.AddScoped<DigitalWars.Server.Services.IGameService, DigitalWars.Server.Services.GameService>();
-builder.Services.AddScoped<DigitalWars.Server.Services.JwtService>();
-builder.Services.AddScoped<DigitalWars.Server.Services.IEmailService, DigitalWars.Server.Services.EmailService>();
-builder.Services.AddSingleton<DigitalWars.Server.Services.IBackgroundTaskQueue>(ctx => new DigitalWars.Server.Services.BackgroundTaskQueue(100));
-builder.Services.AddScoped<DigitalWars.Server.Services.IProvisioningService, DigitalWars.Server.Services.ProvisioningService>();
-
-// --- 3. AUTENTYKACJA (COOKIES TYLKO DO IDENTYFIKACJI) ---
+// --- 6. AUTENTYKACJA ---
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    .AddCookie(options =>
     {
         options.Cookie.Name = "itm.auth.cookie";
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.HttpOnly = true;
-        // ZMIANA: SameSite=None i Secure=Always są wymagane dla Cross-Site (Frontend i Backend na różnych subdomenach)
-        options.Cookie.SameSite = SameSiteMode.None;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.ExpireTimeSpan = TimeSpan.FromDays(7);
-        options.SlidingExpiration = true;
-        options.Events = new CookieAuthenticationEvents
+        options.Events.OnRedirectToLogin = context =>
         {
-            OnRedirectToLogin = context =>
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return Task.CompletedTask;
-            }
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
         };
     });
 
-builder.Services.AddAuthorization(); // Brak polityk = brak dodatkowych restrykcji
-builder.Services.AddSignalR();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddApiVersioning(options =>
-{
-    options.DefaultApiVersion = new ApiVersion(1, 0);
-    options.AssumeDefaultVersionWhenUnspecified = true;
-    options.ReportApiVersions = true;
-}).AddApiExplorer(options =>
-{
-    options.GroupNameFormat = "'v'VVV";
-    options.SubstituteApiVersionInUrl = true;
-});
-
-builder.Services.AddSwaggerGen();
-builder.Services.ConfigureOptions<DigitalWars.Server.Settings.ConfigureSwaggerOptions>();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// --- 4. MIDDLEWARE (Kolejność "Otwarta") ---
+// --- 7. MIDDLEWARE (Kolejność jest kluczowa dla działania CORS i Auth) ---
 
-app.UseForwardedHeaders(); // Rozpoznawanie HTTPS na Azure
-
-// DEBUG: Sprawdźmy, czy request w ogóle wchodzi do aplikacji i dodajmy nagłówek diagnostyczny
-app.Use(async (context, next) =>
+app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    context.Response.Headers.Append("X-App-Version", "FixedCorsv2");
-    await next();
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-app.UseCors(); // CORS (domyślna polityka z AddDefaultPolicy)
+// CORS MUSI BYĆ TUTAJ (przed Auth i przed MapControllers)
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-        foreach (var description in provider.ApiVersionDescriptions)
-            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
-    });
-}
-else
-{
-    // Na Azure wyłączamy wymuszanie przekierowań, jeśli infrastruktura (App Service) już to robi.
-    // To zapobiega błędom 400 (Bad Request) przy pętlach przekierowań.
-    // app.UseHttpsRedirection(); 
-
-    if (builder.Configuration.GetValue<bool>("FrontendSettings:ServeStaticFiles"))
-    {
-        app.UseDefaultFiles();
-        var provider = new FileExtensionContentTypeProvider();
-        provider.Mappings[".glb"] = "model/gltf-binary";
-        provider.Mappings[".gltf"] = "model/gltf+json";
-        app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = provider });
-    }
+    app.UseSwaggerUI();
 }
 
 app.UseAuthentication();
@@ -172,18 +98,13 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<GameHub>("/api/gameHub");
 
-if (builder.Configuration.GetValue<bool>("FrontendSettings:ServeStaticFiles"))
-{
-    app.MapFallbackToFile("/index.html").AllowAnonymous();
-}
-
-// Baza danych
+// --- 8. INICJALIZACJA BAZY ---
 using (var scope = app.Services.CreateScope())
 {
     try
     {
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var provisioningService = scope.ServiceProvider.GetRequiredService<backend.Services.IProvisioningService>();
+        var provisioningService = scope.ServiceProvider.GetRequiredService<IProvisioningService>();
         context.Database.Migrate();
         DbInitializer.Initialize(context, provisioningService);
     }

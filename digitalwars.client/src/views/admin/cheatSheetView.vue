@@ -8,7 +8,7 @@
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
-      <div class="border border-surface-700 rounded-lg p-5 bg-surface-900">
+      <div class="border border-surface-700 rounded-lg p-5 bg-secondary">
         <div
           class="flex justify-between items-center mb-5"
           :class="showFilesSection ? 'border-b border-surface-700 pb-4' : ''"
@@ -101,7 +101,7 @@
               <div
                 v-for="(window, index) in pdfWindows"
                 :key="index"
-                class="flex items-center justify-between bg-surface-800/70 p-3.5 rounded-lg border-2 border-surface-600 hover:border-primary-400 hover:bg-surface-800 transition-all duration-200"
+                class="flex items-center justify-between bg-secondary/70 p-3.5 rounded-lg border-2 border-surface-600 hover:border-primary-400 hover:bg-secondary transition-all duration-200"
               >
                 <div class="flex items-center gap-3 flex-1 min-w-0">
                   <div class="bg-red-500/20 p-1.5 rounded">
@@ -130,10 +130,10 @@
 
           <div
             v-else
-            class="text-center py-12 border-2 border-dashed border-surface-700 rounded-xl bg-surface-950/30"
+            class="text-center py-12 border-2 border-dashed border-surface-700 rounded-xl bg-secondary/30"
           >
             <div
-              class="bg-surface-800/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-3"
+              class="bg-secondary/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-3"
             >
               <font-awesome-icon :icon="faFileCircleQuestion" class="h-10 text-surface-600" />
             </div>
@@ -145,7 +145,7 @@
 
       <div v-if="pdfWindows.length > 0">
         <div
-          class="border-2 border-surface-700 rounded-xl overflow-hidden bg-surface-900 shadow-2xl"
+          class="border-2 border-surface-700 rounded-xl overflow-hidden bg-secondary shadow-2xl"
         >
           <TabView v-model:activeIndex="activePDFIndex" class="pdf-tabs">
             <TabPanel v-for="(window, index) in pdfWindows" :key="index">
@@ -169,60 +169,7 @@
         </div>
       </div>
 
-      <div
-        class="border border-surface-700 rounded-xl p-5 bg-gradient-to-br from-surface-900 to-surface-800 shadow-2xl"
-      >
-        <div class="flex items-center justify-between mb-5 pb-4 border-b border-surface-700">
-          <div class="flex items-center gap-3">
-            <div class="bg-primary-500/20 p-3 rounded-lg">
-              <font-awesome-icon :icon="faDiagramProject" class="h-6 text-primary-400" />
-            </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('decisionTree') }}</h2>
-          </div>
-          <div class="flex gap-2">
-            <Button
-              @click="toggleImageSize"
-              outlined
-              rounded
-              size="small"
-              v-tooltip.top="isZoomed ? t('zoomOut') : t('zoomIn')"
-            >
-              <template #icon>
-                <font-awesome-icon
-                  :icon="isZoomed ? faMagnifyingGlassMinus : faMagnifyingGlassPlus"
-                  class="h-4"
-                />
-              </template>
-            </Button>
-            <Button
-              @click="downloadImage"
-              outlined
-              rounded
-              size="small"
-              v-tooltip.top="t('downloadImage')"
-            >
-              <template #icon>
-                <font-awesome-icon :icon="faDownload" class="h-4" />
-              </template>
-            </Button>
-          </div>
-        </div>
 
-        <div class="relative bg-surface-900 rounded-xl p-4 overflow-auto custom-scrollbar">
-          <div class="flex items-center justify-center">
-            <img
-              :src="drzewko"
-              class="border-2 border-surface-700 rounded-lg transition-all duration-300 hover:border-primary-400 hover:shadow-2xl hover:shadow-primary-500/20 bg-surface-900 p-2"
-              :class="[isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in']"
-              :style="
-                isZoomed ? { width: '100%', minWidth: '100%' } : { width: '50%', height: 'auto' }
-              "
-              :alt="t('decisionTree')"
-              @click="toggleImageSize"
-            />
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -247,7 +194,6 @@ import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
-import drzewko from '@/assets/viewPNGs/DrzewoDecyzji.png'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -285,15 +231,6 @@ const isZoomed = ref<boolean>(false)
 
 function toggleImageSize(): void {
   isZoomed.value = !isZoomed.value
-}
-
-function downloadImage(): void {
-  const link = document.createElement('a')
-  link.href = drzewko
-  link.download = 'drzewo-decyzji.png'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
 }
 
 function openPDF(): void {

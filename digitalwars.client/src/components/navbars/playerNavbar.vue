@@ -33,7 +33,7 @@ const props = defineProps({
   },
   navBgColor: {
     type: String,
-    default: '#1E3A8A',
+    default: '#141c2A',
   },
 })
 

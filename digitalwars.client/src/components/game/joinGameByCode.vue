@@ -18,7 +18,7 @@
     >
       <button
         @click="closeModal"
-        class="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full text-surface-0 hover:text-primary-400 hover:bg-surface-700 backdrop-blur-sm transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30"
+        class="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full text-surface-0 hover:text-primary-400 hover:bg-secondary backdrop-blur-sm transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30"
       >
         <font-awesome-icon :icon="faXmark" class="text-xl" />
       </button>
@@ -40,7 +40,7 @@
                 type="text"
                 v-model="code"
                 :placeholder="t('enterGameCodePlaceholder')"
-                class="w-full px-4 py-4 bg-surface-800 border border-primary-500/30 rounded-xl text-surface-0 placeholder:text-surface-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200"
+                class="w-full px-4 py-4 bg-secondary border border-primary-500/30 rounded-xl text-surface-0 placeholder:text-surface-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200"
                 required
               />
             </div>
@@ -69,7 +69,7 @@
           <button
             type="button"
             @click="startScanning"
-            class="relative w-full py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden group bg-surface-800 hover:bg-gradient-to-r hover:from-primary-600/20 hover:to-primary-700/20 border border-primary-500/30 hover:border-primary-500/50 hover:shadow-md hover:shadow-primary-500/20"
+            class="relative w-full py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden group bg-secondary hover:bg-gradient-to-r hover:from-primary-600/20 hover:to-primary-700/20 border border-primary-500/30 hover:border-primary-500/50 hover:shadow-md hover:shadow-primary-500/20"
           >
             <span class="relative z-10 flex items-center justify-center gap-2">
               <font-awesome-icon :icon="faQrcode" />
@@ -102,7 +102,7 @@
               </div>
               <div
                 v-if="!scanError && !cameraReady"
-                class="text-center p-6 bg-surface-800/80 backdrop-blur-sm"
+                class="text-center p-6 bg-secondary/80 backdrop-blur-sm"
               >
                 <p class="text-surface-300">{{ t('initializingCamera') }}</p>
               </div>
@@ -125,7 +125,7 @@
 
           <button
             @click="isScanning = false"
-            class="relative w-full py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden group bg-surface-800 hover:bg-gradient-to-r hover:from-primary-600/20 hover:to-primary-700/20 border border-primary-500/30 hover:border-primary-500/50"
+            class="relative w-full py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden group bg-secondary hover:bg-gradient-to-r hover:from-primary-600/20 hover:to-primary-700/20 border border-primary-500/30 hover:border-primary-500/50"
           >
             <span class="relative z-10">{{ t('cancel') }}</span>
             <div

@@ -5,7 +5,7 @@
       <label class="block mb-3 text-sm font-medium text-white">{{ t('basicColors') }}</label>
       <div class="flex flex-col sm:flex-row w-full gap-4">
         <!-- Kolor wypełnienia komórki -->
-        <div class="border border-surface-700 py-3 px-4 rounded-lg flex-1 bg-surface-900">
+        <div class="border border-surface-700 py-3 px-4 rounded-lg flex-1 bg-secondary">
           <label for="cell-color" class="block mb-2 text-sm text-surface-200-300">{{
             t('cellColor')
           }}</label>
@@ -25,7 +25,7 @@
         </div>
 
         <!-- Kolor obramowania komórki -->
-        <div class="border border-surface-700 py-3 px-4 rounded-lg flex-1 bg-surface-900">
+        <div class="border border-surface-700 py-3 px-4 rounded-lg flex-1 bg-secondary">
           <label for="border-color" class="block mb-2 text-sm text-surface-200-300">{{
             t('borderColor')
           }}</label>
@@ -51,12 +51,12 @@
       <label class="block mb-3 text-sm font-medium text-white">{{ t('borderColors') }}</label>
 
       <!-- Lista istniejących kolorów stref -->
-      <div class="border border-surface-700 p-3 rounded-lg mb-4 bg-surface-900">
+      <div class="border border-surface-700 p-3 rounded-lg mb-4 bg-secondary">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <div
             v-for="(color, index) in borderColors"
             :key="index"
-            class="flex items-center border border-surface-600 rounded-lg p-2 gap-3 bg-surface-900 hover:border-primary-400 transition-colors duration-200"
+            class="flex items-center border border-surface-600 rounded-lg p-2 gap-3 bg-secondary hover:border-primary-400 transition-colors duration-200"
           >
             <!-- Podgląd i selektor koloru -->
             <input
@@ -90,7 +90,7 @@
 
       <!-- Formularz dodawania nowego koloru -->
       <div
-        class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 border border-surface-700 p-4 rounded-lg bg-surface-900"
+        class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 border border-surface-700 p-4 rounded-lg bg-secondary"
       >
         <div class="flex items-center gap-3 flex-1">
           <input

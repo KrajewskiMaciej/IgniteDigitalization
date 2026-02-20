@@ -5,12 +5,12 @@
       <label class="block mb-2 text-sm font-medium text-white">{{ t('labelsTop') }}</label>
 
       <!-- Lista istniejących etykiet górnych -->
-      <div class="border-2 border-surface-700 px-3 py-3 rounded-lg mb-4 bg-surface-900">
+      <div class="border-2 border-surface-700 px-3 py-3 rounded-lg mb-4 bg-secondary">
         <div class="flex flex-col gap-2">
           <div
             v-for="(label, index) in labelsUp"
             :key="index"
-            class="flex items-center border-2 border-surface-600 rounded-lg p-2 gap-2 bg-surface-900 hover:border-primary-400 transition-colors duration-200"
+            class="flex items-center border-2 border-surface-600 rounded-lg p-2 gap-2 bg-secondary hover:border-primary-400 transition-colors duration-200"
           >
             <InputText
               :modelValue="label"
@@ -56,12 +56,12 @@
       <label class="block mb-2 text-sm font-medium text-white">{{ t('labelsRight') }}</label>
 
       <!-- Lista istniejących etykiet prawych -->
-      <div class="border-2 border-surface-700 px-3 py-3 rounded-lg mb-4 bg-surface-900">
+      <div class="border-2 border-surface-700 px-3 py-3 rounded-lg mb-4 bg-secondary">
         <div class="flex flex-col gap-2">
           <div
             v-for="(label, index) in labelsRight"
             :key="index"
-            class="flex items-center border-2 border-surface-600 rounded-lg p-2 gap-2 bg-surface-900 hover:border-primary-400 transition-colors duration-200"
+            class="flex items-center border-2 border-surface-600 rounded-lg p-2 gap-2 bg-secondary hover:border-primary-400 transition-colors duration-200"
           >
             <InputText
               :modelValue="label"

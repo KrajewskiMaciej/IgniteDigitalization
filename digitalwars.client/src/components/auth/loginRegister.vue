@@ -18,7 +18,7 @@
     >
       <button
         @click="closeModal"
-        class="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full text-surface-0 hover:text-primary-400 hover:bg-surface-700 backdrop-blur-sm transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30"
+        class="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full text-surface-0 hover:text-primary-400 hover:bg-secondary backdrop-blur-sm transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30"
       >
         <font-awesome-icon :icon="faXmark" class="md:text-2xl sm:text-4xl" />
       </button>
@@ -26,7 +26,7 @@
       <div class="px-4 sm:px-5 md:px-6 lg:px-8 pt-16 pb-4 sm:pb-6 md:pb-8">
         <div
           v-if="activeView === 'login' || activeView === 'register'"
-          class="flex items-center gap-2 p-2 mb-4 sm:mb-6 bg-surface-800 rounded-full backdrop-blur-sm border border-primary-500"
+          class="flex items-center gap-2 p-2 mb-4 sm:mb-6 bg-secondary rounded-full backdrop-blur-sm border border-primary-500"
         >
           <button
             @click="activeView = 'login'"

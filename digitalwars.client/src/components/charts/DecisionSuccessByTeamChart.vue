@@ -3,7 +3,7 @@
     <div
       v-for="(teamData, index) in data"
       :key="index"
-      class="w-64 h-80 flex flex-col items-center bg-[#1e293b] p-4 rounded-lg shadow-lg border border-gray-700"
+      class="w-64 h-80 flex flex-col items-center bg-secondary p-4 rounded-lg shadow-lg border border-gray-700"
     >
       <!-- Kontener na wykres z unikalnym ID -->
       <div

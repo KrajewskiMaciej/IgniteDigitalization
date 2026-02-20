@@ -1,35 +1,40 @@
 <template>
   <div>
-    <div class="relative flex flex-col h-screen w-screen overflow-hidden bg-surface-900">
+    <!-- Zmieniono na surface-950 dla najgłębszego tła -->
+    <div class="relative flex flex-col h-screen w-screen overflow-hidden bg-secondary">
       <div class="relative z-20 flex flex-col h-full">
-        <Navbar @open-video="handleShowVideo" />
+        <Navbar/>
 
         <div class="flex-1 relative">
           <AnimatedScene class="absolute inset-0" />
 
           <div class="absolute inset-0 flex flex-col justify-end items-center pb-16">
+            <!-- Kontener przycisków: zastąpiono surface-850 przez surface-900 -->
             <div
-              class="flex items-center text-white bg-gradient-to-r from-surface-850/90 to-surface-800/90 border border-primary-500 shadow-2xl px-2 py-2 rounded-full gap-1.5 backdrop-blur-sm"
+              class="flex items-center text-white bg-gradient-to-r from-surface-900/90 to-surface-800/90 border border-primary-500/40 shadow-2xl px-2 py-2 rounded-full gap-1.5 backdrop-blur-sm"
             >
+              <!-- Przycisk Game Master -->
               <div
                 @click="handleGameMasterClick"
-                class="flex items-center px-8 py-3.5 rounded-full cursor-pointer transition-all duration-600 ease-out relative overflow-hidden group bg-surface-800/50 hover:bg-gradient-to-r hover:from-primary-400 hover:to-primary-500 hover:shadow-lg hover:shadow-primary-500/50 hover:scale-[1.02]"
+                class="flex items-center px-8 py-3.5 rounded-full cursor-pointer transition-all duration-300 ease-out relative overflow-hidden group bg-secondary hover:bg-primary-600 hover:shadow-lg hover:shadow-primary-500/40 hover:scale-[1.02]"
               >
-                <span class="mr-2.5 relative z-20">{{ t('gameMaster') }}</span>
+                <span class="mr-2.5 relative z-20 font-semibold">{{ t('gameMaster') }}</span>
                 <font-awesome-icon :icon="faUserGear" class="h-4 w-4 relative z-20" />
+                <!-- Efekt błysku (Glint) -->
                 <div
-                  class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-500/20 to-primary-500/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"
+                  class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"
                 />
               </div>
 
+              <!-- Przycisk Gracz -->
               <div
                 @click="showJoinByCode = true"
-                class="flex items-center px-8 py-3.5 rounded-full cursor-pointer transition-all duration-600 ease-out relative overflow-hidden group bg-surface-800/50 hover:bg-gradient-to-r hover:from-primary-400 hover:to-primary-500 hover:shadow-lg hover:shadow-primary-500/50 hover:scale-[1.02]"
+                class="flex items-center px-8 py-3.5 rounded-full cursor-pointer transition-all duration-300 ease-out relative overflow-hidden group bg-secondary hover:bg-primary-600 hover:shadow-lg hover:shadow-primary-500/40 hover:scale-[1.02]"
               >
-                <span class="mr-2.5 relative z-20">{{ t('player') }}</span>
+                <span class="mr-2.5 relative z-20 font-semibold">{{ t('player') }}</span>
                 <font-awesome-icon :icon="faUser" class="h-4 w-4 relative z-20" />
                 <div
-                  class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-500/20 to-primary-500/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"
+                  class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"
                 />
               </div>
             </div>
@@ -39,19 +44,11 @@
         <Footer />
       </div>
 
-      <!-- <LoginRegister :is-visible="showAuthModal" @close="showAuthModal = false" /> -->
+      <!-- Komponenty modalne -->
       <NewAuth v-if="showAuthModal" @close="showAuthModal = false" />
       <joinByCode :is-visible="showJoinByCode" @close="showJoinByCode = false" />
     </div>
-    <Teleport v-if="showVideo" to="body">
-      <div
-        class="fixed inset-0 w-screen h-screen z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
-      >
-        <video :autoplay="showVideo" class="w-full h-full rounded-lg disco-shadow" @click.stop>
-          <source src="/easteregss/gandalf.mp4" type="video/mp4" />
-        </video>
-      </div>
-    </Teleport>
+
   </div>
 </template>
 
@@ -65,7 +62,6 @@ import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
 import { faUser, faUserGear } from '@fortawesome/free-solid-svg-icons'
 import { useI18n } from 'vue-i18n'
-import AnimatedScene from '@/components/animations/AnimatedScene.vue'
 import { useCountdown } from '@vueuse/core'
 import loginRegister from '@/components/auth/loginRegister.vue'
 import NewAuth from '@/components/auth/NewAuth.vue'
@@ -75,20 +71,6 @@ const authStore = useAuthStore()
 
 const showAuthModal = ref<boolean>(false)
 const showJoinByCode = ref<boolean>(false)
-const showVideo = ref<boolean>(false)
-
-const countdownSeconds = shallowRef<number>(17)
-
-const { start } = useCountdown(countdownSeconds, {
-  onComplete() {
-    showVideo.value = false
-  },
-})
-
-const handleShowVideo = () => {
-  showVideo.value = true
-  start(countdownSeconds)
-}
 
 onMounted(() => {
   if (sessionStorage.getItem('showLoginAfterRedirect') === 'true') {

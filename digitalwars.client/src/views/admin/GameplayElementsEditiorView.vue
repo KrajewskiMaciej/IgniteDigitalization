@@ -2,7 +2,7 @@
   <div>
     <div class="w-full flex justify-center mt-6">
       <div
-        class="flex gap-4 bg-surface-800/80 px-8 py-4 rounded-xl shadow-md border border-surface-700/60 backdrop-blur-sm"
+        class="flex gap-4 bg-secondary/80 px-8 py-4 rounded-xl shadow-md border border-surface-700/60 backdrop-blur-sm"
       >
         <Button
           :label="t('decisionCards')"

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group relative w-full border-2 rounded-lg bg-surface-850 p-3 flex flex-col gap-2 text-white shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
+    class="group relative w-full border-2 rounded-lg bg-secondary p-3 flex flex-col gap-2 text-white shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
     :style="{ borderColor: props.color }"
     @dblclick="router.push(`/admin/game/market/${game.id}`)"
   >
@@ -27,7 +27,7 @@
       <button
         v-if="game.status === 'During' || game.status === 'Paused'"
         @click.stop="handleStatusChange(game.id, game.status === 'During' ? 'Paused' : 'During')"
-        class="flex-1 flex items-center justify-center gap-1.5 border bg-surface-800 py-1.5 px-2 rounded-md hover:scale-105 transition-all duration-300 text-xs font-medium"
+        class="flex-1 flex items-center justify-center gap-1.5 border bg-secondary py-1.5 px-2 rounded-md hover:scale-105 transition-all duration-300 text-xs font-medium"
         :style="{ borderColor: props.color + '40' }"
       >
         <font-awesome-icon
@@ -41,7 +41,7 @@
       <button
         v-if="game.status !== 'End'"
         @click.stop="handleEndGame(game.id)"
-        class="flex-1 flex items-center justify-center gap-1.5 border border-red-500 bg-surface-800 py-1.5 px-2 rounded-md hover:border-red-500 hover:bg-red-500/10 hover:scale-105 transition-all duration-300 text-xs font-medium"
+        class="flex-1 flex items-center justify-center gap-1.5 border border-red-500 bg-secondary py-1.5 px-2 rounded-md hover:border-red-500 hover:bg-red-500/10 hover:scale-105 transition-all duration-300 text-xs font-medium"
       >
         <font-awesome-icon :icon="faPowerOff" class="h-3.5 text-red-500" />
         <span class="text-red-500">{{ t('endGame') }}</span>

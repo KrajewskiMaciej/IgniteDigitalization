@@ -8,7 +8,7 @@
       transform: 'translate(-50%, -100%) translateY(-8px)',
     }"
   >
-    <div class="bg-surface-0 rounded-t-lg px-4 py-3 border-b border-surface-200 text-center">
+    <div class="bg-secondary rounded-t-lg px-4 py-3 border-b border-surface-200 text-center">
       <span class="font-bold text-surface-900">{{ card.title }}</span>
     </div>
     <div

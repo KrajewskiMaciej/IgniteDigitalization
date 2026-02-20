@@ -13,7 +13,7 @@
           <!-- Dropdown button -->
           <button
             @click="isDropdownOpen = !isDropdownOpen"
-            class="w-full py-4 px-4 bg-surface-0 backdrop-blur-sm rounded-t-2xl text-center text-surface-900 text-lg font-semibold transition-all duration-300 cursor-pointer flex items-center justify-between"
+            class="w-full py-4 px-4 bg-secondary backdrop-blur-sm rounded-t-2xl text-center text-surface-900 text-lg font-semibold transition-all duration-300 cursor-pointer flex items-center justify-between"
           >
             <span class="flex-1">
               {{ selectedCard ? `${selectedCard.id}: ${selectedCard.title}` : t('selectCard') }}
@@ -35,7 +35,7 @@
           >
             <div
               v-show="isDropdownOpen"
-              class="absolute z-50 w-full bg-surface-800 border-2 border-primary-500/30 rounded-b-xl shadow-2xl max-h-80 overflow-y-auto custom-scrollbar"
+              class="absolute z-50 w-full bg-secondary border-2 border-primary-500/30 rounded-b-xl shadow-2xl max-h-80 overflow-y-auto custom-scrollbar"
             >
               <div class="p-2">
                 <button
@@ -105,7 +105,7 @@
       <div class="flex justify-center mt-6">
         <button
           @click="sendCardSelection"
-          class="relative w-full py-2 lg:py-5 mb-2 rounded-3xl font-semibold text-xl transition-all duration-300 overflow-hidden group bg-surface-800 hover:bg-gradient-to-r hover:from-primary-600/20 hover:to-primary-700/20 border border-primary-500/30 hover:border-primary-500/50 hover:shadow-lg hover:shadow-primary-500/30 text-surface-0"
+          class="relative w-full py-2 lg:py-5 mb-2 rounded-3xl font-semibold text-xl transition-all duration-300 overflow-hidden group bg-secondary hover:bg-gradient-to-r hover:from-primary-600/20 hover:to-primary-700/20 border border-primary-500/30 hover:border-primary-500/50 hover:shadow-lg hover:shadow-primary-500/30 text-surface-0"
         >
           <span class="relative z-10">{{ buttonLabel }}</span>
           <div

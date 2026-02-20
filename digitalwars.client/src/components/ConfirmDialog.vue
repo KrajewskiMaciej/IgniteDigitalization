@@ -2,7 +2,7 @@
   <ConfirmDialog :draggable="false">
     <template #container="{ message, acceptCallback, rejectCallback }">
       <div
-        class="flex flex-col items-center rounded-md bg-surface-0 p-5 text-surface-700 dark:bg-surface-800 dark:text-surface-0/80"
+        class="flex flex-col items-center rounded-md bg-secondary p-5 text-surface-700 dark:bg-secondary dark:text-surface-0/80"
       >
         <div
           class="-mt-14 flex h-24 w-24 items-center justify-center rounded-full bg-primary-500 text-surface-0/80 dark:border dark:border-surface-700 dark:bg-primary-400 dark:text-surface-700"

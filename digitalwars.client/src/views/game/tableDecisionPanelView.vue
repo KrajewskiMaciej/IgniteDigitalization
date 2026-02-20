@@ -8,7 +8,7 @@
         {{ t('manageDecisionsAndItemsForTeam') }}
       </p>
       <div
-        class="inline-flex gap-3 items-center px-6 py-3 bg-surface-900 border border-surface-700 rounded-xl shadow-lg"
+        class="inline-flex gap-3 items-center px-6 py-3 bg-secondary border border-surface-700 rounded-xl shadow-lg"
       >
         <div
           class="w-5 h-5 rounded-full ring-2 ring-surface-600 shadow-lg"
@@ -23,7 +23,7 @@
     <div class="max-w-7xl mx-auto w-full">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="space-y-6">
-          <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+          <div class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl">
             <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
               <div class="bg-primary-500/20 p-3 rounded-lg">
                 <font-awesome-icon :icon="faGamepad" class="h-6 text-primary-400" />
@@ -122,7 +122,7 @@
               v-if="
                 (actionMode === 'cards' && selectedCard) || (actionMode === 'items' && selectedItem)
               "
-              class="bg-surface-800 rounded-lg p-4 border border-surface-700 mb-4"
+              class="bg-secondary rounded-lg p-4 border border-surface-700 mb-4"
             >
               <p class="text-sm text-surface-400 mb-1">{{ t('description') }}:</p>
               <p class="text-sm text-gray-300">
@@ -139,7 +139,7 @@
 
             <div
               v-if="teamData"
-              class="bg-surface-800 rounded-lg p-4 border border-surface-700 mb-4"
+              class="bg-secondary rounded-lg p-4 border border-surface-700 mb-4"
             >
               <div class="flex items-center justify-between">
                 <div>
@@ -177,7 +177,7 @@
           </div>
         </div>
 
-        <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+        <div class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl">
           <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
             <div class="bg-yellow-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faClock" class="h-6 text-yellow-400" />
@@ -221,10 +221,10 @@
 
             <div
               v-else-if="pendingDecisions.length === 0"
-              class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-surface-900/50"
+              class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-secondary/50"
             >
               <div
-                class="bg-surface-800/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3"
+                class="bg-secondary/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3"
               >
                 <font-awesome-icon :icon="faClock" class="h-8 text-surface-600" />
               </div>
@@ -234,7 +234,7 @@
             <div
               v-for="entry in pendingDecisions"
               :key="entry.logId"
-              class="border-l-4 border-yellow-500 rounded-lg p-4 bg-surface-800 shadow-lg"
+              class="border-l-4 border-yellow-500 rounded-lg p-4 bg-secondary shadow-lg"
             >
               <div class="flex items-start justify-between mb-2">
                 <div>
@@ -293,10 +293,10 @@
 
             <div
               v-else-if="decisions.length === 0"
-              class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-surface-900/50"
+              class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-secondary/50"
             >
               <div
-                class="bg-surface-800/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3"
+                class="bg-secondary/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3"
               >
                 <font-awesome-icon :icon="faHistory" class="h-8 text-surface-600" />
               </div>
@@ -318,7 +318,7 @@
 
               <div
                 v-else
-                class="border-l-4 rounded-lg p-4 bg-surface-800 shadow-lg relative"
+                class="border-l-4 rounded-lg p-4 bg-secondary shadow-lg relative"
                 :class="entry.result === 'Pozytywny' ? 'border-green-500' : 'border-red-500'"
               >
                 <div

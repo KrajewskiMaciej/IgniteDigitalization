@@ -3,7 +3,7 @@
     <div class="absolute inset-0 bg-black/70" @click="closeModal"></div>
 
     <div
-      class="bg-surface-800 z-20 text-white relative border border-surface-700 animate-jump-in w-full h-full p-4 overflow-y-auto custom-scrollbar sm:w-[90vw] sm:max-w-4xl sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-6 md:p-8 lg:p-10"
+      class="bg-secondary z-20 text-white relative border border-surface-700 animate-jump-in w-full h-full p-4 overflow-y-auto custom-scrollbar sm:w-[90vw] sm:max-w-4xl sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-6 md:p-8 lg:p-10"
     >
       <button @click="closeModal" class="absolute top-3 right-3 sm:top-2 sm:right-2 w-8 h-8 z-10">
         <font-awesome-icon
@@ -20,11 +20,11 @@
         <div class="rounded-full bg-primary-400 h-3 w-3"></div>
         <div
           class="rounded-full h-3 w-3"
-          :class="step >= 2 ? 'bg-primary-400' : 'bg-surface-900'"
+          :class="step >= 2 ? 'bg-primary-400' : 'bg-secondary'"
         ></div>
         <div
           class="rounded-full h-3 w-3"
-          :class="step === 3 ? 'bg-primary-400' : 'bg-surface-900'"
+          :class="step === 3 ? 'bg-primary-400' : 'bg-secondary'"
         ></div>
       </div>
 
@@ -90,7 +90,7 @@
               :class="
                 selectedGameMode === 'remote'
                   ? 'bg-primary-400 shadow-md shadow-primary-400/60'
-                  : 'bg-surface-850 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-primary-400/70 border-2 border-surface-700'
+                  : 'bg-secondary transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-primary-400/70 border-2 border-surface-700'
               "
               @click="selectedGameMode = 'remote'"
             >
@@ -106,7 +106,7 @@
               :class="
                 selectedGameMode === 'stationary'
                   ? 'bg-primary-400 shadow-md shadow-primary-400/60'
-                  : 'bg-surface-850  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-primary-400/70 border-2 border-surface-700'
+                  : 'bg-secondary  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-primary-400/70 border-2 border-surface-700'
               "
               @click="selectedGameMode = 'stationary'"
             >
@@ -194,7 +194,7 @@
           </div>
           <div
             v-if="selectedTeam"
-            class="p-4 rounded-lg bg-surface-850 border border-surface-700 mb-4"
+            class="p-4 rounded-lg bg-secondary border border-surface-700 mb-4"
           >
             <h3 class="font-bold text-center text-lg mb-4 text-white">
                {{ t('editing') }} <span class="text-primary-400">{{ selectedTeam.name }}</span>
@@ -257,7 +257,7 @@
                   @mouseleave="showTip = false"
                 />
                 <div
-                  class="absolute border border-surface-700 rounded-md bottom-full left-1/2 -translate-x-1/2 mb-1 bg-surface-800 p-2 text-white text-sm z-20 w-96 flex items-center"
+                  class="absolute border border-surface-700 rounded-md bottom-full left-1/2 -translate-x-1/2 mb-1 bg-secondary p-2 text-white text-sm z-20 w-96 flex items-center"
                   v-show="showTip"
                 >
                   <div>
@@ -659,7 +659,7 @@ onMounted(async () => {
   margin: 0.5rem 0.3rem;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #a78bfa;
+  background: theme('colors.secondary');
   border-radius: 0.25rem;
   border: 0.1rem solid transparent;
   background-clip: content-box;

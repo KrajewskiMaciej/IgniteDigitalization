@@ -8,7 +8,7 @@
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
-      <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+      <div class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl">
         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-700">
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faFileExport" class="h-6 text-primary-400" />
@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div class="border border-surface-700 rounded-xl p-6 bg-surface-900 shadow-2xl">
+      <div class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl">
         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-700">
           <div class="bg-green-400/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faFileExport" class="h-6 text-green-400" />
@@ -99,7 +99,7 @@
 
           <div
             v-if="selectedBoard && selectedOpponentBoard"
-            class="bg-surface-800 border border-surface-600 rounded-lg p-4"
+            class="bg-secondary border border-surface-600 rounded-lg p-4"
           >
             <div class="flex items-start gap-3">
               <div class="flex-1">

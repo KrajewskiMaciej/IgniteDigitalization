@@ -19,7 +19,7 @@
           </div>
           <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('decisionTree') }}</h2>
         </div>
-        <div class="flex gap-2 bg-surface-800 border border-surface-700 p-2 rounded-lg">
+        <div class="flex gap-2 bg-secondary border border-surface-700 p-2 rounded-lg">
           <Button @click="zoomIn()" outlined rounded size="small" v-tooltip.top="t('zoomIn')">
             <template #icon>
               <font-awesome-icon :icon="faMagnifyingGlassPlus" class="h-4" />
@@ -86,7 +86,7 @@
           <Background pattern-color="#4b5563" :gap="16" />
           <Panel
             position="bottom-left"
-            class="bg-surface-800/90 backdrop-blur-sm rounded-lg p-4 border border-surface-700 min-w-[200px]"
+            class="bg-secondary/90 backdrop-blur-sm rounded-lg p-4 border border-surface-700 min-w-[200px]"
           >
             <div class="space-y-4">
               <div>
@@ -98,7 +98,7 @@
                   <div
                     v-for="table in tables"
                     :key="table.teamId"
-                    class="flex gap-2 items-center hover:bg-surface-700/50 p-1 rounded transition-colors"
+                    class="flex gap-2 items-center hover:bg-secondary/50 p-1 rounded transition-colors"
                   >
                     <div
                       :style="{ backgroundColor: table.teamColor }"

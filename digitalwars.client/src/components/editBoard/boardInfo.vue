@@ -17,14 +17,14 @@
     <!-- Informacje o wymiarach planszy -->
     <div class="flex flex-row w-full items-center justify-center gap-5 mt-8 mb-5">
       <div
-        class="border border-surface-700 px-3 py-2 rounded-lg w-60 text-center text-white bg-surface-900"
+        class="border border-surface-700 px-3 py-2 rounded-lg w-60 text-center text-white bg-secondary"
       >
         <span class="font-medium"
           >{{ t('columns') }}: <span class="text-primary-400">{{ cols }}</span></span
         >
       </div>
       <div
-        class="border border-surface-700 px-3 py-2 rounded-lg w-60 text-center text-white bg-surface-900"
+        class="border border-surface-700 px-3 py-2 rounded-lg w-60 text-center text-white bg-secondary"
       >
         <span class="font-medium"
           >{{ t('rows') }}: <span class="text-primary-400">{{ rows }}</span></span

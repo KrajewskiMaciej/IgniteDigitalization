@@ -5,7 +5,7 @@
 
     <!-- Modal -->
     <div
-      class="bg-surface-800 z-20 text-white relative border border-surface-700 animate-jump-in w-full h-full flex flex-col justify-center p-6 sm:w-[90vw] sm:max-w-lg sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-8"
+      class="bg-secondary z-20 text-white relative border border-surface-700 animate-jump-in w-full h-full flex flex-col justify-center p-6 sm:w-[90vw] sm:max-w-lg sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-8"
     >
       <!-- Treść główna -->
       <div class="flex flex-col justify-center items-center text-center px-2">
@@ -33,7 +33,7 @@
           <span>{{ t('in') }} {{ secondsLeft }} {{ t('seconds') }}</span>
         </div>
 
-        <div class="w-full h-2 bg-surface-900 rounded-full overflow-hidden">
+        <div class="w-full h-2 bg-secondary rounded-full overflow-hidden">
           <div
             class="h-full bg-primary-400 transition-all duration-100"
             :style="{ width: progressPercent + '%' }"

@@ -19,7 +19,7 @@
       <div v-else-if="gameData" class="flex-1 flex flex-col overflow-hidden">
         <div v-if="isMobile" class="flex flex-col h-full">
           <div
-            class="flex gap-2 p-1 bg-surface-850 backdrop-blur-sm border-b border-surface-700 shadow-md"
+            class="flex gap-2 p-1 bg-secondary backdrop-blur-sm border-b border-surface-700 shadow-md"
           >
             <button
               @click="mobileView = 'cards'"
@@ -27,7 +27,7 @@
               :class="
                 mobileView === 'cards'
                   ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                  : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
+                  : 'bg-secondary text-surface-300 hover:text-surface-0 border border-primary-500/30'
               "
             >
               <span class="relative z-10">{{ t('cards') }}</span>
@@ -43,7 +43,7 @@
               :class="
                 mobileView === 'board'
                   ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                  : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
+                  : 'bg-secondary text-surface-300 hover:text-surface-0 border border-primary-500/30'
               "
             >
               <span class="relative z-10">{{ t('yourBoard') }}</span>
@@ -59,7 +59,7 @@
               :class="
                 mobileView === 'market'
                   ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                  : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
+                  : 'bg-secondary text-surface-300 hover:text-surface-0 border border-primary-500/30'
               "
             >
               <span class="relative z-10">{{ t('market') }}</span>
@@ -75,7 +75,7 @@
               :class="
                 mobileView === 'menu'
                   ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                  : 'bg-surface-800 text-surface-300 hover:text-surface-0 border border-primary-500/30'
+                  : 'bg-secondary text-surface-300 hover:text-surface-0 border border-primary-500/30'
               "
             >
               <span class="relative z-10">Menu</span>
@@ -98,7 +98,7 @@
                   :class="
                     showingDecisionCards
                       ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                      : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                      : 'bg-secondary text-surface-300 border border-primary-500/30'
                   "
                 >
                   {{ t('decisions') }}
@@ -109,7 +109,7 @@
                   :class="
                     !showingDecisionCards
                       ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                      : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                      : 'bg-secondary text-surface-300 border border-primary-500/30'
                   "
                 >
                   {{ t('items') }}
@@ -170,7 +170,7 @@
         <div v-else class="flex h-full relative">
           <div
             v-if="leftOpen"
-            class="w-1/3 bg-surface-850 backdrop-blur-sm border-r border-surface-700 shadow-2xl overflow-auto p-4 transition-all duration-300"
+            class="w-1/3 bg-secondary backdrop-blur-sm border-r border-surface-700 shadow-2xl overflow-auto p-4 transition-all duration-300"
           >
             <RouterView />
             <QuestionBox />
@@ -182,7 +182,7 @@
                 :class="
                   showingDecisionCards
                     ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                    : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                    : 'bg-secondary text-surface-300 border border-primary-500/30'
                 "
               >
                 {{ t('decisions') }}
@@ -193,7 +193,7 @@
                 :class="
                   !showingDecisionCards
                     ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                    : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                    : 'bg-secondary text-surface-300 border border-primary-500/30'
                 "
               >
                 {{ t('items') }}
@@ -222,7 +222,7 @@
           </div>
 
           <div
-            class="flex-1 flex flex-col bg-surface-850 backdrop-blur-sm shadow-xl p-4 transition-all duration-300"
+            class="flex-1 flex flex-col bg-secondary backdrop-blur-sm shadow-xl p-4 transition-all duration-300"
           >
             <div class="flex justify-between items-center mb-6">
               <div class="flex gap-2">
@@ -232,7 +232,7 @@
                   :class="
                     currentBoard === 'player'
                       ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                      : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                      : 'bg-secondary text-surface-300 border border-primary-500/30'
                   "
                 >
                   {{ t('yourBoard') }}
@@ -243,7 +243,7 @@
                   :class="
                     currentBoard === 'market'
                       ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                      : 'bg-surface-800 text-surface-300 border border-primary-500/30'
+                      : 'bg-secondary text-surface-300 border border-primary-500/30'
                   "
                 >
                   {{ t('rivalBoard') }}
@@ -253,13 +253,13 @@
               <div class="flex gap-2">
                 <button
                   @click="leftOpen = !leftOpen"
-                  class="px-6 py-3 rounded-xl font-semibold bg-surface-800 text-surface-0 border border-primary-500/30 hover:border-primary-500/50 transition-all duration-300"
+                  class="px-6 py-3 rounded-xl font-semibold bg-secondary text-surface-0 border border-primary-500/30 hover:border-primary-500/50 transition-all duration-300"
                 >
                   {{ leftOpen ? t('hide') : t('show') }} {{ t('cards') }}
                 </button>
                 <button
                   @click="rightOpen = !rightOpen"
-                  class="px-6 py-3 rounded-xl font-semibold bg-surface-800 text-surface-0 border border-primary-500/30 hover:border-primary-500/50 transition-all duration-300"
+                  class="px-6 py-3 rounded-xl font-semibold bg-secondary text-surface-0 border border-primary-500/30 hover:border-primary-500/50 transition-all duration-300"
                 >
                   {{ rightOpen ? t('hide') : t('show') }} {{ t('menu') }}
                 </button>
@@ -284,7 +284,7 @@
 
           <div
             v-if="rightOpen"
-            class="w-1/4 bg-surface-850 backdrop-blur-sm border-l border-surface-700 shadow-2xl overflow-auto p-6 transition-all duration-300"
+            class="w-1/4 bg-secondary backdrop-blur-sm border-l border-surface-700 shadow-2xl overflow-auto p-6 transition-all duration-300"
           >
             <PlayerMenu
               ref="playerMenuRef"

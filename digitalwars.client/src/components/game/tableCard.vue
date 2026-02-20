@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group relative w-full border rounded-lg bg-surface-850 p-3 flex flex-col gap-2 text-white shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
+    class="group relative w-full border rounded-lg bg-secondary p-3 flex flex-col gap-2 text-white shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
     :style="{ borderColor: props.color }"
     @dblclick="router.push(`/admin/game/${props.gameId}/${table.id}`)"
   >
@@ -22,7 +22,7 @@
     <div class="flex gap-2">
       <button
         @click.stop="openQrForTeam"
-        class="flex-1 flex items-center justify-center gap-1.5 border bg-surface-800 py-1.5 px-2 rounded-md hover:scale-105 transition-all duration-300 text-xs font-medium"
+        class="flex-1 flex items-center justify-center gap-1.5 border bg-secondary py-1.5 px-2 rounded-md hover:scale-105 transition-all duration-300 text-xs font-medium"
         :style="{ borderColor: props.color + '40' }"
       >
         <font-awesome-icon :icon="faQrcode" class="h-3.5" :style="{ color: props.color }" />
@@ -51,7 +51,7 @@
     >
       <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
       <div
-        class="bg-surface-800 text-white rounded-xl relative z-10 border p-8 w-full max-w-md shadow-2xl"
+        class="bg-secondary text-white rounded-xl relative z-10 border p-8 w-full max-w-md shadow-2xl"
         :style="{ borderColor: props.color }"
         @click.stop
       >

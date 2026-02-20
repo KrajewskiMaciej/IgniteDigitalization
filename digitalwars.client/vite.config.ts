@@ -17,7 +17,6 @@ export default defineConfig({
     port: 9000,
     cors: true,
     //https: true,
-    strictPort: true,
   },
   build: {
     outDir: 'dist',
