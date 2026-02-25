@@ -377,7 +377,7 @@ namespace backend.Controllers
 
             try
             {
-                var result = await _actionService.PlayCardAsync(cardId, cardData, wasSuccess: true);
+                var result = await _actionService.PlayCardAsync(cardId, null, cardData, wasSuccess: true);
 
                 // Log sukcesu
                 _logger.LogInformation("[PlayerController_SendSuccess] Żądanie zakończone sukcesem dla CardId: {CardId}.", cardId);
@@ -403,7 +403,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("failure/{cardId}")]
-        public async Task<IActionResult> SendFailure(int cardId, [FromBody] CardDataDto cardData)
+        public async Task<IActionResult> SendFailure(int cardId, int enablerId, [FromBody] CardDataDto cardData)
         {
             // Log wejściowy
             _logger.LogInformation("[PlayerController_SendFailure] Otrzymano żądanie. CardId: {CardId}, TeamId: {TeamId}, GameId: {GameId}, Cost: {Cost}, Force: {Force}",
@@ -411,7 +411,7 @@ namespace backend.Controllers
 
             try
             {
-                var result = await _actionService.PlayCardAsync(cardId, cardData, wasSuccess: false);
+                var result = await _actionService.PlayCardAsync(cardId, enablerId, cardData, wasSuccess: false);
 
                 // Log sukcesu
                 _logger.LogInformation("[PlayerController_SendFailure] Żądanie zakończone sukcesem dla CardId: {CardId}.", cardId);
@@ -471,8 +471,10 @@ namespace backend.Controllers
         {
             // Krok 1: Dynamiczne budowanie zapytania na podstawie obecności TeamId
             var query = _context.GameLogs
-                .Include(l => l.Teams) // Dołączenie Teams dla nazwy
-                .Include(l => l.Cards) // Dołączenie Cards dla publicznego Card_Id
+                .Include(l => l.Teams)       // Dołączenie Teams dla nazwy
+                .Include(l => l.Cards)       // Dołączenie Cards dla publicznego Card_Id
+                .Include(l => l.Feedbacks)   // Dołączenie Feedbacks dla opisu
+                .Include(l => l.Games_Events) // Dołączenie Games_Events dla opisu wydarzenia
                 .Where(l => l.Games_Id == request.GameId && l.Is_Approved == true);
 
             // POPRAWKA: Dynamiczne dodawanie warunku filtrowania po TeamId
@@ -504,7 +506,8 @@ namespace backend.Controllers
                     CardTitle = "N/A", // Zmieniono nazwę na CardTitle dla spójności
                     TeamId = log.Teams_Id,
                     TeamName = log.Teams?.Teams_Name,
-                    FeedbackDescription = log.Feedbacks,
+                    FeedbackDescription = log.Feedbacks?.Feedbacks_Long_Description,
+                    EnablerDescription = log.EnablerFeedbacks?.Cards_Enablers_Description,
                     Status = log.Status,
                     GameEventId = log.Games_Events_Id
                 });
@@ -544,7 +547,8 @@ namespace backend.Controllers
                     CardTitle = cardTitle, // Zmieniono nazwę na CardTitle dla spójności
                     TeamId = log.Teams_Id,
                     TeamName = log.Teams?.Teams_Name,
-                    FeedbackDescription = log.Feedbacks,
+                    FeedbackDescription = log.Feedbacks?.Feedbacks_Long_Description,
+                    EnablerDescription = log.EnablerFeedbacks?.Cards_Enablers_Description,
                     Status = log.Status,
                     GameEventId = log.Games_Events_Id
                 };

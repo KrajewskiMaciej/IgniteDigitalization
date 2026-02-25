@@ -46,7 +46,7 @@ namespace backend.Controllers
         [HttpPut("edit/{processId}")]
         public async Task<IActionResult> EditProcess(int processId, [FromBody] ProcessEditDto data)
         {
-            
+
             var process = await _context.Processes.FirstOrDefaultAsync(p => p.Processes_Id == processId);
             if (process == null)
             {
@@ -90,8 +90,6 @@ namespace backend.Controllers
                 Processes_Color = data.Process_Color,
                 Processes_Weight = data.Process_Weight,
                 Decks_Id = data.Deck_Id,
-                Modules_Id = null // tu dałem null, bo nie mamy obsługi modułów na razie
-
             };
 
             _context.Processes.Add(newProcess);
@@ -99,6 +97,6 @@ namespace backend.Controllers
             return Ok(new { message = "Proces został pomyślnie dodany.", ProcessId = newProcess.Processes_Id });
         }
 
-        
+
     }
 }

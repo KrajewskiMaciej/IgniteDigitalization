@@ -12,7 +12,7 @@ namespace backend.Services
 {
     public interface IPlayerActionService
     {
-        Task<object> PlayCardAsync(int cardId, CardDataDto cardData, bool wasSuccess);
+        Task<object> PlayCardAsync(int cardId, int? enablerId, CardDataDto cardData, bool wasSuccess);
         Task ApproveLogAsync(int logId);
         Task RejectLogAsync(int logId);
     }
@@ -32,7 +32,7 @@ namespace backend.Services
             _logger = logger;
         }
 
-        public async Task<object> PlayCardAsync(int cardId, CardDataDto cardData, bool wasSuccess)
+        public async Task<object> PlayCardAsync(int cardId, int? enablerId, CardDataDto cardData, bool wasSuccess)
         {
             _logger.LogInformation("[ActionService_PlayCardAsync] Rozpoczęcie przetwarzania. CardId: {CardId}, TeamId: {TeamId}, WasSuccess: {WasSuccess}, BaseCost: {Cost}",
                 cardId, cardData.TeamId, wasSuccess, cardData.Cost);
@@ -108,6 +108,15 @@ namespace backend.Services
                 .AsNoTracking()
                 .FirstOrDefaultAsync(f => f.Cards_Id == cardEntity.Cards_Id && f.Cards.Decks_Id == cardData.DeckId && f.Status == finalStatus);
 
+            CardEnabler? enabler = null;
+
+            if (enablerId.HasValue)
+            {
+                enabler = await _context.CardEnablers
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(ce => ce.Cards_Id == cardEntity.Cards_Id && ce.Enablers_Id == enablerId);
+            }
+
             _logger.LogInformation("[ActionService_PlayCardAsync] Status karty: {FinalStatus}. Znaleziono FeedbackId: {FeedbackId}",
                 finalStatus, feedback?.Feedbacks_Id);
 
@@ -119,6 +128,7 @@ namespace backend.Services
                 Cards_Id = cardEntity.Cards_Id,
                 Boards_Id = cardData.BoardId,
                 Feedbacks_Id = feedback?.Feedbacks_Id,
+                EnablerFeedbacks_Id = enabler?.Cards_Enablers_Id,
                 Costs = finalCost,
                 Status = finalStatus,
                 Is_Approved = team.Is_Independent || cardData.ForceExecution ? (bool?)true : false,
@@ -280,7 +290,7 @@ namespace backend.Services
             _logger.LogInformation("Co mam w logEntryWithSpecs.Status: {Status} ", logEntryWithSpecs.Status);
 
             if (isDecisionCard && logEntryWithSpecs.Status == true)
-            {   
+            {
                 _logger.LogInformation("[ExecuteCardEffects] Karta decyzji zatwierdzona. Aktualizacja CheatSheet.");
                 await NotifyAdmin(logEntryWithSpecs.Games_Id, "CheatSheetUpdated");
             }

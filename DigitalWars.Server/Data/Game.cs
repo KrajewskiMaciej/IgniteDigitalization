@@ -17,12 +17,11 @@ namespace backend.Data
         public Board Rivals_Boards { get; set; } = null!;
         public int Decks_Id { get; set; }
         public Deck Decks { get; set; } = null!;
-        public int? Modules_Id { get; set; }
-        public Module? Modules { get; set; }
+        public int? Phases_Id { get; set; }
+        public Phase? Phases { get; set; }
         public int Users_Id { get; set; }
         public User Users { get; set; } = null!;
 
-        [Column(TypeName = "ENUM('During', 'Paused', 'End')")]
         public GameStatus? Game_Status { get; set; }
 
         public bool Is_Online { get; set; }

@@ -100,10 +100,11 @@ namespace backend.Services
                 await context.SaveChangesAsync();
                 _logger.LogInformation("[ProvisioningService_CreateDeckFromWorkbookAsync] Utworzono nową talię o nazwie '{DeckName}' z ID {DeckId} dla użytkownika {UserId}", deckName, newDeck.Decks_Id, userId);
 
-                var cardIdMap = await LoadAndMapCardsAsync(context, workbook, newDeck.Decks_Id);
-                var processIdMap = await LoadAndMapEntitiesAsync<Process, int>(context, workbook, "Processes", newDeck.Decks_Id, "Processes_Id", "Processes_Id");
+                var phaseIdMap = await CreatePhaseMapAsync(context, newDeck.Decks_Id);
+                var cardIdMap = await LoadAndMapCardsAsync(context, workbook, newDeck.Decks_Id, phaseIdMap);
+                var processIdMap = await LoadAndMapEntitiesAsync<Process, int>(context, workbook, "Processes", newDeck.Decks_Id, "Processes_Id", "Processes_Id", phaseIdMap);
 
-                await LoadEntitiesWithoutIdMappingAsync<GameEvent>(context, workbook, "GamesEvents", newDeck.Decks_Id);
+                await LoadEntitiesWithoutIdMappingAsync<GameEvent>(context, workbook, "GamesEvents", newDeck.Decks_Id, phaseIdMap);
 
                 LoadRelatedEntities<Decision>(context, workbook, "Decisions", cardIdMap);
                 LoadRelatedEntities<Hardware>(context, workbook, "Hardwares", cardIdMap);
@@ -128,19 +129,34 @@ namespace backend.Services
             }
         }
 
+        private async Task<Dictionary<string, int>> CreatePhaseMapAsync(AppDbContext context, int deckId)
+        {
+            _logger.LogInformation("[ProvisioningService_CreatePhaseMapAsync] Tworzenie 3 faz dla talii {DeckId}.", deckId);
+            var phaseNames = new[] { "Przygotowawcza", "Wejście na rynek", "Rynkowa" };
+            var phases = phaseNames.Select(name => new Phase { Decks_Id = deckId, Phase_Name = name }).ToList();
+            await context.Phases.AddRangeAsync(phases);
+            await context.SaveChangesAsync();
+
+            var map = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < phases.Count; i++)
+            {
+                map[(i + 1).ToString()] = phases[i].Phases_Id;             // "1", "2", "3"
+                map[phases[i].Phase_Name.ToLowerInvariant()] = phases[i].Phases_Id; // "przygotowawcza" etc.
+            }
+            _logger.LogInformation("[ProvisioningService_CreatePhaseMapAsync] Utworzono mapę faz ({Count} kluczy) dla talii {DeckId}.", map.Count, deckId);
+            return map;
+        }
+
         private void ValidateWorkbookStructure(XLWorkbook workbook)
         {
             var requiredSheetsAndColumns = new Dictionary<string, List<string>>
             {
                 { "Cards", new List<string> { "Cards_Id" } },
-                { "Decisions", new List<string> { "Cards_Id", "Decisions_Short_Desc", "Decisions_Long_Desc", "Decisions_Cost_Bits", "Decisions_Cost_Bits_Weight" } },
-                { "Hardwares", new List<string> { "Cards_Id", "Hardwares_Short_Desc", "Hardwares_Long_Desc", "Hardwares_Cost_Bits", "Hardwares_Cost_Bits_Weight" } },
-                { "Softwares", new List<string> { "Cards_Id", "Softwares_Short_Desc", "Softwares_Long_Desc", "Softwares_Cost_Bits", "Softwares_Cost_Bits_Weight" } },
+                { "Decisions", new List<string> { "Cards_Id", "Decisions_Short_Desc", "Decisions_Long_Desc", "Decisions_Cost_Bits", "Decisions_Cost_Bits_Weight", "Phase" } },
                 { "Feedbacks", new List<string> { "Cards_Id", "Status", "Feedbacks_Long_Description" } },
                 { "Processes", new List<string> { "Processes_Id", "Processes_Desc", "Processes_Long_Desc", "Processes_Color", "Processes_Weight" } },
-                { "GamesEvents", new List<string> { "Events_Short_Desc", "Events_Long_Desc", "Turns_Time", "Decisions_Costs_Bits_Weights", "Hardwares_Costs_Bits_Weights", "Softwares_Costs_Bits_Weights", "Boosters_X", "Boosters_Y" } },
                 { "CardsWeights", new List<string> { "Cards_Id", "Processes_Id", "Weights_X", "Weights_Y" } },
-                { "CardsEnablers", new List<string> { "Cards_Id", "Enablers_Id" } }
+                { "CardsEnablers", new List<string> { "Cards_Id", "Enablers_Id", "Cards_Enablers_Description" } }
             };
 
             foreach (var requiredSheet in requiredSheetsAndColumns)
@@ -170,8 +186,7 @@ namespace backend.Services
                 return;
             }
 
-            var sheet = workbook.Worksheet("Boards");
-            if (sheet == null)
+            if (!workbook.TryGetWorksheet("Boards", out var sheet))
             {
                 _logger.LogWarning("[ProvisioningService_SeedBoardsForUserFromFileAsync] Arkusz 'Boards' nie został znaleziony w pliku. Nie można zainicjalizować plansz.");
                 return;
@@ -213,11 +228,10 @@ namespace backend.Services
             }
         }
 
-        private async Task LoadEntitiesWithoutIdMappingAsync<TEntity>(AppDbContext context, XLWorkbook workbook, string sheetName, int deckId) where TEntity : class, new()
+        private async Task LoadEntitiesWithoutIdMappingAsync<TEntity>(AppDbContext context, XLWorkbook workbook, string sheetName, int deckId, Dictionary<string, int>? phaseIdMap = null) where TEntity : class, new()
         {
             _logger.LogInformation("[ProvisioningService_LoadEntitiesWithoutIdMappingAsync] Ładowanie encji typu '{EntityType}' z arkusza '{SheetName}' bez mapowania ID.", typeof(TEntity).Name, sheetName);
-            var sheet = workbook.Worksheet(sheetName);
-            if (sheet == null)
+            if (!workbook.TryGetWorksheet(sheetName, out var sheet))
             {
                 _logger.LogWarning("[ProvisioningService_LoadEntitiesWithoutIdMappingAsync] Arkusz '{SheetName}' nie został znaleziony, pomijanie.", sheetName);
                 return;
@@ -241,18 +255,33 @@ namespace backend.Services
 
                 foreach (var cell in row.CellsUsed())
                 {
-                    if (headers.TryGetValue(cell.Address.ColumnNumber, out var propName) && properties.TryGetValue(propName, out var prop))
+                    if (!headers.TryGetValue(cell.Address.ColumnNumber, out var propName)) continue;
+
+                    string resolvedPropName = (string.Equals(propName, "Phase", StringComparison.OrdinalIgnoreCase) ||
+                                               string.Equals(propName, "Phase_Id", StringComparison.OrdinalIgnoreCase))
+                        ? "Phases_Id" : propName;
+
+                    if (!properties.TryGetValue(resolvedPropName, out var prop)) continue;
+
+                    if (string.Equals(resolvedPropName, "Phases_Id", StringComparison.OrdinalIgnoreCase) && phaseIdMap != null)
                     {
-                        var valueToSet = ConvertValue(cell.GetString(), prop.PropertyType, cell.DataType);
-                        var isNullable = Nullable.GetUnderlyingType(prop.PropertyType) != null || prop.PropertyType == typeof(string);
-                        if (valueToSet == null && !isNullable)
-                        {
-                            prop.SetValue(entity, GetDefaultValue(prop.PropertyType));
-                        }
-                        else
-                        {
-                            prop.SetValue(entity, valueToSet);
-                        }
+                        var phaseValue = cell.GetString().Trim().ToLowerInvariant();
+                        if (phaseIdMap.TryGetValue(phaseValue, out int phaseDbId))
+                            prop.SetValue(entity, phaseDbId);
+                        else if (!string.IsNullOrWhiteSpace(phaseValue))
+                            _logger.LogWarning("[ProvisioningService_LoadEntitiesWithoutIdMappingAsync] Nieznana wartość fazy '{PhaseValue}' w arkuszu '{SheetName}' wiersz {RowNumber}.", phaseValue, sheetName, row.RowNumber());
+                        continue;
+                    }
+
+                    var valueToSet = ConvertValue(cell.GetString(), prop.PropertyType, cell.DataType);
+                    var isNullable = Nullable.GetUnderlyingType(prop.PropertyType) != null || prop.PropertyType == typeof(string);
+                    if (valueToSet == null && !isNullable)
+                    {
+                        prop.SetValue(entity, GetDefaultValue(prop.PropertyType));
+                    }
+                    else
+                    {
+                        prop.SetValue(entity, valueToSet);
                     }
                 }
                 entitiesToAdd.Add(entity);
@@ -269,14 +298,24 @@ namespace backend.Services
             }
         }
 
-        private async Task<Dictionary<int, int>> LoadAndMapCardsAsync(AppDbContext context, XLWorkbook workbook, int deckId)
+        private async Task<Dictionary<int, int>> LoadAndMapCardsAsync(AppDbContext context, XLWorkbook workbook, int deckId, Dictionary<string, int>? phaseIdMap = null)
         {
             _logger.LogInformation("[ProvisioningService_LoadAndMapCardsAsync] Rozpoczynanie ładowania i mapowania kart dla talii {DeckId}.", deckId);
-            var sheet = workbook.Worksheet("Cards");
-            if (sheet == null)
+            if (!workbook.TryGetWorksheet("Cards", out var sheet))
             {
                 _logger.LogError("[ProvisioningService_LoadAndMapCardsAsync] Nie znaleziono wymaganego arkusza 'Cards' w pliku Excel. Dalsze przetwarzanie może być niemożliwe.");
                 throw new InvalidDataException("Arkusz 'Cards' jest wymagany, ale nie został znaleziony.");
+            }
+
+            var headers = sheet.Row(1).CellsUsed().ToDictionary(cell => cell.Address.ColumnNumber, cell => cell.GetString());
+            int? phaseColumnNumber = null;
+            if (phaseIdMap != null)
+            {
+                var phaseHeader = headers.FirstOrDefault(h =>
+                    string.Equals(h.Value, "Phase", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(h.Value, "Phase_Id", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(h.Value, "Phases_Id", StringComparison.OrdinalIgnoreCase));
+                if (phaseHeader.Key != 0) phaseColumnNumber = phaseHeader.Key;
             }
 
             var cardsToAdd = new List<Card>();
@@ -289,11 +328,18 @@ namespace backend.Services
 
                 if (row.Cell(1).TryGetValue(out int cardIdFromExcel))
                 {
-                    cardsToAdd.Add(new Card
+                    var card = new Card { Decks_Id = deckId, Card_Id = cardIdFromExcel };
+
+                    if (phaseColumnNumber.HasValue && phaseIdMap != null)
                     {
-                        Decks_Id = deckId,
-                        Card_Id = cardIdFromExcel,
-                    });
+                        var phaseValue = row.Cell(phaseColumnNumber.Value).GetString().Trim().ToLowerInvariant();
+                        if (phaseIdMap.TryGetValue(phaseValue, out int phaseDbId))
+                            card.Phases_Id = phaseDbId;
+                        else if (!string.IsNullOrWhiteSpace(phaseValue))
+                            _logger.LogWarning("[ProvisioningService_LoadAndMapCardsAsync] Nieznana wartość fazy '{PhaseValue}' w wierszu {RowNumber} w arkuszu 'Cards'.", phaseValue, row.RowNumber());
+                    }
+
+                    cardsToAdd.Add(card);
                 }
             }
 
@@ -317,11 +363,10 @@ namespace backend.Services
             return idMap;
         }
 
-        private async Task<Dictionary<TKey, TKey>> LoadAndMapEntitiesAsync<TEntity, TKey>(AppDbContext context, XLWorkbook workbook, string sheetName, int deckId, string excelIdColumn, string dbIdColumn) where TEntity : class, new() where TKey : notnull
+        private async Task<Dictionary<TKey, TKey>> LoadAndMapEntitiesAsync<TEntity, TKey>(AppDbContext context, XLWorkbook workbook, string sheetName, int deckId, string excelIdColumn, string dbIdColumn, Dictionary<string, int>? phaseIdMap = null) where TEntity : class, new() where TKey : notnull
         {
             _logger.LogInformation("[ProvisioningService_LoadAndMapEntitiesAsync] Rozpoczynanie ładowania i mapowania encji '{EntityType}' z arkusza '{SheetName}'.", typeof(TEntity).Name, sheetName);
-            var sheet = workbook.Worksheet(sheetName);
-            if (sheet == null)
+            if (!workbook.TryGetWorksheet(sheetName, out var sheet))
             {
                 _logger.LogWarning("[ProvisioningService_LoadAndMapEntitiesAsync] Arkusz '{SheetName}' nie został znaleziony, pomijanie.", sheetName);
                 return new Dictionary<TKey, TKey>();
@@ -415,8 +460,7 @@ namespace backend.Services
         private void LoadRelatedEntities<TEntity>(AppDbContext context, XLWorkbook workbook, string sheetName, Dictionary<int, int> cardIdMap, Dictionary<int, int>? processIdMap = null) where TEntity : class, new()
         {
             _logger.LogInformation("[ProvisioningService_LoadRelatedEntities] Ładowanie powiązanych encji '{EntityType}' z arkusza '{SheetName}'.", typeof(TEntity).Name, sheetName);
-            var sheet = workbook.Worksheet(sheetName);
-            if (sheet == null)
+            if (!workbook.TryGetWorksheet(sheetName, out var sheet))
             {
                 _logger.LogWarning("[ProvisioningService_LoadRelatedEntities] Arkusz '{SheetName}' nie został znaleziony. Pomijanie ładowania encji '{EntityType}'.", sheetName, typeof(TEntity).Name);
                 return;
@@ -540,12 +584,6 @@ namespace backend.Services
                     }
                 }
 
-                // Ta walidacja nie jest już potrzebna, ponieważ sprawdzamy to na początku pętli.
-                // if (properties.ContainsKey("Cards_Id") && !isPrimaryCardIdSet)
-                // {
-                //     _logger.LogError("[ProvisioningService_LoadRelatedEntities] Błąd integralności w '{SheetName}' wiersz {RowNumber}. Brak wartości lub nieprawidłowa wartość w kolumnie 'Cards_Id' (lub 'Card_Id').", sheetName, row.RowNumber());
-                //     throw new InvalidDataException($"Błąd integralności w '{sheetName}' wiersz {row.RowNumber()}. Brak wartości lub nieprawidłowa wartość w kolumnie 'Cards_Id' (lub 'Card_Id').");
-                // }
                 entitiesToAdd.Add(entity);
             }
 
@@ -602,6 +640,13 @@ namespace backend.Services
             if (string.IsNullOrWhiteSpace(colorValue))
             {
                 return null;
+            }
+
+            // Normalizacja: jeśli to hex bez '#' (3 lub 6 znaków), dodaj '#'
+            if (!colorValue.StartsWith("#") && (colorValue.Length == 3 || colorValue.Length == 6) &&
+                colorValue.All(c => (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')))
+            {
+                colorValue = "#" + colorValue;
             }
 
             if (colorValue.StartsWith("#") && (colorValue.Length == 4 || colorValue.Length == 7))

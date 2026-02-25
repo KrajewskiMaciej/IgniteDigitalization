@@ -8,8 +8,8 @@ namespace backend.Data
         public int Games_Events_Id { get; set; }
         public int? Decks_Id { get; set; }
         public Deck Decks { get; set; } = null!;
-        public int? Modules_Id { get; set; }
-        public Module Modules { get; set; } = null!;
+        public int? Phases_Id { get; set; }
+        public Phase? Phases { get; set; }
         [MaxLength(100)]
         public string Events_Short_Desc { get; set; } = string.Empty;
         [Column(TypeName = "TEXT")]

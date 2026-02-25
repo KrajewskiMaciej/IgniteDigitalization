@@ -16,8 +16,11 @@ namespace backend.Data
         public Board? Boards { get; set; } = null!;
         public int? Feedbacks_Id { get; set; }
         public Feedback? Feedbacks { get; set; }
+        public int? EnablerFeedbacks_Id { get; set; }
+        public CardEnabler? EnablerFeedbacks { get; set; }
         public double? Costs { get; set; }
         public bool? Status { get; set; }
+
         public bool? Is_Approved { get; set; }
         public double? Booster_X { get; set; }
         public double? Booster_Y { get; set; }

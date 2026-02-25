@@ -19,7 +19,7 @@ namespace backend.Data
         public DbSet<CardWeight> CardWeights { get; set; }
         public DbSet<CardEnabler> CardEnablers { get; set; }
         public DbSet<GameEvent> GameEvents { get; set; }
-        public DbSet<Module> Modules { get; set; }
+        public DbSet<Phase> Phases { get; set; }
         public DbSet<Game> Games { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<GameBoard> GameBoards { get; set; }
@@ -45,13 +45,13 @@ namespace backend.Data
             modelBuilder.Entity<CardWeight>(e => e.HasKey(p => p.Cards_Weights_Id));
             modelBuilder.Entity<CardEnabler>(e => e.HasKey(p => p.Cards_Enablers_Id));
             modelBuilder.Entity<GameEvent>(e => e.HasKey(p => p.Games_Events_Id));
-            modelBuilder.Entity<Module>(e => e.HasKey(p => p.Modules_Id));
             modelBuilder.Entity<Game>(e => e.HasKey(p => p.Games_Id));
             modelBuilder.Entity<Team>(e => e.HasKey(p => p.Teams_Id));
             modelBuilder.Entity<GameBoard>(e => e.HasKey(p => p.Games_Boards_Id));
             modelBuilder.Entity<GameLog>(e => e.HasKey(p => p.Games_Logs_Id));
             modelBuilder.Entity<GameProcess>(e => e.HasKey(p => p.Games_Processes_Id));
             modelBuilder.Entity<GameLogSpec>(e => e.HasKey(p => p.Games_Logs_Specs_Id));
+            modelBuilder.Entity<Phase>(e => e.HasKey(p => p.Phases_Id));
 
             // Zastąp istniejącą konfigurację relacji Game -> Board tą poniżej
             modelBuilder.Entity<Board>()
@@ -79,9 +79,9 @@ namespace backend.Data
                 .HasForeignKey(c => c.Decks_Id);
 
             modelBuilder.Entity<Card>()
-                .HasOne(c => c.Module)
+                .HasOne(c => c.Phase)
                 .WithMany()
-                .HasForeignKey(c => c.Modules_Id);
+                .HasForeignKey(c => c.Phases_Id);
 
             modelBuilder.Entity<CardEnabler>()
                 .HasOne(ce => ce.Cards)
@@ -134,9 +134,9 @@ namespace backend.Data
                 .HasForeignKey(g => g.Decks_Id);
 
             modelBuilder.Entity<Game>()
-                .HasOne(g => g.Modules)
+                .HasOne(g => g.Phases)
                 .WithMany()
-                .HasForeignKey(g => g.Modules_Id);
+                .HasForeignKey(g => g.Phases_Id);
 
             modelBuilder.Entity<Game>()
                 .HasOne(g => g.Users)
@@ -169,9 +169,9 @@ namespace backend.Data
                 .HasForeignKey(ge => ge.Decks_Id);
 
             modelBuilder.Entity<GameEvent>()
-                .HasOne(ge => ge.Modules)
+                .HasOne(ge => ge.Phases)
                 .WithMany()
-                .HasForeignKey(ge => ge.Modules_Id);
+                .HasForeignKey(ge => ge.Phases_Id);
 
             modelBuilder.Entity<GameLog>()
                 .HasOne(gl => gl.Teams)
@@ -203,6 +203,12 @@ namespace backend.Data
                 .WithMany()
                 .HasForeignKey(gl => gl.Feedbacks_Id);
 
+            modelBuilder.Entity<GameLog>()
+                .HasOne(gl => gl.EnablerFeedbacks)
+                .WithMany()
+                .HasForeignKey(gl => gl.EnablerFeedbacks_Id)
+                .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<GameLogSpec>()
                 .HasOne(gls => gls.Games_Logs)
                 .WithMany(gl => gl.GameLogSpecs)
@@ -233,25 +239,20 @@ namespace backend.Data
                 .WithMany()
                 .HasForeignKey(h => h.Cards_Id);
 
-            modelBuilder.Entity<Module>()
-                .HasOne(m => m.Deck)
-                .WithMany()
-                .HasForeignKey(m => m.Decks_Id);
-
             modelBuilder.Entity<Process>()
                 .HasOne(p => p.Decks)
                 .WithMany(d => d.Processes)
                 .HasForeignKey(p => p.Decks_Id);
 
-            modelBuilder.Entity<Process>()
-                .HasOne(p => p.Modules)
-                .WithMany()
-                .HasForeignKey(p => p.Modules_Id);
-
             modelBuilder.Entity<Software>()
                 .HasOne(s => s.Cards)
                 .WithMany()
                 .HasForeignKey(s => s.Cards_Id);
+
+            modelBuilder.Entity<Phase>()
+                .HasOne(p => p.Deck)
+                .WithMany()
+                .HasForeignKey(p => p.Decks_Id);
 
             modelBuilder.Entity<Team>()
                 .HasOne(t => t.Games)

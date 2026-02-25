@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 
 namespace backend.Controllers
 {
@@ -71,7 +70,7 @@ namespace backend.Controllers
             }
             catch (DbUpdateException ex)
             {
-                if (ex.InnerException is MySqlException mySqlEx && mySqlEx.Number == 1451)
+                if (ex.InnerException is Npgsql.PostgresException pgEx && pgEx.SqlState == "23503")
                 {
                     // Zwróć błąd 409 Conflict z czytelnym komunikatem
                     return Conflict(new { message = "Nie można usunąć tej planszy, ponieważ jest ona wciąż używana przez co najmniej jedną grę.", errorCode = 1000 });

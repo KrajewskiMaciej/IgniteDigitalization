@@ -37,7 +37,7 @@ builder.Services.AddCors(options =>
 // --- 3. BAZA DANYCH ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseNpgsql(connectionString));
 
 // --- 4. SETTINGS ---
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));

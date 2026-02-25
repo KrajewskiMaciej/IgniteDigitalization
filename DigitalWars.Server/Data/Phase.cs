@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Data
 {
-    public class Module
+    public class Phase
     {
-        public int Modules_Id { get; set; }
+        public int Phases_Id { get; set; }
         public int Decks_Id { get; set; }
         public Deck? Deck { get; set; }
-        public string Module_Name { get; set; } = string.Empty;
+        public string Phase_Name { get; set; } = string.Empty;
     }
 }

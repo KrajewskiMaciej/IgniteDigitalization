@@ -26,7 +26,7 @@ namespace backend.Services
 
             if (moduleId.HasValue)
             {
-                baseCardQuery = baseCardQuery.Where(card => card.Modules_Id == moduleId.Value);
+                baseCardQuery = baseCardQuery.Where(card => card.Phases_Id == moduleId.Value);
             }
             else
             {
@@ -132,7 +132,7 @@ namespace backend.Services
             await _context.CardEnablers
                 .Where(enabler => enabler.Cards_Id == cardId)
                 .ExecuteDeleteAsync();
-            
+
             foreach (var enablerCardId in enablerCardsIds)
             {
                 var newEnabler = new CardEnabler
@@ -147,7 +147,7 @@ namespace backend.Services
             }
 
             await _context.SaveChangesAsync();
-           
-        } 
+
+        }
     }
 }

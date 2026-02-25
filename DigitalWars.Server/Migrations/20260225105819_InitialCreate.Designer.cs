@@ -2,9 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
 
 #nullable disable
@@ -12,8 +12,8 @@ using backend.Data;
 namespace DigitalWars.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260211101357_PendingChanges")]
-    partial class PendingChanges
+    [Migration("20260225105819_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,22 +21,22 @@ namespace DigitalWars.Server.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.11")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("backend.Data.Board", b =>
                 {
                     b.Property<int>("Boards_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Boards_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Boards_Id"));
 
                     b.Property<string>("Border_Color")
                         .IsRequired()
                         .HasMaxLength(7)
-                        .HasColumnType("varchar(7)");
+                        .HasColumnType("character varying(7)");
 
                     b.Property<string>("Borders_Colors")
                         .IsRequired()
@@ -45,20 +45,20 @@ namespace DigitalWars.Server.Migrations
                     b.Property<string>("Cell_Color")
                         .IsRequired()
                         .HasMaxLength(7)
-                        .HasColumnType("varchar(7)");
+                        .HasColumnType("character varying(7)");
 
                     b.Property<int>("Cols")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description_Down")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Description_Left")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Labels_Right")
                         .IsRequired()
@@ -71,13 +71,13 @@ namespace DigitalWars.Server.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<int>("Rows")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("Users_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Boards_Id");
 
@@ -90,24 +90,24 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Cards_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Cards_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cards_Id"));
 
                     b.Property<int>("Card_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Decks_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<int?>("Modules_Id")
-                        .HasColumnType("int");
+                    b.Property<int?>("Phases_Id")
+                        .HasColumnType("integer");
 
                     b.HasKey("Cards_Id");
 
                     b.HasIndex("Decks_Id");
 
-                    b.HasIndex("Modules_Id");
+                    b.HasIndex("Phases_Id");
 
                     b.ToTable("Cards");
                 });
@@ -116,21 +116,25 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Cards_Enablers_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Cards_Enablers_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cards_Enablers_Id"));
+
+                    b.Property<string>("Cards_Enablers_Description")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("Cards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("Enablers_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("Games_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("Teams_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Cards_Enablers_Id");
 
@@ -149,27 +153,27 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Cards_Weights_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Cards_Weights_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Cards_Weights_Id"));
 
                     b.Property<double>("Booster_X")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double>("Booster_Y")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<int>("Cards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Processes_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Weights_X")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Weights_Y")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Cards_Weights_Id");
 
@@ -184,45 +188,45 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Decisions_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Decisions_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Decisions_Id"));
 
                     b.Property<int>("Cards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double>("Decisions_Cost_Bits")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double>("Decisions_Cost_Bits_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Decisions_Cost_PD")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Decisions_Cost_PD_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Decisions_Long_Desc")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<double?>("Decisions_Reward_Bits")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Decisions_Reward_Bits_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Decisions_Reward_PD")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Decisions_Reward_PD_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Decisions_Short_Desc")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Decisions_Id");
 
@@ -235,17 +239,17 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Decks_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Decks_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Decks_Id"));
 
                     b.Property<string>("Deck_Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<int?>("Users_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Decks_Id");
 
@@ -258,22 +262,22 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Feedbacks_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Feedbacks_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Feedbacks_Id"));
 
                     b.Property<int>("Cards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Feedbacks_Long_Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<byte[]>("Feedbacks_PDF")
-                        .HasColumnType("LONGBLOB");
+                        .HasColumnType("bytea");
 
                     b.Property<bool>("Status")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.HasKey("Feedbacks_Id");
 
@@ -286,41 +290,41 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Games_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Games_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Games_Id"));
 
                     b.Property<int>("Decks_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Game_Status")
-                        .HasColumnType("ENUM('During', 'Paused', 'End')");
+                    b.Property<int?>("Game_Status")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Games_Desc")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<bool>("Is_Online")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
-                    b.Property<int?>("Modules_Id")
-                        .HasColumnType("int");
+                    b.Property<int?>("Phases_Id")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Rivals_Boards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Teams_Boards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Users_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Games_Id");
 
                     b.HasIndex("Decks_Id");
 
-                    b.HasIndex("Modules_Id");
+                    b.HasIndex("Phases_Id");
 
                     b.HasIndex("Rivals_Boards_Id");
 
@@ -335,27 +339,27 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Games_Boards_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Games_Boards_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Games_Boards_Id"));
 
                     b.Property<int>("Boards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Games_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("Games_Processes_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double>("Poz_X")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double>("Poz_Y")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<int>("Teams_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Games_Boards_Id");
 
@@ -374,24 +378,24 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Games_Events_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Games_Events_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Games_Events_Id"));
 
                     b.Property<double?>("Boosters_X")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Boosters_Y")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Decisions_Costs_Bits_Weights")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Decisions_Costs_PD_Weights")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<int?>("Decks_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Events_Long_Desc")
                         .IsRequired()
@@ -400,31 +404,31 @@ namespace DigitalWars.Server.Migrations
                     b.Property<string>("Events_Short_Desc")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<double?>("Hardwares_Costs_Bits_Weights")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Hardwares_Costs_PD_Weights")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
-                    b.Property<int?>("Modules_Id")
-                        .HasColumnType("int");
+                    b.Property<int?>("Phases_Id")
+                        .HasColumnType("integer");
 
                     b.Property<double?>("Softwares_Costs_Bits_Weights")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Softwares_Costs_PD_Weights")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<int>("Turns_Time")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Games_Events_Id");
 
                     b.HasIndex("Decks_Id");
 
-                    b.HasIndex("Modules_Id");
+                    b.HasIndex("Phases_Id");
 
                     b.ToTable("GameEvents");
                 });
@@ -433,51 +437,56 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Games_Logs_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Games_Logs_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Games_Logs_Id"));
 
                     b.Property<int?>("Boards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double?>("Booster_X")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Booster_Y")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<int?>("Cards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double?>("Costs")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("Data")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("EnablerFeedbacks_Id")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("Feedbacks_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("Games_Events_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Games_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool?>("Is_Approved")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<bool?>("Status")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("Teams_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Games_Logs_Id");
 
                     b.HasIndex("Boards_Id");
 
                     b.HasIndex("Cards_Id");
+
+                    b.HasIndex("EnablerFeedbacks_Id");
 
                     b.HasIndex("Feedbacks_Id");
 
@@ -494,21 +503,21 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Games_Logs_Specs_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Games_Logs_Specs_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Games_Logs_Specs_Id"));
 
                     b.Property<int>("Games_Logs_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("Games_Processes_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Moves_X")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Moves_Y")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Games_Logs_Specs_Id");
 
@@ -523,21 +532,21 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Games_Processes_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Games_Processes_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Games_Processes_Id"));
 
                     b.Property<int>("Games_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("Games_Processes_Weights")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Processes_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Teams_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Games_Processes_Id");
 
@@ -554,45 +563,45 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Hardwares_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Hardwares_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Hardwares_Id"));
 
                     b.Property<int>("Cards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double>("Hardwares_Cost_Bits")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double>("Hardwares_Cost_Bits_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Hardwares_Cost_PD")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Hardwares_Cost_PD_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Hardwares_Long_Desc")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<double?>("Hardwares_Reward_Bits")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Hardwares_Reward_Bits_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Hardwares_Reward_PD")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Hardwares_Reward_PD_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Hardwares_Short_Desc")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Hardwares_Id");
 
@@ -601,65 +610,59 @@ namespace DigitalWars.Server.Migrations
                     b.ToTable("Hardwares");
                 });
 
-            modelBuilder.Entity("backend.Data.Module", b =>
+            modelBuilder.Entity("backend.Data.Phase", b =>
                 {
-                    b.Property<int>("Modules_Id")
+                    b.Property<int>("Phases_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Modules_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Phases_Id"));
 
                     b.Property<int>("Decks_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Module_Name")
+                    b.Property<string>("Phase_Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
-                    b.HasKey("Modules_Id");
+                    b.HasKey("Phases_Id");
 
                     b.HasIndex("Decks_Id");
 
-                    b.ToTable("Modules");
+                    b.ToTable("Phases");
                 });
 
             modelBuilder.Entity("backend.Data.Process", b =>
                 {
                     b.Property<int>("Processes_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Processes_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Processes_Id"));
 
                     b.Property<int>("Decks_Id")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Modules_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Processes_Color")
                         .IsRequired()
                         .HasMaxLength(7)
-                        .HasColumnType("varchar(7)");
+                        .HasColumnType("character varying(7)");
 
                     b.Property<string>("Processes_Desc")
                         .IsRequired()
                         .HasMaxLength(25)
-                        .HasColumnType("varchar(25)");
+                        .HasColumnType("character varying(25)");
 
                     b.Property<string>("Processes_Long_Desc")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("TEXT");
 
                     b.Property<double>("Processes_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.HasKey("Processes_Id");
 
                     b.HasIndex("Decks_Id");
-
-                    b.HasIndex("Modules_Id");
 
                     b.ToTable("Processes");
                 });
@@ -668,45 +671,45 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Softwares_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Softwares_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Softwares_Id"));
 
                     b.Property<int>("Cards_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double>("Softwares_Cost_Bits")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double>("Softwares_Cost_Bits_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Softwares_Cost_PD")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Softwares_Cost_PD_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Softwares_Long_Desc")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<double?>("Softwares_Reward_Bits")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Softwares_Reward_Bits_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Softwares_Reward_PD")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<double?>("Softwares_Reward_PD_Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Softwares_Short_Desc")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Softwares_Id");
 
@@ -719,41 +722,41 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Teams_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Teams_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Teams_Id"));
 
                     b.Property<int?>("Games_Events_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Games_Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("Is_Independent")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<double>("Teams_Bud")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Teams_Color")
                         .IsRequired()
                         .HasMaxLength(7)
-                        .HasColumnType("varchar(7)");
+                        .HasColumnType("character varying(7)");
 
                     b.Property<string>("Teams_Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<double?>("Teams_PD")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Teams_Token")
                         .HasMaxLength(6)
-                        .HasColumnType("varchar(6)");
+                        .HasColumnType("character varying(6)");
 
                     b.Property<int?>("Turns_Left")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Teams_Id");
 
@@ -768,42 +771,42 @@ namespace DigitalWars.Server.Migrations
                 {
                     b.Property<int>("Users_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Users_Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Users_Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<bool>("Email_Confirmed")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("Games_In_Progress")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Licenses_Owned")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Licenses_Used")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Link_Token")
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Names")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("Token_Expire_Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Users_Id");
 
@@ -827,13 +830,13 @@ namespace DigitalWars.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Data.Module", "Module")
+                    b.HasOne("backend.Data.Phase", "Phase")
                         .WithMany()
-                        .HasForeignKey("Modules_Id");
+                        .HasForeignKey("Phases_Id");
 
                     b.Navigation("Deck");
 
-                    b.Navigation("Module");
+                    b.Navigation("Phase");
                 });
 
             modelBuilder.Entity("backend.Data.CardEnabler", b =>
@@ -923,9 +926,9 @@ namespace DigitalWars.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Data.Module", "Modules")
+                    b.HasOne("backend.Data.Phase", "Phases")
                         .WithMany()
-                        .HasForeignKey("Modules_Id");
+                        .HasForeignKey("Phases_Id");
 
                     b.HasOne("backend.Data.Board", "Rivals_Boards")
                         .WithMany("RivalGames")
@@ -947,7 +950,7 @@ namespace DigitalWars.Server.Migrations
 
                     b.Navigation("Decks");
 
-                    b.Navigation("Modules");
+                    b.Navigation("Phases");
 
                     b.Navigation("Rivals_Boards");
 
@@ -995,13 +998,13 @@ namespace DigitalWars.Server.Migrations
                         .WithMany()
                         .HasForeignKey("Decks_Id");
 
-                    b.HasOne("backend.Data.Module", "Modules")
+                    b.HasOne("backend.Data.Phase", "Phases")
                         .WithMany()
-                        .HasForeignKey("Modules_Id");
+                        .HasForeignKey("Phases_Id");
 
                     b.Navigation("Decks");
 
-                    b.Navigation("Modules");
+                    b.Navigation("Phases");
                 });
 
             modelBuilder.Entity("backend.Data.GameLog", b =>
@@ -1013,6 +1016,11 @@ namespace DigitalWars.Server.Migrations
                     b.HasOne("backend.Data.Card", "Cards")
                         .WithMany()
                         .HasForeignKey("Cards_Id");
+
+                    b.HasOne("backend.Data.CardEnabler", "EnablerFeedbacks")
+                        .WithMany()
+                        .HasForeignKey("EnablerFeedbacks_Id")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("backend.Data.Feedback", "Feedbacks")
                         .WithMany()
@@ -1037,6 +1045,8 @@ namespace DigitalWars.Server.Migrations
                     b.Navigation("Boards");
 
                     b.Navigation("Cards");
+
+                    b.Navigation("EnablerFeedbacks");
 
                     b.Navigation("Feedbacks");
 
@@ -1102,7 +1112,7 @@ namespace DigitalWars.Server.Migrations
                     b.Navigation("Cards");
                 });
 
-            modelBuilder.Entity("backend.Data.Module", b =>
+            modelBuilder.Entity("backend.Data.Phase", b =>
                 {
                     b.HasOne("backend.Data.Deck", "Deck")
                         .WithMany()
@@ -1121,13 +1131,7 @@ namespace DigitalWars.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Data.Module", "Modules")
-                        .WithMany()
-                        .HasForeignKey("Modules_Id");
-
                     b.Navigation("Decks");
-
-                    b.Navigation("Modules");
                 });
 
             modelBuilder.Entity("backend.Data.Software", b =>

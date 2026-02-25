@@ -11,7 +11,7 @@ namespace backend.Data
         public bool Status { get; set; }
         [Column(TypeName = "TEXT")]
         public string Feedbacks_Long_Description { get; set; } = string.Empty;
-        [Column(TypeName = "LONGBLOB")]
+        [Column(TypeName = "bytea")]
         public byte[]? Feedbacks_PDF { get; set; }
     }
 }
