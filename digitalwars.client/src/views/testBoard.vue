@@ -67,25 +67,31 @@ const posY = ref(0)
 
 const currentPawns = computed(() => [
   {
-    id: 1, // Unikalne ID
+    id: 1,
     x: posX.value,
     y: posY.value,
-    color: '#0000ff', // Kolor pionka
+    color: '#0000ff',
     name: 'Mój Pionek',
+    maxX: formData.cols - 1,
+    maxY: formData.rows - 1,
   },
   {
-    id: 2, // Unikalne ID
+    id: 2,
     x: posX.value,
     y: posY.value,
-    color: '#00ffff', // Kolor pionka
+    color: '#00ffff',
     name: 'Mój Pionek',
+    maxX: formData.cols - 1,
+    maxY: formData.rows - 1,
   },
   {
-    id: 3, // Unikalne ID
+    id: 3,
     x: posX.value,
     y: posY.value,
-    color: '#000fff', // Kolor pionka
+    color: '#000fff',
     name: 'Mój Pionek',
+    maxX: formData.cols - 1,
+    maxY: formData.rows - 1,
   },
 ])
 

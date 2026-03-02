@@ -17,10 +17,12 @@ namespace backend.Controllers
     public class AdminController : BaseApiController
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<CardsDocument> _cardsLogger;
 
-        public AdminController(AppDbContext context)
+        public AdminController(AppDbContext context, ILogger<CardsDocument> cardsLogger)
         {
             _context = context;
+            _cardsLogger = cardsLogger;
             QuestPDF.Settings.License = LicenseType.Community;
         }
 
@@ -54,7 +56,8 @@ namespace backend.Controllers
                     Description = d.Decisions_Long_Desc,
                     CardType = "Decision",
                     Cost = d.Decisions_Cost_Bits,
-                    Phase = d.Card.Phase != null ? d.Card.Phase.Phase_Name : string.Empty
+                    PhaseId = d.Card.Phase != null ? d.Card.Phase.Phases_Id : 0,
+                    PhaseName = d.Card.Phase != null ? d.Card.Phase.Phase_Name : string.Empty
                 })
                 .ToListAsync();
 
@@ -68,7 +71,8 @@ namespace backend.Controllers
                     Description = i.Hardwares_Long_Desc,
                     CardType = "Hardware",
                     Cost = i.Hardwares_Cost_Bits,
-                    Phase = i.Cards.Phase != null ? i.Cards.Phase.Phase_Name : string.Empty
+                    PhaseId = i.Cards.Phase != null ? i.Cards.Phase.Phases_Id : 0,
+                    PhaseName = i.Cards.Phase != null ? i.Cards.Phase.Phase_Name : string.Empty
                 })
                 .ToListAsync();
 
@@ -82,14 +86,15 @@ namespace backend.Controllers
                     Description = i.Softwares_Long_Desc,
                     CardType = "Software",
                     Cost = i.Softwares_Cost_Bits,
-                    Phase = i.Cards.Phase != null ? i.Cards.Phase.Phase_Name : string.Empty
+                    PhaseId = i.Cards.Phase != null ? i.Cards.Phase.Phases_Id : 0,
+                    PhaseName = i.Cards.Phase != null ? i.Cards.Phase.Phase_Name : string.Empty
                 })
                 .ToListAsync();
 
             var allCards = decisionCards.Concat(hardwareCards).Concat(softwareCards).OrderBy(c => c.Id).ToList();
             if (!allCards.Any()) return NotFound($"Brak kart dla talii o ID {deckId}.");
 
-            var document = new CardsDocument(allCards);
+            var document = new CardsDocument(allCards, _cardsLogger);
             byte[] pdfBytes = document.GeneratePdf();
 
             return File(pdfBytes, "application/pdf", "DigitalWars_Karty.pdf");

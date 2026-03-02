@@ -38,7 +38,7 @@
             </button>
 
             <button
-              v-if="!isMarketPhaseOnly"
+              v-if="isMarketPhaseOnly"
               @click="mobileView = 'board'"
               class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 relative overflow-hidden group"
               :class="
@@ -55,6 +55,7 @@
             </button>
 
             <button
+              v-if="!isMarketPhaseOnly"
               @click="mobileView = 'market'"
               class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 relative overflow-hidden group"
               :class="
@@ -272,18 +273,18 @@
             <div class="flex justify-between items-center mb-6">
               <div class="flex gap-2">
                 <button
-                  v-if="!isMarketPhaseOnly"
-                  @click="currentBoard = 'player'"
+                  @click="currentBoard = 'prep'"
                   class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
                   :class="
-                    currentBoard === 'player'
+                    currentBoard === 'prep'
                       ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
                       : 'bg-secondary text-surface-300 border border-primary-500/30'
                   "
                 >
-                  {{ t('yourBoard') }}
+                  {{ t('rivalBoard') }}
                 </button>
                 <button
+                  v-if="!isMarketPhaseOnly"
                   @click="currentBoard = 'market'"
                   class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
                   :class="
@@ -292,7 +293,7 @@
                       : 'bg-secondary text-surface-300 border border-primary-500/30'
                   "
                 >
-                  {{ t('rivalBoard') }}
+                  {{ t('yourBoard') }}
                 </button>
               </div>
 
@@ -313,14 +314,16 @@
             </div>
 
             <div class="flex-1 overflow-auto">
+              <!-- Plansza rynku: CartesianBoard (gameBoardCartesian) -->
               <CartesianBoard
-                v-show="currentBoard === 'player' && gameData?.boardConfig"
+                v-show="currentBoard === 'market' && gameData?.boardConfig"
                 :config="formData"
                 :gameMode="true"
                 :pawns="pawns"
               />
+              <!-- Plansza przygotowawcza: GameBoard (gameBoard) -->
               <GameBoard
-                v-show="currentBoard === 'market' && gameData?.rivalBoardConfig"
+                v-show="currentBoard === 'prep' && gameData?.rivalBoardConfig"
                 :config="enemyformData"
                 :gameMode="true"
                 :pawns="enemypawns"
@@ -435,7 +438,7 @@ const showingDecisionCards = ref(true)
 const currentPanel = ref('menu')
 const leftOpen = ref(true)
 const rightOpen = ref(true)
-const currentBoard = ref('player')
+const currentBoard = ref('market') // 'market' = CartesianBoard (plansza rynku), 'prep' = GameBoard (plansza przygotowawcza)
 const showChat = ref(false)
 const cardMode = ref<'qr' | 'carousel'>('qr')
 const showIndependentTeamModal = ref<boolean>(false)
@@ -496,10 +499,9 @@ const fetchGameDataByToken = async (token: string, skipIndependenceModal = false
     )
     gameData.value = response.data
 
-    // W fazie 1 (Przygotowawcza) domyślnie wyświetlaj planszę rynku (desktop)
-    if (gameData.value.currentPhaseName !== 'Rynkowa') {
-      currentBoard.value = 'market'
-    }
+    // Ustaw domyślną planszę zależnie od fazy
+    // isMarketPhaseOnly = true gdy faza NIE jest Rynkową (czyli faza przygotowawcza)
+    currentBoard.value = isMarketPhaseOnly.value ? 'prep' : 'market'
 
     if (!skipIndependenceModal) {
       if (gameData.value.isIndependent) {
@@ -563,12 +565,10 @@ const handleBudgetChangeFromMenu = (newBudgetFromMenu: number) => {
   currentGlobalBudget.value = newBudgetFromMenu
 }
 
-// Gdy faza zmienia się z powrotem na "tylko rynek", wymuś widok rynku
-watch(isMarketPhaseOnly, (marketOnly) => {
-  if (marketOnly) {
-    currentBoard.value = 'market'
-    if (mobileView.value === 'board') mobileView.value = 'market'
-  }
+// Gdy faza się zmienia, przełącz planszę odpowiednio do fazy
+watch(isMarketPhaseOnly, (isPrepPhase) => {
+  currentBoard.value = isPrepPhase ? 'prep' : 'market'
+  mobileView.value = 'market'
 })
 
 const fetchPawns = async () => {

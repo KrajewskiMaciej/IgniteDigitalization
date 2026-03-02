@@ -96,8 +96,22 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Serwowanie frontendu (Vue) ze wwwroot – aktywne gdy ServeStaticFiles=true lub w trybie produkcyjnym bez jawnego ustawienia
+var serveStatic = app.Configuration.GetValue<bool?>("FrontendSettings:ServeStaticFiles") ?? !app.Environment.IsDevelopment();
+if (serveStatic)
+{
+    app.UseDefaultFiles();   // index.html jako domyślny
+    app.UseStaticFiles();    // pliki z wwwroot/
+}
+
 app.MapControllers();
 app.MapHub<GameHub>("/api/gameHub");
+
+if (serveStatic)
+{
+    // SPA fallback – wszystkie trasy nieznane API trafiają do index.html
+    app.MapFallbackToFile("index.html");
+}
 
 // --- 8. INICJALIZACJA BAZY ---
 using (var scope = app.Services.CreateScope())

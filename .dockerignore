@@ -1,0 +1,21 @@
+# Git
+.git
+.gitignore
+
+# Node
+digitalwars.client/node_modules
+digitalwars.client/dist
+
+# .NET
+DigitalWars.Server/bin
+DigitalWars.Server/obj
+
+# VS / IDE
+.vs
+*.user
+*.suo
+.vscode
+
+# Logi i tymczasowe
+**/*.log
+**/tmp

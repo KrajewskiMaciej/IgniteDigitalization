@@ -52,8 +52,10 @@ namespace backend.Services
                 using var workbook = new XLWorkbook(filePath);
                 _logger.LogInformation("[ProvisioningService_InitializeNewUserAsync] Plik inicjalizacyjny załadowany pomyślnie dla użytkownika {UserId}.", userId);
 
-                await SeedBoardsForUserFromFileAsync(context, workbook, userId);
-                await CreateDeckFromWorkbookAsync(context, workbook, userId, "Talia podstawowa");
+                var seededBoards = await SeedBoardsForUserFromFileAsync(context, workbook, userId);
+                int? teamsDefaultBoardId  = seededBoards.Count > 0 ? seededBoards[0].Boards_Id : null;
+                int? rivalsDefaultBoardId = seededBoards.Count > 1 ? seededBoards[1].Boards_Id : null;
+                await CreateDeckFromWorkbookAsync(context, workbook, userId, "Talia podstawowa", teamsDefaultBoardId, rivalsDefaultBoardId);
 
                 _logger.LogInformation("[ProvisioningService_InitializeNewUserAsync] Zakończono pomyślnie inicjalizację danych dla użytkownika {UserId}.", userId);
             }
@@ -82,10 +84,19 @@ namespace backend.Services
             using var workbook = new XLWorkbook(stream);
             _logger.LogDebug("[ProvisioningService_CreateDeckFromFileForUserAsync] Stworzono obiekt XLWorkbook ze strumienia dla użytkownika {UserId}", userId);
 
-            return await CreateDeckFromWorkbookAsync(context, workbook, userId, deckName);
+            // Pobierz plansze użytkownika z bazy – pierwsza = procesów, druga = rywalizacji
+            var userBoards = await context.Boards
+                .Where(b => b.Users_Id == userId)
+                .OrderBy(b => b.Boards_Id)
+                .Take(2)
+                .ToListAsync();
+            int? teamsDefaultBoardId  = userBoards.Count > 0 ? userBoards[0].Boards_Id : null;
+            int? rivalsDefaultBoardId = userBoards.Count > 1 ? userBoards[1].Boards_Id : null;
+
+            return await CreateDeckFromWorkbookAsync(context, workbook, userId, deckName, teamsDefaultBoardId, rivalsDefaultBoardId);
         }
 
-        private async Task<Deck> CreateDeckFromWorkbookAsync(AppDbContext context, XLWorkbook workbook, int? userId, string deckName)
+        private async Task<Deck> CreateDeckFromWorkbookAsync(AppDbContext context, XLWorkbook workbook, int? userId, string deckName, int? teamsDefaultBoardId = null, int? rivalsDefaultBoardId = null)
         {
             _logger.LogInformation("[ProvisioningService_CreateDeckFromWorkbookAsync] Rozpoczynanie wewnętrznego procesu tworzenia talii '{DeckName}' dla użytkownika {UserId}", deckName, userId);
 
@@ -96,7 +107,14 @@ namespace backend.Services
             _logger.LogDebug("[ProvisioningService_CreateDeckFromWorkbookAsync] Rozpoczęto transakcję w bazie danych.");
             try
             {
-                var newDeck = new Deck { Deck_Name = deckName, Users_Id = userId };
+                var newDeck = new Deck
+                {
+                    Deck_Name = deckName,
+                    Users_Id  = userId,
+                    Default_Teams_Boards_Id  = teamsDefaultBoardId,
+                    Default_Rivals_Boards_Id = rivalsDefaultBoardId
+                };
+                _logger.LogInformation("[ProvisioningService_CreateDeckFromWorkbookAsync] Domyślna plansza procesów: {TeamsId}, Domyślna plansza rywalizacji: {RivalsId}", teamsDefaultBoardId, rivalsDefaultBoardId);
                 context.Decks.Add(newDeck);
                 await context.SaveChangesAsync();
                 _logger.LogInformation("[ProvisioningService_CreateDeckFromWorkbookAsync] Utworzono nową talię o nazwie '{DeckName}' z ID {DeckId} dla użytkownika {UserId}", deckName, newDeck.Decks_Id, userId);
@@ -436,19 +454,23 @@ namespace backend.Services
             return int.TryParse(val, out var r) ? r : null;
         }
 
-        private async Task SeedBoardsForUserFromFileAsync(AppDbContext context, XLWorkbook workbook, int userId)
+        private async Task<List<Board>> SeedBoardsForUserFromFileAsync(AppDbContext context, XLWorkbook workbook, int userId)
         {
             _logger.LogInformation("[ProvisioningService_SeedBoardsForUserFromFileAsync] Rozpoczynanie seedowania plansz dla użytkownika {UserId}", userId);
             if (await context.Boards.AnyAsync(b => b.Users_Id == userId))
             {
                 _logger.LogInformation("[ProvisioningService_SeedBoardsForUserFromFileAsync] Plansze dla użytkownika {UserId} już istnieją. Pomijanie seedowania.", userId);
-                return;
+                // Zwróć istniejące plansze w kolejności (potrzebne do przypisania domyślnych plansz do talii)
+                return await context.Boards
+                    .Where(b => b.Users_Id == userId)
+                    .OrderBy(b => b.Boards_Id)
+                    .ToListAsync();
             }
 
             if (!workbook.TryGetWorksheet("Boards", out var sheet))
             {
                 _logger.LogWarning("[ProvisioningService_SeedBoardsForUserFromFileAsync] Arkusz 'Boards' nie został znaleziony w pliku. Nie można zainicjalizować plansz.");
-                return;
+                return new List<Board>();
             }
 
             var boardsToAdd = new List<Board>();
@@ -480,11 +502,16 @@ namespace backend.Services
                 _logger.LogInformation("[ProvisioningService_SeedBoardsForUserFromFileAsync] Znaleziono {Count} plansz do dodania dla użytkownika {UserId}.", boardsToAdd.Count, userId);
                 context.Boards.AddRange(boardsToAdd);
                 await context.SaveChangesAsync();
-                _logger.LogInformation("[ProvisioningService_SeedBoardsForUserFromFileAsync] Pomyślnie dodano {Count} plansz dla użytkownika {UserId}.", boardsToAdd.Count, userId);
+                _logger.LogInformation("[ProvisioningService_SeedBoardsForUserFromFileAsync] Pomyślnie dodano {Count} plansz dla użytkownika {UserId}. Pierwsza plansza ID={FirstId}, Druga plansza ID={SecondId}.",
+                    boardsToAdd.Count, userId,
+                    boardsToAdd.Count > 0 ? boardsToAdd[0].Boards_Id : (int?)null,
+                    boardsToAdd.Count > 1 ? boardsToAdd[1].Boards_Id : (int?)null);
+                return boardsToAdd;
             }
             else
             {
                 _logger.LogWarning("[ProvisioningService_SeedBoardsForUserFromFileAsync] Arkusz 'Boards' został znaleziony, ale jest pusty. Nie dodano żadnych plansz dla użytkownika {UserId}.", userId);
+                return new List<Board>();
             }
         }
 

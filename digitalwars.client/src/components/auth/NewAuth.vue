@@ -91,7 +91,6 @@
 </template>
 
 <script setup lang="ts">
-import RobotAuth from '../animations/RobotAuth.vue'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
@@ -107,7 +106,6 @@ const isBigScreen = breakpoints.greater('lg')
 const { t } = useI18n()
 const activeView = ref<'login' | 'register' | 'forgotPassword' | 'confirmEmail'>('login')
 const emailToConfirm = ref<string>('')
-const robotRef = ref<InstanceType<typeof RobotAuth> | null>(null)
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -127,10 +125,6 @@ const handleSwitchToConfirmEmail = (email: string) => {
 }
 
 const handleError = () => {
-  robotRef.value?.setEmotion('sad')
-
-  setTimeout(() => {
-    robotRef.value?.setEmotion('happy')
-  }, 5000)
+  // robotRef removed – RobotAuth animation component not present in template
 }
 </script>
