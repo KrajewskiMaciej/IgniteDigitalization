@@ -45,21 +45,45 @@ namespace backend.Controllers
         public async Task<IActionResult> GenerateCardsPdf([FromQuery] int deckId)
         {
             var decisionCards = await _context.Decisions
-                .Include(d => d.Card)
+                .Include(d => d.Card).ThenInclude(c => c.Phase)
                 .Where(d => d.Card.Decks_Id == deckId)
-                .Select(d => new CardPdfModel { Id = d.Cards_Id, Title = d.Decisions_Short_Desc, Description = d.Decisions_Long_Desc, CardType = "Decision" })
+                .Select(d => new CardPdfModel
+                {
+                    Id = d.Cards_Id,
+                    Title = d.Decisions_Short_Desc,
+                    Description = d.Decisions_Long_Desc,
+                    CardType = "Decision",
+                    Cost = d.Decisions_Cost_Bits,
+                    Phase = d.Card.Phase != null ? d.Card.Phase.Phase_Name : string.Empty
+                })
                 .ToListAsync();
 
             var hardwareCards = await _context.Hardwares
-                 .Include(d => d.Cards)
+                .Include(d => d.Cards).ThenInclude(c => c.Phase)
                 .Where(i => i.Cards.Decks_Id == deckId)
-                .Select(i => new CardPdfModel { Id = i.Cards_Id, Title = i.Hardwares_Short_Desc, Description = i.Hardwares_Long_Desc, CardType = "Hardware" })
+                .Select(i => new CardPdfModel
+                {
+                    Id = i.Cards_Id,
+                    Title = i.Hardwares_Short_Desc,
+                    Description = i.Hardwares_Long_Desc,
+                    CardType = "Hardware",
+                    Cost = i.Hardwares_Cost_Bits,
+                    Phase = i.Cards.Phase != null ? i.Cards.Phase.Phase_Name : string.Empty
+                })
                 .ToListAsync();
 
             var softwareCards = await _context.Softwares
-                 .Include(d => d.Cards)
+                .Include(d => d.Cards).ThenInclude(c => c.Phase)
                 .Where(i => i.Cards.Decks_Id == deckId)
-                .Select(i => new CardPdfModel { Id = i.Cards_Id, Title = i.Softwares_Short_Desc, Description = i.Softwares_Long_Desc, CardType = "Software" })
+                .Select(i => new CardPdfModel
+                {
+                    Id = i.Cards_Id,
+                    Title = i.Softwares_Short_Desc,
+                    Description = i.Softwares_Long_Desc,
+                    CardType = "Software",
+                    Cost = i.Softwares_Cost_Bits,
+                    Phase = i.Cards.Phase != null ? i.Cards.Phase.Phase_Name : string.Empty
+                })
                 .ToListAsync();
 
             var allCards = decisionCards.Concat(hardwareCards).Concat(softwareCards).OrderBy(c => c.Id).ToList();
