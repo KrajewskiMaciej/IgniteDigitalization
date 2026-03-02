@@ -38,6 +38,7 @@
             </button>
 
             <button
+              v-if="!isMarketPhaseOnly"
               @click="mobileView = 'board'"
               class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 relative overflow-hidden group"
               :class="
@@ -89,52 +90,93 @@
           <div class="flex-1 overflow-auto p-4">
             <div v-if="mobileView === 'cards'" class="h-full">
               <RouterView />
-              <QuestionBox />
 
-              <div class="flex gap-2 my-4">
+              <!-- Przełącznik trybu: QR / Lista kart -->
+              <div class="flex gap-2 mb-4">
                 <button
-                  @click="showingDecisionCards = true"
-                  class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
+                  @click="cardMode = 'qr'"
+                  class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
                   :class="
-                    showingDecisionCards
+                    cardMode === 'qr'
                       ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
                       : 'bg-secondary text-surface-300 border border-primary-500/30'
                   "
                 >
-                  {{ t('decisions') }}
+                  {{ t('switchToScanner') }}
                 </button>
                 <button
-                  @click="showingDecisionCards = false"
-                  class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
+                  @click="cardMode = 'carousel'"
+                  class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
                   :class="
-                    !showingDecisionCards
+                    cardMode === 'carousel'
                       ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
                       : 'bg-secondary text-surface-300 border border-primary-500/30'
                   "
                 >
-                  {{ t('items') }}
+                  {{ t('switchToCardList') }}
                 </button>
               </div>
 
-              <Suspense>
-                <template #default>
-                  <CardCarousel
-                    ref="cardCarouselRef"
-                    v-show="gameData && gameData.deckId"
-                    :deck-id="gameData.deckId"
-                    :team-id="gameData.teamId"
-                    :game-id="gameData.gameId"
-                    :board-id="gameData.boardConfig?.boardId"
-                    :current-budget="currentGlobalBudget"
-                    :showing-decision-cards="showingDecisionCards"
-                    :is-online-game="gameData.isOnline"
-                    :is-independent-team="gameData.isIndependent"
-                  />
-                </template>
-                <template #fallback>
-                  <div class="text-center text-surface-300">{{ t('loadingCards') }}</div>
-                </template>
-              </Suspense>
+              <!-- Tryb QR -->
+              <QrCardScanner
+                v-if="cardMode === 'qr'"
+                :deck-id="gameData.deckId"
+                :team-id="gameData.teamId"
+                :game-id="gameData.gameId"
+                :board-id="gameData.boardConfig?.boardId"
+                :current-budget="currentGlobalBudget"
+                :is-online-game="gameData.isOnline"
+                :is-independent-team="gameData.isIndependent"
+                @switch-to-carousel="cardMode = 'carousel'"
+              />
+
+              <!-- Tryb karuzelowy -->
+              <template v-if="cardMode === 'carousel'">
+                <div class="flex gap-2 my-4" v-if="cardCarouselRef?.hasItemCards">
+                  <button
+                    @click="showingDecisionCards = true"
+                    class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
+                    :class="
+                      showingDecisionCards
+                        ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                        : 'bg-secondary text-surface-300 border border-primary-500/30'
+                    "
+                  >
+                    {{ t('decisions') }}
+                  </button>
+                  <button
+                    @click="showingDecisionCards = false"
+                    class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
+                    :class="
+                      !showingDecisionCards
+                        ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                        : 'bg-secondary text-surface-300 border border-primary-500/30'
+                    "
+                  >
+                    {{ t('items') }}
+                  </button>
+                </div>
+
+                <Suspense>
+                  <template #default>
+                    <CardCarousel
+                      ref="cardCarouselRef"
+                      v-show="gameData && gameData.deckId"
+                      :deck-id="gameData.deckId"
+                      :team-id="gameData.teamId"
+                      :game-id="gameData.gameId"
+                      :board-id="gameData.boardConfig?.boardId"
+                      :current-budget="currentGlobalBudget"
+                      :showing-decision-cards="showingDecisionCards"
+                      :is-online-game="gameData.isOnline"
+                      :is-independent-team="gameData.isIndependent"
+                    />
+                  </template>
+                  <template #fallback>
+                    <div class="text-center text-surface-300">{{ t('loadingCards') }}</div>
+                  </template>
+                </Suspense>
+              </template>
             </div>
 
             <div v-else-if="mobileView === 'board'" class="h-full">
@@ -143,6 +185,7 @@
                 :config="formData"
                 :gameMode="true"
                 :pawns="pawns"
+                :usePercentage="true"
               />
             </div>
 
@@ -152,6 +195,7 @@
                 :config="enemyformData"
                 :gameMode="true"
                 :pawns="enemypawns"
+                :usePercentage="true"
               />
             </div>
 
@@ -161,6 +205,7 @@
                 v-if="gameData"
                 :game-id="gameData.gameId"
                 :team-id="gameData.teamId"
+                :current-phase-name="gameData.currentPhaseName ?? undefined"
                 @budget-changed-in-menu="handleBudgetChangeFromMenu"
               />
             </div>
@@ -173,9 +218,9 @@
             class="w-1/3 bg-secondary backdrop-blur-sm border-r border-surface-700 shadow-2xl overflow-auto p-4 transition-all duration-300"
           >
             <RouterView />
-            <QuestionBox />
+            <!-- <QuestionBox /> -->
 
-            <div class="flex gap-2 my-4">
+            <div class="flex gap-2 my-4" v-if="cardCarouselRef?.hasItemCards">
               <button
                 @click="showingDecisionCards = true"
                 class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
@@ -227,6 +272,7 @@
             <div class="flex justify-between items-center mb-6">
               <div class="flex gap-2">
                 <button
+                  v-if="!isMarketPhaseOnly"
                   @click="currentBoard = 'player'"
                   class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
                   :class="
@@ -267,7 +313,7 @@
             </div>
 
             <div class="flex-1 overflow-auto">
-              <GameBoard
+              <CartesianBoard
                 v-show="currentBoard === 'player' && gameData?.boardConfig"
                 :config="formData"
                 :gameMode="true"
@@ -278,6 +324,7 @@
                 :config="enemyformData"
                 :gameMode="true"
                 :pawns="enemypawns"
+                :usePercentage="true"
               />
             </div>
           </div>
@@ -291,6 +338,7 @@
               v-show="currentPanel === 'menu' && gameData"
               :game-id="gameData.gameId"
               :team-id="gameData.teamId"
+              :current-phase-name="gameData.currentPhaseName ?? undefined"
               @budget-changed-in-menu="handleBudgetChangeFromMenu"
             />
           </div>
@@ -330,13 +378,20 @@
     :isVisible="showNotIndependentTeamModal"
     :teamName="gameData?.teamName!"
   />
+
+  <PhaseTwo
+    @close="showPhaseTwoModal = false"
+    :isVisible="showPhaseTwoModal"
+    :teamName="gameData?.teamName!"
+  />
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted, onUnmounted } from 'vue'
+import { reactive, ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import PlayerNavbar from '@/components/navbars/playerNavbar.vue'
 import QuestionBox from '@/components/playerComponents/questionBox.vue'
 import GameBoard from '@/components/game/gameBoard.vue'
+import CartesianBoard from '@/components/game/gameBoardCartesian.vue'
 import Footer from '@/components/footers/adminFooter.vue'
 import CardCarousel from '@/components/playerComponents/CardCarousel.vue'
 import PlayerMenu from '@/components/playerComponents/playerMenu.vue'
@@ -347,6 +402,8 @@ import GameStatusDisplay from '@/components/playerComponents/gameStatusDisplay.v
 import GameChat from '@/components/game/gameChat.vue'
 import IndependentTeam from '@/components/game/IndependentTeam.vue'
 import NotIndependentTeam from '@/components/game/NotIndependentTeam.vue'
+import PhaseTwo from '@/components/game/PhaseTwo.vue'
+import QrCardScanner from '@/components/playerComponents/QrCardScanner.vue'
 import type { BoardConfig, GameData, Pawn, RawPawnData, GameStatusError } from '@/interfaces/types'
 import { useBreakpoints } from '@vueuse/core'
 import { faCommentDots } from '@fortawesome/free-solid-svg-icons'
@@ -373,15 +430,17 @@ const props = defineProps({
 })
 
 // --- ZMIENNE STANU ---
-const mobileView = ref('board')
+const mobileView = ref('cards')
 const showingDecisionCards = ref(true)
 const currentPanel = ref('menu')
 const leftOpen = ref(true)
 const rightOpen = ref(true)
 const currentBoard = ref('player')
 const showChat = ref(false)
+const cardMode = ref<'qr' | 'carousel'>('qr')
 const showIndependentTeamModal = ref<boolean>(false)
 const showNotIndependentTeamModal = ref<boolean>(false)
+const showPhaseTwoModal = ref<boolean>(false)
 const cardCarouselRef = ref<InstanceType<typeof CardCarousel> | null>(null)
 
 import { fillBoardConfig } from '@/composables/BoardHelpers'
@@ -393,6 +452,8 @@ const errorLoading = ref<string | null>(null)
 const currentGlobalBudget = ref(0)
 const pawns = ref<Pawn[]>([])
 const enemypawns = ref<Pawn[]>([])
+
+const isMarketPhaseOnly = computed(() => gameData.value?.currentPhaseName !== 'Rynkowa')
 
 const playerMenuRef = ref<{
   fetchGameLog: () => void
@@ -412,6 +473,7 @@ const createDefaultBoardConfig = (): BoardConfig => ({
   cellColor: '#fefae0',
   borderColor: '#595959',
   borderColors: [], // <-- POPRAWIONA NAZWA
+  cellsDescriptions: '',
 })
 
 const formData = reactive<BoardConfig>(createDefaultBoardConfig())
@@ -419,7 +481,7 @@ const enemyformData = reactive<BoardConfig>(createDefaultBoardConfig())
 const gameStatusError = ref<GameStatusError | null>(null)
 
 // --- FUNKCJE ---
-const fetchGameDataByToken = async (token: string) => {
+const fetchGameDataByToken = async (token: string, skipIndependenceModal = false) => {
   if (!token) {
     gameStatusError.value = { title: 'Błąd', message: 'Brak tokena drużyny w adresie URL.' }
     isLoading.value = false
@@ -434,12 +496,17 @@ const fetchGameDataByToken = async (token: string) => {
     )
     gameData.value = response.data
 
-    console.log('Pobrano dane gry przez token:', gameData.value)
+    // W fazie 1 (Przygotowawcza) domyślnie wyświetlaj planszę rynku (desktop)
+    if (gameData.value.currentPhaseName !== 'Rynkowa') {
+      currentBoard.value = 'market'
+    }
 
-    if (gameData.value.isIndependent) {
-      showIndependentTeamModal.value = true
-    } else {
-      showNotIndependentTeamModal.value = true
+    if (!skipIndependenceModal) {
+      if (gameData.value.isIndependent) {
+        showIndependentTeamModal.value = true
+      } else {
+        showNotIndependentTeamModal.value = true
+      }
     }
 
     currentGlobalBudget.value = gameData.value.teamBudget
@@ -450,8 +517,6 @@ const fetchGameDataByToken = async (token: string) => {
 
     if (gameData.value.rivalBoardConfig) {
       fillBoardConfig(enemyformData, gameData.value.rivalBoardConfig)
-
-      console.log('Plansza konkurecji:', gameData.value.rivalBoardConfig)
     } else {
       console.warn('Brak konfiguracji rivalBoardConfig.')
     }
@@ -498,6 +563,14 @@ const handleBudgetChangeFromMenu = (newBudgetFromMenu: number) => {
   currentGlobalBudget.value = newBudgetFromMenu
 }
 
+// Gdy faza zmienia się z powrotem na "tylko rynek", wymuś widok rynku
+watch(isMarketPhaseOnly, (marketOnly) => {
+  if (marketOnly) {
+    currentBoard.value = 'market'
+    if (mobileView.value === 'board') mobileView.value = 'market'
+  }
+})
+
 const fetchPawns = async () => {
   if (!gameData.value?.gameId || !gameData.value.boardConfig?.boardId) return
   try {
@@ -514,6 +587,8 @@ const fetchPawns = async () => {
       y: Number(p.posY),
       color: p.color!,
       name: p.name!,
+      maxX: Number(p.maxPosX) || 1,
+      maxY: Number(p.maxPosY) || 1,
     }))
   } catch (err: any) {
     console.error('Błąd pobierania pionków:', err)
@@ -535,6 +610,8 @@ const fetchRivalPawns = async () => {
       y: Number(p.posY),
       color: p.teamColor!,
       name: p.teamName!,
+      maxX: Number(p.maxPosX) || 1,
+      maxY: Number(p.maxPosY) || 1,
     }))
   } catch (err: any) {
     console.error('Błąd pobierania pionków rynku:', err)
@@ -543,13 +620,11 @@ const fetchRivalPawns = async () => {
 
 // --- LOGIKA SIGNALR ---
 const onBoardUpdate = (data: any) => {
-  console.log("SignalR: Otrzymano 'BoardUpdated'. Odświeżam stan planszy.", data)
   fetchPawns()
   fetchRivalPawns()
 }
 
 const onHistoryUpdate = () => {
-  console.log("SignalR: Otrzymano 'HistoryUpdated'. Odświeżam historię.")
   if (playerMenuRef.value) {
     playerMenuRef.value.fetchGameLog()
     playerMenuRef.value.fetchTeamBud()
@@ -557,7 +632,6 @@ const onHistoryUpdate = () => {
 }
 
 const onPendingUpdate = () => {
-  console.log("SignalR: Otrzymano 'PendingUpdated'. Odświeżam karty")
   if (cardCarouselRef.value) {
     cardCarouselRef.value.fetchCards()
   }
@@ -566,6 +640,15 @@ const onPendingUpdate = () => {
 const onBudgetUpdate = () => {
   if (playerMenuRef.value) {
     playerMenuRef.value.handleFetchBudget()
+  }
+}
+
+const onPhaseUpdate = async () => {
+  if (props.teamToken) {
+    await fetchGameDataByToken(props.teamToken, true)
+    currentBoard.value = 'market'
+    mobileView.value = 'market'
+    showPhaseTwoModal.value = true
   }
 }
 let isSignalRInitialized = false
@@ -583,11 +666,11 @@ watch(
           String(gameData.value.gameId),
           String(gameData.value.teamId),
         )
-        console.log(`SignalR: Połączono i dołączono do pokoju gry ${gameData.value.gameId}`)
         signalrService.connection.on('BoardUpdated', onBoardUpdate)
         signalrService.connection.on('HistoryUpdated', onHistoryUpdate)
         signalrService.connection.on('PendingUpdated', onPendingUpdate)
         signalrService.connection.on('BudgetUpdated', onBudgetUpdate)
+        signalrService.connection.on('PhaseUpdated', onPhaseUpdate)
       } catch (err) {
         console.error('Błąd połączenia SignalR w playerView: ', err)
       }
@@ -599,7 +682,6 @@ watch(
 
 onUnmounted(() => {
   if (gameData.value?.gameId) {
-    console.log(`SignalR: Opuszczanie pokoju gry ${gameData.value.gameId}`)
     signalrService.leaveGameRoomAsPlayer(
       String(gameData.value.gameId),
       String(gameData.value.teamId),
@@ -608,6 +690,7 @@ onUnmounted(() => {
     signalrService.connection.off('HistoryUpdated', onHistoryUpdate)
     signalrService.connection.off('PendingUpdated', onPendingUpdate)
     signalrService.connection.off('BudgetUpdated', onBudgetUpdate)
+    signalrService.connection.off('PhaseUpdated', onPhaseUpdate)
   }
 })
 </script>

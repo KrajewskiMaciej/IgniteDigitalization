@@ -28,6 +28,10 @@ const props = defineProps({
     type: Array as PropType<Pawn[]>,
     default: () => [],
   },
+  usePercentage: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const board: Ref<SVGGElement | null> = ref(null)
@@ -92,6 +96,37 @@ function splitLabelIntoLines(text: string, maxLength = 15): string[] {
 const getScreenPosition = (x: number, y: number) => ({
   screenX: x * cellSize.value + marginLeft.value + cellSize.value / 2,
   screenY: (props.config.rows - 1 - y) * cellSize.value + marginTop.value + cellSize.value / 2,
+})
+
+// processedPawns nadpisuje x/y na docelowe współrzędne siatki (0..cols-1 / 0..rows-1)
+// analogicznie do gameBoardCartesian, który nadpisuje x/y na współrzędne ćwiartki
+const processedPawns = computed(() => {
+  const cols = props.config.cols
+  const rows = props.config.rows
+  const result = props.pawns.map((pawn) => {
+    if (!props.usePercentage) return { ...pawn }
+    const pctX = Math.min(pawn.maxX > 0 ? pawn.x / pawn.maxX : 0, 1)
+    const pctY = Math.min(pawn.maxY > 0 ? pawn.y / pawn.maxY : 0, 1)
+    return { ...pawn, x: pctX * (cols - 1), y: pctY * (rows - 1) }
+  })
+
+  if (props.usePercentage && result.length > 0) {
+    console.group('[GameBoard] processedPawns – dane surowe i przeliczone')
+    console.log(`Rozmiar planszy: cols=${cols}, rows=${rows}`)
+    result.forEach((pawn, i) => {
+      const raw = props.pawns[i]
+      console.log(
+        `[${pawn.id}] ${pawn.name ?? '–'} |`,
+        `raw: x=${raw.x}, y=${raw.y} |`,
+        `maxX=${raw.maxX}, maxY=${raw.maxY} |`,
+        `pct: x=${raw.maxX > 0 ? (raw.x / raw.maxX * 100).toFixed(1) : 'N/A'}%, y=${raw.maxY > 0 ? (raw.y / raw.maxY * 100).toFixed(1) : 'N/A'}% |`,
+        `cell: x=${pawn.x.toFixed(2)}, y=${pawn.y.toFixed(2)}`,
+      )
+    })
+    console.groupEnd()
+  }
+
+  return result
 })
 
 const calculateGroupOffsets = (count: number, index: number) => {
@@ -296,24 +331,20 @@ const drawBoard = (animate = true) => {
       .attr('stroke-width', 3)
   }
 
-  if (Array.isArray(props.pawns)) {
+  if (Array.isArray(processedPawns.value) && processedPawns.value.length > 0) {
     existingPawns.forEach((group) => group.remove())
 
-    const grouped: Record<string, Pawn[]> = {}
-    props.pawns.forEach((pawn) => {
-      const key = `${pawn.x},${pawn.y}`
-      if (!grouped[key]) grouped[key] = []
-      grouped[key].push(pawn)
-    })
+    // Grupuj pionki stojące w tej samej pozycji (jak gameBoardCartesian)
+    const grouped = d3.group(processedPawns.value, (d) => `${d.x},${d.y}`)
 
     let animationIndex = 0
 
-    Object.entries(grouped).forEach(([_, group]) => {
+    grouped.forEach((group) => {
       const count = group.length
       const scaleFactor = 1 / Math.sqrt(count)
       const baseScale = cellSize.value * 0.002 * scaleFactor
 
-      group.forEach((pawn: Pawn, index: number) => {
+      group.forEach((pawn, index: number) => {
         const { screenX, screenY } = getScreenPosition(pawn.x, pawn.y)
         const { offsetX, offsetY } = calculateGroupOffsets(count, index)
         const targetX = screenX + offsetX
@@ -365,11 +396,12 @@ const drawBoard = (animate = true) => {
 
         pawnGroup.append('title').text(pawn.name || `Pionek ${pawn.id}`)
 
+        // Przechowuj przetworzone współrzędne (jak gameBoardCartesian)
         previousPositions.value.set(pawn.id, { x: pawn.x, y: pawn.y })
       })
     })
 
-    const currentIds = new Set(props.pawns.map((p) => p.id))
+    const currentIds = new Set(processedPawns.value.map((p) => p.id))
     previousPositions.value.forEach((_, id) => {
       if (!currentIds.has(id as any)) {
         previousPositions.value.delete(id)
@@ -384,15 +416,17 @@ watch(
   { deep: true },
 )
 
+// Obserwuj przetworzone pionki (jak gameBoardCartesian) – reaguje też na zmiany maxX/maxY
 watch(
-  () => props.pawns,
+  processedPawns,
   () => drawBoard(true),
   { deep: true },
 )
 
 onMounted(() => {
   try {
-    props.pawns.forEach((pawn) => {
+    // Inicjalizuj pozycje startowe z przetworzonych wartości (jak gameBoardCartesian)
+    processedPawns.value.forEach((pawn) => {
       previousPositions.value.set(pawn.id, { x: pawn.x, y: pawn.y })
     })
     drawBoard(false)

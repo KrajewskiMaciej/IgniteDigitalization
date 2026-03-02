@@ -17,7 +17,6 @@ namespace backend.Services
         private readonly AppDbContext _context;
         private readonly ILogger<PlayerService> _logger;
         private readonly IConfiguration _configuration;
-        private const int PositionDivisor = 100;
         private readonly IHubContext<GameHub> _hubContext;
 
         public PlayerService(AppDbContext context, IConfiguration configuration, ILogger<PlayerService> logger, IHubContext<GameHub> hubContext)
@@ -32,23 +31,8 @@ namespace backend.Services
         {
             _logger.LogInformation("Rozpoczynanie aktualizacji pozycji PIONKÓW-PROCESÓW dla GameId: {GameId}, TeamId: {TeamId}", gameId, teamId);
 
-            // [KROK 1] Pobranie planszy dla pionków-procesów.
-            // Upewniamy się, że pobieramy planszę z pionka, który jest procesem (ma przypisane Games_Processes_Id).
-            var processBoardInfo = await _context.GameBoards
-                .AsNoTracking()
-                .Where(gb => gb.Games_Id == gameId && gb.Teams_Id == teamId && gb.Games_Processes_Id != null)
-                .Select(gb => new { gb.Boards.Rows, gb.Boards.Cols })
-                .FirstOrDefaultAsync();
-
-            if (processBoardInfo == null)
-            {
-                _logger.LogWarning("Nie znaleziono planszy dla pionków-procesów w grze {GameId}. Przerywanie aktualizacji.", gameId);
-                return;
-            }
-
-            double maxPozX = processBoardInfo.Cols > 0 ? processBoardInfo.Cols - 1 : 0;
-            double maxPozY = processBoardInfo.Rows > 0 ? processBoardInfo.Rows - 1 : 0;
-
+            // Pozycje zapisywane jako raw suma wag (bez dzielenia przez 100).
+            // Frontend przelicza na % względem MaxPosX/MaxPosY obliczonego z CardWeights.
             var movesByGeneralProcessId = await _context.GameLogSpecs
                 .AsNoTracking()
                 .Where(gls =>
@@ -89,15 +73,9 @@ namespace backend.Services
             {
                 if (entry.Games_Processes != null && movesByGeneralProcessId.TryGetValue(entry.Games_Processes.Processes_Id, out var newPosition))
                 {
-                    var finalX = newPosition.FinalPosX / PositionDivisor;
-                    var finalY = newPosition.FinalPosY / PositionDivisor;
-
-                    // [KROK 2] Zastosowanie ograniczeń planszy procesów
-                    double clampedX = Math.Max(0, Math.Min(finalX, maxPozX));
-                    double clampedY = Math.Max(0, Math.Min(finalY, maxPozY));
-
-                    entry.Poz_X = clampedX;
-                    entry.Poz_Y = clampedY;
+                    // Raw suma wag – bez dzielenia, bez klampowania do rozmiaru planszy
+                    entry.Poz_X = Math.Max(0, (double)newPosition.FinalPosX);
+                    entry.Poz_Y = Math.Max(0, (double)newPosition.FinalPosY);
                 }
             }
 
@@ -109,20 +87,16 @@ namespace backend.Services
 
         public async Task SetTeamPosAsync(int gameId, int teamId)
         {
+            // Pobierz pozycje wszystkich pionków-procesów danej drużyny w danej grze.
+            // Pozycja drużyny = średnia arytmetyczna pozycji procesów (bez ważenia).
             var processPawns = await _context.GameBoards
+                .AsNoTracking()
                 .Where(gb =>
                     gb.Games_Id == gameId &&
                     gb.Teams_Id == teamId &&
                     gb.Games_Processes_Id != null &&
-                    gb.Games_Processes != null &&
-                    gb.Games_Processes.Processes != null)
-                .Select(gb => new PawnData
-                {
-                    ProcessId = gb.Games_Processes!.Processes!.Processes_Id,
-                    PosX = gb.Poz_X,
-                    PosY = gb.Poz_Y,
-                    Weight = gb.Games_Processes.Processes.Processes_Weight
-                })
+                    gb.Games_Processes != null)
+                .Select(gb => new { PosX = gb.Poz_X, PosY = gb.Poz_Y })
                 .ToListAsync();
 
             if (!processPawns.Any())
@@ -131,17 +105,12 @@ namespace backend.Services
                 return;
             }
 
-            List<NormalizedPawnData> normalizedPawns = ProcessAndNormalizeWeights(processPawns);
+            // Średnia arytmetyczna – każdy proces ma jednakową wagę
+            double avgX = processPawns.Average(p => p.PosX);
+            double avgY = processPawns.Average(p => p.PosY);
 
-            double weightedSumX = normalizedPawns.Sum(p => p.PosX * p.NormalizedWeight);
-            double weightedSumY = normalizedPawns.Sum(p => p.PosY * p.NormalizedWeight);
-
-            int finalAvgX = (int)Math.Round(weightedSumX);
-            int finalAvgY = (int)Math.Round(weightedSumY);
-
-            // [KROK 1] Znajdź główny pionek drużyny I JEGO PLANSZĘ
+            // Znajdź główny pionek drużyny (Games_Processes_Id == null)
             var teamPawnEntry = await _context.GameBoards
-                .Include(gb => gb.Boards) // Dołączamy powiązaną encję Board
                 .FirstOrDefaultAsync(gb => gb.Games_Id == gameId && gb.Teams_Id == teamId && gb.Games_Processes_Id == null);
 
             if (teamPawnEntry == null)
@@ -149,105 +118,17 @@ namespace backend.Services
                 _logger.LogError("BŁĄD KRYTYCZNY: Nie znaleziono głównego pionka dla drużyny {TeamId} w grze {GameId}.", teamId, gameId);
                 return;
             }
-            if (teamPawnEntry.Boards == null)
-            {
-                _logger.LogError("BŁĄD KRYTYCZNY: Pionek drużyny {TeamId} nie ma przypisanej planszy.", teamId);
-                return;
-            }
 
-            // [KROK 2] Oblicz granice planszy DRUŻYNY
-            double maxTeamPozX = teamPawnEntry.Boards.Cols > 0 ? teamPawnEntry.Boards.Cols - 1 : 0;
-            double maxTeamPozY = teamPawnEntry.Boards.Rows > 0 ? teamPawnEntry.Boards.Rows - 1 : 0;
-
-            // [KROK 3] Zastosuj ograniczenia planszy drużyny
-            double clampedX = Math.Max(0, Math.Min(finalAvgX, maxTeamPozX));
-            double clampedY = Math.Max(0, Math.Min(finalAvgY, maxTeamPozY));
-
-            teamPawnEntry.Poz_X = clampedX;
-            teamPawnEntry.Poz_Y = clampedY;
+            // Zapisujemy wartość raw (bez klampowania do rozmiaru planszy).
+            // Frontend przelicza na % względem MaxPosX/MaxPosY obliczonego z CardWeights.
+            teamPawnEntry.Poz_X = Math.Max(0, avgX);
+            teamPawnEntry.Poz_Y = Math.Max(0, avgY);
 
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Zaktualizowano średnią ważoną pozycję ({PosX}, {PosY}) dla drużyny {TeamId} w grze {GameId}.", clampedX, clampedY, teamId, gameId);
+            _logger.LogInformation("Zaktualizowano średnią arytmetyczną pozycję ({PosX}, {PosY}) dla drużyny {TeamId} w grze {GameId}.", avgX, avgY, teamId, gameId);
 
-            await _hubContext.Clients.Group(gameId.ToString()).SendAsync("BoardUpdated", new { teamId });
+            await _hubContext.Clients.Group($"game-{gameId}").SendAsync("BoardUpdated");
         }
 
-        // ... reszta serwisu (ProcessAndNormalizeWeights, klasy PawnData itd.) pozostaje bez zmian ...
-        private List<NormalizedPawnData> ProcessAndNormalizeWeights(List<PawnData> pawns)
-        {
-            var pawnsWithWeight = pawns.Where(p => p.Weight > 0).ToList();
-            var pawnsWithoutWeight = pawns.Where(p => p.Weight <= 0).ToList();
-
-            double totalWeightProvided = pawnsWithWeight.Sum(p => p.Weight);
-            double missingWeight = 1.0 - totalWeightProvided;
-
-            if (missingWeight <= 0 || !pawnsWithWeight.Any())
-            {
-                _logger.LogInformation("Wagi nie wymagają redystrybucji. Normalizowanie {PawnCount} pionków.", pawns.Count);
-                return Normalize(pawns, pawns.Sum(p => p.Weight));
-            }
-
-            _logger.LogInformation(
-                "Wykryto brakującą wagę: {MissingWeight}. Rozdzielanie jej między {PawnCount} pionków.",
-                missingWeight, pawnsWithWeight.Count);
-
-            var temporaryWeights = new Dictionary<int, double>();
-
-            foreach (var pawn in pawnsWithWeight)
-            {
-                temporaryWeights[pawn.ProcessId] = pawn.Weight;
-            }
-
-            foreach (var pawn in pawnsWithWeight)
-            {
-                double proportion = pawn.Weight / totalWeightProvided;
-                temporaryWeights[pawn.ProcessId] += missingWeight * proportion;
-            }
-
-            var finalPawnData = pawns.Select(p => new PawnData
-            {
-                ProcessId = p.ProcessId,
-                PosX = p.PosX,
-                PosY = p.PosY,
-                Weight = temporaryWeights.GetValueOrDefault(p.ProcessId, 0)
-            }).ToList();
-
-            return Normalize(finalPawnData, finalPawnData.Sum(p => p.Weight));
-        }
-
-        private List<NormalizedPawnData> Normalize(List<PawnData> pawns, double totalWeight)
-        {
-            if (totalWeight == 0)
-            {
-                _logger.LogWarning("Całkowita suma wag wynosi 0, nie można znormalizować. Zwracam wagi zerowe.");
-                return pawns.Select(p => new NormalizedPawnData(p, 0)).ToList();
-            }
-
-            return pawns.Select(p => new NormalizedPawnData(p, p.Weight / totalWeight)).ToList();
-        }
-
-        private class PawnData
-        {
-            public int ProcessId { get; set; }
-            public double PosX { get; set; }
-            public double PosY { get; set; }
-            public double Weight { get; set; }
-        }
-
-        private class NormalizedPawnData
-        {
-            public int ProcessId { get; }
-            public double PosX { get; }
-            public double PosY { get; }
-            public double NormalizedWeight { get; }
-
-            public NormalizedPawnData(PawnData source, double normalizedWeight)
-            {
-                ProcessId = source.ProcessId;
-                PosX = source.PosX;
-                PosY = source.PosY;
-                NormalizedWeight = normalizedWeight;
-            }
-        }
     }
 }

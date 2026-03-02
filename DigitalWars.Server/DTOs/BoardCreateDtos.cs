@@ -35,5 +35,6 @@ namespace backend.Dtos
         public string Cell_Color { get; set; } = string.Empty;
 
         public string? Borders_Colors { get; set; }
+        public string? Cells_Descriptions { get; set; }
     }
 }

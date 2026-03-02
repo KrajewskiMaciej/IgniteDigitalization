@@ -18,6 +18,7 @@ namespace backend.Services
     {
         Task InitializeNewUserAsync(int userId);
         Task<Deck> CreateDeckFromFileForUserAsync(IFormFile file, int userId, string deckName);
+        Task ImportEconomySettingsFromFileAsync(int deckId, IFormFile file);
     }
 
     public class ProvisioningService : IProvisioningService
@@ -113,6 +114,9 @@ namespace backend.Services
                 LoadRelatedEntities<CardWeight>(context, workbook, "CardsWeights", cardIdMap, processIdMap);
                 LoadRelatedEntities<CardEnabler>(context, workbook, "CardsEnablers", cardIdMap);
 
+                // Import zasad ekonomii – opcjonalny arkusz EconomySettings
+                await ImportEconomySettingsFromWorkbookAsync(context, workbook, newDeck.Decks_Id);
+
                 _logger.LogInformation("[ProvisioningService_CreateDeckFromWorkbookAsync] Wszystkie encje zostały przetworzone. Zapisywanie zmian w bazie danych...");
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -177,6 +181,261 @@ namespace backend.Services
             }
         }
 
+        public async Task ImportEconomySettingsFromFileAsync(int deckId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("Nie przesłano pliku.");
+
+            using var scope = _serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            stream.Position = 0;
+
+            using var workbook = new XLWorkbook(stream);
+            await ImportEconomySettingsFromWorkbookAsync(context, workbook, deckId);
+            await context.SaveChangesAsync();
+
+            _logger.LogInformation("[ProvisioningService] Zaimportowano zasady ekonomii dla Szkolenia {DeckId} z pliku {FileName}.", deckId, file.FileName);
+        }
+
+        private async Task ImportEconomySettingsFromWorkbookAsync(AppDbContext context, XLWorkbook workbook, int deckId)
+        {
+            if (!workbook.TryGetWorksheet("EconomySettings", out var sheet))
+            {
+                _logger.LogInformation("[ProvisioningService] Brak arkusza 'EconomySettings' w pliku. Tworzę domyślne ustawienia ekonomii dla Szkolenia {DeckId}.", deckId);
+                // Utwórz domyślne jeśli nie istnieją
+                var existingDefault = await context.DeckEconomySettings.FirstOrDefaultAsync(es => es.Decks_Id == deckId);
+                if (existingDefault == null)
+                {
+                    context.DeckEconomySettings.Add(new DeckEconomySettings { Decks_Id = deckId });
+                }
+                return;
+            }
+
+            _logger.LogInformation("[ProvisioningService] Wczytujemy arkusz 'EconomySettings' dla Szkolenia {DeckId}.", deckId);
+
+            var settings = await context.DeckEconomySettings.FirstOrDefaultAsync(es => es.Decks_Id == deckId);
+            if (settings == null)
+            {
+                settings = new DeckEconomySettings { Decks_Id = deckId };
+                context.DeckEconomySettings.Add(settings);
+            }
+
+            // Parsuj arkusz z układem: kolumna A = nazwa pola, kolumna B = wartość
+            var headers = sheet.Row(1).CellsUsed().ToDictionary(c => c.Address.ColumnNumber, c => c.GetString());
+
+            // Obsługujemy dwa formaty:
+            // Format 1: Wiersz 1 = nagłówki (Map1_Starting_Budget, ...), Wiersz 2 = wartości
+            // Format 2: Kolumna A = nazwa, Kolumna B = wartość (wiersze)
+
+            bool isHorizontal = headers.Values.Any(h =>
+                h.Equals("Map1_Starting_Budget", StringComparison.OrdinalIgnoreCase) ||
+                h.Equals("Map2_Base_Budget", StringComparison.OrdinalIgnoreCase));
+
+            bool isNaturalLanguage = !isHorizontal && !headers.Values.Any(h =>
+                h.Equals("Map1_Starting_Budget", StringComparison.OrdinalIgnoreCase) ||
+                h.Equals("Map1_Mandatory_Cards_Cost", StringComparison.OrdinalIgnoreCase)) &&
+                sheet.RowsUsed().Take(25).Any(r =>
+                {
+                    var txt = r.Cell(1).GetString().ToLowerInvariant();
+                    return txt.Contains("budżet") || txt.Contains("budzet") || txt.Contains("mapa") ||
+                           txt.Contains("ekonomia") || txt.Contains("mnożnik") || txt.Contains("bonus");
+                });
+
+            if (isHorizontal)
+            {
+                // Nagłówki w wierszu 1, wartości w wierszu 2
+                var dataRow = sheet.Row(2);
+                var colMap = headers.ToDictionary(kvp => kvp.Value, kvp => kvp.Key, StringComparer.OrdinalIgnoreCase);
+
+                if (colMap.TryGetValue("Map1_Starting_Budget", out var col))
+                    settings.Map1_Starting_Budget = ParseDouble(dataRow.Cell(col).GetString()) ?? settings.Map1_Starting_Budget;
+                if (colMap.TryGetValue("Map1_Mandatory_Cards_Cost", out col))
+                    settings.Map1_Mandatory_Cards_Cost = ParseDouble(dataRow.Cell(col).GetString()) ?? settings.Map1_Mandatory_Cards_Cost;
+                if (colMap.TryGetValue("Map1_Target_Cards_Min", out col))
+                    settings.Map1_Target_Cards_Min = ParseInt(dataRow.Cell(col).GetString()) ?? settings.Map1_Target_Cards_Min;
+                if (colMap.TryGetValue("Map1_Target_Cards_Max", out col))
+                    settings.Map1_Target_Cards_Max = ParseInt(dataRow.Cell(col).GetString()) ?? settings.Map1_Target_Cards_Max;
+                if (colMap.TryGetValue("Map2_Base_Budget", out col))
+                    settings.Map2_Base_Budget = ParseDouble(dataRow.Cell(col).GetString()) ?? settings.Map2_Base_Budget;
+                if (colMap.TryGetValue("Map2_Prep_Bonus_Max_Bits", out col))
+                    settings.Map2_Prep_Bonus_Max_Bits = ParseDouble(dataRow.Cell(col).GetString()) ?? settings.Map2_Prep_Bonus_Max_Bits;
+                if (colMap.TryGetValue("Map2_Prep_Cards_Total_Count", out col))
+                    settings.Map2_Prep_Cards_Total_Count = ParseInt(dataRow.Cell(col).GetString()) ?? settings.Map2_Prep_Cards_Total_Count;
+                if (colMap.TryGetValue("Map2_Target_Cards_Min", out col))
+                    settings.Map2_Target_Cards_Min = ParseInt(dataRow.Cell(col).GetString()) ?? settings.Map2_Target_Cards_Min;
+                if (colMap.TryGetValue("Map2_Target_Cards_Max", out col))
+                    settings.Map2_Target_Cards_Max = ParseInt(dataRow.Cell(col).GetString()) ?? settings.Map2_Target_Cards_Max;
+                if (colMap.TryGetValue("PrepMultiplier_Max", out col))
+                    settings.PrepMultiplier_Max = ParseDouble(dataRow.Cell(col).GetString()) ?? settings.PrepMultiplier_Max;
+            }
+            else if (isNaturalLanguage)
+            {
+                // Format naturalny: dokument polski z etykietami i wartościami z jednostkami
+                // np. "Budżet startowy" | "40 bitów", "Cel projektowy Map 1" | "14-16 kart zagranych"
+                ParseNaturalLanguageEconomySheet(sheet, settings);
+            }
+            else
+            {
+                // Pionowy układ: Kolumna A = nazwa (angielska), Kolumna B = wartość
+                foreach (var row in sheet.RowsUsed().Skip(1))
+                {
+                    var fieldName = row.Cell(1).GetString().Trim();
+                    var value = row.Cell(2).GetString().Trim();
+
+                    switch (fieldName)
+                    {
+                        case "Map1_Starting_Budget": settings.Map1_Starting_Budget = ParseDouble(value) ?? settings.Map1_Starting_Budget; break;
+                        case "Map1_Mandatory_Cards_Cost": settings.Map1_Mandatory_Cards_Cost = ParseDouble(value) ?? settings.Map1_Mandatory_Cards_Cost; break;
+                        case "Map1_Target_Cards_Min": settings.Map1_Target_Cards_Min = ParseInt(value) ?? settings.Map1_Target_Cards_Min; break;
+                        case "Map1_Target_Cards_Max": settings.Map1_Target_Cards_Max = ParseInt(value) ?? settings.Map1_Target_Cards_Max; break;
+                        case "Map2_Base_Budget": settings.Map2_Base_Budget = ParseDouble(value) ?? settings.Map2_Base_Budget; break;
+                        case "Map2_Prep_Bonus_Max_Bits": settings.Map2_Prep_Bonus_Max_Bits = ParseDouble(value) ?? settings.Map2_Prep_Bonus_Max_Bits; break;
+                        case "Map2_Prep_Cards_Total_Count": settings.Map2_Prep_Cards_Total_Count = ParseInt(value) ?? settings.Map2_Prep_Cards_Total_Count; break;
+                        case "Map2_Target_Cards_Min": settings.Map2_Target_Cards_Min = ParseInt(value) ?? settings.Map2_Target_Cards_Min; break;
+                        case "Map2_Target_Cards_Max": settings.Map2_Target_Cards_Max = ParseInt(value) ?? settings.Map2_Target_Cards_Max; break;
+                        case "PrepMultiplier_Max": settings.PrepMultiplier_Max = ParseDouble(value) ?? settings.PrepMultiplier_Max; break;
+                    }
+                }
+            }
+
+            _logger.LogInformation("[ProvisioningService] Zasady ekonomii dla Szkolenia {DeckId} wczytane pomyślnie.", deckId);
+        }
+
+        // -------------------------------------------------------------------------
+        // Parsowanie formatu naturalnego (dokument polski)
+        // np. "Budżet startowy" | "40 bitów"
+        //     "Cel projektowy Map 1" | "14-16 kart zagranych"
+        //     "Bonus przygotowania" | "(kart_PRE / 22) × 12 bitów"
+        //     "Formuła" | "MIN(2,0; 1 + kart_PRE_zagranych / 22)"
+        // -------------------------------------------------------------------------
+        private static void ParseNaturalLanguageEconomySheet(IXLWorksheet sheet, DeckEconomySettings settings)
+        {
+            foreach (var row in sheet.RowsUsed())
+            {
+                // Zbieramy tekst ze wszystkich komórek wiersza jako jeden string
+                var cells = row.CellsUsed().Select(c => c.GetString().Trim()).ToList();
+                if (cells.Count == 0) continue;
+
+                // Etykieta to kolumna A, wartość to kolumna B (lub kolejne komórki)
+                var label = cells[0].ToLowerInvariant();
+                var valueCells = cells.Skip(1).ToList();
+                var valueText = string.Join(" ", valueCells);
+
+                // Budżet startowy → Map1_Starting_Budget
+                if (label.Contains("budżet startowy") || label.Contains("budzet startowy"))
+                {
+                    var n = ExtractFirstNumber(valueText);
+                    if (n.HasValue) settings.Map1_Starting_Budget = n.Value;
+                }
+                // Karty obowiązkowe → Map1_Mandatory_Cards_Cost (szukamy "koszt: X" lub samodzielnej liczby)
+                else if (label.Contains("karty obowiązkowe") || label.Contains("mandatory"))
+                {
+                    // Szukamy wzorca "koszt: 9" lub "9 bitów" w którymkolwiek tekście
+                    var allText = string.Join(" ", cells).ToLowerInvariant();
+                    var m = System.Text.RegularExpressions.Regex.Match(allText, @"koszt[:\s]+(\d+)");
+                    if (m.Success)
+                        settings.Map1_Mandatory_Cards_Cost = double.Parse(m.Groups[1].Value);
+                    else
+                    {
+                        var n = ExtractFirstNumber(valueText);
+                        if (n.HasValue) settings.Map1_Mandatory_Cards_Cost = n.Value;
+                    }
+                }
+                // Cel projektowy Map 1 → Min/Max
+                else if ((label.Contains("cel projektowy") || label.Contains("cel projektu")) &&
+                         (label.Contains("map 1") || label.Contains("mapa 1")))
+                {
+                    var (min, max) = ExtractRange(valueText);
+                    if (min.HasValue) settings.Map1_Target_Cards_Min = (int)min.Value;
+                    if (max.HasValue) settings.Map1_Target_Cards_Max = (int)max.Value;
+                }
+                // Budżet bazowy → Map2_Base_Budget
+                else if (label.Contains("budżet bazowy") || label.Contains("budzet bazowy"))
+                {
+                    var n = ExtractFirstNumber(valueText);
+                    if (n.HasValue) settings.Map2_Base_Budget = n.Value;
+                }
+                // Bonus przygotowania → "(kart_PRE / 22) × 12 bitów"
+                // 22 = Map2_Prep_Cards_Total_Count, 12 = Map2_Prep_Bonus_Max_Bits
+                else if (label.Contains("bonus przygotowania") || label.Contains("bonus_pre") || label.Contains("bonus pre"))
+                {
+                    var numbers = ExtractAllNumbers(valueText);
+                    // Wzorzec: pierwsza liczba po "/" to total count (22), po "×" to bonus (12)
+                    var mSlash = System.Text.RegularExpressions.Regex.Match(valueText, @"/\s*(\d+)");
+                    var mMul = System.Text.RegularExpressions.Regex.Match(valueText, @"[×x\*]\s*([\d,\.]+)");
+                    if (mSlash.Success)
+                        settings.Map2_Prep_Cards_Total_Count = int.Parse(mSlash.Groups[1].Value);
+                    if (mMul.Success)
+                        settings.Map2_Prep_Bonus_Max_Bits = ParseDouble(mMul.Groups[1].Value) ?? settings.Map2_Prep_Bonus_Max_Bits;
+                    else if (numbers.Count >= 2)
+                    {
+                        settings.Map2_Prep_Cards_Total_Count = (int)numbers[0];
+                        settings.Map2_Prep_Bonus_Max_Bits = numbers[1];
+                    }
+                }
+                // Cel projektowy Map 2 → Min/Max
+                else if ((label.Contains("cel projektowy") || label.Contains("cel projektu")) &&
+                         (label.Contains("map 2") || label.Contains("mapa 2")))
+                {
+                    var (min, max) = ExtractRange(valueText);
+                    if (min.HasValue) settings.Map2_Target_Cards_Min = (int)min.Value;
+                    if (max.HasValue) settings.Map2_Target_Cards_Max = (int)max.Value;
+                }
+                // Formuła mnożnika → "MIN(2,0; 1 + kart_PRE_zagranych / 22)"
+                else if (label.Contains("formuła") || label.Contains("formula") ||
+                         (label.Contains("mnożnik") && !label.Contains("reguła")))
+                {
+                    // Szukamy MIN(X, ...) lub MAX = X
+                    var mMin = System.Text.RegularExpressions.Regex.Match(valueText, @"MIN\s*\(\s*([\d,\.]+)");
+                    if (mMin.Success)
+                        settings.PrepMultiplier_Max = ParseDouble(mMin.Groups[1].Value) ?? settings.PrepMultiplier_Max;
+                    else
+                    {
+                        var n = ExtractFirstNumber(valueText);
+                        if (n.HasValue) settings.PrepMultiplier_Max = n.Value;
+                    }
+                }
+            }
+        }
+
+        private static double? ExtractFirstNumber(string text)
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(text, @"[\d]+(?:[,\.][\d]+)?");
+            if (!m.Success) return null;
+            return ParseDouble(m.Value);
+        }
+
+        private static List<double> ExtractAllNumbers(string text)
+        {
+            var matches = System.Text.RegularExpressions.Regex.Matches(text, @"[\d]+(?:[,\.][\d]+)?");
+            return matches.Select(m => ParseDouble(m.Value) ?? 0.0).ToList();
+        }
+
+        /// <summary>Wyciąga zakres "X-Y" lub "X–Y" z tekstu, np. "14-16 kart zagranych".</summary>
+        private static (double? min, double? max) ExtractRange(string text)
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(text, @"([\d]+(?:[,\.][\d]+)?)\s*[-–]\s*([\d]+(?:[,\.][\d]+)?)");
+            if (m.Success)
+                return (ParseDouble(m.Groups[1].Value), ParseDouble(m.Groups[2].Value));
+            var single = ExtractFirstNumber(text);
+            return (single, null);
+        }
+
+        private static double? ParseDouble(string val)
+        {
+            val = val.Replace(',', '.');
+            return double.TryParse(val, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var r) ? r : null;
+        }
+
+        private static int? ParseInt(string val)
+        {
+            val = val.Replace(',', '.');
+            return int.TryParse(val, out var r) ? r : null;
+        }
+
         private async Task SeedBoardsForUserFromFileAsync(AppDbContext context, XLWorkbook workbook, int userId)
         {
             _logger.LogInformation("[ProvisioningService_SeedBoardsForUserFromFileAsync] Rozpoczynanie seedowania plansz dla użytkownika {UserId}", userId);
@@ -211,7 +470,8 @@ namespace backend.Services
                     Cols = row.Cell(7).GetValue<int>(),
                     Border_Color = row.Cell(8).GetString(),
                     Cell_Color = row.Cell(9).GetString(),
-                    Borders_Colors = row.Cell(10).GetString()
+                    Borders_Colors = row.Cell(10).GetString(),
+                    Cells_Descriptions = row.Cell(11).GetString()
                 });
             }
 

@@ -255,7 +255,7 @@
 
           <!-- Plansza rywali -->
           <div class="w-full flex justify-center">
-            <GameBoard :config="enemyFormData" :game-mode="false" :pawns="enemyPawns" />
+            <GameBoard :config="enemyFormData" :game-mode="false" :pawns="enemyPawns" :use-percentage="true" />
           </div>
         </div>
 
@@ -515,6 +515,8 @@ interface Pawn {
   y: number
   color: string
   name: string
+  maxX: number
+  maxY: number
 }
 interface RawApiLog {
   logId: number
@@ -525,6 +527,7 @@ interface RawApiLog {
   cardTitle: string
   teamName: string
   feedbackDescription: string
+  enablerDescription?: string
   status: boolean
 }
 interface RawPendingLog {
@@ -541,6 +544,8 @@ interface RawPawnData {
   posY: string | number
   teamColor: string
   teamName: string
+  maxPosX?: number
+  maxPosY?: number
 }
 interface RivalBoardConfigFromApi {
   boardId: number
@@ -554,6 +559,7 @@ interface RivalBoardConfigFromApi {
   cellColor: string
   borderColor: string
   borderColors: string[]
+  cellsDescriptions?: string
 }
 interface BoardConfigForComponent {
   name: string
@@ -567,6 +573,7 @@ interface BoardConfigForComponent {
   borderColor: string
   borderColors: string[]
   boardId: number
+  cellsDescriptions?: string
 }
 interface GameDetails {
   deckId: number
@@ -606,6 +613,7 @@ const enemyFormData = reactive<BoardConfigForComponent>({
   borderColor: '#595959',
   borderColors: [],
   boardId: 0,
+  cellsDescriptions: '',
 })
 const pendingDecisions = ref<PendingDecision[]>([])
 const loadingPending = ref(true)
@@ -782,6 +790,7 @@ const fetchRivalBoard = async () => {
       enemyFormData.cellColor = config.cellColor
       enemyFormData.borderColor = config.borderColor
       enemyFormData.borderColors = config.borderColors
+      enemyFormData.cellsDescriptions = config.cellsDescriptions ?? ''
       await fetchRivalPawns()
     }
   } catch (error: any) {
@@ -802,6 +811,8 @@ const fetchRivalPawns = async () => {
       y: Number(p.posY),
       color: p.teamColor,
       name: p.teamName,
+      maxX: Number(p.maxPosX) || 1,
+      maxY: Number(p.maxPosY) || 1,
     }))
   } catch (err: any) {
     console.error(t('errorFetchingPawns'), err.response?.data || err.message)
@@ -837,6 +848,11 @@ async function executeAction(isCard: boolean) {
     wasSuccess = true
   }
 
+  const minEnablerId =
+    isCard && !wasSuccess && Array.isArray((entity as Card).enablers) && (entity as Card).enablers!.length > 0
+      ? Math.min(...((entity as Card).enablers as number[]))
+      : undefined
+
   const endpoint = wasSuccess
     ? apiConfig.player.playCardSuccess(entity.id)
     : apiConfig.player.playCardFailure(entity.id)
@@ -848,6 +864,7 @@ async function executeAction(isCard: boolean) {
     boardId: team.boardId,
     cost: entity.cost || 0,
     ForceExecution: true,
+    enablerId: minEnablerId,
   }
 
   try {

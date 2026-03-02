@@ -54,6 +54,7 @@ builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IPlayerQueryService, PlayerQueryService>();
 builder.Services.AddScoped<IPlayerActionService, PlayerActionService>();
 builder.Services.AddScoped<ICheatsheetService, CheatsheetService>();
+builder.Services.AddScoped<IEconomyService, EconomyService>();
 
 builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx => new BackgroundTaskQueue(100));
 builder.Services.AddHostedService<QueuedHostedService>();

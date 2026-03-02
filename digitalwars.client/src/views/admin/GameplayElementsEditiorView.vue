@@ -51,6 +51,18 @@
             <font-awesome-icon :icon="faLock" class="mr-2" />
           </template>
         </Button>
+
+        <Button
+          :label="t('economySettings')"
+          @click="currentView = 'economy'"
+          outlined
+          size="large"
+          :severity="currentView === 'economy' ? undefined : 'secondary'"
+        >
+          <template #icon>
+            <font-awesome-icon :icon="faCoins" class="mr-2" />
+          </template>
+        </Button>
       </div>
     </div>
 
@@ -59,6 +71,7 @@
       <EditItems v-model="selectedDeckId" v-else-if="currentView === 'items'" />
       <EditProccesses v-model="selectedDeckId" v-else-if="currentView === 'processes'" />
       <DynamicCheatSheetEdit v-model="selectedDeckId" v-else-if="currentView === 'enablers'" />
+      <DeckEconomySettings v-else-if="currentView === 'economy'" />
     </div>
   </div>
 </template>
@@ -68,13 +81,14 @@ import { ref } from 'vue'
 import EditDecisionCards from '@/components/game/EditDecisionCards.vue'
 import EditItems from '@/components/game/EditItems.vue'
 import EditProccesses from '@/components/game/EditProccesses.vue'
+import DeckEconomySettings from '@/components/game/DeckEconomySettings.vue'
 import Button from 'primevue/button'
-import { faMicrochip, faChessPawn, faClone, faLock } from '@fortawesome/free-solid-svg-icons'
+import { faMicrochip, faChessPawn, faClone, faLock, faCoins } from '@fortawesome/free-solid-svg-icons'
 import DynamicCheatSheetEdit from '@/components/cheatSheet/DynamicCheatSheetEdit.vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-const currentView = ref<'items' | 'decisions' | 'processes' | 'enablers'>('decisions')
+const currentView = ref<'items' | 'decisions' | 'processes' | 'enablers' | 'economy'>('decisions')
 const selectedDeckId = ref<number | undefined>(undefined)
 </script>

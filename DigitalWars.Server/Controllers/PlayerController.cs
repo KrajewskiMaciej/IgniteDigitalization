@@ -42,6 +42,7 @@ namespace backend.Controllers
             var rawTeamData = await _context.Teams
                 .Include(t => t.Games)
                     .ThenInclude(g => g.Teams_Boards)
+                .Include(t => t.CurrentPhase)
                 .Where(t => t.Teams_Id == teamId && t.Games_Id == gameId)
                 .Select(t => new // Użyj anonimowego obiektu do pobrania danych
                 {
@@ -50,7 +51,9 @@ namespace backend.Controllers
                     t.Teams_Bud,
                     t.Teams_Color,
                     t.Games.Decks_Id,
-                    Board = t.Games.Teams_Boards // Pobierz cały obiekt Board
+                    Board = t.Games.Teams_Boards, // Pobierz cały obiekt Board
+                    t.Current_Phase_Id,
+                    CurrentPhaseName = t.CurrentPhase != null ? t.CurrentPhase.Phase_Name : null
                 })
                 .FirstOrDefaultAsync();
 
@@ -67,6 +70,8 @@ namespace backend.Controllers
                 TeamColor = rawTeamData.Teams_Color,
                 TeamBud = rawTeamData.Teams_Bud,
                 DeckId = rawTeamData.Decks_Id,
+                CurrentPhaseId = rawTeamData.Current_Phase_Id,
+                CurrentPhaseName = rawTeamData.CurrentPhaseName,
                 BoardConfig = new BoardConfigDto
                 {
                     BoardId = rawTeamData.Board.Boards_Id,
@@ -79,7 +84,8 @@ namespace backend.Controllers
                     Cols = rawTeamData.Board.Cols,
                     CellColor = rawTeamData.Board.Cell_Color,
                     BorderColor = rawTeamData.Board.Border_Color,
-                    BorderColors = rawTeamData.Board.Borders_Colors.Split(';') // Bezpieczne wywołanie
+                    BorderColors = rawTeamData.Board.Borders_Colors.Split(';'), // Bezpieczne wywołanie
+                    CellsDescriptions = rawTeamData.Board.Cells_Descriptions ?? string.Empty
                 }
             };
 
@@ -351,20 +357,7 @@ namespace backend.Controllers
         [HttpGet("rival-board")]
         public async Task<IActionResult> GetRivalBoardData([FromQuery] int gameId, [FromQuery] int boardId)
         {
-            // POPRAWKA: Zaimplementowano brakującą logikę bezpośrednio w kontrolerze (błąd CS1061)
-            var pawns = await _context.GameBoards
-            .Include(p => p.Teams)
-                .Where(p => p.Games_Id == gameId && p.Boards_Id == boardId && p.Games_Processes_Id == null)
-                .Select(p => new
-                { // Zwróć dane w odpowiednim formacie DTO, jeśli istnieje
-                    TeamId = p.Teams_Id,
-                    PosX = p.Poz_X,
-                    PosY = p.Poz_Y,
-                    TeamColor = p.Teams.Teams_Color,
-                    TeamName = p.Teams.Teams_Name
-                })
-                .ToListAsync();
-
+            var pawns = await _queryService.GetRivalPawnsForBoardAsync(gameId, boardId);
             return Ok(pawns);
         }
 
@@ -403,7 +396,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("failure/{cardId}")]
-        public async Task<IActionResult> SendFailure(int cardId, int enablerId, [FromBody] CardDataDto cardData)
+        public async Task<IActionResult> SendFailure(int cardId, [FromBody] CardDataDto cardData)
         {
             // Log wejściowy
             _logger.LogInformation("[PlayerController_SendFailure] Otrzymano żądanie. CardId: {CardId}, TeamId: {TeamId}, GameId: {GameId}, Cost: {Cost}, Force: {Force}",
@@ -411,7 +404,7 @@ namespace backend.Controllers
 
             try
             {
-                var result = await _actionService.PlayCardAsync(cardId, enablerId, cardData, wasSuccess: false);
+                var result = await _actionService.PlayCardAsync(cardId, cardData.EnablerId, cardData, wasSuccess: false);
 
                 // Log sukcesu
                 _logger.LogInformation("[PlayerController_SendFailure] Żądanie zakończone sukcesem dla CardId: {CardId}.", cardId);
@@ -475,6 +468,7 @@ namespace backend.Controllers
                 .Include(l => l.Cards)       // Dołączenie Cards dla publicznego Card_Id
                 .Include(l => l.Feedbacks)   // Dołączenie Feedbacks dla opisu
                 .Include(l => l.Games_Events) // Dołączenie Games_Events dla opisu wydarzenia
+                .Include(l => l.EnablerFeedbacks)
                 .Where(l => l.Games_Id == request.GameId && l.Is_Approved == true);
 
             // POPRAWKA: Dynamiczne dodawanie warunku filtrowania po TeamId
@@ -586,7 +580,8 @@ namespace backend.Controllers
                     cols = config.Cols,
                     cellColor = config.Cell_Color,
                     borderColor = config.Border_Color,
-                    borderColors = config.Borders_Colors?.Split(';')
+                    borderColors = config.Borders_Colors?.Split(';'),
+                    cellsDescriptions = config.Cells_Descriptions ?? string.Empty
                 }
             });
         }

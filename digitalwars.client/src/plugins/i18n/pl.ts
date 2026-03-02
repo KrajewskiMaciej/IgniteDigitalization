@@ -66,10 +66,9 @@ export const pl = {
   language: 'Język',
   accountLanguage: 'Język konta',
 
-
   //Player
-  yourBoard: 'Twoja plansza',
-  rivalBoard: 'Plansza konkurencji',
+  yourBoard: 'Plansza rynku',
+  rivalBoard: 'Plansza Przygotowawcza',
   market: 'Rynek',
   hide: 'Ukryj',
   show: 'Pokaż',
@@ -100,6 +99,25 @@ export const pl = {
   gameNamePlaceholder: 'Nazwa gry...',
   selectBoardPlaceholder: 'Wybierz planszę...',
   selectDeckPlaceholder: 'Wybierz talię kart...',
+  selectTraining: 'Wybierz szkolenie',
+  selectTrainingPlaceholder: 'Wybierz szkolenie...',
+  training: 'Szkolenie',
+  trainings: 'Szkolenia',
+  defaultTeamsBoard: 'Domyślna plansza Rynku',
+  defaultRivalsBoard: 'Domyślna plansza Przygotowawcza',
+  defaultBoards: 'Domyślne plansze',
+  selectTrainingFirst: 'Najpierw wybierz szkolenie',
+  boardsAutoFilledFromTraining: 'Plansze uzupełnione automatycznie ze szkolenia.',
+  economySettings: 'Zasady ekonomii',
+  map1Budget: 'Mapa 1 – Budżet startowy',
+  map2Budget: 'Mapa 2 – Budżet rynkowy',
+  prepMultiplier: 'Mnożnik przygotowania',
+  saveEconomySettings: 'Zapisz zasady ekonomii',
+  importEconomySettings: 'Importuj zasady ekonomii',
+  economySettingsSaved: 'Zasady ekonomii zostały zapisane.',
+  economySettingsImported: 'Zasady ekonomii zostały zaimportowane.',
+  errorSavingEconomySettings: 'Błąd podczas zapisywania zasad ekonomii. Spróbuj ponownie.',
+  errorImportingEconomySettings: 'Błąd podczas importowania zasad ekonomii. Spróbuj ponownie.',
   selectGameType: 'Wybierz typ rozgrywki',
   remoteGame: 'Gra zdalna',
   stationaryGame: 'Gra stacjonarna',
@@ -124,8 +142,12 @@ export const pl = {
   noProcessesAvailableForSelectedDeck: 'Brak dostępnych procesów dla wybranej talii.',
   enterGameName: 'Wprowadź nazwę gry',
   selectBoard: 'Wybierz planszę',
-  selectRivalBoard: 'Wybierz planszę konkurencji',
-  selectDeck: 'Wybierz talię kart',
+  selectTeamBoard: 'Wybierz planszę Rynku',
+  selectTeamBoardPlaceholder: 'Wybierz planszę Rynku...',
+  selectRivalBoard: 'Wybierz planszę Przygotowawczą',
+  trainingHasNoDefaultBoards:
+    'Szkolenie nie ma przypisanych domyślnych plansz – wybierz je poniżej:',
+  selectDeck: 'Wybierz szkolenie',
   pleaseEnterTeamNames: 'Proszę wprowadzić nazwy drużyn.',
   numberOfBitsMustBeBetween: 'Liczba bitów na start musi być pomiędzy 1 a 100000.',
   pleaseSelectAtLeastOneProcess: 'Proszę wybrać co najmniej jeden proces do gry.',
@@ -139,11 +161,14 @@ export const pl = {
   confirmGameAction: 'Czy na pewno chcesz {action} grę "{gameName}"?',
   noCardAvailableInThisCategory: 'Brak dostępnych kart w tej kategorii.',
   stage: 'Etap',
+  phasePrep: 'Przygotowawczy',
+  phaseMarket: 'Rynkowy',
   decisions: 'Decyzje',
   loadingDecisionHistory: 'Ładowanie historii decyzji...',
   noDecisionHistory: 'Brak historii decyzji.',
   newEvent: 'Nowe wydarzenie',
   result: 'Rezultat',
+  hint: 'Podpowiedź',
   noActiveGameOrInvalidGameId: 'Brak aktywnej gry lub nieprawidłowy identyfikator gry.',
   supportMaterials: 'Materiały pomocnicze',
   supportMaterialsDescription: 'Dokumenty i narzędzia do zarządzania grą',
@@ -189,6 +214,11 @@ export const pl = {
   in: 'za',
   seconds: 'sekund',
 
+  //Phase two modal
+  phaseTwoTitle: 'Drugi etap gry',
+  phaseTwoIntro: 'Gra wchodzi w drugi etap. Drużyna',
+  phaseTwoInfo: 'Rozpoczyna się faza rynkowa. Czas na wdrożenie strategii na rynku!',
+
   //Not independent team modal
   dependentTeamTitle: 'Drużyna zależna',
   dependentTeamInfo:
@@ -215,6 +245,17 @@ export const pl = {
   initializingCamera: 'Inicjalizacja kamery...',
   cancel: 'Anuluj',
 
+  //QR Card Scanner
+  scanCardQrHint: 'Naceluj kamerę na kod QR fizycznej karty',
+  switchToCardList: 'Przełącz na listę kart',
+  switchToScanner: 'Przełącz na skaner QR',
+  confirmCardPlay: 'Potwierdź zagranie karty',
+  confirmCardPlayHint: 'Czy to jest karta, którą chcesz zagrać?',
+  cardNotFound: 'Nie znaleziono karty o podanym numerze',
+  qrNotACard: 'Zeskanowany kod nie jest kartą',
+  cardPlayed: 'Karta zagrana pomyślnie',
+  cameraError: 'Nie można uruchomić kamery. Sprawdź uprawnienia.',
+
   //Auth password requirements
   passwordRequirementLength: 'Co najmniej 8 znaków',
   passwordRequirementUppercase: 'Co najmniej jedna wielka litera',
@@ -233,24 +274,25 @@ export const pl = {
   teamHasNotEnoughBits:
     'Drużyna {teamName} nie ma wystarczającej ilości bitów, aby zagrać tę kartę.',
   accept: 'Akceptuj',
-  errorFetchingDeckId: 'Wystąpił błąd podczas pobierania identyfikatora talii. Spróbuj ponownie.',
+  errorFetchingDeckId:
+    'Wystąpił błąd podczas pobierania identyfikatora szkolenia. Spróbuj ponownie.',
   errorFetchingTeamsInfo:
     'Wystąpił błąd podczas pobierania informacji o zespołach. Spróbuj ponownie.',
   errorFetchingEnablers:
     'Wystąpił błąd podczas pobierania informacji o aktywatorach. Spróbuj ponownie.',
   errorFetchingDecisionCards: 'Wystąpił błąd podczas pobierania kart decyzji. Spróbuj ponownie.',
   errorFetchingItems: 'Wystąpił błąd podczas pobierania przedmiotów. Spróbuj ponownie.',
-  errorFetchingDecks: 'Wystąpił błąd podczas pobierania talii. Spróbuj ponownie.',
+  errorFetchingDecks: 'Wystąpił błąd podczas pobierania szkoleń. Spróbuj ponownie.',
   errorSavingEnablerChanges:
     'Wystąpił błąd podczas zapisywania zmian aktywatorów kart. Spróbuj ponownie.',
   errorFetchigBoards: 'Wystąpił błąd podczas pobierania plansz. Spróbuj ponownie.',
   errorFetchingProcesses: 'Wystąpił błąd podczas pobierania procesów. Spróbuj ponownie.',
   errorCreatingGame: 'Wystąpił błąd podczas tworzenia gry. Spróbuj ponownie.',
   errorFetchingFeedbacks: 'Wystąpił błąd podczas pobierania feedbacków',
-  errorUploadingDeckFile: 'Wystąpił błąd podczas przesyłania pliku talii. Spróbuj ponownie.',
+  errorUploadingDeckFile: 'Wystąpił błąd podczas przesyłania pliku szkolenia. Spróbuj ponownie.',
   errorDownloadingCardsTemplate:
     'Wystąpił błąd podczas pobierania szablonu kart. Spróbuj ponownie.',
-  errorSavingDeckName: 'Wystąpił błąd podczas zapisywania nazwy talii. Spróbuj ponownie.',
+  errorSavingDeckName: 'Wystąpił błąd podczas zapisywania nazwy szkolenia. Spróbuj ponownie.',
   errorSavingCard: 'Wystąpił błąd podczas zapisywania karty. Spróbuj ponownie.',
   errorSavingFeedback: 'Wystąpił błąd podczas zapisywania feedbacku. Spróbuj ponownie.',
   errorSavingItem: 'Wystąpił błąd podczas zapisywania przedmiotu. Spróbuj ponownie.',
@@ -271,7 +313,7 @@ export const pl = {
   errorFetchingDecsionHistory:
     'Wystąpił błąd podczas pobierania historii decyzji. Spróbuj ponownie.',
   errorFetchingSuggestions: 'Wystąpił błąd podczas pobierania sugestii. Spróbuj ponownie.',
-  noDeckId: 'Brak identyfikatora talii. Spróbuj ponownie.',
+  noDeckId: 'Brak identyfikatora szkolenia. Spróbuj ponownie.',
   errorFetchingGameEvents: 'Wystąpił błąd podczas pobierania zdarzeń gry. Spróbuj ponownie.',
   errorFetchingRivalBoard:
     'Wystąpił błąd podczas pobierania danych planszy rywala. Spróbuj ponownie.',
@@ -288,11 +330,11 @@ export const pl = {
   criticalGameIdError: 'Błąd krytyczny: Brak lub nieprawidłowe ID gry!',
 
   //Decision cards
-  manageCardsInTheDeck: 'Zarządzaj kartami decyzji w talii kart',
-  loadDeckFromExcel: 'Wczytaj talię kart z pliku Excel',
+  manageCardsInTheDeck: 'Zarządzaj kartami w szkoleniu',
+  loadDeckFromExcel: 'Wczytaj szkolenie z pliku Excel',
   downloadCardTemplate: 'Pobierz szablon kart',
-  deckName: 'Nazwa talii kart',
-  deckNamePlaceholder: 'Nazwa talii kart...',
+  deckName: 'Nazwa szkolenia',
+  deckNamePlaceholder: 'Nazwa szkolenia...',
   changeName: 'Zmień nazwę',
   loadingCards: 'Ładowanie kart...',
   selectCard: 'Wybierz kartę',
@@ -309,11 +351,11 @@ export const pl = {
   feedbackDescription: 'Opis feedbacku',
   feedbackDescriptionPlaceholder: 'Opis feedbacku...',
   saveFeedback: 'Zapisz feedback',
-  selectDeckToEditDecisionCards: 'Wybierz talię kart aby zarządzać kartami decyzji',
+  selectDeckToEditDecisionCards: 'Wybierz szkolenie aby zarządzać kartami decyzji',
   cardEdit: 'Edycja karty',
   fileSuccessfullyUploadedAndDeckCreated:
-    'Plik został pomyślnie przesłany, a talia kart została utworzona.',
-  deckNameCannotBeEmpty: 'Nazwa talii kart nie może być pusta!',
+    'Plik został pomyślnie przesłany i szkolenie zostało utworzone.',
+  deckNameCannotBeEmpty: 'Nazwa szkolenia nie może być pusta!',
   editDecisionCards: 'Edytuj karty decyzji',
   decisionCards: 'Karty decyzji',
 
@@ -357,11 +399,11 @@ export const pl = {
   selectItemPlaceholder: 'Wybierz przedmiot...',
   itemEdition: 'Edycja przedmiotu',
   itemsEdition: 'Edycja przedmiotów',
-  selectDeckToEditItems: 'Wybierz talię kart aby edytować przedmioty',
+  selectDeckToEditItems: 'Wybierz szkolenie aby edytować przedmioty',
   useItem: 'Użyj przedmiotu',
 
   //Processes
-  manageProcessesInTheDeck: 'Zarządzaj procesami w talii kart',
+  manageProcessesInTheDeck: 'Zarządzaj procesami w szkoleniu',
   editProcesses: 'Edytuj procesy',
   processName: 'Nazwa procesu',
   processNamePlaceholder: 'Nazwa procesu...',
@@ -375,7 +417,7 @@ export const pl = {
   selectProcessPlaceholder: 'Wybierz proces...',
   newProcess: 'Nowy proces',
   processEdition: 'Edycja procesu',
-  selectDeckToEditProcesses: 'Wybierz talię kart aby edytować procesy',
+  selectDeckToEditProcesses: 'Wybierz szkolenie aby edytować procesy',
   processColor: 'Kolor procesu',
   clickToEditColor: 'Kliknij, aby edytować kolor',
   clickToSelectColor: 'Kliknij, aby wybrać kolor',
@@ -389,7 +431,7 @@ export const pl = {
   loadingTeams: 'Ładowanie drużyn...',
   selectTeamLabel: 'Wybierz drużynę:',
   selectTeamPlaceholder: 'Wybierz drużynę...',
-  bits: 'bitów',
+  bits: 'Bity',
   currentBudget: 'Aktualny budżet:',
   newBudget: 'Nowy budżet:',
   enterNewBudgetPlaceholder: 'Wprowadź nowy budżet...',
@@ -435,7 +477,7 @@ export const pl = {
   atLeastOneUpLabel: 'Musi istnieć co najmniej jedna etykieta górna!',
   selectBoardTemplate: 'Wybierz szablon planszy',
   selectBoardToEdit: 'Wybierz planszę do edycji',
-  selectRivalBoardPlaceholder: 'Wybierz planszę konkurencji...',
+  selectRivalBoardPlaceholder: 'Wybierz planszę Przygotowawczą...',
   addBoard: 'Dodaj planszę',
   gameBoardPreview: 'Podgląd planszy gry',
   noBoardSelected: 'Nie wybrano planszy.',
@@ -498,9 +540,9 @@ export const pl = {
   cardEnablers: 'Aktywatory kart',
   manageCardEnablersDescription:
     'Zarządzaj aktywatorami kart, które wpływają na dostępność kart decyzji dla zespołów podczas gry.',
-  deckSelection: 'Wybór talii',
+  deckSelection: 'Wybór szkolenia',
   decisionTree: 'Drzewo decyzyji',
-  selectDeckToEditEnablers: 'Wybierz talię, aby edytować aktywatory kart',
+  selectDeckToEditEnablers: 'Wybierz szkolenie, aby edytować aktywatory kart',
 
   suggectCard: 'Zasugeruj kartę',
   playCard: 'Zagraj kartę',

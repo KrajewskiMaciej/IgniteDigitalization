@@ -13,7 +13,7 @@
           <!-- Dropdown button -->
           <button
             @click="isDropdownOpen = !isDropdownOpen"
-            class="w-full py-4 px-4 bg-secondary backdrop-blur-sm rounded-t-2xl text-center text-surface-900 text-lg font-semibold transition-all duration-300 cursor-pointer flex items-center justify-between"
+            class="w-full py-4 px-4 bg-accent backdrop-blur-sm rounded-t-2xl text-center text-surface-200 text-lg font-semibold transition-all duration-300 cursor-pointer flex items-center justify-between"
           >
             <span class="flex-1">
               {{ selectedCard ? `${selectedCard.id}: ${selectedCard.title}` : t('selectCard') }}
@@ -230,7 +230,6 @@ const buttonLabel = computed(() => {
 })
 
 async function fetchCards() {
-  console.log('Będę pobierać karty z API...')
   const { deckId, gameId, teamId } = props
   if (deckId == null || gameId == null || teamId == null) {
     fetchError.value = 'Brak wymaganych danych do pobrania kart.'
@@ -291,6 +290,9 @@ const sendCardSelection = async () => {
   const hasEnablers = Array.isArray(enablers) && enablers.length > 0
   const hasSufficientBudget = props.currentBudget >= cost
   const isSuccess = !hasEnablers && hasSufficientBudget
+  const apiUrl = isSuccess
+    ? apiConfig.player.playCardSuccess(cardId)
+    : apiConfig.player.playCardFailure(cardId)
 
   const cardPlayData = {
     gameId: props.gameId,
@@ -299,11 +301,8 @@ const sendCardSelection = async () => {
     boardId: props.boardId,
     gameProcessId: props.gameProcessId,
     cost: cost,
+    enablerId: hasEnablers ? Math.min(...(enablers as number[])) : undefined,
   }
-
-  const apiUrl = isSuccess
-    ? apiConfig.player.playCardSuccess(cardId)
-    : apiConfig.player.playCardFailure(cardId)
 
   try {
     const response = await apiServices.post<{ message?: string; newTeamBudget: number }>(
@@ -322,6 +321,7 @@ const sendCardSelection = async () => {
 
 defineExpose({
   fetchCards,
+  hasItemCards: computed(() => itemCards.value.length > 0),
 })
 
 watch(displayCards, () => {

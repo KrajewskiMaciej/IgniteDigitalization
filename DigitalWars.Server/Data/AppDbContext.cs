@@ -26,6 +26,7 @@ namespace backend.Data
         public DbSet<GameLog> GameLogs { get; set; }
         public DbSet<GameProcess> GameProcesses { get; set; }
         public DbSet<GameLogSpec> GameLogSpecs { get; set; }
+        public DbSet<DeckEconomySettings> DeckEconomySettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,6 +53,7 @@ namespace backend.Data
             modelBuilder.Entity<GameProcess>(e => e.HasKey(p => p.Games_Processes_Id));
             modelBuilder.Entity<GameLogSpec>(e => e.HasKey(p => p.Games_Logs_Specs_Id));
             modelBuilder.Entity<Phase>(e => e.HasKey(p => p.Phases_Id));
+            modelBuilder.Entity<DeckEconomySettings>(e => e.HasKey(p => p.DeckEconomySettings_Id));
 
             // Zastąp istniejącą konfigurację relacji Game -> Board tą poniżej
             modelBuilder.Entity<Board>()
@@ -123,6 +125,28 @@ namespace backend.Data
                 .WithMany()
                 .HasForeignKey(d => d.Users_Id);
 
+            modelBuilder.Entity<Deck>()
+                .HasOne(d => d.DefaultTeamsBoard)
+                .WithMany()
+                .HasForeignKey(d => d.Default_Teams_Boards_Id)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Deck>()
+                .HasOne(d => d.DefaultRivalsBoard)
+                .WithMany()
+                .HasForeignKey(d => d.Default_Rivals_Boards_Id)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<DeckEconomySettings>()
+                .HasOne(es => es.Deck)
+                .WithOne(d => d.EconomySettings)
+                .HasForeignKey<DeckEconomySettings>(es => es.Decks_Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DeckEconomySettings>()
+                .HasIndex(es => es.Decks_Id)
+                .IsUnique();
+
             modelBuilder.Entity<Feedback>()
                 .HasOne(f => f.Cards)
                 .WithMany()
@@ -132,11 +156,6 @@ namespace backend.Data
                 .HasOne(g => g.Decks)
                 .WithMany()
                 .HasForeignKey(g => g.Decks_Id);
-
-            modelBuilder.Entity<Game>()
-                .HasOne(g => g.Phases)
-                .WithMany()
-                .HasForeignKey(g => g.Phases_Id);
 
             modelBuilder.Entity<Game>()
                 .HasOne(g => g.Users)
@@ -263,6 +282,12 @@ namespace backend.Data
                 .HasOne(t => t.Games_Events)
                 .WithMany(ge => ge.Teams)
                 .HasForeignKey(t => t.Games_Events_Id);
+
+            modelBuilder.Entity<Team>()
+                .HasOne(t => t.CurrentPhase)
+                .WithMany()
+                .HasForeignKey(t => t.Current_Phase_Id)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

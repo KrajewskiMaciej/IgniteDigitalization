@@ -5,7 +5,7 @@
       <div class="text-xl font-bold text-green-600">
         {{ t('bits') }}: {{ currentBudget }}
       </div>
-      <div class="text-md font-semibold text-primary-400">{{ t('stage') }}</div>
+      <div class="text-md font-semibold text-primary-400">{{ phaseDisplayLabel }}</div>
     </div>
 
     <div
@@ -71,6 +71,9 @@
                 <p class="text-xs text-gray-300 leading-relaxed">
                   {{ decision.description }}
                 </p>
+                <p v-if="decision.hint" class="text-xs text-gray-300 leading-relaxed">
+                  {{ t('hint') }}: {{ decision.hint }}
+                </p>
               </div>
             </div>
           </li>
@@ -97,6 +100,7 @@ interface ApiLogEntry {
   cardId: number
   status: boolean
   feedbackDescription?: string
+  enablerDescription?: string
   cost: number
   gameEventId: number | null
 }
@@ -105,6 +109,7 @@ interface ApiLogEntry {
 interface ProcessedLogEntry {
   isEventNotification: boolean
   description: string
+  hint?: string
   choice: string
   cardId: number
   result: 'Pozytywny' | 'Negatywny'
@@ -119,6 +124,12 @@ const error = ref<string | null>(null)
 const props = defineProps({
   gameId: Number,
   teamId: Number,
+  currentPhaseName: String,
+})
+
+const phaseDisplayLabel = computed(() => {
+  if (props.currentPhaseName === 'Rynkowa') return `${t('stage')}: 2 - ${t('phaseMarket')}`
+  return `${t('stage')}: 1 - ${t('phasePrep')}`
 })
 
 const emit = defineEmits(['budget-changed-in-menu'])
@@ -160,11 +171,11 @@ async function fetchData() {
           description:
             log.feedbackDescription ||
             (log.cost !== undefined ? `Koszt: ${log.cost}` : 'Brak opisu'),
+            hint: log.enablerDescription || undefined,
           eventApplied: log.gameEventId != null,
         }
       })
     }
-    console.log('Przetworzone logi historii:', gameLogEntries.value)
     currentBudget.value = budgetResponse.data.budget
     emit('budget-changed-in-menu', currentBudget.value)
   } catch (err: any) {

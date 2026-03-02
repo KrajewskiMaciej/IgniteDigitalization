@@ -22,11 +22,13 @@ namespace backend.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IProvisioningService _provisioningService;
+        private readonly IEconomyService _economyService;
 
-        public DeckController(AppDbContext context, IProvisioningService provisioningService)
+        public DeckController(AppDbContext context, IProvisioningService provisioningService, IEconomyService economyService)
         {
             _context = context;
             _provisioningService = provisioningService;
+            _economyService = economyService;
         }
 
         [HttpPost("upload")]
@@ -83,27 +85,44 @@ namespace backend.Controllers
         {
             var userId = CurrentUserId;
             if (userId == null)
-            {
                 return Unauthorized("Brak danych uwierzytelniającego użytkownika.");
-            }
 
             var deckToEdit = await _context.Decks
                 .FirstOrDefaultAsync(deck => deck.Decks_Id == dto.Decks_Id && deck.Users_Id == userId.Value);
 
             if (deckToEdit == null)
-            {
-                return NotFound("Nie znaleziono talii o podanym ID lub nie masz do niej uprawnień.");
-            }
+                return NotFound("Nie znaleziono szkolenia o podanym ID lub nie masz do niego uprawnień.");
 
             if (string.IsNullOrWhiteSpace(dto.Decks_Name))
-            {
-                return BadRequest("Nazwa talii nie może być pusta.");
-            }
+                return BadRequest("Nazwa Szkolenia nie może być pusta.");
 
             deckToEdit.Deck_Name = dto.Decks_Name;
-            await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Nazwa talii została pomyślnie zaktualizowana." });
+            // Aktualizacja domyślnych plansz (jeśli podano)
+            if (dto.Default_Teams_Boards_Id.HasValue)
+            {
+                var boardExists = await _context.Boards.AnyAsync(b => b.Boards_Id == dto.Default_Teams_Boards_Id.Value && b.Users_Id == userId.Value);
+                if (!boardExists) return BadRequest("Domyślna plansza drużynowa nie istnieje lub nie należy do Ciebie.");
+                deckToEdit.Default_Teams_Boards_Id = dto.Default_Teams_Boards_Id.Value;
+            }
+            else
+            {
+                deckToEdit.Default_Teams_Boards_Id = null;
+            }
+
+            if (dto.Default_Rivals_Boards_Id.HasValue)
+            {
+                var boardExists = await _context.Boards.AnyAsync(b => b.Boards_Id == dto.Default_Rivals_Boards_Id.Value && b.Users_Id == userId.Value);
+                if (!boardExists) return BadRequest("Domyślna plansza rynkowa nie istnieje lub nie należy do Ciebie.");
+                deckToEdit.Default_Rivals_Boards_Id = dto.Default_Rivals_Boards_Id.Value;
+            }
+            else
+            {
+                deckToEdit.Default_Rivals_Boards_Id = null;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Szkolenie zostało pomyślnie zaktualizowane." });
         }
 
         [HttpGet("get")]
@@ -115,7 +134,15 @@ namespace backend.Controllers
             var decks = await _context.Decks
                 .AsNoTracking()
                 .Where(deck => deck.Users_Id == userId.Value)
-                .Select(deck => new { id = deck.Decks_Id, title = deck.Deck_Name })
+                .Select(deck => new DeckListItemDto
+                {
+                    Id = deck.Decks_Id,
+                    Title = deck.Deck_Name,
+                    DefaultTeamsBoardId = deck.Default_Teams_Boards_Id,
+                    DefaultRivalsBoardId = deck.Default_Rivals_Boards_Id,
+                    DefaultTeamsBoardName = deck.DefaultTeamsBoard != null ? deck.DefaultTeamsBoard.Name : null,
+                    DefaultRivalsBoardName = deck.DefaultRivalsBoard != null ? deck.DefaultRivalsBoard.Name : null,
+                })
                 .ToListAsync();
 
             return Ok(decks);
@@ -288,6 +315,67 @@ namespace backend.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { message = "Przedmiot został pomyślnie zaktualizowany." });
         }
+
+        // --- Zasady ekonomii Szkolenia ---
+
+        [HttpGet("{deckId}/economy")]
+        public async Task<IActionResult> GetEconomySettings(int deckId)
+        {
+            var userId = CurrentUserId;
+            if (userId == null) return Unauthorized();
+
+            var deckExists = await _context.Decks.AnyAsync(d => d.Decks_Id == deckId && d.Users_Id == userId.Value);
+            if (!deckExists) return NotFound("Szkolenie nie istnieje lub brak dostępu.");
+
+            var settings = await _economyService.GetEconomySettingsAsync(deckId);
+            return Ok(settings);
+        }
+
+        [HttpPut("{deckId}/economy")]
+        public async Task<IActionResult> UpdateEconomySettings(int deckId, [FromBody] UpdateDeckEconomySettingsDto dto)
+        {
+            var userId = CurrentUserId;
+            if (userId == null) return Unauthorized();
+
+            var deckExists = await _context.Decks.AnyAsync(d => d.Decks_Id == deckId && d.Users_Id == userId.Value);
+            if (!deckExists) return NotFound("Szkolenie nie istnieje lub brak dostępu.");
+
+            var result = await _economyService.UpdateEconomySettingsAsync(deckId, dto);
+            return Ok(result);
+        }
+
+        [HttpPost("{deckId}/economy/import")]
+        public async Task<IActionResult> ImportEconomySettings(int deckId, IFormFile file)
+        {
+            var userId = CurrentUserId;
+            if (userId == null) return Unauthorized();
+
+            var deckExists = await _context.Decks.AnyAsync(d => d.Decks_Id == deckId && d.Users_Id == userId.Value);
+            if (!deckExists) return NotFound("Szkolenie nie istnieje lub brak dostępu.");
+
+            try
+            {
+                await _provisioningService.ImportEconomySettingsFromFileAsync(deckId, file);
+                return Ok(new { message = "Zasady ekonomii zostały zaimportowane pomyślnie." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Błąd: {ex.Message}" });
+            }
+        }
+
+        [HttpGet("{gameId}/economy-preview")]
+        public async Task<IActionResult> GetGameEconomyPreview(int gameId)
+        {
+            var userId = CurrentUserId;
+            if (userId == null) return Unauthorized();
+
+            var preview = await _economyService.GetGameEconomyPreviewAsync(gameId);
+            return Ok(preview);
+        }
     }
 }
-

@@ -17,8 +17,6 @@ namespace backend.Data
         public Board Rivals_Boards { get; set; } = null!;
         public int Decks_Id { get; set; }
         public Deck Decks { get; set; } = null!;
-        public int? Phases_Id { get; set; }
-        public Phase? Phases { get; set; }
         public int Users_Id { get; set; }
         public User Users { get; set; } = null!;
 

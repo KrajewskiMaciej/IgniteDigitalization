@@ -23,13 +23,15 @@ namespace backend.Services
         private readonly IPlayerService _playerPosService;
         private readonly IHubContext<GameHub> _hubContext;
         private readonly ILogger<PlayerActionService> _logger;
+        private readonly IEconomyService _economyService;
 
-        public PlayerActionService(AppDbContext context, IPlayerService playerPosService, IHubContext<GameHub> hubContext, ILogger<PlayerActionService> logger)
+        public PlayerActionService(AppDbContext context, IPlayerService playerPosService, IHubContext<GameHub> hubContext, ILogger<PlayerActionService> logger, IEconomyService economyService)
         {
             _context = context;
             _playerPosService = playerPosService;
             _hubContext = hubContext;
             _logger = logger;
+            _economyService = economyService;
         }
 
         public async Task<object> PlayCardAsync(int cardId, int? enablerId, CardDataDto cardData, bool wasSuccess)
@@ -37,7 +39,9 @@ namespace backend.Services
             _logger.LogInformation("[ActionService_PlayCardAsync] Rozpoczęcie przetwarzania. CardId: {CardId}, TeamId: {TeamId}, WasSuccess: {WasSuccess}, BaseCost: {Cost}",
                 cardId, cardData.TeamId, wasSuccess, cardData.Cost);
 
-            var cardEntity = await _context.Cards.FirstOrDefaultAsync(c => c.Card_Id == cardId && c.Decks_Id == cardData.DeckId);
+            var cardEntity = await _context.Cards
+                .Include(c => c.Phase)
+                .FirstOrDefaultAsync(c => c.Card_Id == cardId && c.Decks_Id == cardData.DeckId);
             if (cardEntity == null)
             {
                 _logger.LogError("[ActionService_PlayCardAsync] Karta nie znaleziona: {CardId}", cardId);
@@ -117,8 +121,8 @@ namespace backend.Services
                     .FirstOrDefaultAsync(ce => ce.Cards_Id == cardEntity.Cards_Id && ce.Enablers_Id == enablerId);
             }
 
-            _logger.LogInformation("[ActionService_PlayCardAsync] Status karty: {FinalStatus}. Znaleziono FeedbackId: {FeedbackId}",
-                finalStatus, feedback?.Feedbacks_Id);
+            _logger.LogInformation("[ActionService_PlayCardAsync] Status karty: {FinalStatus}. Znaleziono FeedbackId: {FeedbackId}. Znaleziono EnablerId: {EnablerId}",
+                finalStatus, feedback?.Feedbacks_Id, enabler?.Cards_Enablers_Id);
 
             var gameLogEntry = new GameLog
             {
@@ -148,6 +152,11 @@ namespace backend.Services
 
             _logger.LogInformation("[ActionService_PlayCardAsync] Znaleziono {Count} wag (CardWeights) dla karty.", cardWeights.Count);
 
+            // Dla kart Fazy 2 ("Rynkowa", Phases_Id == 3) wagi są mnożone przez mnożnik przygotowania.
+            // Mnożnik jest zamrożony przy wejściu w Fazę 2 i zapisany w GameProcess.Games_Processes_Weights (* 100).
+            // Dzięki temu jest niezmienny dla wszystkich kart Fazy 2 – niezależnie od kolejności ich zagrania.
+            bool isPhase2Card = cardEntity.Phases_Id == 3;
+
             foreach (var cardWeight in cardWeights)
             {
                 var gameProcess = await _context.GameProcesses
@@ -158,17 +167,28 @@ namespace backend.Services
 
                 if (gameProcess != null)
                 {
+                    // Odczytaj zamrożony mnożnik z GameProcess (1.0 jeśli nie ustawiony lub karta Fazy 1)
+                    double prepMultiplier = 1.0;
+                    if (isPhase2Card && gameProcess.Games_Processes_Weights.HasValue && gameProcess.Games_Processes_Weights.Value > 0)
+                    {
+                        prepMultiplier = gameProcess.Games_Processes_Weights.Value / 100.0;
+                        _logger.LogInformation("[ActionService_PlayCardAsync] Karta Fazy 2 – zamrożony mnożnik przygotowania: {Multiplier}", prepMultiplier);
+                    }
+
+                    int movesX = (int)Math.Round(cardWeight.Weights_X * prepMultiplier);
+                    int movesY = (int)Math.Round(cardWeight.Weights_Y * prepMultiplier);
+
                     var spec = new GameLogSpec
                     {
                         Games_Logs_Id = gameLogEntry.Games_Logs_Id,
                         Games_Processes_Id = gameProcess.Games_Processes_Id,
-                        Moves_X = cardWeight.Weights_X,
-                        Moves_Y = cardWeight.Weights_Y
+                        Moves_X = movesX,
+                        Moves_Y = movesY
                     };
                     _context.GameLogSpecs.Add(spec);
 
-                    _logger.LogInformation("[ActionService_PlayCardAsync] Utworzono spec: Process={ProcessId}, X={X}, Y={Y}",
-                        cardWeight.Processes_Id, cardWeight.Weights_X, cardWeight.Weights_Y);
+                    _logger.LogInformation("[ActionService_PlayCardAsync] Utworzono spec: Process={ProcessId}, X={X}, Y={Y} (mnożnik={Multiplier})",
+                        cardWeight.Processes_Id, movesX, movesY, prepMultiplier);
                 }
                 else
                 {
@@ -193,6 +213,30 @@ namespace backend.Services
             }
 
             await _context.SaveChangesAsync();
+
+            // Sprawdzenie zmiany fazy: jeśli zagrana karta jest kartą "Wejście na rynek",
+            // automatycznie przesuń drużynę do fazy "Rynkowa" tego samego talii.
+            if (cardEntity.Phase?.Phase_Name == "Wejście na rynek")
+            {
+                var rynkowaPhase = await _context.Phases
+                    .FirstOrDefaultAsync(p => p.Decks_Id == cardData.DeckId && p.Phase_Name == "Rynkowa");
+
+                if (rynkowaPhase != null)
+                {
+                    team.Current_Phase_Id = rynkowaPhase.Phases_Id;
+
+                    // Zastosuj mnożnik przygotowania i oblicz nowy budżet Mapy 2
+                    await _economyService.ApplyPreparationMultiplierAsync(cardData.GameId, cardData.TeamId);
+                    var map2Budget = await _economyService.CalculateMap2BudgetAsync(cardData.GameId, cardData.TeamId);
+                    team.Teams_Bud = team.Teams_Bud + map2Budget; // DODAJ do pozostałego budżetu Mapy 1
+
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("[ActionService_PlayCardAsync] Zmiana fazy drużyny {TeamId} na 'Rynkowa' (PhaseId={PhaseId}). Nowy budżet: {Budget} BITS, mnożnik przygotowania zastosowany.",
+                        team.Teams_Id, rynkowaPhase.Phases_Id, map2Budget);
+                    await NotifyTeam(cardData.GameId, cardData.TeamId, "PhaseUpdated", "BudgetUpdated");
+                    await NotifyAdmin(cardData.GameId, "PhaseUpdated", "BudgetUpdated");
+                }
+            }
 
             if (gameLogEntry.Is_Approved == true)
             {

@@ -173,7 +173,7 @@
           </div>
 
           <div v-if="showOwnBoard" class="w-full flex justify-center">
-            <GameBoard :config="formData" :game-mode="true" :pawns="pawns" />
+            <GameBoard :config="formData" :game-mode="true" :pawns="pawns" :use-percentage="true" />
           </div>
         </div>
 
@@ -446,6 +446,8 @@ interface Pawn {
   y: number
   color: string
   name: string
+  maxX: number
+  maxY: number
 }
 interface BoardConfig {
   boardId: number
@@ -469,6 +471,7 @@ interface RawHistoryLog {
   teamId: number
   teamName: string
   feedbackDescription: string
+  enablerDescription?: string
   status: boolean
   gameEventId: number | null
 }
@@ -486,6 +489,8 @@ interface RawPawn {
   posY: string
   color: string
   name: string
+  maxPosX?: number
+  maxPosY?: number
 }
 
 const props = defineProps({
@@ -671,6 +676,8 @@ const fetchPawns = async () => {
       y: Number(p.posY),
       color: p.color,
       name: p.name,
+      maxX: Number(p.maxPosX) || 1,
+      maxY: Number(p.maxPosY) || 1,
     }))
   } catch (err) {
     console.error('Błąd pobierania pionków:', err)
@@ -720,6 +727,11 @@ const executeCardOrItemAction = async (isCard: boolean) => {
     )
   }
 
+  const minEnablerId =
+    isCard && !wasSuccess && Array.isArray((entity as Card).enablers) && (entity as Card).enablers!.length > 0
+      ? Math.min(...((entity as Card).enablers as number[]))
+      : undefined
+
   const endpoint = wasSuccess
     ? apiConfig.player.playCardSuccess(entity.id)
     : apiConfig.player.playCardFailure(entity.id)
@@ -731,6 +743,7 @@ const executeCardOrItemAction = async (isCard: boolean) => {
     boardId: team.boardId,
     cost: entity.cost || 0,
     ForceExecution: true,
+    enablerId: minEnablerId,
   }
 
   try {

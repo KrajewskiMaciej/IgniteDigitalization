@@ -46,7 +46,8 @@ namespace backend.Services
                 Cols = boardDto.Cols,
                 Cell_Color = boardDto.Cell_Color,
                 Border_Color = boardDto.Border_Color,
-                Borders_Colors = boardDto.Borders_Colors ?? string.Empty
+                Borders_Colors = boardDto.Borders_Colors ?? string.Empty,
+                Cells_Descriptions = boardDto.Cells_Descriptions ?? string.Empty
             };
 
             _context.Boards.Add(newBoard);
@@ -73,6 +74,7 @@ namespace backend.Services
             boardToUpdate.Cell_Color = boardDto.Cell_Color;
             boardToUpdate.Border_Color = boardDto.Border_Color;
             boardToUpdate.Borders_Colors = boardDto.Borders_Colors ?? string.Empty;
+            boardToUpdate.Cells_Descriptions = boardDto.Cells_Descriptions ?? string.Empty;
 
             await _context.SaveChangesAsync();
             return boardToUpdate;

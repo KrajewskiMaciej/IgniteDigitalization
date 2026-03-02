@@ -1,4 +1,3 @@
-
 let apiUrl = import.meta.env.VITE_API_URL || '/api'
 
 // Zabezpieczenie: Jeśli URL został podany bez protokołu (np. w zmiennych środowiskowych pipeline), dodajemy https://
@@ -7,7 +6,6 @@ if (apiUrl && !apiUrl.startsWith('http') && !apiUrl.startsWith('/')) {
 }
 
 const API_BASE_URL = apiUrl
-
 
 const endpoints = {
   auth: {
@@ -33,6 +31,10 @@ const endpoints = {
       updateCard: '/admin/deck/decisions/edit',
       getFeedbacks: (cardId: number) => `/admin/deck/feedbacks?cardId=${cardId}`,
       updateFeedbacks: (cardId: number) => `/admin/deck/feedbacks/edit?cardId=${cardId}`,
+      getEconomy: (deckId: number) => `/admin/deck/${deckId}/economy`,
+      updateEconomy: (deckId: number) => `/admin/deck/${deckId}/economy`,
+      importEconomy: (deckId: number) => `/admin/deck/${deckId}/economy/import`,
+      economyPreview: (gameId: number) => `/admin/deck/${gameId}/economy-preview`,
     },
     settings: {
       licenses: '/admin/licenses',

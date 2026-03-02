@@ -110,6 +110,8 @@ export interface Pawn {
   y: number
   color: string
   name: string
+  maxX: number
+  maxY: number
 }
 
 export interface RawApiLog {
@@ -121,6 +123,7 @@ export interface RawApiLog {
   cardTitle: string
   teamName: string
   feedbackDescription: string
+  enablerDescription?: string
   status: boolean
   isEventNotification?: boolean
   eventDescription?: string
@@ -144,6 +147,8 @@ export interface RawPawnData {
   gpId?: number
   color?: string
   name?: string
+  maxPosX?: number
+  maxPosY?: number
 }
 
 export interface RivalBoardConfigFromApi {
@@ -158,6 +163,7 @@ export interface RivalBoardConfigFromApi {
   cellColor: string
   borderColor: string
   borderColors: string[]
+  cellsDescriptions?: string
 }
 
 export interface BoardConfigForComponent {
@@ -172,6 +178,7 @@ export interface BoardConfigForComponent {
   borderColor: string
   borderColors: string[]
   boardId: number
+  cellsDescriptions?: string
 }
 
 export interface GameDetails {
@@ -266,6 +273,9 @@ export interface BoardConfig {
   // Wymiary
   rows: number
   cols: number
+
+  // Opisy Ćwiartek
+  cellsDescriptions?: string
 }
 
 export interface GameData {
@@ -279,6 +289,8 @@ export interface GameData {
   isIndependent: boolean
   boardConfig: BoardConfig
   rivalBoardConfig?: any
+  currentPhaseId?: number | null
+  currentPhaseName?: string | null
 }
 
 export interface GameStatusError {
@@ -362,6 +374,7 @@ export interface RawHistoryLog {
   teamId: number
   teamName: string
   feedbackDescription: string
+  enablerDescription?: string
   status: boolean
   gameEventId: number | null
 }
@@ -386,6 +399,7 @@ export interface ApiLogEntry {
   cardId: number
   status: boolean
   feedbackDescription?: string
+  enablerDescription?: string
   cost: number
   gameEventId: number | null
 }

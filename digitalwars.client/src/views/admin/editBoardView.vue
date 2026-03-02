@@ -65,10 +65,40 @@
             />
 
             <boardDescriptions
+              v-if="!isCartesianPreview"
               v-model:descriptionDown="formData.descriptionDown"
               v-model:descriptionLeft="formData.descriptionLeft"
               @blur="validateDescriptions"
             />
+
+            <div class="mt-3 md:mt-5 px-4">
+              <label class="block mb-3 text-sm font-medium text-white">
+                Nazwy ćwiartek
+                <span class="text-xs text-surface-500 ml-2">— niepuste = plansza kartezjańska</span>
+              </label>
+              <div class="border-2 border-surface-700 px-3 py-3 rounded-lg mb-2 bg-secondary">
+                <div class="flex flex-col gap-2">
+                  <div
+                    v-for="(name, index) in quadrantNamesArray"
+                    :key="index"
+                    class="flex items-center border-2 border-surface-600 rounded-lg p-2 gap-2 bg-secondary hover:border-primary-400 transition-colors duration-200"
+                  >
+                    <span class="text-xs text-surface-400 w-28 flex-shrink-0">{{ quadrantLabels[index] }}</span>
+                    <InputText
+                      :modelValue="name"
+                      @update:modelValue="(v) => updateQuadrantName(index, v)"
+                      class="flex-1"
+                      placeholder="..."
+                    />
+                  </div>
+                </div>
+              </div>
+              <p class="text-xs text-surface-500">
+                Etykiety osi pobierane są z pól
+                <span class="text-surface-400">Etykiety góra</span> i
+                <span class="text-surface-400">Etykiety prawo</span>.
+              </p>
+            </div>
 
             <div class="w-full px-4 flex items-center justify-center">
               <Button
@@ -89,7 +119,8 @@
         <h2 class="text-xl mb-4 text-center flex-shrink-0">{{ t('gameBoardPreview') }}</h2>
 
         <div class="relative flex-grow min-h-0">
-          <myBoard :config="previewConfig" />
+          <myBoardCartesian v-if="isCartesianPreview" :config="previewConfig" />
+          <myBoard v-else :config="previewConfig" />
         </div>
       </div>
     </div>
@@ -103,11 +134,13 @@ import { useToast } from 'vue-toastification'
 import { useConfirm } from 'primevue/useconfirm'
 import Button from 'primevue/button'
 import myBoard from '@/components/game/gameBoard.vue'
+import myBoardCartesian from '@/components/game/gameBoardCartesian.vue'
 import boardSelector from '@/components/editBoard/boardSelector.vue'
 import boardInfo from '@/components/editBoard/boardInfo.vue'
 import boardColorSettings from '@/components/editBoard/boardColorSettings.vue'
 import boardLabelsEditors from '@/components/editBoard/boardLabelsEditors.vue'
 import boardDescriptions from '@/components/editBoard/boardDescriptions.vue'
+import InputText from 'primevue/inputtext'
 import { useI18n } from 'vue-i18n'
 
 import apiConfig from '@/services/apiConfig'
@@ -130,6 +163,7 @@ interface ApiBoard {
   cell_Color: string
   border_Color: string
   borders_Colors: string
+  cells_Descriptions: string
 }
 
 // Ujednolicony interfejs używany wewnątrz komponentu (z konwencją camelCase)
@@ -145,6 +179,7 @@ interface BoardConfig {
   cellColor: string
   borderColor: string
   borderColors: string[]
+  cellsDescriptions: string
 }
 
 // --- ZMIENNE REAKTYWNE ---
@@ -170,6 +205,7 @@ const getDefaultFormData = (): BoardConfig => ({
   cellColor: '#ffffff',
   borderColor: '#000000',
   borderColors: ['#008000', '#FFFF00', '#FFA500', '#FF0000'],
+  cellsDescriptions: '',
 })
 
 const formData = reactive<BoardConfig>(getDefaultFormData())
@@ -271,6 +307,7 @@ const loadSelectedBoard = (boardId: number) => {
   formData.cellColor = selectedBoard.cell_Color
   formData.borderColor = selectedBoard.border_Color
   formData.borderColors = stringToArray(selectedBoard.borders_Colors)
+  formData.cellsDescriptions = selectedBoard.cells_Descriptions ?? ''
 }
 
 const saveBoard = async () => {
@@ -299,6 +336,7 @@ const saveBoard = async () => {
       Cell_Color: formData.cellColor,
       Border_Color: formData.borderColor,
       Borders_Colors: arrayToString(formData.borderColors),
+      Cells_Descriptions: formData.cellsDescriptions,
     }
 
     if (activeView.value === 'add') {
@@ -368,10 +406,26 @@ const validateDescriptions = () => {
   }
 }
 
+// --- NAZWY ĆWIARTEK ---
+const quadrantLabels = ['Lewy-górny', 'Prawy-górny', 'Lewy-dolny', 'Prawy-dolny']
+
+const quadrantNamesArray = computed(() => {
+  const parts = formData.cellsDescriptions.split(';').map((s) => s.trim())
+  return [parts[0] || '', parts[1] || '', parts[2] || '', parts[3] || '']
+})
+
+const updateQuadrantName = (index: number, value: string | undefined) => {
+  const arr = [...quadrantNamesArray.value]
+  arr[index] = value?.trim() ?? ''
+  formData.cellsDescriptions = arr.every((s) => !s) ? '' : arr.join(';')
+}
+
 // --- COMPUTED & LIFECYCLE ---
 const previewConfig = computed<BoardConfig>(() => {
   return { ...formData }
 })
+
+const isCartesianPreview = computed(() => quadrantNamesArray.value.some((n) => n !== ''))
 
 onMounted(fetchBoardsFromAPI)
 </script>

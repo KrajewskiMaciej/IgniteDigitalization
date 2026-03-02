@@ -19,6 +19,8 @@ namespace backend.Data
         public GameEvent? Games_Events { get; set; }
         public int? Turns_Left { get; set; }
         public bool Is_Independent { get; set; }
+        public int? Current_Phase_Id { get; set; }
+        public Phase? CurrentPhase { get; set; }
 
         public virtual ICollection<GameProcess> Game_Processes { get; set; } = new List<GameProcess>();
     }

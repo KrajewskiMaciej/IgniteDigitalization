@@ -16,6 +16,7 @@ namespace backend.Dtos
         public string CellColor { get; set; } = string.Empty;
         public string BorderColor { get; set; } = string.Empty;
         public string[] BorderColors { get; set; } = Array.Empty<string>();
+        public string CellsDescriptions { get; set; } = string.Empty;
     }
 
     public class SessionDataDto
@@ -26,6 +27,8 @@ namespace backend.Dtos
         public double TeamBud { get; set; }
         public int DeckId { get; set; }
         public BoardConfigDto BoardConfig { get; set; } = new BoardConfigDto();
+        public int? CurrentPhaseId { get; set; }
+        public string? CurrentPhaseName { get; set; }
     }
 
 
@@ -49,6 +52,7 @@ namespace backend.Dtos
         public int BoardId { get; set; }
         public double Cost { get; set; }
         public bool ForceExecution { get; set; } = false;
+        public int? EnablerId { get; set; }
     }
 
     public class LogDataRequest

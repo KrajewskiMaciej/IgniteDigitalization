@@ -18,11 +18,13 @@ namespace backend.Services
     {
         private readonly AppDbContext _context;
         private readonly ILogger<GameService> _logger;
+        private readonly IEconomyService _economyService;
 
-        public GameService(AppDbContext context, ILogger<GameService> logger)
+        public GameService(AppDbContext context, ILogger<GameService> logger, IEconomyService economyService)
         {
             _context = context;
             _logger = logger;
+            _economyService = economyService;
         }
 
         public async Task<Game> CreateNewGameAsync(CreateGameDto gameDto, int userId)
@@ -31,24 +33,37 @@ namespace backend.Services
             if (user == null) throw new Exception("Użytkownik nie został znaleziony.");
             if (user.Licenses_Owned <= 0) throw new Exception("Brak dostępnych licencji.");
 
-            // KROK 1: Weryfikacja, czy plansze istnieją w bazie danych
-            var teamBoardExists = await _context.Boards.AnyAsync(b => b.Boards_Id == gameDto.BoardId && b.Users_Id == userId);
-            var rivalBoardExists = await _context.Boards.AnyAsync(b => b.Boards_Id == gameDto.RivalBoardId && b.Users_Id == userId);
+            // Pobierz Szkolenie z domyślnymi planszami
+            var deck = await _context.Decks
+                .Include(d => d.EconomySettings)
+                .FirstOrDefaultAsync(d => d.Decks_Id == gameDto.DeckId);
+            if (deck == null)
+                throw new Exception($"Szkolenie o ID {gameDto.DeckId} nie zostało znalezione.");
 
+            // Wyznacz plansze – ze DTO lub z domyślnych Szkolenia
+            int teamBoardId = gameDto.BoardId ?? deck.Default_Teams_Boards_Id
+                ?? throw new Exception("Nie wybrano planszy drużynowej i Szkolenie nie ma domyślnej planszy drużynowej.");
+            int rivalBoardId = gameDto.RivalBoardId ?? deck.Default_Rivals_Boards_Id
+                ?? throw new Exception("Nie wybrano planszy rywali i Szkolenie nie ma domyślnej planszy rynkowej.");
+
+            // Weryfikacja plansz
+            var teamBoardExists = await _context.Boards.AnyAsync(b => b.Boards_Id == teamBoardId && b.Users_Id == userId);
+            var rivalBoardExists = await _context.Boards.AnyAsync(b => b.Boards_Id == rivalBoardId && b.Users_Id == userId);
             if (!teamBoardExists || !rivalBoardExists)
-            {
                 throw new Exception("Jedna lub obie wybrane plansze są nieprawidłowe lub nie należą do tego użytkownika.");
-            }
 
-            var requestedProcessShortNames = gameDto.Processes.Select(p => p.ShortName).ToList();
-            var processesFromDb = await _context.Processes
-                .Where(p => p.Decks_Id == gameDto.DeckId && requestedProcessShortNames.Contains(p.Processes_Desc))
-                .ToDictionaryAsync(p => p.Processes_Desc);
+            // Pobierz WSZYSTKIE procesy z Szkolenia
+            var allProcesses = await _context.Processes
+                .Where(p => p.Decks_Id == gameDto.DeckId)
+                .ToListAsync();
 
-            if (processesFromDb.Count != requestedProcessShortNames.Count)
-            {
-                throw new Exception("Jeden lub więcej wybranych procesów nie istnieje w podanej talii kart.");
-            }
+            if (!allProcesses.Any())
+                throw new Exception("Szkolenie nie zawiera żadnych procesów. Zaimportuj plik z procesami.");
+
+            // Wyznacz budżet startowy – ze DTO lub z zasad ekonomii
+            double startBits = gameDto.StartBits > 0
+                ? gameDto.StartBits
+                : (deck.EconomySettings?.Map1_Starting_Budget ?? 40);
 
             await using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -56,8 +71,8 @@ namespace backend.Services
                 var newGame = new Game
                 {
                     Games_Desc = gameDto.GameName,
-                    Teams_Boards_Id = gameDto.BoardId,
-                    Rivals_Boards_Id = gameDto.RivalBoardId,
+                    Teams_Boards_Id = teamBoardId,
+                    Rivals_Boards_Id = rivalBoardId,
                     Decks_Id = gameDto.DeckId,
                     Game_Status = GameStatus.During,
                     Users_Id = userId,
@@ -72,20 +87,19 @@ namespace backend.Services
                     {
                         Teams_Name = teamDto.Name,
                         Teams_Color = teamDto.Colour,
-                        Teams_Bud = gameDto.StartBits,
+                        Teams_Bud = startBits,
                         Teams_Token = GameController.TokenGenerator.GenerateRandomAlphanumericToken(6),
                         Is_Independent = teamDto.IsAbleToMakeDecisions,
                         Games = newGame
                     };
 
-                    foreach (var processDto in gameDto.Processes)
+                    foreach (var process in allProcesses)
                     {
-                        var dbProcess = processesFromDb[processDto.ShortName];
                         var newGameProcess = new GameProcess
                         {
                             Games = newGame,
                             Teams = gameTeam,
-                            Processes_Id = dbProcess.Processes_Id
+                            Processes_Id = process.Processes_Id
                         };
                         gameTeam.Game_Processes.Add(newGameProcess);
                     }
@@ -99,12 +113,27 @@ namespace backend.Services
                 {
                     foreach (var gameProcess in team.Game_Processes)
                     {
-                        _context.GameBoards.Add(new GameBoard { Games_Id = newGame.Games_Id, Teams_Id = team.Teams_Id, Boards_Id = newGame.Teams_Boards_Id, Games_Processes_Id = gameProcess.Games_Processes_Id, Poz_X = 0, Poz_Y = 0 });
+                        _context.GameBoards.Add(new GameBoard
+                        {
+                            Games_Id = newGame.Games_Id,
+                            Teams_Id = team.Teams_Id,
+                            Boards_Id = newGame.Teams_Boards_Id,
+                            Games_Processes_Id = gameProcess.Games_Processes_Id,
+                            Poz_X = 0,
+                            Poz_Y = 0
+                        });
                     }
-                    _context.GameBoards.Add(new GameBoard { Games_Id = newGame.Games_Id, Teams_Id = team.Teams_Id, Boards_Id = newGame.Rivals_Boards_Id, Games_Processes_Id = null, Poz_X = 0, Poz_Y = 0 });
+                    _context.GameBoards.Add(new GameBoard
+                    {
+                        Games_Id = newGame.Games_Id,
+                        Teams_Id = team.Teams_Id,
+                        Boards_Id = newGame.Rivals_Boards_Id,
+                        Games_Processes_Id = null,
+                        Poz_X = 0,
+                        Poz_Y = 0
+                    });
                 }
 
-                // POPRAWKA: Aktualizuj tylko jedno pole, a nie cały obiekt użytkownika
                 user.Licenses_Owned--;
                 user.Games_In_Progress++;
                 _context.Users.Attach(user);
@@ -113,6 +142,9 @@ namespace backend.Services
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+
+                _logger.LogInformation("[GameService] Utworzono grę '{Name}' (ID: {Id}) ze Szkolenia {DeckId}, {ProcessCount} procesów, {TeamCount} drużyn, budżet: {Budget} BITS.",
+                    newGame.Games_Desc, newGame.Games_Id, gameDto.DeckId, allProcesses.Count, newTeams.Count, startBits);
 
                 return newGame;
             }

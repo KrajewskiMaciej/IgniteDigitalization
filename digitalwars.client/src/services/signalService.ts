@@ -8,8 +8,6 @@ if (!baseUrl.startsWith('http') && !baseUrl.startsWith('/')) {
 }
 const HUB_URL = `${baseUrl}/gameHub`
 
-console.log('SignalR: Używany HUB_URL:', HUB_URL)
-
 const connection = new signalR.HubConnectionBuilder()
   .withUrl(HUB_URL, { withCredentials: true })
   .withAutomaticReconnect()
@@ -35,7 +33,6 @@ const signalRService: ISignalRService = {
     // Jeśli połączenie nie zostało jeszcze zainicjowane, stwórz nową obietnicę startu.
     // To zapobiega wielokrotnym próbom połączenia, gdy wiele komponentów próbuje to zrobić jednocześnie.
     if (!startPromise) {
-      console.log('SignalR: Inicjowanie nowego połączenia...')
       startPromise = connection.start().catch((err: any) => {
         console.error('SignalR: Błąd podczas startu, resetowanie obietnicy.', err)
         startPromise = null // Zresetuj w razie błędu, aby umożliwić ponowną próbę

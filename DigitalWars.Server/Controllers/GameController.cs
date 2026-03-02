@@ -22,11 +22,13 @@ namespace backend.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IGameService _gameService;
+        private readonly IEconomyService _economyService;
 
-        public GameController(AppDbContext context, IGameService gameService)
+        public GameController(AppDbContext context, IGameService gameService, IEconomyService economyService)
         {
             _context = context;
             _gameService = gameService;
+            _economyService = economyService;
         }
 
         [Authorize]

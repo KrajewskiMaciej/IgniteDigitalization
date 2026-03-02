@@ -17,6 +17,9 @@ export function fillBoardConfig(target: BoardConfig, api: any) {
   target.descriptionDown = api.description_Down
   target.descriptionLeft = api.description_Left
 
+  // Opisy komórek
+  target.cellsDescriptions = api.cells_Descriptions ?? api.cellsDescriptions ?? ''
+
   // Wymiary
   target.rows = api.rows
   target.cols = api.cols

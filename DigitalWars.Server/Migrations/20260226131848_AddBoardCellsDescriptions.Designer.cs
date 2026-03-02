@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace DigitalWars.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260226131848_AddBoardCellsDescriptions")]
+    partial class AddBoardCellsDescriptions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -249,73 +252,14 @@ namespace DigitalWars.Server.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<int?>("Default_Rivals_Boards_Id")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Default_Teams_Boards_Id")
-                        .HasColumnType("integer");
-
                     b.Property<int?>("Users_Id")
                         .HasColumnType("integer");
 
                     b.HasKey("Decks_Id");
 
-                    b.HasIndex("Default_Rivals_Boards_Id");
-
-                    b.HasIndex("Default_Teams_Boards_Id");
-
                     b.HasIndex("Users_Id");
 
                     b.ToTable("Decks");
-                });
-
-            modelBuilder.Entity("backend.Data.DeckEconomySettings", b =>
-                {
-                    b.Property<int>("DeckEconomySettings_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DeckEconomySettings_Id"));
-
-                    b.Property<int>("Decks_Id")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("Map1_Mandatory_Cards_Cost")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("Map1_Starting_Budget")
-                        .HasColumnType("double precision");
-
-                    b.Property<int>("Map1_Target_Cards_Max")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Map1_Target_Cards_Min")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("Map2_Base_Budget")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("Map2_Prep_Bonus_Max_Bits")
-                        .HasColumnType("double precision");
-
-                    b.Property<int>("Map2_Prep_Cards_Total_Count")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Map2_Target_Cards_Max")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Map2_Target_Cards_Min")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("PrepMultiplier_Max")
-                        .HasColumnType("double precision");
-
-                    b.HasKey("DeckEconomySettings_Id");
-
-                    b.HasIndex("Decks_Id")
-                        .IsUnique();
-
-                    b.ToTable("DeckEconomySettings");
                 });
 
             modelBuilder.Entity("backend.Data.Feedback", b =>
@@ -960,36 +904,11 @@ namespace DigitalWars.Server.Migrations
 
             modelBuilder.Entity("backend.Data.Deck", b =>
                 {
-                    b.HasOne("backend.Data.Board", "DefaultRivalsBoard")
-                        .WithMany()
-                        .HasForeignKey("Default_Rivals_Boards_Id")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("backend.Data.Board", "DefaultTeamsBoard")
-                        .WithMany()
-                        .HasForeignKey("Default_Teams_Boards_Id")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("backend.Data.User", "User")
                         .WithMany()
                         .HasForeignKey("Users_Id");
 
-                    b.Navigation("DefaultRivalsBoard");
-
-                    b.Navigation("DefaultTeamsBoard");
-
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("backend.Data.DeckEconomySettings", b =>
-                {
-                    b.HasOne("backend.Data.Deck", "Deck")
-                        .WithOne("EconomySettings")
-                        .HasForeignKey("backend.Data.DeckEconomySettings", "Decks_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Deck");
                 });
 
             modelBuilder.Entity("backend.Data.Feedback", b =>
@@ -1264,8 +1183,6 @@ namespace DigitalWars.Server.Migrations
 
             modelBuilder.Entity("backend.Data.Deck", b =>
                 {
-                    b.Navigation("EconomySettings");
-
                     b.Navigation("Processes");
                 });
 

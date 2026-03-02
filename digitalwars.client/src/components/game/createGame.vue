@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div v-if="props.isVisible" class="fixed inset-0 flex items-center justify-center z-10">
     <div class="absolute inset-0 bg-black/70" @click="closeModal"></div>
 
@@ -16,25 +16,23 @@
         {{ t('createNewGame') }}
       </h1>
       <hr class="my-3 border-surface-700" />
+
+      <!-- Wskaźnik: 2 kropki -->
       <div class="flex flex-row justify-center space-x-2">
         <div class="rounded-full bg-primary-400 h-3 w-3"></div>
         <div
           class="rounded-full h-3 w-3"
-          :class="step >= 2 ? 'bg-primary-400' : 'bg-secondary'"
-        ></div>
-        <div
-          class="rounded-full h-3 w-3"
-          :class="step === 3 ? 'bg-primary-400' : 'bg-secondary'"
+          :class="step >= 2 ? 'bg-primary-400' : 'bg-surface-700'"
         ></div>
       </div>
 
       <form class="mt-3" @submit.prevent="handleSubmit">
-        <!--Krok 1-->
+        <!-- Krok 1: Szkolenie + tryb gry -->
         <div v-if="step === 1" :class="direction === 'backwards' ? 'animate-fade-left' : ''">
-          <div class="space-y-1 mb-1 sm:mb-2">
-            <label for="gameName" class="block font-bold text-left text-xs sm:text-sm"
-              >{{ t('gameName') }}</label
-            >
+          <div class="space-y-1 mb-2">
+            <label for="gameName" class="block font-bold text-left text-xs sm:text-sm">
+              {{ t('gameName') }}
+            </label>
             <InputText
               id="gameName"
               v-model="gameName"
@@ -44,45 +42,60 @@
               class="w-full"
             />
           </div>
-          <div class="mb-1 sm:mb-2">
-            <label for="selectBoard" class="block font-bold text-left text-xs mb-1"
-              >{{ t('selectBoard') }}</label
-            >
+
+          <div class="mb-2">
+            <label for="selectTraining" class="block font-bold text-left text-xs mb-1">
+              {{ t('training') }}
+            </label>
             <Dropdown
-              v-model="selectedBoardId"
-              :options="data.boards"
-              optionLabel="name"
-              optionValue="boards_Id"
-              :placeholder="t('selectBoardPlaceholder')"
-              class="w-full custom-dropdown"
-            />
-          </div>
-          <div class="mb-1 sm:mb-2">
-            <label for="selectOpponentBoard" class="block font-bold text-left text-xs mb-1"
-              >{{ t('selectRivalBoard') }}</label
-            >
-            <Dropdown
-              v-model="selectedOponentBoardId"
-              :options="opponentBoardOptions"
-              optionLabel="name"
-              optionValue="boards_Id"
-              :placeholder="t('selectRivalBoardPlaceholder')"
-              class="w-full"
-            />
-          </div>
-          <div class="mb-1 sm:mb-2">
-            <label for="selectDeck" class="block font-bold text-left text-xs mb-1"
-              >{{ t('selectDeck') }}</label
-            >
-            <Dropdown
-              v-model="selectedDeckId"
-              :options="data.decks"
+              v-model="selectedTrainingId"
+              :options="data.trainings"
               optionLabel="title"
               optionValue="id"
-              :placeholder="t('selectDeckPlaceholder')"
+              :placeholder="t('selectTrainingPlaceholder')"
               class="w-full custom-dropdown"
+              :loading="isLoadingEconomy"
             />
+            <p
+              v-if="selectedTraining && (selectedTraining.defaultTeamsBoardId || selectedTraining.defaultRivalsBoardId)"
+              class="text-xs text-surface-400 mt-1"
+            >
+              {{ t('boardsAutoFilledFromTraining') }}
+            </p>
           </div>
+
+          <!-- Plansze – widoczne gdy szkolenie nie ma domyślnych -->
+          <div
+            v-if="selectedTrainingId && (!selectedTraining?.defaultTeamsBoardId || !selectedTraining?.defaultRivalsBoardId)"
+            class="mb-3 space-y-2 border border-surface-700 rounded-lg p-3"
+          >
+            <p class="text-xs text-yellow-400 font-semibold mb-2">
+              {{ t('trainingHasNoDefaultBoards') }}
+            </p>
+            <div v-if="!selectedTraining?.defaultTeamsBoardId">
+              <label class="block font-bold text-left text-xs mb-1">{{ t('selectTeamBoard') }}</label>
+              <Dropdown
+                v-model="selectedTeamBoardId"
+                :options="data.boards"
+                optionLabel="name"
+                optionValue="boards_Id"
+                :placeholder="t('selectTeamBoardPlaceholder')"
+                class="w-full custom-dropdown"
+              />
+            </div>
+            <div v-if="!selectedTraining?.defaultRivalsBoardId">
+              <label class="block font-bold text-left text-xs mb-1">{{ t('selectRivalBoard') }}</label>
+              <Dropdown
+                v-model="selectedRivalBoardId"
+                :options="data.boards"
+                optionLabel="name"
+                optionValue="boards_Id"
+                :placeholder="t('selectRivalBoardPlaceholder')"
+                class="w-full custom-dropdown"
+              />
+            </div>
+          </div>
+
           <p class="block font-bold text-left text-xs mb-2">{{ t('selectGameType') }}</p>
           <div class="flex gap-2 w-full mb-5">
             <div
@@ -106,7 +119,7 @@
               :class="
                 selectedGameMode === 'stationary'
                   ? 'bg-primary-400 shadow-md shadow-primary-400/60'
-                  : 'bg-secondary  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-primary-400/70 border-2 border-surface-700'
+                  : 'bg-secondary transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-primary-400/70 border-2 border-surface-700'
               "
               @click="selectedGameMode = 'stationary'"
             >
@@ -124,16 +137,16 @@
           </Button>
         </div>
 
-        <!--Krok 2-->
+        <!-- Krok 2: Konfiguracja drużyn -->
         <div
           v-if="step === 2"
           :class="direction === 'forwards' ? 'animate-fade-right' : 'animate-fade-left'"
         >
           <div class="flex flex-row gap-2">
             <div class="flex-1">
-              <label for="numberOfTeams" class="block font-bold text-left text-xs sm:text-sm mb-1"
-                >{{ t('numberOfTeams') }}</label
-              >
+              <label for="numberOfTeams" class="block font-bold text-left text-xs sm:text-sm mb-1">
+                {{ t('numberOfTeams') }}
+              </label>
               <InputNumber
                 id="numberOfTeams"
                 v-model="numberOfTeams"
@@ -144,23 +157,24 @@
               />
             </div>
             <div class="flex-1">
-              <label for="numberOfBits" class="block font-bold text-left text-xs sm:text-sm mb-1"
-                >{{ t('numberOfBits') }}</label
-              >
+              <label for="numberOfBits" class="block font-bold text-left text-xs sm:text-sm mb-1">
+                {{ t('numberOfBits') }}
+              </label>
               <InputNumber
                 id="numberOfBits"
                 v-model="numberOfBits"
-                :min="20"
-                :max="1000"
+                :min="1"
+                :max="100000"
                 showButtons
                 class="w-full"
               />
             </div>
           </div>
+
           <div class="mb-6 mt-4">
-            <label class="block text-left text-xs sm:text-sm font-bold text-white mb-2"
-              >{{ t('selectTeamToEdit') }}</label
-            >
+            <label class="block text-left text-xs sm:text-sm font-bold text-white mb-2">
+              {{ t('selectTeamToEdit') }}
+            </label>
             <Dropdown
               v-model="currentlyEditingTeamId"
               :options="teams"
@@ -192,20 +206,20 @@
               </template>
             </Dropdown>
           </div>
+
           <div
             v-if="selectedTeam"
             class="p-4 rounded-lg bg-secondary border border-surface-700 mb-4"
           >
             <h3 class="font-bold text-center text-lg mb-4 text-white">
-               {{ t('editing') }} <span class="text-primary-400">{{ selectedTeam.name }}</span>
+              {{ t('editing') }} <span class="text-primary-400">{{ selectedTeam.name }}</span>
             </h3>
             <div class="space-y-4">
               <div>
                 <label
                   :for="'editTeamName-' + selectedTeam.id"
                   class="block text-sm font-medium text-gray-300 mb-1"
-                  >{{ t('teamName') }}</label
-                >
+                >{{ t('teamName') }}</label>
                 <InputText
                   :id="'editTeamName-' + selectedTeam.id"
                   v-model="selectedTeam.name"
@@ -216,8 +230,7 @@
                 <label
                   :for="'editTeamColor-' + selectedTeam.id"
                   class="block text-sm font-medium text-gray-300 mb-1"
-                  >{{ t('teamColor') }}</label
-                >
+                >{{ t('teamColor') }}</label>
                 <input
                   type="color"
                   :id="'editTeamColor-' + selectedTeam.id"
@@ -229,8 +242,7 @@
             <label
               :for="'decision-' + selectedTeam.id"
               class="block text-sm font-medium text-gray-300 mb-2 mt-5 cursor-pointer"
-              >{{ t('canTeamMakeDecisions') }}</label
-            >
+            >{{ t('canTeamMakeDecisions') }}</label>
             <div class="flex items-center gap-2">
               <label class="relative inline-block w-11 h-6">
                 <input
@@ -265,85 +277,28 @@
                       <h2 class="font-nasalization mb-1 font-semibold text-orange-500">
                         {{ t('gmControl') }}
                       </h2>
-                      <span
-                        >{{ t('gmControlDescription') }}</span
-                      </span>
+                      <span>{{ t('gmControlDescription') }}</span>
                     </div>
                     <hr class="mt-2 border-surface-700" />
                     <div>
                       <h2 class="font-nasalization mb-1 mt-2 font-semibold text-green-500">
                         {{ t('independentDecisions') }}
                       </h2>
-                      <span
-                        >{{ t('independentDecisionsDescription') }}</span
-                      >
+                      <span>{{ t('independentDecisionsDescription') }}</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
           <div class="flex gap-2">
             <Button @click="handlePreviousStep" type="button" severity="secondary" class="w-full">
               <font-awesome-icon :icon="faArrowLeft" class="mr-2" />
               <span>{{ t('previous') }}</span>
             </Button>
-            <Button @click="handleNextStep" type="button" class="w-full">
-              <span>{{ t('next') }}</span>
-              <font-awesome-icon :icon="faArrowRight" class="ml-2" />
-            </Button>
+            <Button type="submit" :label="t('createNewGame')" class="w-full" />
           </div>
-        </div>
-        <!-- Krok 3 -->
-        <div
-          v-if="step === 3"
-          :class="direction === 'forwards' ? 'animate-fade-right' : 'animate-fade-left'"
-        >
-          <div class="flex justify-between items-center mb-3">
-            <h2 class="block text-left text-sm sm:text-base font-bold text-white">
-              {{ t('selectProcessesForGame') }}
-            </h2>
-            <Button
-              @click="toggleAllProcesses"
-              :label="allProcessesSelected ? t('deselectAll') : t('selectAll')"
-              size="small"
-              outlined
-            />
-          </div>
-          <div v-if="isLoadingProcesses" class="text-center text-surface-400">
-            <p>{{ t('loadingProcesses') }}</p>
-          </div>
-          <div v-else-if="availableProcesses.length === 0" class="text-center text-surface-400">
-            <p>{{ t('noProcessesAvailableForSelectedDeck') }}</p>
-          </div>
-          <div v-else class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-2">
-            <label
-              v-for="process in availableProcesses"
-              :key="process.processId"
-              class="flex items-center p-3 bg-tertiary rounded-md cursor-pointer hover:bg-primary-400/30 transition-colors duration-200"
-            >
-              <Checkbox :value="process.processId" v-model="selectedProcessIds" :binary="false" />
-              <div class="ml-3 flex items-center gap-2 flex-1">
-                <div class="flex-1">
-                  <span class="font-bold text-white">{{ process.processDesc }}</span>
-                  <span class="text-sm text-surface-400 ml-2">
-                    - {{ process.processLongDesc }}</span
-                  >
-                </div>
-                <span
-                  class="w-6 h-6 rounded-full inline-block border-2 border-tertiary flex-shrink-0"
-                  :style="{ backgroundColor: process.processColor }"
-                ></span>
-              </div>
-            </label>
-          </div>
-        </div>
-        <div v-if="step === 3" class="flex gap-2 mt-4">
-          <Button @click="handlePreviousStep" type="button" severity="secondary" class="w-full">
-            <font-awesome-icon :icon="faArrowLeft" class="mr-2" />
-            <span>{{ t('previous') }}</span>
-          </Button>
-          <Button type="submit" :label="t('createNewGame')" class="w-full" />
         </div>
       </form>
     </div>
@@ -365,21 +320,22 @@ import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
-import Checkbox from 'primevue/checkbox'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
 import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
-// --- DEFINICJE INTERFEJSÓW ---
+// --- INTERFEJSY ---
+interface Training {
+  id: number
+  title: string
+  defaultTeamsBoardId?: number | null
+  defaultRivalsBoardId?: number | null
+}
 interface Board {
   boards_Id: number
   name: string
-}
-interface Deck {
-  id: number
-  title: string
 }
 interface Team {
   id: number
@@ -387,14 +343,8 @@ interface Team {
   colour: string
   isAbleToMakeDecisions: boolean
 }
-interface GameProcess {
-  processId: number
-  processDesc: string
-  processLongDesc: string
-  processColor: string
-}
 type ApiError = {
-  response?: { data?: { title?: string } }
+  response?: { data?: { title?: string } | string }
   message: string
 }
 
@@ -402,54 +352,35 @@ type ApiError = {
 const props = defineProps({ isVisible: { type: Boolean, default: false } })
 const emits = defineEmits(['close', 'gameCreated'])
 
-// --- ZMIENNE REAKTYWNE Z TYPOWANIEM ---
+// --- ZMIENNE REAKTYWNE ---
 const toast = useToast()
 const gameName = ref('')
-const selectedBoardId = ref<number | null>(null)
-const selectedOponentBoardId = ref<number | null>(null)
-const selectedDeckId = ref<number | null>(null)
+const selectedTrainingId = ref<number | null>(null) // odpowiada Training.id
+const selectedTeamBoardId = ref<number | null>(null)
+const selectedRivalBoardId = ref<number | null>(null)
 const selectedGameMode = ref<'stationary' | 'remote'>('stationary')
 const numberOfTeams = ref(2)
-const numberOfBits = ref(20)
+const numberOfBits = ref(40)
 const teams = ref<Team[]>([])
 const currentlyEditingTeamId = ref<number | undefined>(0)
 const showTip = ref(false)
-const availableProcesses = ref<GameProcess[]>([])
-const selectedProcessIds = ref<number[]>([])
-const isLoadingProcesses = ref(false)
+const isLoadingEconomy = ref(false)
 const step = ref(1)
 const direction = ref('')
-const data = reactive<{ boards: Board[]; decks: Deck[] }>({ boards: [], decks: [] })
+const data = reactive<{ trainings: Training[]; boards: Board[] }>({ trainings: [], boards: [] })
 
 // --- WŁAŚCIWOŚCI OBLICZENIOWE ---
+const selectedTraining = computed<Training | undefined>(() =>
+  selectedTrainingId.value !== null
+    ? data.trainings.find((tr) => tr.id === selectedTrainingId.value)
+    : undefined,
+)
 const selectedTeam = computed<Team | undefined>(() => {
   if (currentlyEditingTeamId.value === undefined) return undefined
   return teams.value.find((team) => team.id === currentlyEditingTeamId.value)
 })
 
-const opponentBoardOptions = computed<Board[]>(() => {
-  if (!selectedBoardId.value) {
-    return data.boards
-  }
-  return data.boards.filter((board) => board.boards_Id !== selectedBoardId.value)
-})
-
-const allProcessesSelected = computed(() => {
-  return (
-    availableProcesses.value.length > 0 &&
-    selectedProcessIds.value.length === availableProcesses.value.length
-  )
-})
-
 // --- FUNKCJE ---
-const toggleAllProcesses = () => {
-  if (allProcessesSelected.value) {
-    selectedProcessIds.value = []
-  } else {
-    selectedProcessIds.value = availableProcesses.value.map((p) => p.processId)
-  }
-}
-
 const updateTeamsArray = (count: number) => {
   const newTeams: Team[] = []
   for (let i = 0; i < count; i++) {
@@ -479,10 +410,13 @@ const handlePreviousStep = () => {
 
 const validateFirstStep = () => {
   const errors: string[] = []
-  if (!gameName.value.trim()) errors.push(t('EnterGameName'))
-  if (selectedBoardId.value === null) errors.push(t('selectBoard'))
-  if (selectedOponentBoardId.value === null) errors.push(t('selectRivalBoard'))
-  if (selectedDeckId.value === null) errors.push(t('selectDeck'))
+  if (!gameName.value.trim()) errors.push(t('enterGameName'))
+  if (selectedTrainingId.value === null) errors.push(t('selectTraining'))
+  const tr = selectedTraining.value
+  if (tr && !tr.defaultTeamsBoardId && !selectedTeamBoardId.value)
+    errors.push(t('selectTeamBoard'))
+  if (tr && !tr.defaultRivalsBoardId && !selectedRivalBoardId.value)
+    errors.push(t('selectRivalBoard'))
   if (errors.length > 0) {
     toast.error(errors.join('\n'))
     return false
@@ -490,49 +424,45 @@ const validateFirstStep = () => {
   return true
 }
 
-const fetchBoardsFromAPI = async () => {
+const fetchTrainingsFromAPI = async () => {
   try {
-    const response = await apiService.get<Board[]>(apiConfig.boards.getAll)
-    data.boards = response.data
-  } catch (error) {
-    const typedError = error as ApiError
-    toast.error(
-      t('errorFetchingBoards', {
-        error:
-          typedError.response?.data?.title || typedError.message,
-      })
-    )
-  }
-}
-
-const fetchDecksFromAPI = async () => {
-  try {
-    const response = await apiService.get<Deck[]>(apiConfig.admin.deck.getAll)
-    data.decks = response.data
+    const response = await apiService.get<Training[]>(apiConfig.admin.deck.getAll)
+    data.trainings = response.data
   } catch (error) {
     const typedError = error as ApiError
     toast.error(
       t('errorFetchingDecks', {
         error:
-          typedError.response?.data?.title || typedError.message,
-      })
+          (typeof typedError.response?.data === 'object'
+            ? typedError.response?.data?.title
+            : typedError.response?.data) || typedError.message,
+      }),
     )
+  }
+}
+
+const fetchBoardsFromAPI = async () => {
+  try {
+    const response = await apiService.get<Board[]>(apiConfig.boards.getAll)
+    data.boards = response.data
+  } catch {
+    // plansze niedostępne – nie blokujemy
   }
 }
 
 const closeModal = () => {
   gameName.value = ''
-  selectedBoardId.value = null
-  selectedOponentBoardId.value = null
-  selectedDeckId.value = null
+  selectedTrainingId.value = null
+  selectedTeamBoardId.value = null
+  selectedRivalBoardId.value = null
   numberOfTeams.value = 2
+  numberOfBits.value = 40
   step.value = 1
-  numberOfBits.value = 20
   emits('close')
 }
 
 const handleSubmit = async () => {
-  if (step.value !== 3) {
+  if (step.value !== 2) {
     handleNextStep()
     return
   }
@@ -544,20 +474,13 @@ const handleSubmit = async () => {
     toast.warning(t('numberOfBitsMustBeBetween'))
     return
   }
-  if (selectedProcessIds.value.length === 0) {
-    toast.warning(t('pleaseSelectAtLeastOneProcess'))
-    return
-  }
 
-  const selectedProcessesForPayload = availableProcesses.value
-    .filter((p) => selectedProcessIds.value.includes(p.processId))
-    .map((p) => ({ Name: p.processLongDesc, ShortName: p.processDesc }))
-
+  const training = selectedTraining.value
   const gamePayload = {
     GameName: gameName.value,
-    BoardId: selectedBoardId.value,
-    RivalBoardId: selectedOponentBoardId.value,
-    DeckId: selectedDeckId.value,
+    BoardId: training?.defaultTeamsBoardId ?? selectedTeamBoardId.value ?? null,
+    RivalBoardId: training?.defaultRivalsBoardId ?? selectedRivalBoardId.value ?? null,
+    DeckId: selectedTrainingId.value,
     GameMode: selectedGameMode.value !== 'stationary',
     StartBits: Number(numberOfBits.value),
     Teams: teams.value.map((team) => ({
@@ -565,73 +488,46 @@ const handleSubmit = async () => {
       colour: team.colour,
       isAbleToMakeDecisions: team.isAbleToMakeDecisions,
     })),
-    Processes: selectedProcessesForPayload,
   }
 
-  console.log('Payload tworzenia gry:', gamePayload)
-
   try {
-    const response = await apiService.post<{ message?: string }>(
-      apiConfig.games.create,
-      gamePayload,
-    )
+    await apiService.post<{ message?: string }>(apiConfig.games.create, gamePayload)
     emits('gameCreated')
     closeModal()
   } catch (error) {
-    const typedError = error as {
-      response?: { data?: { title?: string } | string }
-      message: string
-    }
+    const typedError = error as ApiError
     const errorMessage =
       (typeof typedError.response?.data === 'object'
-        ? typedError.response.data.title
+        ? typedError.response?.data?.title
         : typedError.response?.data) ||
       typedError.message ||
       t('errorCreatingGame')
-    toast.error(errorMessage)
+    toast.error(errorMessage as string)
   }
 }
 
 const defaultColors = [
-  '#ef4444', // red-500
-  '#8b5cf6', // purple-500
-  '#10b981', // green-500
-  '#ec4899', // pink-500
-  '#a855f7', // violet-500
-  '#84cc16', // lime-500
-  '#06b6d4', // cyan-500
-  '#f97316', // orange-500
-  '#eab308', // yellow-500
-  '#14b8a6', // teal-500
-  '#d946ef', // fuchsia-500
-  '#22c55e', // green-400
-  '#f43f5e', // rose-500
-  '#6366f1', // indigo-500
-  '#0ea5e9', // sky-500
+  '#ef4444', '#8b5cf6', '#10b981', '#ec4899', '#a855f7',
+  '#84cc16', '#06b6d4', '#f97316', '#eab308', '#14b8a6',
+  '#d946ef', '#22c55e', '#f43f5e', '#6366f1', '#0ea5e9',
 ]
 
-watch(selectedBoardId, (newId) => {
-  if (newId === selectedOponentBoardId.value) {
-    selectedOponentBoardId.value = null
-  }
-})
-
-watch(selectedDeckId, async (newDeckId) => {
-  if (newDeckId) {
-    isLoadingProcesses.value = true
-    availableProcesses.value = []
-    selectedProcessIds.value = []
+// Po wyborze szkolenia: pobierz zasady ekonomii i ustaw numberOfBits
+watch(selectedTrainingId, async (newId) => {
+  if (newId) {
+    isLoadingEconomy.value = true
     try {
-      const response = await apiService.get<GameProcess[]>(apiConfig.processes.getByDeck(newDeckId))
-      availableProcesses.value = response.data
+      const response = await apiService.get<{ map1_Starting_Budget?: number }>(
+        apiConfig.admin.deck.getEconomy(newId),
+      )
+      if (response.data?.map1_Starting_Budget) {
+        numberOfBits.value = response.data.map1_Starting_Budget
+      }
     } catch {
-      toast.error(t('errorFetchingProcesses'))
+      // jeśli brak zasad ekonomii, zostaw domyślne
     } finally {
-      isLoadingProcesses.value = false
+      isLoadingEconomy.value = false
     }
-  } else {
-    availableProcesses.value = []
-    selectedProcessIds.value = []
   }
 })
 
@@ -645,8 +541,7 @@ watch(
 )
 
 onMounted(async () => {
-  await fetchBoardsFromAPI()
-  await fetchDecksFromAPI()
+  await Promise.all([fetchTrainingsFromAPI(), fetchBoardsFromAPI()])
 })
 </script>
 
@@ -665,11 +560,9 @@ onMounted(async () => {
   background-clip: content-box;
 }
 
-/* Fix dla dropdownów - usuwa padding z lewej strony */
 :deep(.custom-dropdown .p-dropdown-label) {
   padding-left: 0.75rem !important;
 }
-
 :deep(.custom-dropdown .p-dropdown-trigger) {
   width: 2.5rem;
 }
