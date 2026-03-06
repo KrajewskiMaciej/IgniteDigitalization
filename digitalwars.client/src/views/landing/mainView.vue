@@ -5,8 +5,24 @@
       <div class="relative z-20 flex flex-col h-full">
         <Navbar/>
 
-        <div class="flex-1 relative">
-          <AnimatedScene class="absolute inset-0" />
+        <div class="flex-1 flex flex-col justify-center items-center text-center">
+
+          <div class="mb-3 md:mb-4 lg:mb-6 inline-flex flex-col items-stretch">
+            <h1 class="
+              text-white font-bold font-inter animate-glow w-full text-center
+              text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[190px]
+              mb-1 sm:mb-2 md:mb-3 lg:mb-5 xl:mb-7
+            ">
+              IGNITE
+            </h1>
+            <h1 class="
+              text-white font-bold font-inter animate-glow w-full text-center
+              text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[78px]
+              mb-1 sm:mb-2 md:mb-3 lg:mb-5 xl:mb-7
+            ">
+              DIGITALIZATION
+            </h1>
+          </div>
 
           <div class="absolute inset-0 flex flex-col justify-end items-center pb-16">
             <!-- Kontener przycisków: zastąpiono surface-850 przez surface-900 -->
@@ -89,31 +105,42 @@ const handleGameMasterClick = () => {
 </script>
 
 <style scoped>
-.disco-shadow {
-  animation: disco 0.5s ease-in-out infinite;
-}
-
-@keyframes disco {
-  0% {
-    box-shadow: 0 0 60px 20px rgba(239, 68, 68, 0.7);
-  }
-  16% {
-    box-shadow: 0 0 60px 20px rgba(249, 115, 22, 0.7);
-  }
-  33% {
-    box-shadow: 0 0 60px 20px rgba(234, 179, 8, 0.7);
+/*Animacja świecenia się napisu DIGITAL WARS, #a78bfa jest kolor akcentu z configu tailwind*/
+@keyframes glow {
+  0%, 100% {
+    color: white;
+    text-shadow: none;
   }
   50% {
-    box-shadow: 0 0 60px 20px rgba(34, 197, 94, 0.7);
+    color: #3b82f6;
+    text-shadow: 
+      0 0 5px #3b82f6, 
+      0 0 10px #3b82f6, 
+      0 0 15px #3b82f6,
+      0 0 20px #3b82f6;
   }
-  66% {
-    box-shadow: 0 0 60px 20px rgba(59, 160, 246, 0.7);
-  }
-  83% {
-    box-shadow: 0 0 60px 20px rgba(168, 85, 247, 0.7);
-  }
-  200% {
-    box-shadow: 0 0 60px 20px rgba(239, 68, 68, 0.7);
+}
+
+.animate-glow {
+  animation-name: glow;
+  animation-duration: 4s;
+  animation-delay: 4s;
+  animation-iteration-count: infinite;
+}
+
+@media (max-width: 640px) {
+  @keyframes glow {
+    0%, 100% {
+      color: white;
+      text-shadow: none;
+    }
+    50% {
+      color: #3b82f6;
+      text-shadow: 
+        0 0 3px #3b82f6, 
+        0 0 6px #3b82f6, 
+        0 0 9px #3b82f6;
+    }
   }
 }
 </style>
