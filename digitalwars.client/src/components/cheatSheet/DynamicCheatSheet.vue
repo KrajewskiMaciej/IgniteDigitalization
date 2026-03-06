@@ -200,7 +200,6 @@ const nodeTypes = markRaw({
   decision: CustomNode,
 } as any)
 
-//Dane do ściągi
 const nodes = ref<ICardNode[]>([])
 const cardTypes = ref<ICardTypes[]>([])
 const enablers = ref<Record<number, number[]>>()
@@ -280,7 +279,6 @@ const createEdgesFromEnablers = (
   })
 }
 
-//Pobieranie id talii kart
 const fetchDeckId = async () => {
   try {
     const response = await apiServices.get<IGameResponse>(apiConfig.games.getById(gameId.value))
@@ -290,7 +288,6 @@ const fetchDeckId = async () => {
   }
 }
 
-//Pobieranie informacji o drużynach w grze
 const fetchTemasInfo = async () => {
   try {
     const response = await apiServices.get<ITeamManagmentResponse[]>(
@@ -298,7 +295,6 @@ const fetchTemasInfo = async () => {
     )
 
     tables.value = response.data
-    console.log('Stoły:', tables.value)
   } catch {
     toast.error(t('errorFetchingTeamsInfo'))
   }
@@ -320,7 +316,6 @@ const fetchEnablersMap = async () => {
 
 //Ostatnia zagrana karta z sukcesem przez każdą drużynę
 const fetchAllTeamsEntries = async () => {
-  console.log('Czy przy pobieraniu ostatnich zagranych kart mam typy kart?', cardTypes.value)
   const entriesPromises = tables.value.map(async (table) => {
     try {
       const response = await apiServices.get<number>(
@@ -340,14 +335,10 @@ const fetchAllTeamsEntries = async () => {
 
   const results = await Promise.all(entriesPromises)
 
-  console.log('Rezultaty:', results)
-
   results.forEach((result) => {
     if (!result) return
 
     const card = cardTypes.value.find((card) => card.cards_Id === result.cardsId)
-
-    console.log('Czy znaleziono kartę ?', card)
 
     if (card) {
       const cardId = card.card_Id
@@ -363,8 +354,6 @@ const fetchAllTeamsEntries = async () => {
       })
     }
   })
-
-  console.log('Team entries:', tableEntries.value)
 }
 
 const fetchDecisionCards = async () => {
@@ -374,8 +363,6 @@ const fetchDecisionCards = async () => {
     )
 
     decisionCardsData.value = response.data
-
-    console.log('Karty decyzji:', decisionCardsData.value)
   } catch {
     toast.error(t('errorFetchingDecisionCards'))
   }
@@ -387,14 +374,12 @@ const fetchItems = async () => {
 
     itemsData.value = response.data
 
-    console.log('Pobrane karty przedmiotów:', itemsData.value)
   } catch {
     toast.error(t('errorFetchingItems'))
   }
 }
 
 const onCheatSheetUpdated = async () => {
-  console.log('Event')
   tableEntries.value = {}
   await fetchAllTeamsEntries()
 }
@@ -403,7 +388,6 @@ watch(
   tableEntries,
   (newEntries) => {
     if (nodes.value.length === 0) return
-    console.log('[CheatSheet] tableEntries zmienione, aktualizacja węzłów')
 
     nodes.value = nodes.value.map((node) => {
       const cardId = Number(node.id.replace('card-', ''))

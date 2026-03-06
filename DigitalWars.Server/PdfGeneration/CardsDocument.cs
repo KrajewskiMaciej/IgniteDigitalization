@@ -1,290 +1,158 @@
-using QuestPDF.Fluent;
-using QuestPDF.Infrastructure;
-using QuestPDF.Helpers;
-using QRCoder;
-using System.Collections.Generic;
-using System;
-using System.IO;
-using System.Linq;
-using Microsoft.Extensions.Logging;
+    using QuestPDF.Fluent;
+    using QuestPDF.Infrastructure;
+    using QuestPDF.Helpers;
+    using QRCoder;
+    using System.Collections.Generic;
+    using System;
+    using System.IO;
+    using Microsoft.Extensions.Logging;
 
-namespace backend.PdfGeneration
-{
-    public class CardPdfModel
+    namespace backend.PdfGeneration
     {
-        public int Id { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string Application { get; set; } = string.Empty;
-        public string CardType { get; set; } = "Unknown";
-        public double Cost { get; set; }
-        public int PhaseId { get; set; }
-        public string PhaseName { get; set; } = string.Empty;
-    }
-
-    public class CardsDocument : IDocument
-    {
-        private readonly List<CardPdfModel> _cards;
-        private readonly ILogger<CardsDocument> _logger;
-
-        private const string FontClother = "Clother";
-
-        // Phase colours
-        private const string ColorNavy   = "#1B2A4A";
-        private const string ColorYellow = "#E8C040";
-        private const string ColorPurple = "#6B3FA0";
-
-        public CardsDocument(List<CardPdfModel> cards, ILogger<CardsDocument> logger)
+        public class CardPdfModel
         {
-            _cards = cards;
-            _logger = logger;
-
-            var clotherPath = Path.Combine(AppContext.BaseDirectory, "Templates", "Clother.ttf");
-            if (File.Exists(clotherPath))
-            {
-                try { QuestPDF.Drawing.FontManager.RegisterFont(File.OpenRead(clotherPath)); }
-                catch { /* already registered */ }
-            }
-            else
-            {
-                _logger.LogWarning("[CardsDocument_Constructor] Nie znaleziono czcionki Clother.ttf w {Path}.", clotherPath);
-            }
-
-            _logger.LogInformation("[CardsDocument_Constructor] Zainicjalizowano dokument z {Count} kartami.", _cards.Count);
+            public int Id { get; set; }
+            public string Title { get; set; } = string.Empty;
+            public string Description { get; set; } = string.Empty;
+            public double Cost { get; set; }
+            public int PhaseId { get; set; }
+            public string PhaseName { get; set; } = string.Empty;
         }
 
-        /// <summary>
-        /// Returns 1/2/3 based on the sorted position of PhaseId within the document's card set.
-        /// The lowest PhaseId = phase 1, next = 2, highest = 3.
-        /// </summary>
-        private int GetPhaseOrder(int phaseId)
+        public class CardsDocument : IDocument
         {
-            var sorted = _cards
-                .Select(c => c.PhaseId)
-                .Distinct()
-                .OrderBy(id => id)
-                .ToList();
-            var idx = sorted.IndexOf(phaseId);
-            return idx >= 0 ? idx + 1 : 0;
-        }
+            private readonly List<CardPdfModel> _cards;
+            private readonly ILogger<CardsDocument> _logger;
 
-        private static string GetCircleColor(int phaseOrder) => phaseOrder switch
-        {
-            1 => ColorNavy,
-            2 => ColorYellow,
-            3 => ColorPurple,
-            _ => ColorNavy
-        };
+            private const string FontInter = "Inter";
+            private const string ColorDarkBlue = "#1B2333";
+            private const string ColorYellow = "#FFD752";
+            
+            private const float CardWidth = 600;
+            private const float CardHeight = 286; 
 
-        private static string GetTitleColor(int phaseOrder) =>
-            phaseOrder == 2 ? ColorYellow : Colors.Black;
-
-        public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
-
-        public void Compose(IDocumentContainer container)
-        {
-            _logger.LogInformation("[CardsDocument_Compose] Rozpoczynam kompozycję dokumentu. Liczba kart: {Count}.", _cards.Count);
-
-            // Pierwsza strona: rewers wspólny dla wszystkich kart
-            if (_cards.Count > 0)
+            public CardsDocument(List<CardPdfModel> cards, ILogger<CardsDocument> logger)
             {
-                var logoPath     = Path.Combine(AppContext.BaseDirectory, "Templates", "Zasob_14x.png");
-                var logotypyPath = Path.Combine(AppContext.BaseDirectory, "Templates", "Zasob_24x.png");
-                _logger.LogInformation("[CardsDocument_Compose] Generuję stronę rewersu. Logo: {L}, Logotypy: {Lg}.", File.Exists(logoPath), File.Exists(logotypyPath));
+                _cards = cards;
+                _logger = logger;
 
-                container.Page(page =>
+                var fontsDir = Path.Combine(AppContext.BaseDirectory, "Templates", "Fonts");
+                if (Directory.Exists(fontsDir))
                 {
-                    page.Size(2481, 1182, Unit.Point);
-                    page.Margin(0);
-
-                    page.Background()
-                        .Border(8)
-                        .BorderColor("#3A3600");
-
-                    page.Content()
-                        .PaddingTop(412)
-                        .AlignCenter()
-                        .Width(600)
-                        .Image(logoPath)
-                        .FitWidth();
-
-                    page.Footer()
-                        .PaddingHorizontal(80)
-                        .PaddingBottom(205)
-                        .Height(100)
-                        .AlignCenter()
-                        .Image(logotypyPath)
-                        .FitHeight();
-                });
+                    foreach (var ttf in Directory.GetFiles(fontsDir, "Inter*.ttf"))
+                    {
+                        try { QuestPDF.Drawing.FontManager.RegisterFont(File.OpenRead(ttf)); }
+                        catch { }
+                    }
+                }
             }
 
-            // Pozostałe karty jako normalne strony (awers)
-            foreach (var card in _cards)
+            public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
+
+            public void Compose(IDocumentContainer container)
             {
-                _logger.LogInformation("[CardsDocument_Compose] Generuję awers karty Id={Id}, Tytuł='{Title}'.", card.Id, card.Title);
-                container.Page(page =>
+                // --- REWERS ---
+                if (_cards.Count > 0)
                 {
-                    page.Size(2481, 1182, Unit.Point);
-                    page.Margin(0);
-                    page.Content().Element(c => ComposeCard(c, card));
-                });
-            }
+                    var logoPath = Path.Combine(AppContext.BaseDirectory, "Templates", "Zasob_14x.png");
+                    var logotypyPath = Path.Combine(AppContext.BaseDirectory, "Templates", "Zasob_24x.png");
 
-            _logger.LogInformation("[CardsDocument_Compose] Kompozycja dokumentu zakończona.");
-        }
-
-        private void ComposeCard(IContainer container, CardPdfModel card)
-        {
-            _logger.LogInformation("[CardsDocument_ComposeCard] Komponuję kartę Id={Id}, Faza='{Phase}', Koszt={Cost}.", card.Id, card.PhaseName, card.Cost);
-
-            var phaseOrder  = GetPhaseOrder(card.PhaseId);
-            var titleColor  = GetTitleColor(phaseOrder);
-            var circleColor = GetCircleColor(phaseOrder);
-
-            // For phase 2 wrap title with ★ symbols
-            var displayTitle = phaseOrder == 2
-                ? $"\u2605 {card.Title} \u2605"
-                : card.Title;
-
-            container
-                .Background(Colors.White)
-                .Border(8)
-                .BorderColor("#3A3600")
-                .Row(row =>
-                {
-                    // ── LEFT: text content ──────────────────────────────────
-                    row.RelativeItem(6)
-                        .PaddingLeft(110)
-                        .PaddingRight(60)
-                        .PaddingVertical(90)
-                        .Column(col =>
+                    container.Page(page =>
+                    {
+                        page.Size(CardWidth, CardHeight, Unit.Point);
+                        page.PageColor(Colors.White);
+                        page.Content().Layers(layers =>
                         {
-                            col.Spacing(36);
+                            layers.PrimaryLayer().Width(CardWidth).Height(CardHeight).Container();
 
-                            col.Item()
-                                .DefaultTextStyle(s => s
-                                    .FontFamily(FontClother)
-                                    .FontColor(titleColor))
-                                .Text(displayTitle)
-                                .FontSize(62);
-
-                            col.Item()
-                                .DefaultTextStyle(s => s
-                                    .FontFamily(FontClother)
-                                    .FontColor("#222222")
-                                    .FontSize(32)
-                                    .LineHeight(1.55f))
-                                .Text(card.Description)
-                                .Justify();
-
-                            if (!string.IsNullOrWhiteSpace(card.Application))
+                            // Logo Główne (X: 225, Y: 80)
+                            layers.Layer().TranslateX(225).TranslateY(80).Width(150).Image(logoPath);
+                            
+                            // Logotypy Partnerów (X: 50, Y: 210) - Jawne wymiary gwarantują widoczność
+                            if (File.Exists(logotypyPath))
                             {
-                                col.Item()
-                                    .DefaultTextStyle(s => s
-                                        .FontFamily(FontClother)
-                                        .FontColor("#222222")
-                                        .FontSize(32)
-                                        .LineHeight(1.55f))
-                                    .Text(text =>
-                                    {
-                                        text.Span("Zastosowanie: ").Bold();
-                                        text.Span(card.Application);
-                                    });
+                                layers.Layer().TranslateX(50).TranslateY(210).Width(500).Height(30)
+                                    .Image(logotypyPath).FitArea();
                             }
                         });
+                    });
+                }
 
-                    // ── RIGHT: circle + QR code ─────────────────────────────
-                    row.RelativeItem(3)
-                        .PaddingTop(50)
-                        .PaddingBottom(40)
-                        .PaddingHorizontal(20)
-                        .Column(col =>
-                        {
-                            col.Spacing(28);
+                // --- AWERSY ---
+                foreach (var card in _cards)
+                {
+                    container.Page(page =>
+                    {
+                        page.Size(CardWidth, CardHeight, Unit.Point);
+                        page.PageColor(Colors.White);
+                        page.Content().Element(c => ComposeCard(c, card));
+                    });
+                }
+            }
 
-                            // Coloured circle with badge
-                            col.Item()
-                                .DefaultTextStyle(s => s
-                                    .FontFamily(FontClother)
-                                    .FontColor(Colors.White))
-                                .AlignCenter()
-                                .Width(480)
-                                .Height(480)
-                                .Svg(GenerateCircleSvg(card.Id, card.PhaseName, card.Cost, circleColor));
+            private void ComposeCard(IContainer container, CardPdfModel card)
+            {
+                container.Layers(layers =>
+                {
+                    // Podkładka 0,0
+                    layers.PrimaryLayer().Width(CardWidth).Height(CardHeight).Container();
 
-                            // QR code
-                            col.Item()
-                                .AlignCenter()
-                                .Width(300)
-                                .Height(300)
-                                .Image(GenerateQrCode(card.Id));
-                        });
+                    // 1. TYTUŁ (X: 50, Y: 45)
+                    layers.Layer().TranslateX(50).TranslateY(45).Width(350)
+                        .Text(card.Title).FontFamily(FontInter).FontSize(18).ExtraBold().FontColor(Colors.Black);
+
+                    // 2. OPIS (X: 50, Y: 90)
+                    layers.Layer().TranslateX(50).TranslateY(90).Width(360)
+                        .Text(card.Description).FontFamily(FontInter).FontSize(14).Light().LineHeight(1.15f);
+
+                    // --- SEKCJA GRANATOWEGO KOŁA (Baza X: 435, Y: 42) ---
+
+                    // Okrąg granatowy
+                    layers.Layer().TranslateX(435).TranslateY(42).Width(100).Height(100)
+                        .Svg(GetCircleSvg(ColorDarkBlue));
+
+                    // Numer karty (np. 01) - Wycentrowany względem koła
+                    layers.Layer().TranslateX(454).TranslateY(69).Width(61).Height(40)
+                        .AlignCenter().Text(card.Id.ToString("D2"))
+                        .FontFamily(FontInter).FontSize(48).ExtraBold().FontColor(Colors.White);
+
+                    // Nazwa fazy (np. PRZYGOTOWANIE) - Wycentrowana pod numerem
+                    layers.Layer().TranslateX(435).TranslateY(110).Width(100)
+                        .AlignCenter().Text(card.PhaseName.ToUpper())
+                        .FontFamily(FontInter).FontSize(6).ExtraBold().LetterSpacing(0.1f).FontColor(Colors.White);
+
+                    // --- SEKCJA ŻÓŁTEGO KOŁA KOSZTU (Baza X: 510, Y: 10) ---
+
+                    // Okrąg żółty
+                    layers.Layer().TranslateX(510).TranslateY(10).Width(60).Height(60)
+                        .Svg(GetCircleSvg(ColorYellow));
+
+                    // Wartość kosztu (np. 2$) - Wycentrowana w żółtym kole
+                    layers.Layer().TranslateX(510).TranslateY(22).Width(60)
+                        .AlignCenter().Text($"{card.Cost}$")
+                        .FontFamily(FontInter).FontSize(18).ExtraBold().FontColor(Colors.White);
+
+                    // Słowo "KOSZT" - Wycentrowane pod wartością
+                    layers.Layer().TranslateX(510).TranslateY(47).Width(60)
+                        .AlignCenter().Text("KOSZT")
+                        .FontFamily(FontInter).FontSize(4).ExtraBold().FontColor(Colors.White);
+
+                    // --- KOD QR (X: 454, Y: 168) ---
+                    layers.Layer().TranslateX(454).TranslateY(168).Width(90).Height(90)
+                        .Image(GenerateQrCode(card.Id));
                 });
-        }
+            }
 
-        private static string GenerateCircleSvg(int id, string phase, double cost, string circleColor)
-        {
-            var idText = id < 10 ? $"0{id}" : id.ToString();
-            var costText = cost == Math.Floor(cost) ? $"{(int)cost}$" : $"{cost:F1}$";
-            var phaseText = (phase ?? string.Empty).ToUpper();
+            // Metoda generująca SVG gwarantuje IDEALNE KOŁO bez błędów kompilacji
+            private string GetCircleSvg(string hexColor) 
+                => $@"<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><circle cx='50' cy='50' r='50' fill='{hexColor}' /></svg>";
 
-            // Font-size for phase label — reduce if long
-            var phaseFontSize = phaseText.Length > 14 ? 22 : 26;
-
-            return $@"<svg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'>
-  <!-- Main circle -->
-  <circle cx='250' cy='265' r='230' fill='{circleColor}' />
-
-  <!-- Card number -->
-  <text x='250' y='258'
-        font-family='Arial, sans-serif'
-        font-size='170'
-        font-weight='bold'
-        fill='white'
-        text-anchor='middle'
-        dominant-baseline='middle'>{idText}</text>
-
-  <!-- Phase label -->
-  <text x='250' y='390'
-        font-family='Arial, sans-serif'
-        font-size='{phaseFontSize}'
-        font-weight='bold'
-        letter-spacing='3'
-        fill='white'
-        text-anchor='middle'
-        dominant-baseline='middle'>{phaseText}</text>
-
-  <!-- Gold cost badge -->
-  <circle cx='420' cy='55' r='68' fill='#E8C040' />
-
-  <!-- Cost value -->
-  <text x='420' y='42'
-        font-family='Arial, sans-serif'
-        font-size='32'
-        font-weight='bold'
-        fill='white'
-        text-anchor='middle'
-        dominant-baseline='middle'>{costText}</text>
-
-  <!-- KOSZT label -->
-  <text x='420' y='76'
-        font-family='Arial, sans-serif'
-        font-size='15'
-        font-weight='bold'
-        letter-spacing='2'
-        fill='white'
-        text-anchor='middle'
-        dominant-baseline='middle'>KOSZT</text>
-</svg>";
-        }
-
-        private static byte[] GenerateQrCode(int cardId)
-        {
-            using var qrGenerator = new QRCodeGenerator();
-            using var qrCodeData = qrGenerator.CreateQrCode(cardId.ToString(), QRCodeGenerator.ECCLevel.M);
-            using var pngCode = new PngByteQRCode(qrCodeData);
-            var result = pngCode.GetGraphic(12);
-            return result;
+            private static byte[] GenerateQrCode(int cardId)
+            {
+                using var qrGenerator = new QRCodeGenerator();
+                using var qrCodeData = qrGenerator.CreateQrCode(cardId.ToString(), QRCodeGenerator.ECCLevel.M);
+                using var pngCode = new PngByteQRCode(qrCodeData);
+                return pngCode.GetGraphic(15);
+            }
         }
     }
-}

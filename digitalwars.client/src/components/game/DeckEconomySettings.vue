@@ -11,47 +11,6 @@
     </div>
 
     <div class="max-w-4xl mx-auto w-full space-y-6">
-      <!-- Import zasad z pliku -->
-      <div class="text-center">
-        <input
-          type="file"
-          accept=".xls,.xlsx"
-          ref="fileInput"
-          @change="handleFileImport"
-          style="display: none"
-        />
-        <Button
-          @click="() => fileInput?.click()"
-          severity="success"
-          size="large"
-          :label="t('importEconomySettings')"
-          :loading="isImporting"
-        >
-          <template #icon>
-            <font-awesome-icon :icon="faFileExcel" class="mr-2" />
-          </template>
-        </Button>
-      </div>
-
-      <!-- Wybór szkolenia -->
-      <div class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl">
-        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-primary-500/20 p-3 rounded-lg">
-            <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
-          </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('training') }}</h2>
-        </div>
-        <Dropdown
-          v-model="selectedDeckId"
-          :options="decksData"
-          optionLabel="title"
-          optionValue="id"
-          showClear
-          :placeholder="t('selectTrainingPlaceholder')"
-          class="w-full"
-          :disabled="isLoadingDecks"
-        />
-      </div>
 
       <!-- Sekcja zasad ekonomii -->
       <div v-if="selectedDeckId && settings" class="space-y-6">
@@ -66,25 +25,25 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                Budżet startowy (BITS)
+                {{ t('map1StartingBudget') }}
               </label>
               <InputNumber v-model="settings.map1_Starting_Budget" :min="0" :max="10000" showButtons class="w-full" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                Koszty obowiązkowe (BITS)
+                {{ t('map1MandatoryCardsCost') }}
               </label>
               <InputNumber v-model="settings.map1_Mandatory_Cards_Cost" :min="0" :max="10000" showButtons class="w-full" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                Min. kart (cel)
+                {{ t('targetCardsMin') }}
               </label>
               <InputNumber v-model="settings.map1_Target_Cards_Min" :min="0" :max="100" showButtons class="w-full" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                Max. kart (cel)
+                {{ t('targetCardsMax') }}
               </label>
               <InputNumber v-model="settings.map1_Target_Cards_Max" :min="0" :max="100" showButtons class="w-full" />
             </div>
@@ -102,31 +61,31 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                Budżet bazowy (BITS)
+                {{ t('map2BaseBudget') }}
               </label>
               <InputNumber v-model="settings.map2_Base_Budget" :min="0" :max="10000" showButtons class="w-full" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                Maks. bonus PRE (BITS)
+                {{ t('map2PrepBonusMaxBits') }}
               </label>
               <InputNumber v-model="settings.map2_Prep_Bonus_Max_Bits" :min="0" :max="10000" showButtons class="w-full" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                Łączna liczba kart PRE
+                {{ t('map2PrepCardsTotalCount') }}
               </label>
               <InputNumber v-model="settings.map2_Prep_Cards_Total_Count" :min="1" :max="1000" showButtons class="w-full" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                Min. kart (cel)
+                {{ t('targetCardsMin') }}
               </label>
               <InputNumber v-model="settings.map2_Target_Cards_Min" :min="0" :max="100" showButtons class="w-full" />
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                Max. kart (cel)
+                {{ t('targetCardsMax') }}
               </label>
               <InputNumber v-model="settings.map2_Target_Cards_Max" :min="0" :max="100" showButtons class="w-full" />
             </div>
@@ -144,7 +103,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                Maksymalny mnożnik
+                {{ t('prepMultiplierMax') }}
               </label>
               <InputNumber
                 v-model="settings.prepMultiplier_Max"
@@ -159,7 +118,7 @@
             </div>
           </div>
           <p class="text-xs text-surface-400 mt-3">
-            Formuła: MIN(Maks. mnożnik; 1 + zagrane_PRE / łącznych_PRE)
+            {{ t('prepMultiplierFormula') }}
           </p>
         </div>
 
@@ -174,7 +133,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                {{ t('defaultTeamsBoard') }} <span class="text-surface-500">(Mapa 1)</span>
+                {{ t('defaultTeamsBoard') }} <span class="text-surface-500">{{ t('map1Label') }}</span>
               </label>
               <Dropdown
                 v-model="selectedTeamBoardId"
@@ -188,7 +147,7 @@
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-300 mb-1">
-                {{ t('defaultRivalsBoard') }} <span class="text-surface-500">(Mapa 2)</span>
+                {{ t('defaultRivalsBoard') }} <span class="text-surface-500">{{ t('map2Label') }}</span>
               </label>
               <Dropdown
                 v-model="selectedRivalBoardId"
@@ -219,14 +178,21 @@
       </div>
 
       <!-- Brak szkolenia -->
-      <div v-else-if="!selectedDeckId" class="text-center text-surface-400 py-10">
-        <font-awesome-icon :icon="faLayerGroup" class="h-10 mb-3 text-surface-600" />
-        <p>{{ t('selectTrainingFirst') }}</p>
+      <div
+        v-else-if="!selectedDeckId"
+        class="text-center py-12 border border-dashed border-surface-700 rounded-xl bg-secondary/50"
+      >
+        <div
+          class="bg-secondary/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-3"
+        >
+          <font-awesome-icon :icon="faLayerGroup" class="h-10 text-surface-600" />
+        </div>
+        <p class="text-surface-400 text-sm font-medium">{{ t('selectTrainingFirst') }}</p>
       </div>
 
       <!-- Ładowanie -->
       <div v-else-if="isLoadingSettings" class="text-center text-surface-400 py-10">
-        <p>Ładowanie zasad ekonomii...</p>
+        <p>{{ t('loadingEconomySettings') }}</p>
       </div>
     </div>
   </div>
@@ -277,20 +243,16 @@ interface EconomySettings {
   prepMultiplier_Max: number
 }
 
-const selectedDeckId = ref<number | undefined>(undefined)
+const selectedDeckId = defineModel<number | undefined>()
 const decksData = ref<DeckListItem[]>([])
 const boardsData = ref<Board[]>([])
 const selectedTeamBoardId = ref<number | null>(null)
 const selectedRivalBoardId = ref<number | null>(null)
 const settings = ref<EconomySettings | null>(null)
-const isLoadingDecks = ref(false)
 const isLoadingSettings = ref(false)
 const isSaving = ref(false)
-const isImporting = ref(false)
-const fileInput = ref<HTMLInputElement | null>(null)
 
 const fetchDecks = async () => {
-  isLoadingDecks.value = true
   try {
     const response = await apiService.get<Array<{ id: number; title: string; defaultTeamsBoardId?: number | null; defaultRivalsBoardId?: number | null }>>(
       apiConfig.admin.deck.getAll,
@@ -301,10 +263,14 @@ const fetchDecks = async () => {
       defaultTeamsBoardId: d.defaultTeamsBoardId,
       defaultRivalsBoardId: d.defaultRivalsBoardId,
     }))
+    // Jeśli talia była już wybrana przed załadowaniem listy, ustaw plansze
+    if (selectedDeckId.value) {
+      const deck = decksData.value.find((d) => d.id === selectedDeckId.value)
+      selectedTeamBoardId.value = deck?.defaultTeamsBoardId ?? null
+      selectedRivalBoardId.value = deck?.defaultRivalsBoardId ?? null
+    }
   } catch {
     toast.error(t('errorFetchingDecks'))
-  } finally {
-    isLoadingDecks.value = false
   }
 }
 
@@ -360,27 +326,6 @@ const saveSettings = async () => {
   }
 }
 
-const handleFileImport = async (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file || !selectedDeckId.value) {
-    toast.warning(t('selectTrainingFirst'))
-    return
-  }
-  isImporting.value = true
-  const formData = new FormData()
-  formData.append('file', file)
-  try {
-    await apiService.post(apiConfig.admin.deck.importEconomy(selectedDeckId.value), formData)
-    toast.success(t('economySettingsImported'))
-    await fetchSettings(selectedDeckId.value)
-  } catch {
-    toast.error(t('errorImportingEconomySettings'))
-  } finally {
-    isImporting.value = false
-    if (fileInput.value) fileInput.value.value = ''
-  }
-}
-
 watch(selectedDeckId, (newId) => {
   if (newId) {
     fetchSettings(newId)
@@ -393,7 +338,7 @@ watch(selectedDeckId, (newId) => {
     selectedTeamBoardId.value = null
     selectedRivalBoardId.value = null
   }
-})
+}, { immediate: true })
 
 fetchDecks()
 fetchBoards()

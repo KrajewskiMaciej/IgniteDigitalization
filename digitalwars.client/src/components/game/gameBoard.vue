@@ -98,8 +98,6 @@ const getScreenPosition = (x: number, y: number) => ({
   screenY: (props.config.rows - 1 - y) * cellSize.value + marginTop.value + cellSize.value / 2,
 })
 
-// processedPawns nadpisuje x/y na docelowe współrzędne siatki (0..cols-1 / 0..rows-1)
-// analogicznie do gameBoardCartesian, który nadpisuje x/y na współrzędne ćwiartki
 const processedPawns = computed(() => {
   const cols = props.config.cols
   const rows = props.config.rows
@@ -111,19 +109,9 @@ const processedPawns = computed(() => {
   })
 
   if (props.usePercentage && result.length > 0) {
-    console.group('[GameBoard] processedPawns – dane surowe i przeliczone')
-    console.log(`Rozmiar planszy: cols=${cols}, rows=${rows}`)
     result.forEach((pawn, i) => {
       const raw = props.pawns[i]
-      console.log(
-        `[${pawn.id}] ${pawn.name ?? '–'} |`,
-        `raw: x=${raw.x}, y=${raw.y} |`,
-        `maxX=${raw.maxX}, maxY=${raw.maxY} |`,
-        `pct: x=${raw.maxX > 0 ? (raw.x / raw.maxX * 100).toFixed(1) : 'N/A'}%, y=${raw.maxY > 0 ? (raw.y / raw.maxY * 100).toFixed(1) : 'N/A'}% |`,
-        `cell: x=${pawn.x.toFixed(2)}, y=${pawn.y.toFixed(2)}`,
-      )
     })
-    console.groupEnd()
   }
 
   return result
@@ -334,7 +322,6 @@ const drawBoard = (animate = true) => {
   if (Array.isArray(processedPawns.value) && processedPawns.value.length > 0) {
     existingPawns.forEach((group) => group.remove())
 
-    // Grupuj pionki stojące w tej samej pozycji (jak gameBoardCartesian)
     const grouped = d3.group(processedPawns.value, (d) => `${d.x},${d.y}`)
 
     let animationIndex = 0
@@ -396,7 +383,6 @@ const drawBoard = (animate = true) => {
 
         pawnGroup.append('title').text(pawn.name || `Pionek ${pawn.id}`)
 
-        // Przechowuj przetworzone współrzędne (jak gameBoardCartesian)
         previousPositions.value.set(pawn.id, { x: pawn.x, y: pawn.y })
       })
     })
@@ -415,8 +401,6 @@ watch(
   () => drawBoard(false),
   { deep: true },
 )
-
-// Obserwuj przetworzone pionki (jak gameBoardCartesian) – reaguje też na zmiany maxX/maxY
 watch(
   processedPawns,
   () => drawBoard(true),
@@ -425,7 +409,6 @@ watch(
 
 onMounted(() => {
   try {
-    // Inicjalizuj pozycje startowe z przetworzonych wartości (jak gameBoardCartesian)
     processedPawns.value.forEach((pawn) => {
       previousPositions.value.set(pawn.id, { x: pawn.x, y: pawn.y })
     })

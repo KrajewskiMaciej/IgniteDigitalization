@@ -382,7 +382,7 @@ export const pl = {
   approve: 'Zatwierdź',
   reject: 'Odrzuć',
   eventDescription: 'Opis zdarzenia',
-  manageDecisionsAndItemsForTeam: 'Zarządzaj decyzjami i przedmiotami dla drużyny',
+  manageDecisionsAndItemsForTeam: 'Zarządzaj decyzjami dla drużyny',
   noFeedbackDescription: 'Brak opisu feedbacku.',
 
   //Items
@@ -547,6 +547,104 @@ export const pl = {
   suggectCard: 'Zasugeruj kartę',
   playCard: 'Zagraj kartę',
 
+  //Economy settings
+  map1StartingBudget: 'Budżet startowy (BITS)',
+  map1MandatoryCardsCost: 'Koszty obowiązkowe (BITS)',
+  targetCardsMin: 'Min. kart (cel)',
+  targetCardsMax: 'Max. kart (cel)',
+  map2BaseBudget: 'Budżet bazowy (BITS)',
+  map2PrepBonusMaxBits: 'Maks. bonus PRE (BITS)',
+  map2PrepCardsTotalCount: 'Łączna liczba kart PRE',
+  prepMultiplierMax: 'Maksymalny mnożnik',
+  prepMultiplierFormula: 'Formuła: MIN(Maks. mnożnik; 1 + zagrane_PRE / łącznych_PRE)',
+  loadingEconomySettings: 'Ładowanie zasad ekonomii...',
+  map1Label: '(Mapa 1)',
+  map2Label: '(Mapa 2)',
+
   //Footer
   allRightsReserved: 'Wszelkie prawa zastrzeżone.',
+
+  //Loading spinner
+  pleaseWait: 'Proszę czekać',
+
+  //Statistics
+  gameStatistics: 'Statystyki gry',
+  selectStatisticFromSidebar: 'Wybierz statystykę z menu bocznego.',
+
+  //Reset password
+  linkExpiredTitle: 'Link wygasł',
+
+  //Player view errors
+  errorLoadingData: 'Błąd ładowania',
+  cannotLoadGameData: 'Nie można załadować danych gry.',
+  missingTeamToken: 'Brak tokena drużyny w adresie URL.',
+  gamePausedTitle: 'Gra Wstrzymana',
+  gamePausedMessage: 'Gra jest obecnie wstrzymana. Skontaktuj się z Game Masterem.',
+  gameEndedTitle: 'Gra Zakończona',
+  gameEndedMessage: 'Ta gra została już zakończona.',
+  gameNotFoundTitle: 'Nie znaleziono Gry',
+  gameNotFoundMessage: 'Nie znaleziono gry lub drużyny dla podanego tokena.',
+  loadingBoardName: 'Ładowanie...',
+
+  //Pawn preview
+  clickToChangeColor: 'Kliknij aby zmienić kolor',
+
+  //Card card ID
+  cardIdLabel: 'ID karty:',
+
+  //testCardCarousel
+  loadingCardsError: 'Błąd ładowania kart:',
+  noCardsAvailable: 'Brak dostępnych kart.',
+  unknownError: 'Nieznany błąd',
+  selectCardButton: 'Wybierz kartę',
+
+  //joinGameByCode camera errors
+  cameraPermissionDenied: 'Brak dostępu do kamery. Sprawdź uprawnienia przeglądarki.',
+  cameraNotFound: 'Nie znaleziono kamery w urządzeniu.',
+  cameraInUse: 'Kamera jest obecnie używana przez inną aplikację.',
+  orSeparator: 'lub',
+
+  //editBoardView
+  quadrantNames: 'Nazwy ćwiartek',
+  quadrantNamesHint: '— niepuste = plansza kartezjańska',
+  axisLabelsInfo: 'Etykiety osi pobierane są z pól',
+  labelsTopRef: 'Etykiety góra',
+  labelsRightRef: 'Etykiety prawo',
+  quadrantTopLeft: 'Lewy-górny',
+  quadrantTopRight: 'Prawy-górny',
+  quadrantBottomLeft: 'Lewy-dolny',
+  quadrantBottomRight: 'Prawy-dolny',
+  selectDeckToEditEnablersLabel: 'Wybierz talię...',
+
+  //gameChat
+  chatWelcomeMessage: 'Cześć! Jestem Twoim asystentem AI 🤖. Mogę pomóc Ci w grze, odpowiedzieć na pytania. Każda podpowiedź kosztuje {cost} Bitów 💰. Jak mogę Ci pomóc?',
+  chatPlaceholder: 'Wyślij wiadomość ...',
+  chatAiPlaceholder: '[Tu będzie odpowiedź od AI]',
+
+  //auth changePassword
+  passwordsDoNotMatchExclamation: 'Hasła się nie zgadzają!',
+
+  //tableManagmentView
+  selectTeamAndCard: 'Proszę wybrać drużynę i kartę.',
+
+  //boardColorSettings tooltip
+  deleteZone: 'Usuń strefę {index}',
+
+  //CardCarousel aria
+  previousCard: 'Poprzednia karta',
+  nextCard: 'Następna karta',
+  missingCardsData: 'Brak wymaganych danych do pobrania kart.',
+  errorFetchingCards: 'Wystąpił błąd podczas pobierania kart.',
+
+  //EditProccesses
+  invalidProcessData: 'Proszę wprowadzić poprawne dane procesu',
+  newProcessAdded: 'Nowy proces został dodany',
+  loadingHistory: 'Ładowanie historii...',
+  changeTeam: 'Zmień drużynę',
+  clickToChangeTeam: 'Kliknij, aby zmienić drużynę',
+  current: 'Aktualnie',
+  alsoManage: 'Zarządzaj też (zaznacz)',
+
+  //generic
+  and: 'i',
 }

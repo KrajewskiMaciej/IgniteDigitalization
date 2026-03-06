@@ -10,34 +10,6 @@
       </p>
     </div>
 
-    <div class="max-w-6xl mx-auto w-full">
-      <div class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl">
-        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-primary-500/20 p-3 rounded-lg">
-            <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
-          </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('deckSelection') }}</h2>
-        </div>
-
-        <div>
-          <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            {{ t('selectDeck') }}
-          </label>
-          <Dropdown
-            id="deck-select"
-            v-model="selectedDeckId"
-            :options="decksData"
-            optionLabel="title"
-            optionValue="id"
-            showClear
-            placeholder="Wybierz talię..."
-            class="w-full"
-            :disabled="isLoadingDecks"
-          />
-        </div>
-      </div>
-    </div>
-
     <div
       v-if="selectedDeckId"
       class="border border-surface-700 rounded-xl p-5 bg-gradient-to-br from-surface-900 to-surface-800 shadow-2xl"
@@ -189,7 +161,6 @@ import type { ICardNode, ICardEdge } from '@/types/Nodes'
 import { Background } from '@vue-flow/background'
 import { useI18n } from 'vue-i18n'
 import CustomNode from './CustomNode.vue'
-import Dropdown from 'primevue/dropdown'
 import {
   faDiagramProject,
   faMagnifyingGlassPlus,
@@ -220,8 +191,6 @@ const { t } = useI18n()
 const toast = useToast()
 
 const selectedDeckId = defineModel<number | undefined>()
-const decksData = ref<Deck[]>([])
-const isLoadingDecks = ref<boolean>(false)
 const currentLayout = useStorage<'TB' | 'LR'>('prefferedLayour', 'TB')
 const decisionCardsData = ref<IDecisonCard[]>([])
 const itemsData = ref<IItemCard[]>([])
@@ -255,8 +224,6 @@ const markCardAsChanged = (targetCardId: number) => {
     cardsId,
     enablers: [...(enablers.value[targetCardId] || [])],
   })
-
-  console.log('Pending changes:', Array.from(pendingEnablersChanges.value.values()))
 }
 
 async function layoutGraph(direction: 'LR' | 'TB') {
@@ -294,8 +261,6 @@ const handleSaveChanges = async () => {
     isEditMode.value = false
     return
   }
-
-  console.log('Jakie mam zmiany do zrobienia ?', changes)
 
   for (const change of changes) {
     const enablerCardsIds = change.enablers
@@ -435,19 +400,6 @@ const createEdgesFromEnablers = (
   }
 }
 
-async function fetchDecks(): Promise<void> {
-  isLoadingDecks.value = true
-  try {
-    const response = await apiServices.get(apiConfig.admin.deck.getAll)
-    decksData.value = response.data as Deck[]
-  } catch (error) {
-    console.error('Błąd przy pobieraniu talii:', error)
-    toast.error(t('errorFetchingDecks'))
-  } finally {
-    isLoadingDecks.value = false
-  }
-}
-
 const fetchEnablersMap = async (deckId: number) => {
   try {
     const response = await apiServices.get<IEnablersMapResponse>(
@@ -491,11 +443,9 @@ watch(selectedDeckId, async (newSelectedDeckId) => {
     createEdgesFromEnablers(enablers.value, cardTypes.value)
     layoutGraph(currentLayout.value)
   }
-})
+}, { immediate: true })
 
-onMounted(async () => {
-  fetchDecks()
-})
+
 </script>
 
 <style>

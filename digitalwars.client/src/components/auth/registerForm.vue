@@ -168,18 +168,15 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-// --- KROK 1: Import enumu POSITION ---
 import { useToast, POSITION } from 'vue-toastification'
 import passwordStrength from './passwordStrength.vue'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
-// Poprawiono ścieżki importu
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
 
-// --- KROK 2: Definicja typu dla błędu API ---
 interface ApiError {
   response?: {
     data?: string
@@ -193,7 +190,6 @@ const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const isLoading = ref(false)
 
-// --- KROK 3: Jawne otypowanie parametru 'email' ---
 const validateEmail = (email: string) => {
   if (!email) return false
   return String(email)
@@ -241,7 +237,6 @@ const handleRegister = async () => {
   toast.clear()
 
   if (registerData.value.password !== registerData.value.confirmPassword) {
-    // --- KROK 4: Użycie enumu POSITION ---
     toast.error(t('passwordsDoNotMatch'), {
       position: POSITION.TOP_CENTER,
     })
@@ -256,15 +251,12 @@ const handleRegister = async () => {
     )
 
     if (response.data.success) {
-      console.log('✅ Zarejestrowano pomyślnie!')
       toast.success(t('registrationSuccessful'), {
         position: POSITION.TOP_CENTER,
       })
       emit('switchToConfirmEmail', registerData.value.email)
     }
   } catch (error: unknown) {
-    // Jawne otypowanie błędu jako 'unknown'
-    // --- KROK 5: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
 
     emit('error')
@@ -280,7 +272,6 @@ const handleRegister = async () => {
         })
       }
     } else {
-      // Ogólny błąd, jeśli struktura jest inna
       toast.error(t('errorServerUnavailable'), {
         position: POSITION.TOP_CENTER,
       })

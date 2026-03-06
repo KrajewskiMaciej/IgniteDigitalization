@@ -22,7 +22,7 @@
       "
     >
       <span class="text-sm">{{ card.description }}</span>
-      <span class="text-xs mt-2 opacity-70">ID karty: {{ card.id }}</span>
+      <span class="text-xs mt-2 opacity-70">{{ t('cardIdLabel') }} {{ card.id }}</span>
     </div>
     <div
       class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent"
@@ -40,6 +40,9 @@
 <script setup lang="ts">
 import type { IDecisonCard } from '@/types/Game'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   card: IDecisonCard

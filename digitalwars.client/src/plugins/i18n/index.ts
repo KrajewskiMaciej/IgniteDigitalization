@@ -14,7 +14,6 @@ function getInitialLocale(): string {
 
   const browser = navigator.language.split('-')[0]
   if (browser in messages) {
-    console.log('Język z przeglądarki:', browser)
     return browser
   }
 

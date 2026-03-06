@@ -9,33 +9,6 @@
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
-      <!-- Sekcja wyboru talii -->
-      <div class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl">
-        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-primary-500/20 p-3 rounded-lg">
-            <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
-          </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('deckSelection') }}</h2>
-        </div>
-
-        <div>
-          <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            {{ t('selectDeck') }}
-          </label>
-          <Dropdown
-            id="deck-select"
-            v-model="selectedDeck"
-            showClear
-            :options="decksData"
-            optionLabel="title"
-            optionValue="id"
-            :placeholder="t('selectDeckPlaceholder')"
-            class="w-full"
-          >
-          </Dropdown>
-        </div>
-      </div>
-
       <!-- Sekcja wyboru procesu -->
       <div
         v-if="selectedDeck"
@@ -230,7 +203,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useToast } from 'vue-toastification'
 import {
   faTrash,
@@ -259,11 +232,6 @@ interface IProcessResponse {
 }
 
 // --- INTERFACES ---
-interface Deck {
-  id: number
-  title: string
-}
-
 interface Process {
   processId: number
   deckId: number
@@ -274,7 +242,6 @@ interface Process {
 
 // --- REACTIVE DATA ---
 const selectedDeck = defineModel<number | undefined>()
-const decksData = ref<Deck[]>([])
 
 const processesData = ref<Process[]>([])
 const selectedProcess = ref<number | null>(null)
@@ -333,7 +300,7 @@ const deleteSelectedProcess = async () => {
 
 const saveProcessChanges = async () => {
   if (!isProcessValid.value) {
-    toast.error('Proszę wprowadzić poprawne dane procesu')
+    toast.error(t('invalidProcessData'))
     return
   }
 
@@ -356,7 +323,7 @@ const saveProcessChanges = async () => {
 
       selectedProcess.value = response.data.processId
 
-      toast.success('Nowy proces został dodany')
+      toast.success(t('newProcessAdded'))
     } else {
       // API call to update process
       const index = processesData.value.findIndex(
@@ -414,7 +381,7 @@ watch(selectedDeck, async (newDeck) => {
       toast.error(t('errorFetchingProcesses') + error)
     }
   }
-})
+}, { immediate: true })
 
 watch(selectedProcess, (newProcess) => {
   if (newProcess && !isAddingNewProcess.value) {
@@ -437,14 +404,4 @@ watch(selectedProcess, (newProcess) => {
   }
 })
 
-// --- LIFECYCLE ---
-onMounted(async () => {
-  try {
-    const response = await apiServices.get<Deck[]>(apiConfig.admin.deck.getAll)
-    decksData.value = response.data
-  } catch (error) {
-    console.error('Błąd przy pobieraniu talii:', error)
-    toast.error(t('errorFetchingDecks') + error)
-  }
-})
 </script>

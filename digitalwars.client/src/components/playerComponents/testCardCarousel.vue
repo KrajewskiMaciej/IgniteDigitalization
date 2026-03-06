@@ -1,11 +1,11 @@
 <template>
   <div class="w-full max-w-xl mx-auto mt-10">
-    <div v-if="loading" class="text-center text-white">Ładowanie kart...</div>
+    <div v-if="loading" class="text-center text-white">{{ t('loadingCards') }}</div>
     <div v-else-if="fetchError" class="text-center text-red-500">
-      Błąd ładowania kart: {{ fetchError }}
+      {{ t('loadingCardsError') }} {{ fetchError }}
     </div>
     <div v-else-if="!cards || cards.length === 0" class="text-center text-white">
-      Brak dostępnych kart.
+      {{ t('noCardsAvailable') }}
     </div>
 
     <!-- Warunek v-else, aby uniknąć renderowania, gdy karty są puste -->
@@ -24,7 +24,7 @@
           <button
             @click.stop="prevCard"
             class="w-12 flex items-center justify-center hover:bg-black/20 rounded-l-2xl transition"
-            aria-label="Poprzednia karta"
+            :aria-label="t('previousCard')"
             :disabled="cards.length <= 1"
           >
             <!-- POPRAWKA: Użyto encji HTML, aby uniknąć błędu parsowania -->
@@ -49,7 +49,7 @@
           <button
             @click.stop="nextCard"
             class="w-12 flex items-center justify-center hover:bg-black/20 rounded-r-2xl transition"
-            aria-label="Następna karta"
+            :aria-label="t('nextCard')"
             :disabled="cards.length <= 1"
           >
             <!-- POPRAWKA: Użyto encji HTML -->
@@ -84,7 +84,7 @@
           @click="sendCardSelection"
           class="bg-black text-white px-6 py-2 rounded-full shadow-md hover:bg-gray-800 transition-colors duration-200"
         >
-          Wybierz kartę
+          {{ t('selectCardButton') }}
         </button>
       </div>
     </div>
@@ -93,8 +93,11 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 // Upewnij się, że ta ścieżka jest poprawna dla Twojego projektu
 import apiClient from '@/services/apiServices'
+
+const { t } = useI18n()
 
 // --- DEFINICJE INTERFEJSÓW ---
 interface Card {

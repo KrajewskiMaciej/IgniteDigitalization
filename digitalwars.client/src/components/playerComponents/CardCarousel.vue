@@ -67,7 +67,7 @@
           <button
             @click.stop="prevCard"
             class="flex items-center justify-center lg:px-2 hover:bg-black/10 rounded-bl-2xl transition-colors duration-300 ease-out"
-            aria-label="Poprzednia karta"
+            :aria-label="t('previousCard')"
             :disabled="displayCards.length <= 1"
           >
             <font-awesome-icon :icon="faChevronLeft" class="font-bold text-lg lg:text-xl" />
@@ -93,7 +93,7 @@
           <button
             @click.stop="nextCard"
             class="flex items-center justify-center lg:px-2 hover:bg-black/10 rounded-br-2xl transition-colors duration-300 ease-out"
-            aria-label="Następna karta"
+            :aria-label="t('nextCard')"
             :disabled="displayCards.length <= 1"
           >
             <font-awesome-icon :icon="faChevronRight" class="font-bold text-lg lg:text-xl" />
@@ -232,7 +232,7 @@ const buttonLabel = computed(() => {
 async function fetchCards() {
   const { deckId, gameId, teamId } = props
   if (deckId == null || gameId == null || teamId == null) {
-    fetchError.value = 'Brak wymaganych danych do pobrania kart.'
+    fetchError.value = t('missingCardsData')
     loading.value = false
     return
   }
@@ -263,7 +263,7 @@ async function fetchCards() {
   } catch (error: any) {
     decisionCards.value = []
     itemCards.value = []
-    fetchError.value = 'Wystąpił błąd podczas pobierania kart.'
+    fetchError.value = t('errorFetchingCards')
     console.error('[CardCarousel] Błąd pobierania kart:', error)
   } finally {
     loading.value = false

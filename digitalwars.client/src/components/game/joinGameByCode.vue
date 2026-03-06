@@ -62,7 +62,7 @@
             <div
               class="flex-1 h-px bg-gradient-to-r from-transparent via-primary-500/30 to-primary-500/30"
             ></div>
-            <span class="text-surface-400 text-sm">lub</span>
+            <span class="text-surface-400 text-sm">{{ t('orSeparator') }}</span>
             <div class="flex-1 h-px bg-gradient-to-r from-primary-500/30 to-transparent"></div>
           </div>
 
@@ -218,13 +218,13 @@ const onCameraOn = () => {
 }
 
 const onScannerError = (error: Error) => {
-  let errorMessage = 'Błąd kamery'
+  let errorMessage = t('cameraError')
   if (error.name === 'NotAllowedError') {
-    errorMessage = 'Brak dostępu do kamery. Sprawdź uprawnienia przeglądarki.'
+    errorMessage = t('cameraPermissionDenied')
   } else if (error.name === 'NotFoundError') {
-    errorMessage = 'Nie znaleziono kamery w urządzeniu.'
+    errorMessage = t('cameraNotFound')
   } else if (error.name === 'NotReadableError') {
-    errorMessage = 'Kamera jest obecnie używana przez inną aplikację.'
+    errorMessage = t('cameraInUse')
   }
   scanError.value = errorMessage
   console.error('Błąd skanera QR:', error)

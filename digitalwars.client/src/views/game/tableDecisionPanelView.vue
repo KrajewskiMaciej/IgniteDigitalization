@@ -8,16 +8,86 @@
         {{ t('manageDecisionsAndItemsForTeam') }}
       </p>
       <div
-        class="inline-flex gap-3 items-center px-6 py-3 bg-secondary border border-surface-700 rounded-xl shadow-lg"
+        class="inline-flex gap-3 items-center px-6 py-3 bg-secondary border border-surface-700 rounded-xl shadow-lg cursor-pointer hover:border-primary-500 hover:bg-primary-500/10 transition-all duration-200"
+        :title="t('clickToChangeTeam')"
+        @click="showTeamPicker = true"
       >
-        <div
-          class="w-5 h-5 rounded-full ring-2 ring-surface-600 shadow-lg"
-          :style="{ backgroundColor: teamData?.teamColor }"
-        ></div>
-        <span class="font-nasalization font-bold text-2xl text-surface-0 tracking-wide">
-          {{ teamData?.teamName }}
-        </span>
+        <template v-if="managedTeamIds.length <= 1">
+          <div
+            class="w-5 h-5 rounded-full ring-2 ring-surface-600 shadow-lg"
+            :style="{ backgroundColor: teamData?.teamColor }"
+          ></div>
+          <span class="font-nasalization font-bold text-2xl text-surface-0 tracking-wide">
+            {{ teamData?.teamName }}
+          </span>
+        </template>
+        <template v-else>
+          <div class="flex items-center gap-2 flex-wrap justify-center">
+            <div
+              v-for="team in managedTeamsData.slice(0, 3)"
+              :key="team.teamId"
+              class="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-surface-600 bg-surface-800/60"
+            >
+              <div
+                class="w-3.5 h-3.5 rounded-full ring-1 ring-surface-500 flex-shrink-0"
+                :style="{ backgroundColor: team.teamColor }"
+              ></div>
+              <span class="font-semibold text-sm text-surface-0">{{ team.teamName }}</span>
+            </div>
+            <div
+              v-if="managedTeamsData.length > 3"
+              class="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-surface-600 bg-surface-700/60 text-surface-300 text-sm font-semibold"
+            >
+              +{{ managedTeamsData.length - 3 }}
+            </div>
+          </div>
+        </template>
+        <font-awesome-icon :icon="faChevronDown" class="h-4 text-surface-400 flex-shrink-0" />
       </div>
+
+      <Dialog
+        v-model:visible="showTeamPicker"
+        :header="t('changeTeam')"
+        modal
+        :style="{ width: '400px' }"
+        :pt="{ root: { class: 'bg-secondary border border-surface-700' } }"
+      >
+        <div class="space-y-2 mt-2">
+          <div
+            v-if="loadingTeams"
+            class="text-center py-6"
+          >
+            <ProgressSpinner style="width: 2rem; height: 2rem" strokeWidth="4" />
+          </div>
+          <div
+            v-else
+            v-for="team in availableTeams"
+            :key="team.teamId"
+            class="flex items-center gap-2 px-3 py-3 rounded-lg border transition-all duration-150"
+            :class="isManagedTeam(team.teamId)
+              ? 'border-primary-500 bg-primary-500/15'
+              : 'border-surface-700 bg-surface-800'"
+          >
+            <input
+              type="checkbox"
+              :checked="isManagedTeam(team.teamId)"
+              @change.stop="toggleManagedTeam(team)"
+              class="w-4 h-4 flex-shrink-0 cursor-pointer accent-primary-500"
+              :title="t('alsoManage')"
+            />
+            <div
+              class="flex items-center gap-3 flex-1 cursor-pointer"
+              @click="selectTeam(team)"
+            >
+              <div
+                class="w-4 h-4 rounded-full ring-2 ring-surface-600 flex-shrink-0"
+                :style="{ backgroundColor: team.teamColor }"
+              ></div>
+              <span class="font-semibold text-white">{{ team.teamName }}</span>
+            </div>
+          </div>
+        </div>
+      </Dialog>
     </div>
 
     <div class="max-w-7xl mx-auto w-full">
@@ -31,24 +101,32 @@
               <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('actionManagment') }}</h2>
             </div>
 
-            <div class="flex gap-3 mb-5">
-              <Button
-                :label="t('decisions')"
-                @click="actionMode = 'cards'"
-                :severity="actionMode === 'cards' ? undefined : 'secondary'"
-                class="flex-1"
-                outlined
-              />
-              <Button
-                :label="t('items')"
-                @click="actionMode = 'items'"
-                :severity="actionMode === 'items' ? undefined : 'secondary'"
-                class="flex-1"
-                outlined
-              />
+            <div v-if="managedTeamIds.length > 1" class="mb-4">
+              <label class="block mb-2 text-sm font-semibold text-gray-300">{{ t('selectTable') }}</label>
+              <Dropdown
+                v-model="selectedPlayTeamId"
+                :options="managedTeamsData"
+                optionLabel="teamName"
+                optionValue="teamId"
+                :placeholder="t('selectTablePlaceholder')"
+                class="w-full"
+              >
+                <template #option="slotProps">
+                  <div class="flex items-center justify-between gap-2 w-full">
+                    <div class="flex gap-2 items-center">
+                      <div
+                        :style="{ backgroundColor: slotProps.option.teamColor }"
+                        class="w-4 h-4 rounded-full"
+                      ></div>
+                      <span>{{ slotProps.option.teamName }}</span>
+                    </div>
+                    <span class="text-green-400">{{ slotProps.option.teamBud }} {{ t('bits') }}</span>
+                  </div>
+                </template>
+              </Dropdown>
             </div>
 
-            <div v-if="actionMode === 'cards'" class="mb-4">
+            <div class="mb-4">
               <label class="block mb-2 text-sm font-semibold text-gray-300">{{
                 t('selectCard')
               }}</label>
@@ -77,103 +155,74 @@
               </Dropdown>
             </div>
 
-            <div v-if="actionMode === 'items'" class="mb-4">
-              <label class="block mb-2 text-sm font-semibold text-gray-300">
-                {{ t('selectItem') }}
-              </label>
-              <Dropdown
-                v-model="selectedItemId"
-                :options="items"
-                optionLabel="title"
-                optionValue="id"
-                :placeholder="t('selectItemPlaceholder')"
-                class="w-full"
-                :disabled="loading.items"
-              >
-                <template #value="slotProps">
-                  <div v-if="slotProps.value" class="flex items-center gap-2">
-                    <span
-                      :class="
-                        items.find((i) => i.id === slotProps.value)?.type === 'software'
-                          ? 'text-green-400'
-                          : 'text-orange-400'
-                      "
-                      >#{{ slotProps.value }}</span
-                    >
-                    <span>{{ items.find((i) => i.id === slotProps.value)?.title }}</span>
-                  </div>
-                  <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
-                </template>
-                <template #option="slotProps">
-                  <div class="flex items-center gap-2">
-                    <span
-                      :class="
-                        slotProps.option.type === 'software' ? 'text-green-400' : 'text-orange-400'
-                      "
-                      >#{{ slotProps.option.id }}</span
-                    >
-                    <span>{{ slotProps.option.title }}</span>
-                  </div>
-                </template>
-              </Dropdown>
-            </div>
-
             <div
-              v-if="
-                (actionMode === 'cards' && selectedCard) || (actionMode === 'items' && selectedItem)
-              "
+              v-if="selectedCard"
               class="bg-secondary rounded-lg p-4 border border-surface-700 mb-4"
             >
               <p class="text-sm text-surface-400 mb-1">{{ t('description') }}:</p>
-              <p class="text-sm text-gray-300">
-                {{ actionMode === 'cards' ? selectedCard?.description : selectedItem?.description }}
-              </p>
+              <p class="text-sm text-gray-300">{{ selectedCard?.description }}</p>
               <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-700">
                 <span class="text-sm text-surface-400">{{ t('cost') }}:</span>
                 <span class="text-lg font-bold text-green-400">
-                  {{ (actionMode === 'cards' ? selectedCard?.cost : selectedItem?.cost) || 0 }}
+                  {{ selectedCard?.cost || 0 }}
                   {{ t('bits') }}
                 </span>
               </div>
             </div>
 
             <div
-              v-if="teamData"
+              v-if="selectedPlayTeam"
               class="bg-secondary rounded-lg p-4 border border-surface-700 mb-4"
             >
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm text-surface-400">{{ t('teamBudget') }}:</p>
-                  <p class="text-sm font-semibold text-white">{{ teamData.teamName }}</p>
+                  <p class="text-sm font-semibold text-white">{{ selectedPlayTeam.teamName }}</p>
                 </div>
                 <span class="text-2xl font-bold text-green-400"
-                  >{{ teamData.teamBud }} {{ t('bits') }}</span
+                  >{{ selectedPlayTeam.teamBud }} {{ t('bits') }}</span
                 >
               </div>
             </div>
 
             <div class="flex justify-center">
               <Button
-                v-if="actionMode === 'cards'"
                 :disabled="!selectedCardId"
                 @click="playCard"
                 :label="t('playCard')"
                 size="large"
                 class="w-full"
               />
-              <Button
-                v-if="actionMode === 'items'"
-                :disabled="!selectedItemId"
-                @click="giveItem"
-                :label="t('useItem')"
-                size="large"
-                class="w-full"
-              />
             </div>
           </div>
 
-          <div v-if="showOwnBoard" class="w-full flex justify-center">
-            <GameBoard :config="formData" :game-mode="true" :pawns="pawns" :use-percentage="true" />
+          <div class="w-full space-y-3">
+            <div class="flex gap-2 justify-center">
+              <Button
+                :label="t('yourBoard')"
+                :severity="boardView === 'own' ? undefined : 'secondary'"
+                @click="boardView = 'own'"
+                size="small"
+                outlined
+              />
+              <Button
+                :label="t('rivalBoard')"
+                :severity="boardView === 'rival' ? undefined : 'secondary'"
+                @click="boardView = 'rival'"
+                size="small"
+                outlined
+              />
+            </div>
+            <div v-if="boardView === 'own'" class="w-full flex justify-center">
+              <GameBoardCartesian
+                :config="formData"
+                :pawns="managedTeamIds.length > 1 ? allManagedPawns : pawns"
+                :circle-mode="managedTeamIds.length > 1"
+              />
+            </div>
+            <div v-else class="w-full flex justify-center">
+              <GameBoard :config="enemyFormData" :game-mode="false" :pawns="enemyPawns" :use-percentage="true" />
+            </div>
           </div>
         </div>
 
@@ -238,7 +287,14 @@
             >
               <div class="flex items-start justify-between mb-2">
                 <div>
-                  <p class="text-white font-semibold">{{ entry.tableName }}</p>
+                  <div class="flex items-center gap-2 mb-0.5">
+                    <div
+                      v-if="managedTeamIds.length > 1 && entry.teamColor"
+                      class="w-3 h-3 rounded-full flex-shrink-0"
+                      :style="{ backgroundColor: entry.teamColor }"
+                    ></div>
+                    <p class="text-white font-semibold">{{ entry.tableName }}</p>
+                  </div>
                   <p class="text-sm text-surface-400">{{ t('suggectCard') }}</p>
                 </div>
                 <span
@@ -329,7 +385,14 @@
                 </div>
                 <div class="flex items-start justify-between mb-2">
                   <div>
-                    <p class="text-white font-semibold">{{ entry.tableName }}</p>
+                    <div class="flex items-center gap-2 mb-0.5">
+                      <div
+                        v-if="managedTeamIds.length > 1 && entry.teamColor"
+                        class="w-3 h-3 rounded-full flex-shrink-0"
+                        :style="{ backgroundColor: entry.teamColor }"
+                      ></div>
+                      <p class="text-white font-semibold">{{ entry.tableName }}</p>
+                    </div>
                     <p class="text-sm text-surface-400">{{ t('cardId') }}: {{ entry.cardId }}</p>
                   </div>
                   <span
@@ -358,8 +421,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useToast } from 'vue-toastification'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
   faGamepad,
@@ -368,11 +432,14 @@ import {
   faHistory,
   faCheck,
   faTimes,
+  faChevronDown,
 } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
+import Dialog from 'primevue/dialog'
 import ProgressSpinner from 'primevue/progressspinner'
 
+import GameBoardCartesian from '@/components/game/gameBoardCartesian.vue'
 import GameBoard from '@/components/game/gameBoard.vue'
 import apiConfig from '@/services/apiConfig'
 import apiServices from '@/services/apiServices'
@@ -387,6 +454,14 @@ interface SessionData {
   boardConfig: BoardConfig & { boardId: number }
 }
 interface TeamData {
+  teamId: number
+  teamName: string
+  teamColor: string
+  teamBud: number
+  deckId: number
+  boardId: number
+}
+interface AvailableTeam {
   teamId: number
   teamName: string
   teamColor: string
@@ -424,6 +499,7 @@ interface DecisionLog {
   cardTitle?: string
   tableId?: number
   tableName?: string
+  teamColor?: string
   result?: 'Pozytywny' | 'Negatywny'
   eventAppliedId?: number | null
 }
@@ -433,6 +509,7 @@ interface PendingDecision {
   cardTitle: string
   tableId: number
   tableName: string
+  teamColor?: string
   timestamp: string
 }
 interface GameEvent {
@@ -492,14 +569,39 @@ interface RawPawn {
   maxPosX?: number
   maxPosY?: number
 }
+interface RivalBoardConfig {
+  boardId: number
+  name: string
+  labelsUp: string[]
+  labelsRight: string[]
+  descriptionDown: string
+  descriptionLeft: string
+  rows: number
+  cols: number
+  cellColor: string
+  borderColor: string
+  borderColors: string[]
+  cellsDescriptions?: string
+}
+interface RawPawnData {
+  teamId: number
+  posX: string | number
+  posY: string | number
+  teamColor: string
+  teamName: string
+  maxPosX?: number
+  maxPosY?: number
+}
 
 const props = defineProps({
   gameId: { type: [Number, String], required: true },
-  teamId: { type: [Number, String], required: true },
+  teamId: { type: [Number, String], required: false },
+  allTeams: { type: Boolean, default: false },
 })
 
 const toast = useToast()
 const { t } = useI18n()
+const router = useRouter()
 
 const formData = reactive<BoardConfig>({
   boardId: 0,
@@ -515,32 +617,111 @@ const formData = reactive<BoardConfig>({
   borderColors: [],
 })
 
-const loading = reactive({ teamData: true, cards: true, items: true, history: true, pending: true })
+const loading = reactive({ teamData: true, cards: true, history: true, pending: true })
 const teamData = ref<TeamData | null>(null)
+const availableTeams = ref<AvailableTeam[]>([])
+const showTeamPicker = ref(false)
+const loadingTeams = ref(false)
+const currentTeamId = ref<number>(props.teamId ? Number(props.teamId) : 0)
+const managedTeamIds = ref<number[]>(props.teamId ? [Number(props.teamId)] : [])
+const boardView = ref<'own' | 'rival'>('own')
+const enemyFormData = reactive<RivalBoardConfig>({
+  boardId: 0,
+  name: '',
+  labelsUp: [],
+  labelsRight: [],
+  descriptionDown: '',
+  descriptionLeft: '',
+  rows: 8,
+  cols: 8,
+  cellColor: '#f0f0f0',
+  borderColor: '#595959',
+  borderColors: [],
+  cellsDescriptions: '',
+})
+const enemyPawns = ref<Pawn[]>([])
 const cards = ref<Card[]>([])
-const items = ref<Item[]>([])
 const decisions = ref<DecisionLog[]>([])
 const pendingDecisions = ref<PendingDecision[]>([])
 const pawns = ref<Pawn[]>([])
-const availableEvents = ref<GameEvent[]>([])
 
-const actionMode = ref<'cards' | 'items' | 'events'>('cards')
 const decisionMode = ref<'pending' | 'history'>('history')
 const selectedCardId = ref<number | null>(null)
-const selectedItemId = ref<number | null>(null)
-const selectedPendingEventIndex = ref<number | null>(null)
-const showOwnBoard = ref(true)
+const selectedPlayTeamId = ref<number>(props.teamId ? Number(props.teamId) : 0)
+const allManagedPawns = ref<Pawn[]>([])
+
+const managedTeamsData = computed<AvailableTeam[]>(() => {
+  const fromAvailable = availableTeams.value.filter((t) => managedTeamIds.value.includes(t.teamId))
+  // Ensure primary team is always present even if availableTeams hasn't loaded yet
+  if (teamData.value && !fromAvailable.find((t) => t.teamId === teamData.value!.teamId)) {
+    return [{ ...teamData.value } as AvailableTeam, ...fromAvailable]
+  }
+  return fromAvailable
+})
+
+const selectedPlayTeam = computed<TeamData | AvailableTeam | null>(() => {
+  if (selectedPlayTeamId.value === currentTeamId.value && teamData.value) return teamData.value
+  return availableTeams.value.find((t) => t.teamId === selectedPlayTeamId.value) ?? null
+})
+
+watch(selectedPlayTeamId, () => {
+  selectedCardId.value = null
+  fetchAvailableCardsAndItems()
+})
 
 const selectedCard = computed<Card | undefined>(() =>
   cards.value.find((c) => c.id === selectedCardId.value),
 )
-const selectedItem = computed<Item | undefined>(() =>
-  items.value.find((i) => i.id === selectedItemId.value),
-)
+
+const isManagedTeam = (teamId: number) => managedTeamIds.value.includes(teamId)
+
+const toggleManagedTeam = (team: AvailableTeam) => {
+  const idx = managedTeamIds.value.indexOf(team.teamId)
+  if (idx === -1) {
+    managedTeamIds.value.push(team.teamId)
+    fetchDecisionHistory()
+    fetchPendingDecisions()
+    fetchAllManagedPawns()
+  } else {
+    if (team.teamId === currentTeamId.value) return // cannot remove primary
+    managedTeamIds.value.splice(idx, 1)
+    fetchDecisionHistory()
+    fetchPendingDecisions()
+    fetchAllManagedPawns()
+  }
+}
+
+const fetchTeams = async () => {
+  loadingTeams.value = true
+  try {
+    const response = await apiServices.get<AvailableTeam[]>(
+      apiConfig.player.getTeamsManagement(Number(props.gameId)),
+    )
+    availableTeams.value = response.data
+  } catch (error) {
+    console.error('Błąd pobierania drużyn:', error)
+  } finally {
+    loadingTeams.value = false
+  }
+}
+
+const selectTeam = async (team: AvailableTeam) => {
+  showTeamPicker.value = false
+  const wasPrimary = team.teamId === currentTeamId.value
+  currentTeamId.value = team.teamId
+  selectedPlayTeamId.value = team.teamId
+  if (!managedTeamIds.value.includes(team.teamId)) {
+    managedTeamIds.value.push(team.teamId)
+  }
+  router.replace({ name: 'table-decision-panel', params: { gameId: props.gameId, teamId: team.teamId } })
+  if (!wasPrimary) {
+    await fetchAllDataForTeam()
+  }
+}
 
 const fetchAllDataForTeam = async () => {
   const gameIdNum = Number(props.gameId)
-  const teamIdNum = Number(props.teamId)
+  const teamIdNum = currentTeamId.value
   if (isNaN(gameIdNum) || isNaN(teamIdNum)) return
 
   Object.keys(loading).forEach((k) => (loading[k as keyof typeof loading] = true))
@@ -554,8 +735,6 @@ const fetchAllDataForTeam = async () => {
     if (sessionData.boardConfig) {
       Object.assign(formData, sessionData.boardConfig)
     }
-
-    console.log('Dane drużyny:', response.data)
 
     teamData.value = {
       teamId: sessionData.teamId,
@@ -571,8 +750,8 @@ const fetchAllDataForTeam = async () => {
       fetchPawns(),
       fetchDecisionHistory(),
       fetchPendingDecisions(),
-      fetchGameEvents(teamData.value.deckId),
     ])
+    if (managedTeamIds.value.length > 1) await fetchAllManagedPawns()
   } catch (error) {
     toast.error(t('errorLoadingTeamData'))
     console.error('Błąd w fetchAllDataForTeam:', error)
@@ -581,32 +760,51 @@ const fetchAllDataForTeam = async () => {
   }
 }
 
+const fetchAllManagedPawns = async () => {
+  const gameIdNum = Number(props.gameId)
+  const teamsToFetch = managedTeamIds.value
+    .map((tId) => {
+      const t = availableTeams.value.find((x) => x.teamId === tId)
+      const teamColor = t?.teamColor ?? (tId === currentTeamId.value ? teamData.value?.teamColor : undefined) ?? '#ffffff'
+      if (t?.boardId) return { teamId: tId, boardId: t.boardId, teamColor }
+      if (tId === currentTeamId.value && teamData.value?.boardId)
+        return { teamId: tId, boardId: teamData.value.boardId, teamColor }
+      return null
+    })
+    .filter((x): x is { teamId: number; boardId: number; teamColor: string } => !!x)
+  try {
+    const results = await Promise.all(
+      teamsToFetch.map(async ({ teamId, boardId, teamColor }) => {
+        const url = apiConfig.player.getPawns(gameIdNum, teamId, boardId)
+        const r = await apiServices.get<RawPawn[]>(url)
+        return r.data.map((p) => ({
+          id: p.gpId,
+          x: Number(p.posX),
+          y: Number(p.posY),
+          color: teamColor,
+          name: p.name,
+          maxX: Number(p.maxPosX) || 1,
+          maxY: Number(p.maxPosY) || 1,
+        }))
+      }),
+    )
+    allManagedPawns.value = results.flat()
+  } catch (err) {
+    console.error('Błąd pobierania pionków wielu drużyn:', err)
+  }
+}
+
 const fetchAvailableCardsAndItems = async () => {
-  if (!teamData.value?.deckId || !props.gameId || !props.teamId) return
+  const playTeam = selectedPlayTeam.value
+  if (!playTeam?.deckId || !props.gameId) return
   try {
     const url = apiConfig.player.getCards(
-      teamData.value.deckId,
+      playTeam.deckId,
       Number(props.gameId),
-      Number(props.teamId),
+      playTeam.teamId,
     )
-
-    const response = await apiServices.get<ICardsResponse>(url)
-
-    console.log('Pobrane dane kart', response.data)
-
+    const response = await apiServices.get<{ decisionCards: Card[] }>(url)
     cards.value = response.data.decisionCards || []
-
-    const softwareCards = (response.data.softwareCards || []).map((item: Item) => ({
-      ...item,
-      type: 'software',
-    }))
-
-    const hardwareCards = (response.data.hardwareCards || []).map((item: Item) => ({
-      ...item,
-      type: 'hardware',
-    }))
-
-    items.value = [...softwareCards, ...hardwareCards]
   } catch (error) {
     toast.error(t('errorFetchingCardsAndItems'))
     console.error('Błąd pobierania kart:', error)
@@ -615,56 +813,101 @@ const fetchAvailableCardsAndItems = async () => {
 
 const fetchDecisionHistory = async () => {
   try {
-    const response = await apiServices.post<RawHistoryLog[]>(apiConfig.player.getPlayerHistory, {
-      gameId: props.gameId,
-      teamId: props.teamId,
+    const responses = await Promise.all(
+      managedTeamIds.value.map((tId) =>
+        apiServices.post<RawHistoryLog[]>(apiConfig.player.getPlayerHistory, {
+          gameId: props.gameId,
+          teamId: tId,
+        }),
+      ),
+    )
+    const allLogs = responses.flatMap((r) => r.data || [])
+    allLogs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    decisions.value = allLogs.map((log) => {
+      const teamColor =
+        availableTeams.value.find((x) => x.teamId === log.teamId)?.teamColor ??
+        (log.teamId === currentTeamId.value ? teamData.value?.teamColor : undefined)
+      return log.isEventNotification
+        ? {
+            isEventNotification: true,
+            feedbackDescription: log.eventDescription || 'Aktywowano nowe wydarzenie.',
+            timestamp: log.timestamp,
+          }
+        : {
+            isEventNotification: false,
+            cardId: log.cardId,
+            cardTitle: log.cardTitle,
+            tableId: log.teamId,
+            tableName: log.teamName,
+            teamColor,
+            timestamp: log.timestamp,
+            feedbackDescription: log.feedbackDescription,
+            result: log.status ? 'Pozytywny' : 'Negatywny',
+            eventAppliedId: log.gameEventId,
+          }
     })
-    const logs = response.data
-    if (Array.isArray(logs)) {
-      decisions.value = logs.map((log) =>
-        log.isEventNotification
-          ? {
-              isEventNotification: true,
-              feedbackDescription: log.eventDescription || 'Aktywowano nowe wydarzenie.',
-              timestamp: log.timestamp,
-            }
-          : {
-              isEventNotification: false,
-              cardId: log.cardId,
-              cardTitle: log.cardTitle,
-              tableId: log.teamId,
-              tableName: log.teamName,
-              timestamp: log.timestamp,
-              feedbackDescription: log.feedbackDescription,
-              result: log.status ? 'Pozytywny' : 'Negatywny',
-              eventAppliedId: log.gameEventId,
-            },
-      )
-    }
   } catch (error) {
-    // Używam klucza z literówką "Decsion", bo tak jest w Twoim pliku pl.ts
     toast.error(t('errorFetchingDecsionHistory'))
   }
 }
 
 const fetchPendingDecisions = async () => {
   try {
-    const response = await apiServices.get<PendingDecision[]>(
-      apiConfig.player.getPendingLogsForTeam(Number(props.gameId), Number(props.teamId)),
+    const groups = await Promise.all(
+      managedTeamIds.value.map(async (tId) => {
+        const teamColor =
+          availableTeams.value.find((x) => x.teamId === tId)?.teamColor ??
+          (tId === currentTeamId.value ? teamData.value?.teamColor : undefined)
+        const r = await apiServices.get<PendingDecision[]>(
+          apiConfig.player.getPendingLogsForTeam(Number(props.gameId), tId),
+        )
+        return (r.data || []).map((entry) => ({ ...entry, teamColor }))
+      }),
     )
-    pendingDecisions.value = response.data
-    console.log('Pobrane decyzje do akceptacji:', pendingDecisions.value)
+    pendingDecisions.value = groups.flat()
   } catch (error) {
     toast.error(t('errorFetchingSuggestions'))
   }
 }
 
+const fetchRivalBoard = async () => {
+  try {
+    const url = apiConfig.player.getGameData(Number(props.gameId))
+    const response = await apiServices.get<{ rivalBoardConfig: RivalBoardConfig }>(url)
+    if (response.data.rivalBoardConfig) {
+      Object.assign(enemyFormData, response.data.rivalBoardConfig)
+      await fetchRivalPawns()
+    }
+  } catch (error) {
+    console.error('Błąd pobierania planszy rywali:', error)
+  }
+}
+
+const fetchRivalPawns = async () => {
+  if (!enemyFormData.boardId || !props.gameId) return
+  try {
+    const url = apiConfig.player.getRivalPawns(Number(props.gameId), enemyFormData.boardId)
+    const response = await apiServices.get<RawPawnData[]>(url)
+    enemyPawns.value = (response.data || []).map((p) => ({
+      id: p.teamId,
+      x: Number(p.posX),
+      y: Number(p.posY),
+      color: p.teamColor,
+      name: p.teamName,
+      maxX: Number(p.maxPosX) || 1,
+      maxY: Number(p.maxPosY) || 1,
+    }))
+  } catch (err) {
+    console.error('Błąd pobierania pionków rywali:', err)
+  }
+}
+
 const fetchPawns = async () => {
-  if (!teamData.value?.boardId || !props.gameId || !props.teamId) return
+  if (!teamData.value?.boardId || !props.gameId || !currentTeamId.value) return
   try {
     const url = apiConfig.player.getPawns(
       Number(props.gameId),
-      Number(props.teamId),
+      currentTeamId.value,
       teamData.value.boardId,
     )
 
@@ -674,7 +917,7 @@ const fetchPawns = async () => {
       id: p.gpId,
       x: Number(p.posX),
       y: Number(p.posY),
-      color: p.color,
+      color: teamData.value?.teamColor ?? p.color,
       name: p.name,
       maxX: Number(p.maxPosX) || 1,
       maxY: Number(p.maxPosY) || 1,
@@ -684,23 +927,9 @@ const fetchPawns = async () => {
   }
 }
 
-const fetchGameEvents = async (deckId: number) => {
-  if (!deckId) return
-  try {
-    const url = apiConfig.player.getGameEvents(deckId)
-    const response = await apiServices.get(url)
-    availableEvents.value = [
-      { eventId: null, shortDesc: 'Brak zdarzenia', longDesc: '' },
-      ...(response.data as GameEvent[]),
-    ]
-  } catch (error) {
-    console.error('Błąd pobierania zdarzeń:', error)
-  }
-}
-
-const executeCardOrItemAction = async (isCard: boolean) => {
-  const entity = isCard ? selectedCard.value : selectedItem.value
-  const team = teamData.value
+async function playCard() {
+  const entity = selectedCard.value
+  const team = selectedPlayTeam.value
 
   if (!entity || !team) {
     toast.error(t('missingActionData'))
@@ -717,19 +946,15 @@ const executeCardOrItemAction = async (isCard: boolean) => {
     return
   }
 
-  let wasSuccess = true
-  if (isCard) {
-    const cardEntity = entity as Card
-    wasSuccess = !(
-      cardEntity.enablers &&
-      Array.isArray(cardEntity.enablers) &&
-      cardEntity.enablers.length > 0
-    )
-  }
+  const wasSuccess = !(
+    entity.enablers &&
+    Array.isArray(entity.enablers) &&
+    entity.enablers.length > 0
+  )
 
   const minEnablerId =
-    isCard && !wasSuccess && Array.isArray((entity as Card).enablers) && (entity as Card).enablers!.length > 0
-      ? Math.min(...((entity as Card).enablers as number[]))
+    !wasSuccess && Array.isArray(entity.enablers) && entity.enablers.length > 0
+      ? Math.min(...(entity.enablers as number[]))
       : undefined
 
   const endpoint = wasSuccess
@@ -747,17 +972,16 @@ const executeCardOrItemAction = async (isCard: boolean) => {
   }
 
   try {
-    console.log('Wysyłany Id Karty:', entity.id)
     const response = await apiServices.post<{ message?: string; newTeamBudget: number }>(
       endpoint,
       payload,
     )
 
-    // Usunięty toast.success zgodnie z instrukcją
-    // toast.success(response.data?.message || 'Akcja przetworzona pomyślnie.')
-
-    if (teamData.value) {
+    if (team.teamId === currentTeamId.value && teamData.value) {
       teamData.value.teamBud = response.data.newTeamBudget
+    } else {
+      const managedTeam = availableTeams.value.find((x) => x.teamId === team.teamId)
+      if (managedTeam) managedTeam.teamBud = response.data.newTeamBudget
     }
 
     await fetchAvailableCardsAndItems()
@@ -767,23 +991,14 @@ const executeCardOrItemAction = async (isCard: boolean) => {
       return
     }
     toast.error(error.response?.data?.message || t('actionExecutionError'))
-    console.error('Błąd akcji karty/przedmiotu:', error.response?.data || error.message)
+    console.error('Błąd akcji karty:', error.response?.data || error.message)
   }
-
-  if (isCard) {
-    selectedCardId.value = null
-  } else {
-    selectedItemId.value = null
-  }
+  selectedCardId.value = null
 }
-
-const playCard = () => executeCardOrItemAction(true)
-const giveItem = () => executeCardOrItemAction(false)
 
 const approveDecision = async (logId: number) => {
   try {
     await apiServices.post(apiConfig.player.approveLog(logId), {})
-    // Usunięty toast.success zgodnie z instrukcją
   } catch (error) {
     toast.error(t('errorApprovingSuggestion'))
   }
@@ -807,19 +1022,32 @@ onMounted(async () => {
     return
   }
 
-  await fetchAllDataForTeam()
+  if (props.allTeams) {
+    // First fetch all teams, then mark every one as managed
+    await Promise.all([fetchTeams(), fetchRivalBoard()])
+    if (availableTeams.value.length > 0) {
+      const firstTeam = availableTeams.value[0]
+      currentTeamId.value = firstTeam.teamId
+      selectedPlayTeamId.value = firstTeam.teamId
+      managedTeamIds.value = availableTeams.value.map((t) => t.teamId)
+    }
+    await fetchAllDataForTeam()
+  } else {
+    await Promise.all([fetchAllDataForTeam(), fetchTeams(), fetchRivalBoard()])
+  }
 
   signalService.connection.on('HistoryUpdated', () => fetchDecisionHistory())
   signalService.connection.on('PendingUpdated', () => fetchPendingDecisions())
-  signalService.connection.on('BoardUpdated', () => fetchPawns())
+  signalService.connection.on('BoardUpdated', () => {
+    fetchPawns()
+    fetchRivalPawns()
+    if (managedTeamIds.value.length > 1) fetchAllManagedPawns()
+  })
   signalService.connection.on('BudgetUpdated', () => fetchAllDataForTeam())
 
   try {
     await signalService.start()
-    await signalService.joinGameRoomAsPlayer(String(gameIdNum), String(props.teamId))
-    console.log(
-      `Pomyślnie dołączono do pokoju SignalR dla gry: ${gameIdNum}, zespół: ${props.teamId}`,
-    )
+    await signalService.joinGameRoomAsPlayer(String(gameIdNum), String(currentTeamId.value))
   } catch (err) {
     console.error('Błąd połączenia SignalR: ', err)
   }
@@ -827,7 +1055,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (props.gameId) {
-    signalService.leaveGameRoomAsPlayer(String(props.gameId), String(props.teamId))
+    signalService.leaveGameRoomAsPlayer(String(props.gameId), String(currentTeamId.value))
     signalService.connection.off('HistoryUpdated')
     signalService.connection.off('PendingUpdated')
     signalService.connection.off('BoardUpdated')

@@ -319,7 +319,7 @@ const saveBudget = async () => {
 
 const handleUnlockCard = async () => {
   if (!selectedTeamId.value || !selectedCardId.value) {
-    toast.warning('Proszę wybrać drużynę i kartę.')
+    toast.warning(t('selectTeamAndCard'))
     return
   }
 

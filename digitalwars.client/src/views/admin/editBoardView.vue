@@ -73,8 +73,8 @@
 
             <div class="mt-3 md:mt-5 px-4">
               <label class="block mb-3 text-sm font-medium text-white">
-                Nazwy ćwiartek
-                <span class="text-xs text-surface-500 ml-2">— niepuste = plansza kartezjańska</span>
+                {{ t('quadrantNames') }}
+                <span class="text-xs text-surface-500 ml-2">{{ t('quadrantNamesHint') }}</span>
               </label>
               <div class="border-2 border-surface-700 px-3 py-3 rounded-lg mb-2 bg-secondary">
                 <div class="flex flex-col gap-2">
@@ -94,9 +94,9 @@
                 </div>
               </div>
               <p class="text-xs text-surface-500">
-                Etykiety osi pobierane są z pól
-                <span class="text-surface-400">Etykiety góra</span> i
-                <span class="text-surface-400">Etykiety prawo</span>.
+                {{ t('axisLabelsInfo') }}
+                <span class="text-surface-400">{{ t('labelsTopRef') }}</span> {{ t('and') }}
+                <span class="text-surface-400">{{ t('labelsRightRef') }}</span>.
               </p>
             </div>
 
@@ -407,7 +407,7 @@ const validateDescriptions = () => {
 }
 
 // --- NAZWY ĆWIARTEK ---
-const quadrantLabels = ['Lewy-górny', 'Prawy-górny', 'Lewy-dolny', 'Prawy-dolny']
+const quadrantLabels = computed(() => [t('quadrantTopLeft'), t('quadrantTopRight'), t('quadrantBottomLeft'), t('quadrantBottomRight')])
 
 const quadrantNamesArray = computed(() => {
   const parts = formData.cellsDescriptions.split(';').map((s) => s.trim())

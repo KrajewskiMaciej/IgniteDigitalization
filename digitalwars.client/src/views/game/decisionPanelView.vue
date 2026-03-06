@@ -23,36 +23,8 @@
               <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('actionManagment') }}</h2>
             </div>
 
-            <!-- Przełącznik kart/przedmiotów -->
-            <div class="flex gap-3 mb-5">
-              <Button
-                :label="t('decisions')"
-                @click="actionMode = 'cards'"
-                :severity="actionMode === 'cards' ? undefined : 'secondary'"
-                class="flex-1"
-                outlined
-              >
-              </Button>
-              <Button
-                :label="t('items')"
-                @click="actionMode = 'items'"
-                :severity="actionMode === 'items' ? undefined : 'secondary'"
-                class="flex-1"
-                outlined
-              >
-              </Button>
-              <Button
-                :label="t('events')"
-                @click="actionMode = 'events'"
-                :severity="actionMode === 'events' ? undefined : 'secondary'"
-                class="flex-1"
-                outlined
-              >
-              </Button>
-            </div>
-
             <!-- Wybór stołu -->
-            <div v-if="!teamId && (actionMode === 'cards' || actionMode === 'items')" class="mb-4">
+            <div v-if="!teamId" class="mb-4">
               <label class="block mb-2 text-sm font-semibold text-gray-300">{{
                 t('selectTable')
               }}</label>
@@ -80,7 +52,7 @@
                 </template>
               </Dropdown>
             </div>
-            <div v-if="actionMode === 'cards'" class="mb-4">
+            <div class="mb-4">
               <label class="block mb-2 text-sm font-semibold text-gray-300">{{
                 t('selectCard')
               }}</label>
@@ -109,105 +81,25 @@
               </Dropdown>
             </div>
 
-            <!-- Wybór przedmiotu -->
-            <div v-if="actionMode === 'items'" class="mb-4">
-              <label class="block mb-2 text-sm font-semibold text-gray-300">
-                {{ t('selectItem') }}
-              </label>
-              <Dropdown
-                v-model="selectedItemId"
-                :options="items"
-                optionLabel="title"
-                optionValue="id"
-                :placeholder="t('selectItemPlaceholder')"
-                class="w-full"
-                :disabled="loading.items"
-              >
-                <template #value="slotProps">
-                  <div v-if="slotProps.value" class="flex items-center gap-2">
-                    <span
-                      :class="
-                        items.find((i) => i.id === slotProps.value)?.type === 'software'
-                          ? 'text-green-400'
-                          : 'text-orange-400'
-                      "
-                      >#{{ slotProps.value }}</span
-                    >
-                    <span>{{ items.find((i) => i.id === slotProps.value)?.title }}</span>
-                  </div>
-                  <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
-                </template>
-                <template #option="slotProps">
-                  <div class="flex items-center gap-2">
-                    <span
-                      :class="
-                        slotProps.option.type === 'software' ? 'text-green-400' : 'text-orange-400'
-                      "
-                      >#{{ slotProps.option.id }}</span
-                    >
-                    <span>{{ slotProps.option.title }}</span>
-                  </div>
-                </template>
-              </Dropdown>
-            </div>
-
-            <div v-if="actionMode === 'events'" class="mb-4">
-              <label class="block mb-2 text-sm font-semibold text-gray-300">
-                {{ t('selectEvent') }}
-              </label>
-              <Dropdown
-                v-model="selectedPendingEventIndex"
-                :options="availableEvents"
-                optionLabel="shortDesc"
-                optionValue="eventId"
-                :placeholder="t('selectEventPlaceholder')"
-                class="w-full"
-              >
-                <template #value="slotProps">
-                  <div v-if="slotProps.value !== null">
-                    <span>
-                      {{ availableEvents.find((e) => e.eventId === slotProps.value)?.shortDesc }}
-                    </span>
-                  </div>
-                  <span v-else class="text-surface-400">{{ slotProps.placeholder }}</span>
-                </template>
-              </Dropdown>
-            </div>
-
-            <!-- Opis wybranej karty/przedmiotu -->
+            <!-- Opis wybranej karty -->
             <div
-              v-if="
-                (actionMode === 'cards' && selectedCard) || (actionMode === 'items' && selectedItem)
-              "
+              v-if="selectedCard"
               class="bg-secondary rounded-lg p-4 border border-surface-700 mb-4"
             >
               <p class="text-sm text-surface-400 mb-1">{{ t('description') }}</p>
-              <p class="text-sm text-gray-300">
-                {{ actionMode === 'cards' ? selectedCard?.description : selectedItem?.description }}
-              </p>
+              <p class="text-sm text-gray-300">{{ selectedCard?.description }}</p>
               <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-700">
                 <span class="text-sm text-surface-400">{{ t('cost') }}:</span>
                 <span class="text-lg font-bold text-green-400">
-                  {{ (actionMode === 'cards' ? selectedCard?.cost : selectedItem?.cost) || 0 }}
+                  {{ selectedCard?.cost || 0 }}
                   {{ t('bits') }}
                 </span>
               </div>
             </div>
 
-            <div
-              v-if="selectedEvent && selectedEvent.eventId && actionMode === 'events'"
-              class="bg-secondary rounded-lg p-4 border border-surface-700 mb-4"
-            >
-              <p class="text-sm text-surface-400 mb-1">{{ t('eventDescription') }}</p>
-              <p class="text-sm text-gray-300">{{ selectedEvent.longDesc }}</p>
-            </div>
-
             <!-- Budżet drużyny -->
             <div
-              v-if="
-                (selectedTableId && actionMode === 'cards') ||
-                (selectedTableId && actionMode === 'items')
-              "
+              v-if="selectedTableId"
               class="bg-secondary rounded-lg p-4 border border-surface-700 mb-4"
             >
               <div class="flex items-center justify-between">
@@ -224,28 +116,9 @@
             <!-- Przyciski akcji -->
             <div class="flex justify-center">
               <Button
-                v-if="actionMode === 'cards'"
                 :disabled="!selectedCardId || !selectedTableId"
                 @click="playCard"
                 :label="t('playCard')"
-                size="large"
-                class="w-full"
-              >
-              </Button>
-              <Button
-                v-if="actionMode === 'items'"
-                :disabled="!selectedItemId || !selectedTableId"
-                @click="giveItem"
-                :label="t('useItem')"
-                size="large"
-                class="w-full"
-              >
-              </Button>
-              <Button
-                v-if="actionMode === 'events'"
-                :disabled="!selectedPendingEventIndex"
-                @click="applySelectedEvent"
-                :label="t('applyEvent')"
                 size="large"
                 class="w-full"
               >
@@ -431,7 +304,7 @@
                 </div>
                 <p class="text-lg font-bold text-primary-400 mb-2">{{ entry.cardTitle }}</p>
                 <p class="text-sm text-gray-300 mb-2">
-                  {{ entry.feedbackDescription || 'Brak opisu feedbacku.' }}
+                  {{ entry.feedbackDescription || t('noFeedbackDescription') }}
                 </p>
                 <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
               </div>
@@ -590,16 +463,13 @@ const teamId = computed(() => (props.teamId ? Number(props.teamId) : undefined))
 
 const deckId = ref<number | null>(null)
 
-const loading = reactive({ teams: true, cards: true, items: true })
+const loading = reactive({ teams: true, cards: true })
 const decisions = ref<DecisionLog[]>([])
 const loadingHistory = ref(true)
 const selectedCardId = ref<number | null>(null)
 const selectedTableId = ref<number | null>(null)
-const selectedPendingEventIndex = ref<number | null>(null)
 const tables = ref<Team[]>([])
 const cards = ref<Card[]>([])
-const items = ref<Item[]>([])
-const availableEvents = ref<GameEvent[]>([])
 const { t } = useI18n()
 const enemyFormData = reactive<BoardConfigForComponent>({
   name: '',
@@ -621,29 +491,19 @@ const loadingPending = ref(true)
 const selectedCard = computed<Card | undefined>(() =>
   cards.value.find((c) => c.id === selectedCardId.value),
 )
-const selectedItem = computed<Item | undefined>(() =>
-  items.value.find((i) => i.id === selectedItemId.value),
-)
 const selectedTeam = computed<Team | undefined>(() =>
   tables.value.find((t) => t.teamId === selectedTableId.value),
 )
 const currentBits = computed(() => (selectedTeam.value ? selectedTeam.value.teamBud : 0))
-const selectedEvent = computed<GameEvent | undefined>(() =>
-  availableEvents.value.find((e) => e.eventId === selectedPendingEventIndex.value),
-)
 
 const decisionMode = ref('history')
-const actionMode = ref<'cards' | 'items' | 'events'>('cards')
-const selectedItemId = ref<number | null>(null)
 
 watch(selectedTableId, (newTeamId) => {
   selectedCardId.value = null
-  selectedItemId.value = null
   if (newTeamId) {
     fetchAvailableCardsForTeam()
   } else {
     cards.value = []
-    items.value = []
   }
 })
 
@@ -720,54 +580,16 @@ const fetchAvailableCardsForTeam = async () => {
   const team = selectedTeam.value
   if (!team || !deckId.value) return
   loading.cards = true
-  loading.items = true
   try {
     const url = apiConfig.player.getCards(deckId.value, gameId, team.teamId)
     const response = await apiServices.get(url)
-    const data = response.data as {
-      decisionCards: Card[]
-      hardwareCards: Item[]
-      softwareCards: Item[]
-    }
+    const data = response.data as { decisionCards: Card[] }
     cards.value = data.decisionCards || []
-
-    const softwareCards = data.softwareCards.map((item) => ({
-      ...item,
-      type: 'software',
-    }))
-
-    console.log('Pobrane karty oprogramowania:', softwareCards)
-
-    const hardwareCards = data.hardwareCards.map((item) => ({
-      ...item,
-      type: 'hardware',
-    }))
-
-    items.value = [...softwareCards, ...hardwareCards]
   } catch (error: any) {
-    toast.error(t('errorFetchingDecisionCards') + t('errorFetchingItems'))
+    toast.error(t('errorFetchingDecisionCards'))
     console.error('Błąd pobierania kart:', error.response?.data || error.message)
   } finally {
     loading.cards = false
-    loading.items = false
-  }
-}
-
-const fetchGameEvents = async (currentDeckId: number) => {
-  if (!currentDeckId) {
-    toast.error(t('noDeckId'))
-    return
-  }
-  try {
-    const url = apiConfig.player.getGameEvents(currentDeckId)
-    const response = await apiServices.get(url)
-    availableEvents.value = [
-      { eventId: null, shortDesc: 'Brak zdarzenia', longDesc: '' },
-      ...(response.data as GameEvent[]),
-    ]
-  } catch (error: any) {
-    toast.error(t('errorFetchingGameEvents'))
-    console.error('Błąd pobierania zdarzeń:', error.response?.data || error.message)
   }
 }
 
@@ -820,12 +642,12 @@ const fetchRivalPawns = async () => {
 }
 
 // --- ACTIONS ---
-async function executeAction(isCard: boolean) {
-  const entity = isCard ? selectedCard.value : selectedItem.value
+async function playCard() {
+  const entity = selectedCard.value
   const team = selectedTeam.value
 
   if (!entity || !team || !deckId.value) {
-    toast.error('Brak kluczowych danych (drużyna, talia, karta/przedmiot), aby wykonać akcję.')
+    toast.error(t('missingActionData'))
     return
   }
   if (!team.boardId || team.boardId === 0) {
@@ -836,21 +658,16 @@ async function executeAction(isCard: boolean) {
     toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }))
     return
   }
-  let wasSuccess: boolean
-  if (isCard) {
-    const cardEntity = entity as Card
-    wasSuccess = !(
-      cardEntity.enablers &&
-      Array.isArray(cardEntity.enablers) &&
-      cardEntity.enablers.length > 0
-    )
-  } else {
-    wasSuccess = true
-  }
+
+  const wasSuccess = !(
+    entity.enablers &&
+    Array.isArray(entity.enablers) &&
+    entity.enablers.length > 0
+  )
 
   const minEnablerId =
-    isCard && !wasSuccess && Array.isArray((entity as Card).enablers) && (entity as Card).enablers!.length > 0
-      ? Math.min(...((entity as Card).enablers as number[]))
+    !wasSuccess && Array.isArray(entity.enablers) && entity.enablers.length > 0
+      ? Math.min(...(entity.enablers as number[]))
       : undefined
 
   const endpoint = wasSuccess
@@ -868,7 +685,6 @@ async function executeAction(isCard: boolean) {
   }
 
   try {
-    console.log('Wysyłany Id Karty: ', entity.id)
     const response = await apiServices.post<{ message?: string; newTeamBudget: number }>(
       endpoint,
       payload,
@@ -887,28 +703,15 @@ async function executeAction(isCard: boolean) {
       toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }))
       return
     }
-    toast.error(error.response?.data?.message || 'Wystąpił błąd podczas wykonywania akcji.')
-    console.error('Błąd akcji karty/przedmiotu:', error.response?.data || error.message)
+    toast.error(error.response?.data?.message || t('actionExecutionError'))
+    console.error('Błąd akcji karty:', error.response?.data || error.message)
   }
-  if (isCard) {
-    selectedCardId.value = null
-  } else {
-    selectedItemId.value = null
-  }
+  selectedCardId.value = null
 }
-const playCard = () => executeAction(true)
-const giveItem = () => executeAction(false)
 
 const approveDecision = async (logId: number) => {
-  console.log('Jaki log jest do zatwierdzenia  ?', logId)
   try {
     const response = await apiServices.post(apiConfig.player.approveLog(logId), {})
-    console.log(response.data, 'Co otrzymałem po approve ?')
-    console.log(
-      'Zaktualizowano listę decyzji po zatwierdzeniu do zatwierdzenia:',
-      pendingDecisions.value,
-    )
-    console.log('Pobrana historia decyzji:', decisions.value)
   } catch (error: any) {
     toast.error(t('errorApprovingSuggestion') + error)
     console.error('Błąd zatwierdzania:', error.response?.data || error.message)
@@ -924,21 +727,6 @@ const rejectDecision = async (logId: number) => {
   }
 }
 
-async function applySelectedEvent() {
-  if (!selectedPendingEventIndex.value) {
-    toast('Proszę wybrać zdarzenie do aktywacji.')
-    return
-  }
-  try {
-    await apiServices.post(apiConfig.player.applyEvent(gameId), {
-      eventId: selectedPendingEventIndex.value,
-    })
-  } catch (error: any) {
-    toast.error(t('errorApplyingEvent') + error)
-    console.error('Błąd aktywacji zdarzenia:', error.response?.data || error.message)
-  }
-}
-
 const formatDate = (timestamp: string) => new Date(timestamp).toLocaleString('pl-PL')
 
 onMounted(async () => {
@@ -951,7 +739,6 @@ onMounted(async () => {
       fetchTeams(),
       fetchDecisionHistory(),
       fetchPendingDecisions(),
-      fetchGameEvents(deckId.value),
       fetchRivalBoard(),
     ])
   } else {
@@ -971,7 +758,6 @@ onMounted(async () => {
   try {
     await signalService.start()
     await signalService.joinGameRoomAsAdmin(String(gameId))
-    console.log('Połączono z SignalR i dołączono do pokoju gry.')
     signalService.connection.on('HistoryUpdated', () => fetchDecisionHistory())
     signalService.connection.on('PendingUpdated', () => fetchPendingDecisions())
     signalService.connection.on('BoardUpdated', () => fetchRivalPawns())

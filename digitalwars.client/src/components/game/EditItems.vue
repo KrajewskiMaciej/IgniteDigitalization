@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
-    <!-- Nagłówek -->
     <div class="text-center">
       <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
         {{ t('editItems') }}
@@ -9,57 +8,28 @@
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
-      <!-- Sekcja wyboru talii -->
-      <div class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl">
-        <!-- Nagłówek -->
-        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
-          <div class="bg-primary-500/20 p-3 rounded-lg">
-            <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
-          </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('deckSelection') }}</h2>
-        </div>
-
-        <!-- Wybór talii -->
-        <div>
-          <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
-            {{ t('selectDeck') }}
+      <!-- Edycja nazwy szkolenia -->
+      <div
+        v-if="deckName"
+        class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl grid grid-cols-4 gap-4"
+      >
+        <!-- Pole inputa -->
+        <div class="md:col-span-3 flex flex-col">
+          <label for="deck-name" class="mb-2 text-sm font-semibold text-gray-300">
+            {{ t('deckName') }}
           </label>
-          <Dropdown
-            id="deck-select"
-            v-model="selectedDeckId"
-            :options="decksData"
-            showClear
-            optionLabel="title"
-            optionValue="id"
-            :placeholder="t('selectDeckPlaceholder')"
+
+          <InputText
+            id="deck-name"
+            v-model="deckName"
             class="w-full"
-            :disabled="isLoadingDecks"
+            :placeholder="t('deckNamePlaceholder')"
           />
         </div>
 
-        <!-- Edycja nazwy -->
-        <div
-          v-if="deckName"
-          class="mt-6 p-4 bg-secondary border border-surface-700 rounded-lg grid grid-cols-4 gap-4"
-        >
-          <!-- Pole inputa -->
-          <div class="md:col-span-3 flex flex-col">
-            <label for="deck-name" class="mb-2 text-sm font-semibold text-gray-300">
-              {{ t('deckName') }}
-            </label>
-
-            <InputText
-              id="deck-name"
-              v-model="deckName"
-              class="w-full"
-              :placeholder="t('deckNamePlaceholder')"
-            />
-          </div>
-
-          <!-- Przycisk -->
-          <div class="flex items-end">
-            <Button :label="t('changeName')" class="w-full" @click="handleSaveDeckName" />
-          </div>
+        <!-- Przycisk -->
+        <div class="flex items-end">
+          <Button :label="t('changeName')" class="w-full" @click="handleSaveDeckName" />
         </div>
       </div>
 
@@ -220,7 +190,6 @@ const itemsData = ref<Item[]>([])
 const currentItem = ref<Item | null>(null)
 const deckName = ref<string>('')
 
-const isLoadingDecks = ref(true)
 const isLoadingItems = ref(false)
 const isSaving = ref(false)
 
@@ -235,7 +204,6 @@ const handleSaveDeckName = async () => {
       decks_Name: deckName.value,
     })
 
-    console.log('Odpowiedź:', response)
     const deck = decksData.value.find((deck) => deck.id === selectedDeckId.value)
     if (deck) {
       deck.title = deckName.value
@@ -247,15 +215,12 @@ const handleSaveDeckName = async () => {
 
 // --- Pobieranie danych z API ---
 const fetchDecks = async () => {
-  isLoadingDecks.value = true
   try {
     const response = await apiService.get(apiConfig.admin.deck.getAll)
     decksData.value = response.data as Deck[]
   } catch (error) {
     toast.error(t('errorFetchingDecks') + error)
     console.error('Błąd pobierania talii:', error)
-  } finally {
-    isLoadingDecks.value = false
   }
 }
 
@@ -281,7 +246,6 @@ const handleSaveItem = async () => {
   }
   isSaving.value = true
   try {
-    console.log(currentItem.value.id, 'ID')
     await apiService.put(apiConfig.admin.deck.updateItem(currentItem.value.id), {
       cardId: currentItem.value.id,
       shortDesc: currentItem.value.shortDesc,
@@ -318,7 +282,7 @@ watch(selectedDeckId, (newDeckId) => {
   if (deck) {
     deckName.value = deck.title
   }
-})
+}, { immediate: true })
 
 watch(selectedItem, (newValue) => {
   if (newValue !== undefined) {

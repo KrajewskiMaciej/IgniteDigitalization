@@ -100,16 +100,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-// --- KROK 1: Import enumu POSITION ---
 import { useToast, POSITION } from 'vue-toastification'
-// --- KROK 2: Usunięcie nieużywanego importu 'apiClient' ---
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
 import { faEnvelopeCircleCheck, faUserLock } from '@fortawesome/free-solid-svg-icons'
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
-
-// --- KROK 3: Definicja typu dla błędu API ---
 interface ApiError {
   message?: string
   status: number
@@ -130,7 +126,6 @@ const handleSendEmail = async () => {
     })
 
     if (response.data.success) {
-      console.log('✅ Wysłano email do zmiany hasła')
 
       if (!isEmailSent.value) {
         isEmailSent.value = true
@@ -139,14 +134,10 @@ const handleSendEmail = async () => {
       startCooldown()
     }
   } catch (error: unknown) {
-    // Jawne typowanie błędu
-    // --- KROK 4: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
     const status: number = apiError.status
 
     emit('error')
-
-    console.log('Jaki błąd otrzymuje:', apiError.status)
 
     if (status === 409) {
       toast.warning(t('invalidEmailOrEmailDoesntExist'), {

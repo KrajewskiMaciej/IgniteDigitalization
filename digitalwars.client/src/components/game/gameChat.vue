@@ -20,8 +20,7 @@
         <div
           class="bg-secondary text-white rounded-2xl rounded-bl-md px-4 py-2 max-w-xs break-words"
         >
-          Cześć! Jestem Twoim asystentem AI 🤖. Mogę pomóc Ci w grze, odpowiedzieć na pytania. Każda
-          podpowiedź kosztuje <b>10 Bitów 💰</b>. Jak mogę Ci pomóc?
+          {{ t('chatWelcomeMessage', { cost: 10 }) }}
         </div>
       </div>
 
@@ -44,7 +43,7 @@
     <!--Input na wiadomości-->
     <div class="flex items-end p-4 flex-shrink-0">
       <textarea
-        placeholder="Wyślij wiadomość ..."
+        :placeholder="t('chatPlaceholder')"
         v-model="message"
         rows="1"
         class="flex-1 border border-lgray-accent bg-tertiary rounded-2xl px-2 py-2 text-white resize-none transition-all duration-300 focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none min-h-[40px] max-h-40 overflow-y-hidden custom-scrollbar"
@@ -65,6 +64,9 @@
 import { faXmark, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import logo from '@/assets/logos/ITM_poziom_biale.png'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 //Input użytkownika
 const message = ref('')
@@ -115,7 +117,7 @@ const sendMessage = () => {
   setTimeout(() => {
     const aiMessage = {
       id: Date.now() + 1,
-      text: '[Tu będzie odpowiedź od AI]',
+      text: t('chatAiPlaceholder'),
       isUser: false,
       timestamp: new Date(),
     }

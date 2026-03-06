@@ -30,56 +30,6 @@
           </RouterLink>
         </li>
 
-        <!-- <li
-          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
-          @click="handleStats"
-        >
-          <div
-            class="flex items-center px-4 py-3 rounded-md"
-            :class="isSideBarOpen ? 'justify-between' : 'justify-center'"
-          >
-            <div>
-              <font-awesome-icon
-                :icon="faChartLine"
-                class="h-4 text-accent"
-                :class="isSideBarOpen ? 'mr-4' : 'mr-0'"
-              />
-              <span v-if="isSideBarOpen">{{ t('gamesStatistics') }}</span>
-            </div>
-
-            <div v-if="isSideBarOpen">
-              <font-awesome-icon
-                :icon="isStatsDropdownOpen ? faArrowUp : faArrowDown"
-                class="h-4"
-              />
-            </div>
-          </div>
-
-          <div v-show="isStatsDropdownOpen" class="flex flex-col py-1 space-y-1">
-            <RouterLink
-              :to="{ path: '/admin/statistics', query: { stat: 'results' } }"
-              class="px-4 py-2 hover:bg-secondary rounded-md transition-all duration-200"
-              @click.stop
-            >
-              {{ t('decisionEffectiveness') }}
-            </RouterLink>
-            <RouterLink
-              :to="{ path: '/admin/statistics', query: { stat: 'bits' } }"
-              class="px-4 py-2 hover:bg-secondary rounded-md transition-all duration-200"
-              @click.stop
-            >
-              {{ t('averageBitsPerRound') }}
-            </RouterLink>
-            <RouterLink
-              :to="{ path: '/admin/statistics', query: { stat: 'deviation' } }"
-              class="px-4 py-2 hover:bg-secondary rounded-md transition-all duration-200"
-              @click.stop
-            >
-              {{ t('standardDeviation') }}
-            </RouterLink>
-          </div>
-        </li> -->
-
         <li
           class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
@@ -103,19 +53,6 @@
           >
             <font-awesome-icon :icon="faChessBoard" class="h-4 text-accent" />
             <span v-if="isSideBarOpen">{{ t('editBoard') }}</span>
-          </RouterLink>
-        </li>
-
-        <li
-          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
-        >
-          <RouterLink
-            to="/admin/cheatSheet"
-            class="flex items-center gap-4 px-4 py-3 rounded-md"
-            :class="isSideBarOpen ? '' : 'justify-center'"
-          >
-            <font-awesome-icon :icon="faFile" class="h-4 text-accent" />
-            <span v-if="isSideBarOpen">{{ t('gameMasterCheatSheet') }}</span>
           </RouterLink>
         </li>
 

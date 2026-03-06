@@ -8,7 +8,7 @@
 
     <div class="relative z-10 flex flex-col h-full">
       <PlayerNavbar
-        :team-name="gameData?.teamName || 'Błąd ładowania'"
+        :team-name="gameData?.teamName || t('errorLoadingData')"
         :nav-bg-color="gameData?.teamColor || 'bg-secondary'"
       />
 
@@ -80,7 +80,7 @@
                   : 'bg-secondary text-surface-300 hover:text-surface-0 border border-primary-500/30'
               "
             >
-              <span class="relative z-10">Menu</span>
+              <span class="relative z-10">{{ t('menu') }}</span>
               <div
                 v-if="mobileView !== 'menu'"
                 class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
@@ -466,7 +466,7 @@ const playerMenuRef = ref<{
 
 const createDefaultBoardConfig = (): BoardConfig => ({
   boardId: 0,
-  name: 'Ładowanie...',
+  name: t('loadingBoardName'),
   labelsUp: [],
   labelsRight: [],
   descriptionDown: '',
@@ -486,7 +486,7 @@ const gameStatusError = ref<GameStatusError | null>(null)
 // --- FUNKCJE ---
 const fetchGameDataByToken = async (token: string, skipIndependenceModal = false) => {
   if (!token) {
-    gameStatusError.value = { title: 'Błąd', message: 'Brak tokena drużyny w adresie URL.' }
+    gameStatusError.value = { title: t('errorLoadingData'), message: t('missingTeamToken') }
     isLoading.value = false
     return
   }
@@ -530,8 +530,8 @@ const fetchGameDataByToken = async (token: string, skipIndependenceModal = false
     await fetchPawns()
     await fetchRivalPawns()
   } catch (err: any) {
-    let title = 'Wystąpił Błąd'
-    let message = err.message || 'Nie można załadować danych gry.'
+    let title = t('errorLoadingData')
+    let message = err.message || t('cannotLoadGameData')
 
     if (err.response) {
       const status = err.response.status
@@ -540,17 +540,17 @@ const fetchGameDataByToken = async (token: string, skipIndependenceModal = false
       if (status === 409 && data.errorCode) {
         switch (data.errorCode) {
           case 'GamePaused':
-            title = 'Gra Wstrzymana'
-            message = data.message || 'Gra jest obecnie wstrzymana. Skontaktuj się z Game Masterem.'
+            title = t('gamePausedTitle')
+            message = data.message || t('gamePausedMessage')
             break
           case 'GameEnded':
-            title = 'Gra Zakończona'
-            message = data.message || 'Ta gra została już zakończona.'
+            title = t('gameEndedTitle')
+            message = data.message || t('gameEndedMessage')
             break
         }
       } else {
-        title = 'Nie znaleziono Gry'
-        message = data.message || 'Nie znaleziono gry lub drużyny dla podanego tokena.'
+        title = t('gameNotFoundTitle')
+        message = data.message || t('gameNotFoundMessage')
       }
     }
 

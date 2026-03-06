@@ -377,7 +377,7 @@ export const en = {
   approve: 'Approve',
   reject: 'Reject',
   eventDescription: 'Event description',
-  manageDecisionsAndItemsForTeam: 'Manage decisions and items for team',
+  manageDecisionsAndItemsForTeam: 'Manage decisions for team',
   noFeedbackDescription: 'No feedback description.',
 
   //Items
@@ -546,6 +546,104 @@ export const en = {
   suggectCard: 'Suggest Card',
   playCard: 'Play Card',
 
+  //Economy settings
+  map1StartingBudget: 'Starting budget (BITS)',
+  map1MandatoryCardsCost: 'Mandatory cards cost (BITS)',
+  targetCardsMin: 'Min. cards (target)',
+  targetCardsMax: 'Max. cards (target)',
+  map2BaseBudget: 'Base budget (BITS)',
+  map2PrepBonusMaxBits: 'Max PRE bonus (BITS)',
+  map2PrepCardsTotalCount: 'Total PRE cards count',
+  prepMultiplierMax: 'Maximum multiplier',
+  prepMultiplierFormula: 'Formula: MIN(Max multiplier; 1 + played_PRE / total_PRE)',
+  loadingEconomySettings: 'Loading economy settings...',
+  map1Label: '(Map 1)',
+  map2Label: '(Map 2)',
+
   //Footer
   allRightsReserved: 'All rights reserved.',
+
+  //Loading spinner
+  pleaseWait: 'Please wait',
+
+  //Statistics
+  gameStatistics: 'Game statistics',
+  selectStatisticFromSidebar: 'Select a statistic from the sidebar.',
+
+  //Reset password
+  linkExpiredTitle: 'Link expired',
+
+  //Player view errors
+  errorLoadingData: 'Loading error',
+  cannotLoadGameData: 'Cannot load game data.',
+  missingTeamToken: 'Missing team token in URL.',
+  gamePausedTitle: 'Game Paused',
+  gamePausedMessage: 'The game is currently paused. Please contact the Game Master.',
+  gameEndedTitle: 'Game Ended',
+  gameEndedMessage: 'This game has already ended.',
+  gameNotFoundTitle: 'Game Not Found',
+  gameNotFoundMessage: 'No game or team found for the given token.',
+  loadingBoardName: 'Loading...',
+
+  //Pawn preview
+  clickToChangeColor: 'Click to change color',
+
+  //Card card ID
+  cardIdLabel: 'Card ID:',
+
+  //testCardCarousel
+  loadingCardsError: 'Error loading cards:',
+  noCardsAvailable: 'No cards available.',
+  unknownError: 'Unknown error',
+  selectCardButton: 'Select card',
+
+  //joinGameByCode camera errors
+  cameraPermissionDenied: 'Camera access denied. Check browser permissions.',
+  cameraNotFound: 'No camera found on this device.',
+  cameraInUse: 'Camera is currently in use by another application.',
+  orSeparator: 'or',
+
+  //editBoardView
+  quadrantNames: 'Quadrant names',
+  quadrantNamesHint: '— non-empty = Cartesian board',
+  axisLabelsInfo: 'Axis labels are taken from fields',
+  labelsTopRef: 'Top labels',
+  labelsRightRef: 'Right labels',
+  quadrantTopLeft: 'Top-left',
+  quadrantTopRight: 'Top-right',
+  quadrantBottomLeft: 'Bottom-left',
+  quadrantBottomRight: 'Bottom-right',
+  selectDeckToEditEnablersLabel: 'Select deck...',
+
+  //gameChat
+  chatWelcomeMessage: 'Hello! I am your AI assistant 🤖. I can help you in the game and answer questions. Each hint costs {cost} Bits 💰. How can I help you?',
+  chatPlaceholder: 'Send a message ...',
+  chatAiPlaceholder: '[AI response will appear here]',
+
+  //auth changePassword
+  passwordsDoNotMatchExclamation: 'Passwords do not match!',
+
+  //tableManagmentView
+  selectTeamAndCard: 'Please select a team and a card.',
+
+  //boardColorSettings tooltip
+  deleteZone: 'Delete zone {index}',
+
+  //CardCarousel aria
+  previousCard: 'Previous card',
+  nextCard: 'Next card',
+  missingCardsData: 'Missing required data to fetch cards.',
+  errorFetchingCards: 'An error occurred while fetching cards.',
+
+  //EditProccesses
+  invalidProcessData: 'Please enter valid process data',
+  newProcessAdded: 'New process has been added',
+  loadingHistory: 'Loading history...',
+  changeTeam: 'Change team',
+  clickToChangeTeam: 'Click to change team',
+  current: 'Current',
+  alsoManage: 'Also manage (check)',
+
+  //generic
+  and: 'and',
 }

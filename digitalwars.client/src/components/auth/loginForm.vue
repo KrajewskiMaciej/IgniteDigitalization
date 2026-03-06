@@ -75,8 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, computed, nextTick } from 'vue'
-// --- KROK 1: Import enumu POSITION ---
+import { ref, computed, nextTick } from 'vue'
 import { useToast, POSITION } from 'vue-toastification'
 import router from '@/router'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
@@ -86,7 +85,6 @@ import apiService from '@/services/apiServices'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
-// --- KROK 2: Definicja typu dla błędu API ---
 interface ApiError {
   response?: { data?: string }
   message?: string
@@ -99,13 +97,11 @@ const emit = defineEmits(['login', 'close', 'forgotPassword', 'error'])
 const showPassword = ref(false)
 const isLoading = ref(false)
 
-// --- POPRAWKA: Zmiana username na email ---
 const loginData = ref({
   email: '',
   password: '',
 })
 
-// --- KROK 3: Jawne otypowanie parametru 'email' ---
 const validateEmail = (email: string) => {
   if (!email) return false
   return String(email)
@@ -116,7 +112,6 @@ const validateEmail = (email: string) => {
 }
 
 const isLoginFormValid = computed(() => {
-  // --- POPRAWKA: Użycie loginData.value.email ---
   return (
     loginData.value.email.trim() !== '' &&
     loginData.value.password.trim() !== '' &&
@@ -138,21 +133,18 @@ const handleLogin = async () => {
 
   try {
     const payload = {
-      username: loginData.value.email, // Przypisz wartość 'email' do klucza 'username'
+      username: loginData.value.email,
       password: loginData.value.password,
     }
     const response = await apiService.post<{ success: boolean }>(apiConfig.auth.login, payload)
 
     if (response.data.success) {
-      console.log('✅ Zalogowano pomyślnie')
       authStore.setAuthenticated(true)
-      emit('close') // Zamknięcie modala po udanym logowaniu
+      emit('close')
       await nextTick()
       router.push('/admin')
     }
   } catch (error: unknown) {
-    // Jawne otypowanie błędu
-    // --- KROK 5: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
     emit('error')
     if (apiError.response?.data) {

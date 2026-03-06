@@ -71,7 +71,6 @@
           class="absolute right-3 -translate-y-1/2 top-1/2"
           type="button"
         >
-          <!-- POPRAWKA: Ikona powinna się zmieniać poprawnie -->
           <font-awesome-icon
             :icon="showConfirmPassword ? faEye : faEyeSlash"
             class="h-4 text-white hover:text-accent transition-all duration-300"
@@ -139,19 +138,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-// --- KROK 1: Import enumu POSITION ---
 import { useToast, POSITION } from 'vue-toastification'
 import passwordStrength from './passwordStrength.vue'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
-
-// Zakładając istnienie tych plików
-// import apiService from '@/services/apiServices';
-// import apiConfig from '@/services/apiConfig';
-
-// --- KROK 2: Definicja typu dla błędu API ---
 interface ApiError {
   response?: { data?: string }
   message?: string
@@ -183,13 +175,12 @@ const passwordRequirements = computed(() => {
 })
 
 const handleChangePassword = async () => {
-  // Resetowanie stanu błędów
   passwordValid.value = true
   errorPasswordsNotMatch.value = false
 
   if (changePasswordData.value.password !== changePasswordData.value.confirmPassword) {
     errorPasswordsNotMatch.value = true
-    toast.error('Hasła się nie zgadzają!')
+    toast.error(t('passwordsDoNotMatchExclamation'))
     return
   }
 
@@ -199,31 +190,24 @@ const handleChangePassword = async () => {
 
   if (!isPasswordCompliant) {
     passwordValid.value = false
-    // --- KROK 3: Użycie enumu POSITION ---
     toast.error(t('passwordDoesntMeetRequirements'), {
       position: POSITION.TOP_CENTER,
     })
     return
   }
 
-  // Jeśli wszystko jest w porządku, resetuj flagę `passwordValid`
   passwordValid.value = true
 
   try {
-    // --- KROK 4: Bezpieczna obsługa wywołania API (zakomentowane) ---
-    // const response = await apiService.post(apiConfig.auth.changePassword, changePasswordData.value);
-    const response = { data: { success: true } } // Przykładowa odpowiedź na potrzeby demonstracji
+    const response = { data: { success: true } }
 
     if (response && response.data.success) {
-      // Sprawdzenie, czy response nie jest null
-      console.log('✅ Hasło zmienione pomyślnie!')
+
       toast.success(t('passwordChangedSuccessfully'), {
         position: POSITION.TOP_CENTER,
       })
     }
   } catch (error: unknown) {
-    // Jawne typowanie błędu
-    // --- KROK 5: Bezpieczne rzutowanie typu błędu ---
     const apiError = error as ApiError
     console.error('❌ Wystąpił błąd:', apiError.response?.data || apiError.message)
     toast.error(t('errorServerUnavailable'), {

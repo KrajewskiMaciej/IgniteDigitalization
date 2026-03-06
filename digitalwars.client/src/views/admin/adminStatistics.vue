@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import BitsUsage from '@/components/charts/AverageBitsUsage.vue'
 import DecisionSuccessChart from '@/components/charts/DecisionSuccessByTeamChart.vue'
 import StandardDeviationChart from '@/components/charts/StandardDeviationChart.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 
 const selectedStat = computed(() => route.query.stat || 'positions')
@@ -33,7 +35,7 @@ const stddevData = [
 
 <template>
   <div class="p-8">
-    <h2 class="text-2xl font-bold mb-6 text-white">Statystyki gry</h2>
+    <h2 class="text-2xl font-bold mb-6 text-white">{{ t('gameStatistics') }}</h2>
 
     <div v-if="selectedStat === 'bits'">
       <BitsUsage :data="avgBitsUsageByTeam" xAxisLabel="Gra" />
@@ -45,7 +47,7 @@ const stddevData = [
       <StandardDeviationChart :data="stddevData" />
     </div>
     <div v-else>
-      <p class="text-white">Wybierz statystykę z menu bocznego.</p>
+      <p class="text-white">{{ t('selectStatisticFromSidebar') }}</p>
     </div>
   </div>
 </template>

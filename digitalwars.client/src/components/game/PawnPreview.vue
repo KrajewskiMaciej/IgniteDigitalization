@@ -3,7 +3,7 @@
     ref="container"
     class="flex justify-center items-center h-full w-full cursor-pointer group"
     @click="emit('click')"
-    title="Kliknij aby zmienić kolor"
+    :title="t('clickToChangeColor')"
   >
     <div class="relative w-full h-full max-w-[300px] max-h-[300px] mx-auto">
       <div
@@ -23,8 +23,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, defineEmits } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import * as d3 from 'd3'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const emit = defineEmits(['click'])
 

@@ -24,6 +24,10 @@ const props = defineProps({
     type: Array as PropType<Pawn[]>,
     default: () => [],
   },
+  circleMode: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const board: Ref<SVGGElement | null> = ref(null)
@@ -254,128 +258,209 @@ const drawBoard = (animate = true) => {
   const logo = svg.append('g').attr('transform', `translate(${centerX.value}, ${centerY.value})`)
   logo.append('circle').attr('r', 25).attr('fill', '#fff').attr('stroke', borderColor).attr('stroke-width', 2)
 
-  // 4. Wielokąt łączący pionki 1-2-3-4-1 + animacja śledząca hop pionków
-  if (processedPawns.value && processedPawns.value.length >= 4) {
-    const pawns4 = processedPawns.value.slice(0, 4)
+  if (!props.circleMode) {
+    // 4. Wielokąt łączący pionki 1-2-3-4-1 + animacja śledząca hop pionków
+    if (processedPawns.value && processedPawns.value.length >= 4) {
+      const pawns4 = processedPawns.value.slice(0, 4)
 
-    const toPoints = pawns4.map(pawn => {
-      const { screenX, screenY } = getScreenPosition(pawn.x, pawn.y)
-      return { x: screenX, y: screenY }
-    })
-
-    const fromPoints = pawns4.map((pawn, i) => {
-      const prev = previousPositions.value.get(pawn.id)
-      if (animate && prev && (prev.x !== pawn.x || prev.y !== pawn.y)) {
-        const { screenX, screenY } = getScreenPosition(prev.x, prev.y)
+      const toPoints = pawns4.map(pawn => {
+        const { screenX, screenY } = getScreenPosition(pawn.x, pawn.y)
         return { x: screenX, y: screenY }
+      })
+
+      const fromPoints = pawns4.map((pawn, i) => {
+        const prev = previousPositions.value.get(pawn.id)
+        if (animate && prev && (prev.x !== pawn.x || prev.y !== pawn.y)) {
+          const { screenX, screenY } = getScreenPosition(prev.x, prev.y)
+          return { x: screenX, y: screenY }
+        }
+        return { x: toPoints[i].x, y: toPoints[i].y }
+      })
+
+      const hasMovement = fromPoints.some((f, i) => f.x !== toPoints[i].x || f.y !== toPoints[i].y)
+
+      const interpolate = (t: number) =>
+        toPoints.map((to, i) => {
+          const from = fromPoints[i]
+          const moving = from.x !== to.x || from.y !== to.y
+          return {
+            x: from.x + (to.x - from.x) * t,
+            y: from.y + (to.y - from.y) * t - (moving ? Math.sin(t * Math.PI) * ANIMATION.hopHeight : 0),
+          }
+        })
+
+      const pointsStr = (pts: { x: number; y: number }[]) =>
+        pts.map(p => `${p.x},${p.y}`).join(' ')
+
+      const polygon = svg
+        .append('polygon')
+        .attr('points', pointsStr(fromPoints))
+        .attr('fill', 'gray')
+        .attr('fill-opacity', 0.5)
+        .attr('stroke', 'none')
+
+      if (hasMovement) {
+        polygon
+          .transition()
+          .duration(ANIMATION.duration)
+          .ease(ANIMATION.easing)
+          .attrTween('points', () => (t: number) => pointsStr(interpolate(t)))
       }
-      return { x: toPoints[i].x, y: toPoints[i].y }
-    })
 
-    const hasMovement = fromPoints.some((f, i) => f.x !== toPoints[i].x || f.y !== toPoints[i].y)
+      const lineOrder = [0, 1, 2, 3, 0]
+      for (let li = 0; li < 4; li++) {
+        const ai = lineOrder[li]
+        const bi = lineOrder[li + 1]
 
-    // Interpolacja z hopem – identyczna formuła jak w attrTween pionków
-    // t jest już wygładzony przez ease() D3, więc sin(t*PI) daje właściwy łuk
-    const interpolate = (t: number) =>
-      toPoints.map((to, i) => {
-        const from = fromPoints[i]
+        const line = svg
+          .append('line')
+          .attr('x1', fromPoints[ai].x).attr('y1', fromPoints[ai].y)
+          .attr('x2', fromPoints[bi].x).attr('y2', fromPoints[bi].y)
+          .attr('stroke', 'white')
+          .attr('stroke-width', 1.5)
+          .attr('stroke-opacity', 0.7)
+
+        if (hasMovement) {
+          line
+            .transition()
+            .duration(ANIMATION.duration)
+            .ease(ANIMATION.easing)
+            .attrTween('x1', () => (t: number) => String(interpolate(t)[ai].x))
+            .attrTween('y1', () => (t: number) => String(interpolate(t)[ai].y))
+            .attrTween('x2', () => (t: number) => String(interpolate(t)[bi].x))
+            .attrTween('y2', () => (t: number) => String(interpolate(t)[bi].y))
+        }
+      }
+    }
+
+    // 5. Pionki (Procesy)
+    if (processedPawns.value && processedPawns.value.length > 0) {
+      const grouped = d3.group(processedPawns.value, d => `${d.x},${d.y}`)
+
+      grouped.forEach((pawnsInCell) => {
+        const count = pawnsInCell.length
+
+        pawnsInCell.forEach((pawn, index) => {
+          const { screenX, screenY } = getScreenPosition(pawn.x, pawn.y)
+          const { offsetX, offsetY } = calculateGroupOffsets(count, index)
+          const targetX = screenX + offsetX
+          const targetY = screenY + offsetY
+
+          const baseScale = cellSize.value * 0.002
+
+          const pawnGroup = svg.append('g')
+            .attr('class', 'pawn-group')
+            .attr('data-id', pawn.id)
+
+          pawnGroup.append('path')
+            .attr('d', pawnPath)
+            .attr('fill', pawn.color)
+            .attr('stroke', '#000')
+            .attr('stroke-width', 1.5 / baseScale)
+
+          const prev = previousPositions.value.get(pawn.id)
+          if (animate && prev && (prev.x !== pawn.x || prev.y !== pawn.y)) {
+            const fromPos = getScreenPosition(prev.x, prev.y)
+            pawnGroup
+              .attr('transform', `translate(${fromPos.screenX}, ${fromPos.screenY}) scale(${baseScale}) translate(${-originalCenterX}, ${-originalCenterY})`)
+              .transition().duration(ANIMATION.duration).ease(ANIMATION.easing)
+              .attrTween('transform', () => (t: number) => {
+                const curX = fromPos.screenX + (targetX - fromPos.screenX) * t
+                const curY = fromPos.screenY + (targetY - fromPos.screenY) * t
+                const hop = Math.sin(t * Math.PI) * ANIMATION.hopHeight
+                return `translate(${curX}, ${curY - hop}) scale(${baseScale}) translate(${-originalCenterX}, ${-originalCenterY})`
+              })
+          } else {
+            pawnGroup.attr('transform', `translate(${targetX}, ${targetY}) scale(${baseScale}) translate(${-originalCenterX}, ${-originalCenterY})`)
+          }
+
+          previousPositions.value.set(pawn.id, { x: pawn.x, y: pawn.y })
+        })
+      })
+    }
+  } else {
+    // circleMode: polygon per team (grouped by color) + circles instead of pawn shapes
+    const makeInterpolate = (fromPts: {x:number;y:number}[], toPts: {x:number;y:number}[]) =>
+      (t: number) => toPts.map((to, i) => {
+        const from = fromPts[i]
         const moving = from.x !== to.x || from.y !== to.y
         return {
           x: from.x + (to.x - from.x) * t,
           y: from.y + (to.y - from.y) * t - (moving ? Math.sin(t * Math.PI) * ANIMATION.hopHeight : 0),
         }
       })
-
     const pointsStr = (pts: { x: number; y: number }[]) =>
       pts.map(p => `${p.x},${p.y}`).join(' ')
 
-    const polygon = svg
-      .append('polygon')
-      .attr('points', pointsStr(fromPoints))
-      .attr('fill', 'gray')
-      .attr('fill-opacity', 0.5)
-      .attr('stroke', 'none')
-
-    if (hasMovement) {
-      polygon
-        .transition()
-        .duration(ANIMATION.duration)
-        .ease(ANIMATION.easing)
-        .attrTween('points', () => (t: number) => pointsStr(interpolate(t)))
-    }
-
-    const lineOrder = [0, 1, 2, 3, 0]
-    for (let li = 0; li < 4; li++) {
-      const ai = lineOrder[li]
-      const bi = lineOrder[li + 1]
-
-      const line = svg
-        .append('line')
-        .attr('x1', fromPoints[ai].x).attr('y1', fromPoints[ai].y)
-        .attr('x2', fromPoints[bi].x).attr('y2', fromPoints[bi].y)
-        .attr('stroke', 'white')
-        .attr('stroke-width', 1.5)
-        .attr('stroke-opacity', 0.7)
-
-      if (hasMovement) {
-        line
-          .transition()
-          .duration(ANIMATION.duration)
-          .ease(ANIMATION.easing)
-          .attrTween('x1', () => (t: number) => String(interpolate(t)[ai].x))
-          .attrTween('y1', () => (t: number) => String(interpolate(t)[ai].y))
-          .attrTween('x2', () => (t: number) => String(interpolate(t)[bi].x))
-          .attrTween('y2', () => (t: number) => String(interpolate(t)[bi].y))
-      }
-    }
-  }
-
-  // 5. Pionki (Procesy)
-  if (processedPawns.value && processedPawns.value.length > 0) {
-    const grouped = d3.group(processedPawns.value, d => `${d.x},${d.y}`)
-
-    grouped.forEach((pawnsInCell) => {
-      const count = pawnsInCell.length
-      
-      pawnsInCell.forEach((pawn, index) => {
+    // 4. Polygons per team color
+    const byColor = d3.group(processedPawns.value, (d) => d.color)
+    byColor.forEach((teamPawns, teamColor) => {
+      if (teamPawns.length < 2) return
+      const toPoints = teamPawns.map((pawn) => {
         const { screenX, screenY } = getScreenPosition(pawn.x, pawn.y)
-        const { offsetX, offsetY } = calculateGroupOffsets(count, index)
-        const targetX = screenX + offsetX
-        const targetY = screenY + offsetY
-        
-        const baseScale = cellSize.value * 0.002 // dynamiczne skalowanie do wielkości komórki
-
-        const pawnGroup = svg.append('g')
-          .attr('class', 'pawn-group')
-          .attr('data-id', pawn.id)
-
-        // Rysowanie kształtu pionka
-        pawnGroup.append('path')
-          .attr('d', pawnPath)
-          .attr('fill', pawn.color)
-          .attr('stroke', '#000')
-          .attr('stroke-width', 1.5 / baseScale)
-
-        // Pozycjonowanie i animacja
+        return { x: screenX, y: screenY }
+      })
+      const fromPoints = teamPawns.map((pawn, i) => {
         const prev = previousPositions.value.get(pawn.id)
         if (animate && prev && (prev.x !== pawn.x || prev.y !== pawn.y)) {
-          const fromPos = getScreenPosition(prev.x, prev.y)
-          pawnGroup
-            .attr('transform', `translate(${fromPos.screenX}, ${fromPos.screenY}) scale(${baseScale}) translate(${-originalCenterX}, ${-originalCenterY})`)
-            .transition().duration(ANIMATION.duration).ease(ANIMATION.easing)
-            .attrTween('transform', () => (t: number) => {
-              const curX = fromPos.screenX + (targetX - fromPos.screenX) * t
-              const curY = fromPos.screenY + (targetY - fromPos.screenY) * t
-              const hop = Math.sin(t * Math.PI) * ANIMATION.hopHeight
-              return `translate(${curX}, ${curY - hop}) scale(${baseScale}) translate(${-originalCenterX}, ${-originalCenterY})`
-            })
-        } else {
-          pawnGroup.attr('transform', `translate(${targetX}, ${targetY}) scale(${baseScale}) translate(${-originalCenterX}, ${-originalCenterY})`)
+          const { screenX, screenY } = getScreenPosition(prev.x, prev.y)
+          return { x: screenX, y: screenY }
         }
-
-        previousPositions.value.set(pawn.id, { x: pawn.x, y: pawn.y })
+        return { x: toPoints[i].x, y: toPoints[i].y }
       })
+      const hasMovement = fromPoints.some((f, i) => f.x !== toPoints[i].x || f.y !== toPoints[i].y)
+      const interp = makeInterpolate(fromPoints, toPoints)
+
+      const polygon = svg.append('polygon')
+        .attr('points', pointsStr(fromPoints))
+        .attr('fill', teamColor)
+        .attr('fill-opacity', 0.2)
+        .attr('stroke', teamColor)
+        .attr('stroke-width', 1.5)
+        .attr('stroke-opacity', 0.75)
+      if (hasMovement) {
+        polygon.transition().duration(ANIMATION.duration).ease(ANIMATION.easing)
+          .attrTween('points', () => (t: number) => pointsStr(interp(t)))
+      }
     })
+
+    // 5. Circles per pawn
+    if (processedPawns.value && processedPawns.value.length > 0) {
+      const circleR = cellSize.value * 0.15
+      const grouped = d3.group(processedPawns.value, (d) => `${d.x},${d.y}`)
+      grouped.forEach((pawnsInCell) => {
+        const count = pawnsInCell.length
+        pawnsInCell.forEach((pawn, index) => {
+          const { screenX, screenY } = getScreenPosition(pawn.x, pawn.y)
+          const { offsetX, offsetY } = calculateGroupOffsets(count, index)
+          const targetX = screenX + offsetX
+          const targetY = screenY + offsetY
+
+          const g = svg.append('g').attr('class', 'pawn-group').attr('data-id', pawn.id)
+          g.append('circle')
+            .attr('r', circleR)
+            .attr('fill', pawn.color)
+            .attr('stroke', '#000')
+            .attr('stroke-width', 1.5)
+
+          const prev = previousPositions.value.get(pawn.id)
+          if (animate && prev && (prev.x !== pawn.x || prev.y !== pawn.y)) {
+            const fromPos = getScreenPosition(prev.x, prev.y)
+            g.attr('transform', `translate(${fromPos.screenX}, ${fromPos.screenY})`)
+              .transition().duration(ANIMATION.duration).ease(ANIMATION.easing)
+              .attrTween('transform', () => (t: number) => {
+                const curX = fromPos.screenX + (targetX - fromPos.screenX) * t
+                const curY = fromPos.screenY + (targetY - fromPos.screenY) * t
+                const hop = Math.sin(t * Math.PI) * ANIMATION.hopHeight
+                return `translate(${curX}, ${curY - hop})`
+              })
+          } else {
+            g.attr('transform', `translate(${targetX}, ${targetY})`)
+          }
+          previousPositions.value.set(pawn.id, { x: pawn.x, y: pawn.y })
+        })
+      })
+    }
   }
 };
 

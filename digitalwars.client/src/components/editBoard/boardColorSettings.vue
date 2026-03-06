@@ -80,7 +80,7 @@
               rounded
               size="small"
               class="flex-shrink-0"
-              :title="`Usuń strefę ${index + 1}`"
+              :title="t('deleteZone', { index: index + 1 })"
             >
               <font-awesome-icon :icon="faMinus" class="h-3.5" />
             </Button>

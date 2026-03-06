@@ -7,12 +7,16 @@
           class="w-16 h-16 border-4 border-accent/30 rounded-full animate-spin border-t-accent"
         ></div>
       </div>
-      <p class="text-white text-sm text-center mt-4">{{ message }}</p>
+      <p class="text-white text-sm text-center mt-4">{{ message || t('pleaseWait') }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   show: {
     type: Boolean,
@@ -20,7 +24,7 @@ defineProps({
   },
   message: {
     type: String,
-    default: 'Proszę czekać',
+    default: '',
   },
 })
 </script>

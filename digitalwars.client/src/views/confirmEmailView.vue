@@ -80,7 +80,6 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-// --- POPRAWKA: Definicja interfejsu dla odpowiedzi API ---
 interface ConfirmEmailResponse {
   success: boolean
 }
@@ -96,18 +95,14 @@ const handleReturnToLogin = () => {
 
 onMounted(async () => {
   const tokenParam = router.currentRoute.value.params.token
-  // --- POPRAWKA: Upewniamy się, że token jest pojedynczym stringiem ---
   const token = Array.isArray(tokenParam) ? tokenParam[0] : tokenParam
 
-  console.log('Token', token)
   if (token) {
     try {
-      // --- POPRAWKA: Dodajemy typ generyczny do wywołania API ---
       const response = await apiService.get<ConfirmEmailResponse>(
         apiConfig.auth.confirmEmail(token),
       )
 
-      // Teraz TypeScript wie, że response.data.success istnieje i jest typu boolean
       if (response.data.success) {
         isTokenValid.value = true
       }
