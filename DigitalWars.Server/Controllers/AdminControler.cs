@@ -63,7 +63,13 @@ namespace backend.Controllers
             var allCards = decisionCards.OrderBy(c => c.Id).ToList();
             if (!allCards.Any()) return NotFound($"Brak kart dla talii o ID {deckId}.");
 
-            var document = new CardsDocument(allCards, _cardsLogger);
+            var orderedPhaseIds = await _context.Phases
+                .Where(p => p.Decks_Id == deckId)
+                .OrderBy(p => p.Phases_Id)
+                .Select(p => p.Phases_Id)
+                .ToListAsync();
+
+            var document = new CardsDocument(allCards, _cardsLogger, orderedPhaseIds);
             byte[] pdfBytes = document.GeneratePdf();
 
             return File(pdfBytes, "application/pdf", "DigitalWars_Karty.pdf");
