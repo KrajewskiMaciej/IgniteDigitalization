@@ -24,6 +24,39 @@
           :loading="isLoadingDecks"
           class="w-full"
         />
+
+        <div class="mt-6 pt-5 border-t border-surface-700">
+          <p class="text-sm text-gray-400 mb-3">{{ t('orImportFromFile') }}</p>
+          <input
+            type="file"
+            accept=".xls,.xlsx"
+            ref="fileInput"
+            @change="handleFileChange"
+            style="display: none"
+          />
+          <div class="flex gap-2">
+            <Button
+              @click="triggerFileInput"
+              severity="success"
+              class="flex-1"
+              :label="t('loadDeckFromExcel')"
+            >
+              <template #icon>
+                <font-awesome-icon :icon="faFileExcel" class="mr-2" />
+              </template>
+            </Button>
+            <Button
+              @click="handleDownloadTemplate"
+              severity="secondary"
+              outlined
+              :label="t('downloadCardTemplate')"
+            >
+              <template #icon>
+                <font-awesome-icon :icon="faDownload" class="mr-2" />
+              </template>
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -37,7 +70,7 @@
           <div class="flex items-center gap-3 pr-4 border-r border-surface-700">
             <span class="text-sm text-gray-300">{{ selectedDeckTitle }}</span>
             <Button
-              :label="t('change')"
+              :label="t('changeTraining')"
               size="small"
               severity="secondary"
               outlined
@@ -138,13 +171,17 @@ import {
   faCoins,
   faLayerGroup,
   faArrowLeft,
+  faFileExcel,
+  faDownload,
 } from '@fortawesome/free-solid-svg-icons'
 import DynamicCheatSheetEdit from '@/components/cheatSheet/DynamicCheatSheetEdit.vue'
 import { useI18n } from 'vue-i18n'
+import { useToast } from 'vue-toastification'
 import apiService from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
 
 const { t } = useI18n()
+const toast = useToast()
 
 interface Deck {
   id: number
@@ -155,6 +192,7 @@ const currentView = ref<'items' | 'decisions' | 'processes' | 'enablers' | 'econ
 const selectedDeckId = ref<number | undefined>(undefined)
 const decksData = ref<Deck[]>([])
 const isLoadingDecks = ref(false)
+const fileInput = ref<HTMLInputElement | null>(null)
 
 const selectedDeckTitle = computed(
   () => decksData.value.find((d) => d.id === selectedDeckId.value)?.title ?? '',
@@ -167,6 +205,46 @@ async function fetchDecks() {
     decksData.value = response.data as Deck[]
   } finally {
     isLoadingDecks.value = false
+  }
+}
+
+function triggerFileInput(): void {
+  fileInput.value?.click()
+}
+
+async function handleFileChange(event: Event): Promise<void> {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append('file', file)
+
+  try {
+    await apiService.post(apiConfig.admin.deck.upload, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      withCredentials: true,
+    })
+    toast.success(t('fileSuccessfullyUploadedAndDeckCreated'))
+    await fetchDecks()
+  } catch (error: any) {
+    toast.error(t('errorUploadingDeckFile') + error.message)
+  }
+}
+
+const handleDownloadTemplate = async () => {
+  try {
+    const response = await apiService.getFile(apiConfig.admin.deck.getCardsTemplate)
+    const file = response.data
+    const url = window.URL.createObjectURL(file)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'DigitalWars_SzablonKart.xlsx'
+    link.click()
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('Błąd przy pobieraniu szablonu kart:', error)
+    toast.error(t('errorDownloadingCardsTemplate') + error)
   }
 }
 

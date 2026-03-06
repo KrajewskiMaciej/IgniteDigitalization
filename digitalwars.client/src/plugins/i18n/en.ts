@@ -332,7 +332,7 @@ export const en = {
   //Decision Cards
   manageCardsInTheDeck: 'Manage decision cards in the deck',
   loadDeckFromExcel: 'Load deck from Excel file',
-  downloadCardTemplate: 'Download card template',
+  downloadCardTemplate: 'Download template',
   deckName: 'Deck name',
   deckNamePlaceholder: 'Deck name...',
   changeName: 'Change name',
@@ -616,7 +616,8 @@ export const en = {
   selectDeckToEditEnablersLabel: 'Select deck...',
 
   //gameChat
-  chatWelcomeMessage: 'Hello! I am your AI assistant 🤖. I can help you in the game and answer questions. Each hint costs {cost} Bits 💰. How can I help you?',
+  chatWelcomeMessage:
+    'Hello! I am your AI assistant 🤖. I can help you in the game and answer questions. Each hint costs {cost} Bits 💰. How can I help you?',
   chatPlaceholder: 'Send a message ...',
   chatAiPlaceholder: '[AI response will appear here]',
 
@@ -646,4 +647,7 @@ export const en = {
 
   //generic
   and: 'and',
+
+  orImportFromFile: 'or import from file',
+  changeTraining: 'Change training',
 }

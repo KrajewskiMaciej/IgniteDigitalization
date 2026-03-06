@@ -9,34 +9,6 @@
     </div>
 
     <div class="max-w-6xl mx-auto w-full space-y-6">
-      <!-- Przycisk importu pliku -->
-      <div class="text-center">
-        <input
-          type="file"
-          accept=".xls,.xlsx"
-          ref="fileInput"
-          @change="handleFileChange"
-          style="display: none"
-        />
-        <div class="flex gap-2 justify-center">
-          <Button
-            @click="triggerFileInput"
-            severity="success"
-            size="large"
-            :label="t('loadDeckFromExcel')"
-          >
-            <template #icon>
-              <font-awesome-icon :icon="faFileExcel" class="mr-2" />
-            </template>
-          </Button>
-
-          <Button @click="handleDownloadTemplate" size="large" :label="t('downloadCardTemplate')">
-            <template #icon>
-              <font-awesome-icon :icon="faDownload" class="mr-2" />
-            </template>
-          </Button>
-        </div>
-      </div>
 
       <!-- Edycja nazwy szkolenia -->
       <div
@@ -301,10 +273,8 @@
 <script setup lang="ts">
 import {
   faPenToSquare,
-  faFileExcel,
   faLayerGroup,
   faComment,
-  faDownload,
   faCircleCheck,
   faCircleXmark,
 } from '@fortawesome/free-solid-svg-icons'
@@ -344,8 +314,6 @@ const selectedCardId = ref<number | undefined>(undefined)
 const selectedFeedbackId = ref<number | undefined>(undefined)
 const feedbacksData = ref<IFeedback[]>([])
 
-const fileInput = ref<HTMLInputElement | null>(null)
-
 const decksData = ref<Deck[]>([])
 const deckName = ref<string>('')
 const cardsData = ref<Card[]>([])
@@ -361,10 +329,6 @@ const isSavingCard = ref(false)
 const isSavingFeedback = ref(false)
 
 // --- FUNKCJE ---
-function triggerFileInput(): void {
-  fileInput.value?.click()
-}
-
 const fetchFeedbacks = async () => {
   if (!currentCard.value?.id) return
 
@@ -384,46 +348,6 @@ const fetchFeedbacks = async () => {
     feedbacksData.value = mapped
   } catch (error) {
     toast.error(t('errorFetchingFeedbacks'))
-  }
-}
-
-async function handleFileChange(event: Event): Promise<void> {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-
-  if (!file) return
-
-  const formData = new FormData()
-  formData.append('file', file)
-
-  try {
-    const response = await apiService.post(apiConfig.admin.deck.upload, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      withCredentials: true,
-    })
-    toast.success(t('fileSuccessfullyUploadedAndDeckCreated'))
-    await fetchDecks()
-  } catch (error: any) {
-    toast.error(t('errorUploadingDeckFile') + error.message)
-  }
-}
-
-const handleDownloadTemplate = async () => {
-  try {
-    const response = await apiServices.getFile(apiConfig.admin.deck.getCardsTemplate)
-    const file = response.data
-
-    const url = window.URL.createObjectURL(file)
-
-    const link = document.createElement('a')
-    link.href = url
-    link.download = 'DigitalWars_SzablonKart.xlsx'
-    link.click()
-
-    window.URL.revokeObjectURL(url)
-  } catch (error) {
-    console.error('Błąd przy pobieraniu szablonu kart:', error)
-    toast.error(t('errorDownloadingCardsTemplate') + error)
   }
 }
 

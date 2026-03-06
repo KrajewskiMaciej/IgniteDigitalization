@@ -332,7 +332,7 @@ export const pl = {
   //Decision cards
   manageCardsInTheDeck: 'Zarządzaj kartami w szkoleniu',
   loadDeckFromExcel: 'Wczytaj szkolenie z pliku Excel',
-  downloadCardTemplate: 'Pobierz szablon kart',
+  downloadCardTemplate: 'Pobierz szablon',
   deckName: 'Nazwa szkolenia',
   deckNamePlaceholder: 'Nazwa szkolenia...',
   changeName: 'Zmień nazwę',
@@ -617,7 +617,8 @@ export const pl = {
   selectDeckToEditEnablersLabel: 'Wybierz talię...',
 
   //gameChat
-  chatWelcomeMessage: 'Cześć! Jestem Twoim asystentem AI 🤖. Mogę pomóc Ci w grze, odpowiedzieć na pytania. Każda podpowiedź kosztuje {cost} Bitów 💰. Jak mogę Ci pomóc?',
+  chatWelcomeMessage:
+    'Cześć! Jestem Twoim asystentem AI 🤖. Mogę pomóc Ci w grze, odpowiedzieć na pytania. Każda podpowiedź kosztuje {cost} Bitów 💰. Jak mogę Ci pomóc?',
   chatPlaceholder: 'Wyślij wiadomość ...',
   chatAiPlaceholder: '[Tu będzie odpowiedź od AI]',
 
@@ -647,4 +648,7 @@ export const pl = {
 
   //generic
   and: 'i',
+
+  orImportFromFile: 'lub zaimportuj z pliku',
+  changeTraining: 'Zmień szkolenie',
 }

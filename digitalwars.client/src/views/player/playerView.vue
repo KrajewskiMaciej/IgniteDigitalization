@@ -38,7 +38,6 @@
             </button>
 
             <button
-              v-if="isMarketPhaseOnly"
               @click="mobileView = 'board'"
               class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 relative overflow-hidden group"
               :class="
@@ -47,7 +46,7 @@
                   : 'bg-secondary text-surface-300 hover:text-surface-0 border border-primary-500/30'
               "
             >
-              <span class="relative z-10">{{ t('yourBoard') }}</span>
+              <span class="relative z-10">{{ t('rivalBoard') }}</span>
               <div
                 v-if="mobileView !== 'board'"
                 class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
@@ -55,7 +54,6 @@
             </button>
 
             <button
-              v-if="!isMarketPhaseOnly"
               @click="mobileView = 'market'"
               class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 relative overflow-hidden group"
               :class="
@@ -64,7 +62,7 @@
                   : 'bg-secondary text-surface-300 hover:text-surface-0 border border-primary-500/30'
               "
             >
-              <span class="relative z-10">{{ t('market') }}</span>
+              <span class="relative z-10">{{ t('yourBoard') }}</span>
               <div
                 v-if="mobileView !== 'market'"
                 class="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/10 to-primary-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
@@ -182,21 +180,20 @@
 
             <div v-else-if="mobileView === 'board'" class="h-full">
               <GameBoard
-                v-if="gameData?.boardConfig"
-                :config="formData"
-                :gameMode="true"
-                :pawns="pawns"
-                :usePercentage="true"
-              />
-            </div>
-
-            <div v-else-if="mobileView === 'market'" class="h-full">
-              <GameBoard
                 v-if="gameData?.rivalBoardConfig"
                 :config="enemyformData"
                 :gameMode="true"
                 :pawns="enemypawns"
                 :usePercentage="true"
+              />
+            </div>
+
+            <div v-else-if="mobileView === 'market'" class="h-full">
+              <CartesianBoard
+                v-if="gameData?.boardConfig"
+                :config="formData"
+                :gameMode="true"
+                :pawns="pawns"
               />
             </div>
 
@@ -221,6 +218,47 @@
             <RouterView />
             <!-- <QuestionBox /> -->
 
+            <!-- Przełącznik trybu: QR / Lista kart -->
+            <div v-if="!isDesktop" class="flex gap-2 mb-4">
+              <button
+                @click="cardMode = 'qr'"
+                class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
+                :class="
+                  cardMode === 'qr'
+                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                    : 'bg-secondary text-surface-300 border border-primary-500/30'
+                "
+              >
+                {{ t('switchToScanner') }}
+              </button>
+              <button
+                @click="cardMode = 'carousel'"
+                class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
+                :class="
+                  cardMode === 'carousel'
+                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                    : 'bg-secondary text-surface-300 border border-primary-500/30'
+                "
+              >
+                {{ t('switchToCardList') }}
+              </button>
+            </div>
+
+            <!-- Tryb QR -->
+            <QrCardScanner
+              v-if="cardMode === 'qr' && !isDesktop"
+              :deck-id="gameData.deckId"
+              :team-id="gameData.teamId"
+              :game-id="gameData.gameId"
+              :board-id="gameData.boardConfig?.boardId"
+              :current-budget="currentGlobalBudget"
+              :is-online-game="gameData.isOnline"
+              :is-independent-team="gameData.isIndependent"
+              @switch-to-carousel="cardMode = 'carousel'"
+            />
+
+            <!-- Tryb karuzelowy -->
+            <template v-if="cardMode === 'carousel' || isDesktop">
             <div class="flex gap-2 my-4" v-if="cardCarouselRef?.hasItemCards">
               <button
                 @click="showingDecisionCards = true"
@@ -265,6 +303,7 @@
                 <div class="text-center text-surface-300">{{ t('loadingCards') }}</div>
               </template>
             </Suspense>
+            </template>
           </div>
 
           <div
@@ -423,9 +462,11 @@ onClickOutside(chatRef, () => {
 
 const breakpoints = useBreakpoints({
   mobile: 768,
+  desktop: 1280,
 })
 
 const isMobile = breakpoints.smaller('mobile')
+const isDesktop = breakpoints.greaterOrEqual('desktop')
 
 // --- PROPSY ---
 const props = defineProps({
