@@ -77,6 +77,21 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// --- REJESTRACJA CZCIONEK (jednorazowo przy starcie) ---
+var fontsDir = Path.Combine(AppContext.BaseDirectory, "Templates", "Fonts");
+
+if (Directory.Exists(fontsDir))
+{
+    var fontFiles = Directory.GetFiles(fontsDir, "*.ttf", SearchOption.AllDirectories)
+        .Concat(Directory.GetFiles(fontsDir, "*.ttc", SearchOption.AllDirectories))
+        .ToList();
+
+    foreach (var font in fontFiles)
+    {
+        QuestPDF.Drawing.FontManager.RegisterFont(File.OpenRead(font));
+    }
+}
+
 // --- 7. MIDDLEWARE (Kolejność jest kluczowa dla działania CORS i Auth) ---
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions

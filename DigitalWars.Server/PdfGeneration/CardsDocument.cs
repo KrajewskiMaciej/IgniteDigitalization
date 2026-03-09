@@ -54,16 +54,6 @@ namespace backend.PdfGeneration
             _phaseColors = new Dictionary<int, (string, string)>();
             for (int i = 0; i < orderedPhaseIds.Count && i < colors.Length; i++)
                 _phaseColors[orderedPhaseIds[i]] = colors[i];
-
-            var fontsDir = Path.Combine(AppContext.BaseDirectory, "Templates", "Fonts");
-            if (Directory.Exists(fontsDir))
-            {
-                foreach (var ttf in Directory.GetFiles(fontsDir, "Inter*.ttf"))
-                {
-                    try { QuestPDF.Drawing.FontManager.RegisterFont(File.OpenRead(ttf)); }
-                    catch { }
-                }
-            }
         }
 
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
@@ -85,12 +75,12 @@ namespace backend.PdfGeneration
                         layers.PrimaryLayer().Width(CardWidth).Height(CardHeight).Container();
 
                         // Logo Główne (X: 225, Y: 80)
-                        layers.Layer().TranslateX(225).TranslateY(80).Width(150).Image(logoPath);
+                        layers.Layer().TranslateX(220).TranslateY(100).Width(144).Image(logoPath);
 
                         // Logotypy Partnerów (X: 50, Y: 210) - Jawne wymiary gwarantują widoczność
                         if (File.Exists(logotypyPath))
                         {
-                            layers.Layer().TranslateX(50).TranslateY(210).Width(500).Height(30)
+                            layers.Layer().TranslateX(125).TranslateY(212).Width(332).Height(24)
                                 .Image(logotypyPath).FitArea();
                         }
                     });
@@ -124,7 +114,7 @@ namespace backend.PdfGeneration
                 // 1. TYTUŁ (X: 50, Y: 45)
                 var titleColor = isEntryPhase ? circleColor : "#000000";
                 layers.Layer().TranslateX(50).TranslateY(67).Width(370).Height(24)
-                    .Text(card.Title).FontFamily(FontInter).FontSize(18).ExtraBold().FontColor(titleColor);
+                    .Text(card.Title).FontFamily(FontInter).FontSize(18).Black().FontColor(titleColor);
 
                 // 2. OPIS (X: 50, Y: 90)
                 layers.Layer().TranslateX(51).TranslateY(100).Width(340).Height(180)
@@ -137,14 +127,14 @@ namespace backend.PdfGeneration
                     .Svg(GetCircleSvg(circleColor));
 
                 // Numer karty (np. 01) - zawsze biały
-                layers.Layer().TranslateX(454).TranslateY(60).Width(61)
+                layers.Layer().TranslateX(451).TranslateY(60).Width(70)
                     .AlignCenter().Text(card.Id.ToString("D2"))
-                    .FontFamily(FontInter).FontSize(48).ExtraBold().FontColor(Colors.White);
+                    .FontFamily(FontInter).FontSize(48).Black().FontColor(Colors.White);
 
                 // Nazwa fazy (np. PRZYGOTOWANIE) - zawsze biała
                 layers.Layer().TranslateX(451).TranslateY(112).Width(70)
                     .AlignCenter().Text(card.PhaseName.ToUpper())
-                    .FontFamily(FontInter).FontSize(6).ExtraBold().LetterSpacing(0.1f).FontColor(Colors.White);
+                    .FontFamily(FontInter).FontSize(6).Black().FontColor(Colors.White);
 
                 // --- SEKCJA ŻÓŁTEGO KOŁA KOSZTU (tylko gdy NIE jest fazą wejście na rynek) ---
                 if (!isEntryPhase)
@@ -156,12 +146,12 @@ namespace backend.PdfGeneration
                     // Wartość kosztu (np. 2$) - Wycentrowana w żółtym kole
                     layers.Layer().TranslateX(513).TranslateY(27).Width(30)
                         .AlignCenter().Text($"{card.Cost}$")
-                        .FontFamily(FontInter).FontSize(21).ExtraBold().FontColor(Colors.White);
+                        .FontFamily(FontInter).FontSize(21).Black().FontColor(Colors.White);
 
                     // Słowo "KOSZT" - Wycentrowane pod wartością
                     layers.Layer().TranslateX(512).TranslateY(52).Width(32)
                         .AlignCenter().Text("KOSZT")
-                        .FontFamily(FontInter).FontSize(6).ExtraBold().FontColor(Colors.White);
+                        .FontFamily(FontInter).FontSize(6).Black().FontColor(Colors.White);
                 }
 
                 // --- KOD QR (X: 454, Y: 168) ---
