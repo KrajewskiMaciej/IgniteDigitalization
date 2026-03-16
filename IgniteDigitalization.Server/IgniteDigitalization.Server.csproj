@@ -10,20 +10,20 @@
     <SpaProxyServerUrl>http://localhost:61536</SpaProxyServerUrl>
   </PropertyGroup>
 
-    <Target Name="BuildFrontend" BeforeTargets="Publish">
+    <Target Name="BuildFrontend" BeforeTargets="Publish" Condition="'$(SkipFrontendBuild)' != 'true'">
     <Message Importance="high" Text="Budowanie frontendu Vue..." />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
   </Target>
 
-  <Target Name="CopyFrontendToWwwroot" AfterTargets="BuildFrontend">
+  <Target Name="CopyFrontendToWwwroot" AfterTargets="BuildFrontend" Condition="'$(SkipFrontendBuild)' != 'true'">
     <ItemGroup>
       <DistFiles Include="$(SpaDist)**\*" />
     </ItemGroup>
     <Copy SourceFiles="@(DistFiles)" DestinationFolder="wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" />
   </Target>
 
-  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition="'$(SkipFrontendBuild)' != 'true'">
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
 
@@ -37,7 +37,7 @@
     </ItemGroup>
   </Target>
   <ItemGroup>
-    <ProjectReference Include="..\ignitedigitalization.client\ignitedigitalization.client.esproj">
+    <ProjectReference Include="..\ignitedigitalization.client\ignitedigitalization.client.esproj" Condition="'$(SkipFrontendBuild)' != 'true'">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     
