@@ -1,6 +1,6 @@
-# DigitalWars – Edukacyjna Gra Webowa typu *"Learning by Doing"*
+# IgniteDigitalization – Edukacyjna Gra Webowa typu *"Learning by Doing"*
 
-**DigitalWars** to interaktywna aplikacja webowa, która przenosi planszową grę edukacyjną do środowiska cyfrowego.  
+**IgniteDigitalization** to interaktywna aplikacja webowa, która przenosi planszową grę edukacyjną do środowiska cyfrowego.  
 Celem projektu jest nauka zagadnień z zakresu digitalizacji przedsiębiorstw poprzez aktywne uczestnictwo w symulowanej grze strategicznej.  
 Gra oparta jest na mechanice **learning by doing**, dzięki czemu uczestnicy zdobywają wiedzę w trakcie działania.
 

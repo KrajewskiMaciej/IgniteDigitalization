@@ -1,0 +1,109 @@
+<template>
+  <aside
+    class="h-container bg-secondary text-white flex flex-col rounded-r-md border-t border-r border-b border-surface-700"
+    :class="isSideBarOpen ? 'w-64' : 'w-16'"
+  >
+    <div class="py-6 flex flex-row justify-between items-center px-4">
+      <div></div>
+      <h1 v-if="isSideBarOpen" class="text-xl font-bold text-white font-nasalization">
+        IGNITE DIGITALIZATION
+      </h1>
+      <div>
+        <button @click="handleSidebar">
+          <font-awesome-icon :icon="isSideBarOpen ? faArrowLeft : faArrowRight" class="h-4" />
+        </button>
+      </div>
+    </div>
+
+    <nav class="flex-1 px-2 py-2">
+      <ul class="space-y-2">
+        <li
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+        >
+          <RouterLink
+            to="/admin"
+            class="flex items-center gap-4 px-4 py-3 rounded-md"
+            :class="isSideBarOpen ? '' : 'justify-center'"
+          >
+            <font-awesome-icon :icon="faGamepad" class="h-4 text-accent" />
+            <span v-if="isSideBarOpen">{{ t('activeGames') }}</span>
+          </RouterLink>
+        </li>
+
+        <li
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+        >
+          <RouterLink
+            class="flex items-center gap-4 px-4 py-3 rounded-md"
+            :class="isSideBarOpen ? '' : 'justify-center'"
+            to="/admin/editGameplayElements"
+          >
+            <font-awesome-icon :icon="faPenToSquare" class="h-4 text-accent" />
+            <span v-if="isSideBarOpen">{{ t('editGameplayElements') }}</span>
+          </RouterLink>
+        </li>
+
+        <li
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+        >
+          <RouterLink
+            class="flex items-center gap-4 px-4 py-3 rounded-md"
+            :class="isSideBarOpen ? '' : 'justify-center'"
+            to="/admin/editBoard"
+          >
+            <font-awesome-icon :icon="faChessBoard" class="h-4 text-accent" />
+            <span v-if="isSideBarOpen">{{ t('editBoard') }}</span>
+          </RouterLink>
+        </li>
+
+        <li
+          class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
+        >
+          <RouterLink
+            to="/admin/exportToPDF"
+            class="flex items-center gap-4 px-4 py-3 rounded-md"
+            :class="isSideBarOpen ? '' : 'justify-center'"
+          >
+            <font-awesome-icon :icon="faFilePdf" class="h-4 text-accent" />
+            <span v-if="isSideBarOpen">{{ t('generateGameToPdf') }}</span>
+          </RouterLink>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+</template>
+
+<script setup lang="ts">
+import {
+  faArrowDown,
+  faArrowUp,
+  faGamepad,
+  faChartLine,
+  faPenToSquare,
+  faFile,
+  faFilePdf,
+  faArrowLeft,
+  faArrowRight,
+  faChessBoard,
+} from '@fortawesome/free-solid-svg-icons'
+import { ref } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+const isSideBarOpen = ref(true)
+const isStatsDropdownOpen = ref(false)
+
+const handleSidebar = () => {
+  isSideBarOpen.value = !isSideBarOpen.value
+  isStatsDropdownOpen.value = false
+}
+
+const handleStats = () => {
+  isStatsDropdownOpen.value = !isStatsDropdownOpen.value
+
+  if (!isSideBarOpen.value) {
+    isSideBarOpen.value = true
+  }
+}
+</script>

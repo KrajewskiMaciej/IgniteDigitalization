@@ -3,12 +3,12 @@
 .gitignore
 
 # Node
-digitalwars.client/node_modules
-digitalwars.client/dist
+ignitedigitalization.client/node_modules
+ignitedigitalization.client/dist
 
 # .NET
-DigitalWars.Server/bin
-DigitalWars.Server/obj
+IgniteDigitalization.Server/bin
+IgniteDigitalization.Server/obj
 
 # VS / IDE
 .vs

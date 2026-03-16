@@ -1,0 +1,6 @@
+@IgniteDigitalization.Server_HostAddress = http://localhost:5049
+
+GET {{IgniteDigitalization.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

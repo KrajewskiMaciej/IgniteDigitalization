@@ -6,11 +6,11 @@ FROM node:22-alpine AS frontend-build
 WORKDIR /app/client
 
 # Kopiuj pliki zależności i pobierz paczki
-COPY digitalwars.client/package.json digitalwars.client/package-lock.json ./
+COPY ignitedigitalization.client/package.json ignitedigitalization.client/package-lock.json ./
 RUN npm ci
 
 # Kopiuj resztę kodu frontendu i zbuduj
-COPY digitalwars.client/ ./
+COPY ignitedigitalization.client/ ./
 RUN npm run build-only
 
 # =============================================================================
@@ -21,12 +21,12 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS backend-build
 WORKDIR /app/server
 
 # Kopiuj plik projektu i przywróć zależności (cache-friendly)
-COPY DigitalWars.Server/DigitalWars.Server.csproj ./
+COPY IgniteDigitalization.Server/IgniteDigitalization.Server.csproj ./
 RUN dotnet restore
 
 # Kopiuj resztę kodu i opublikuj w trybie Release
-COPY DigitalWars.Server/ ./
-RUN dotnet publish -c Release -o /publish --no-restore
+COPY IgniteDigitalization.Server/ ./
+RUN dotnet publish IgniteDigitalization.Server.csproj -c Release -o /publish --no-restore /p:SkipFrontendBuild=true
 
 # Skopiuj zbudowany frontend do wwwroot publikacji
 COPY --from=frontend-build /app/client/dist /publish/wwwroot
@@ -53,4 +53,4 @@ EXPOSE 8080
 # Włącz serwowanie plików statycznych frontendu
 ENV FrontendSettings__ServeStaticFiles=true
 
-ENTRYPOINT ["dotnet", "DigitalWars.Server.dll"]
+ENTRYPOINT ["dotnet", "IgniteDigitalization.Server.dll"]
