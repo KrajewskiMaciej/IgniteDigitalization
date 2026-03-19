@@ -112,13 +112,13 @@ namespace backend.PdfGeneration
                 // Podkładka 0,0
                 layers.PrimaryLayer().Width(CardWidth).Height(CardHeight).Container();
 
-                // 1. TYTUŁ (X: 50, Y: 45)
+                // 1. TYTUŁ
                 var titleColor = isEntryPhase ? circleColor : "#000000";
-                layers.Layer().TranslateX(50).TranslateY(67).Width(370).Height(24)
+                layers.Layer().TranslateX(50).TranslateY(45).Width(370).Height(24)
                     .Text(card.Title).FontFamily(FontInter).FontSize(18).Black().FontColor(titleColor);
 
-                // 2. OPIS (X: 50, Y: 90)
-                layers.Layer().TranslateX(51).TranslateY(100).Width(340).Height(180)
+                // 2. OPIS
+                layers.Layer().TranslateX(51).TranslateY(78).Width(340).Height(180)
                     .Text(card.Description).FontFamily(FontInter).FontSize(15).Light().LineHeight(1.15f).Justify();
 
                 // --- SEKCJA KOŁA FAZY (Baza X: 435, Y: 42) ---
