@@ -14,11 +14,11 @@
 
     <!-- Tabela decyzji -->
     <div class="flex flex-col flex-grow pt-3 overflow-hidden">
-      <h2 class="text-lg font-semibold mb-2 text-white">{{ t('decisions') }}</h2>
+      <h2 class="text-lg font-semibold mb-2 text-surface-500">{{ t('decisions') }}</h2>
 
       <!-- Lista -->
       <div class="overflow-y-auto custom-scrollbar pr-2 flex-grow">
-        <div v-if="isLoading" class="text-center text-gray-500">
+        <div v-if="isLoading" class="text-center text-surface-300">
           {{ t('loadingDecisionHistory') }}
         </div>
         <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
@@ -32,14 +32,14 @@
               class="border-2 border-blue-400 rounded-lg p-3 bg-blue-900/60 text-center"
             >
               <h4 class="font-bold text-blue-300 text-sm mb-1">{{ t('newEvent') }}</h4>
-              <p class="text-white text-xs leading-relaxed">{{ decision.description }}</p>
+              <p class="text-surface-500 text-xs leading-relaxed">{{ decision.description }}</p>
             </div>
 
             <div
               v-else
-              class="border-2 bg-gray-800 text-white text-left p-3 rounded-lg shadow-md space-y-2 relative"
+              class="border-2 bg-tertiary text-surface-500 text-left p-3 rounded-lg shadow-md space-y-2 relative"
               :class="
-                decision.eventApplied ? 'border-purple-400 bg-purple-900/20' : 'border-gray-600'
+                decision.eventApplied ? 'border-purple-400 bg-purple-900/20' : 'border-lgray-accent'
               "
             >
               <div
@@ -52,10 +52,10 @@
               <div class="font-semibold text-sm">
                 <span class="text-surface-400">{{ t('cardId') }} {{ decision.cardId }}</span>
                 <span class="mx-1">→</span>
-                <span class="text-white">{{ decision.choice }}</span>
+                <span class="text-surface-500">{{ decision.choice }}</span>
               </div>
 
-              <div class="border-t border-gray-600 pt-2">
+              <div class="border-t border-lgray-accent pt-2">
                 <div class="flex items-center gap-2 mb-1">
                   <span class="text-surface-400 text-xs">{{ t('result') }}:</span>
                   <span
@@ -68,10 +68,10 @@
                     {{ decision.result }}
                   </span>
                 </div>
-                <p class="text-xs text-gray-300 leading-relaxed">
+                <p class="text-xs text-surface-300 leading-relaxed">
                   {{ decision.description }}
                 </p>
-                <p v-if="decision.hint" class="text-xs text-gray-300 leading-relaxed">
+                <p v-if="decision.hint" class="text-xs text-surface-300 leading-relaxed">
                   {{ t('hint') }}: {{ decision.hint }}
                 </p>
               </div>

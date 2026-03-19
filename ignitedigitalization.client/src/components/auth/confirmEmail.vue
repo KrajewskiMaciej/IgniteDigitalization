@@ -15,13 +15,13 @@
       class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-4 sm:mb-6"
     />
 
-    <div class="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6 text-center space-y-1.5">
+    <div class="text-sm sm:text-base text-surface-300 mb-4 sm:mb-6 text-center space-y-1.5">
       <p>{{ t('oneMoreStepLeft') }}</p>
       <p>
-        {{ t('toYourEmailAddress') }} <b class="text-white">{{ email }}</b>
+        {{ t('toYourEmailAddress') }} <b class="text-surface-500">{{ email }}</b>
       </p>
       <p>{{ t('weHaveSentVerificationLink') }}</p>
-      <p class="text-xs sm:text-sm text-gray-400">{{ t('checkSpamFolder') }}</p>
+      <p class="text-xs sm:text-sm text-surface-300">{{ t('checkSpamFolder') }}</p>
     </div>
 
     <div class="flex justify-center items-center">

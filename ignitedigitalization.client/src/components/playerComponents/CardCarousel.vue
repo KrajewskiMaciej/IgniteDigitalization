@@ -1,8 +1,8 @@
 <template>
   <div class="w-full max-w-xl mx-auto mt-10">
-    <div v-if="loading" class="text-center text-white">{{ t('loadingCards') }}</div>
+    <div v-if="loading" class="text-center text-surface-500">{{ t('loadingCards') }}</div>
 
-    <div v-else-if="!displayCards || displayCards.length === 0" class="text-center text-white">
+    <div v-else-if="!displayCards || displayCards.length === 0" class="text-center text-surface-500">
       {{ t('noCardAvailableInThisCategory') }}
     </div>
 

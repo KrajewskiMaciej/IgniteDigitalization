@@ -2,11 +2,11 @@
   <div>
     <!-- Sekcja wyboru kolorów podstawowych -->
     <div class="mt-3 md:mt-5">
-      <label class="block mb-3 text-sm font-medium text-white">{{ t('basicColors') }}</label>
+      <label class="block mb-3 text-sm font-medium text-surface-500">{{ t('basicColors') }}</label>
       <div class="flex flex-col sm:flex-row w-full gap-4">
         <!-- Kolor wypełnienia komórki -->
         <div class="border border-surface-700 py-3 px-4 rounded-lg flex-1 bg-secondary">
-          <label for="cell-color" class="block mb-2 text-sm text-surface-200-300">{{
+          <label for="cell-color" class="block mb-2 text-sm text-surface-300">{{
             t('cellColor')
           }}</label>
           <div class="flex items-center gap-3">
@@ -18,15 +18,15 @@
               @input="(event) => handleColorInput(event, 'cell')"
             />
             <div class="flex flex-col flex-1 min-w-0">
-              <span class="text-xs text-surface-200-400">{{ t('hexValue') }}:</span>
-              <span class="font-mono text-sm text-white truncate">{{ cellColor }}</span>
+              <span class="text-xs text-surface-400">{{ t('hexValue') }}:</span>
+              <span class="font-mono text-sm text-surface-500 truncate">{{ cellColor }}</span>
             </div>
           </div>
         </div>
 
         <!-- Kolor obramowania komórki -->
         <div class="border border-surface-700 py-3 px-4 rounded-lg flex-1 bg-secondary">
-          <label for="border-color" class="block mb-2 text-sm text-surface-200-300">{{
+          <label for="border-color" class="block mb-2 text-sm text-surface-300">{{
             t('borderColor')
           }}</label>
           <div class="flex items-center gap-3">
@@ -38,8 +38,8 @@
               @input="(event) => handleColorInput(event, 'border')"
             />
             <div class="flex flex-col flex-1 min-w-0">
-              <span class="text-xs text-surface-200-400">{{ t('hexValue') }}:</span>
-              <span class="font-mono text-sm text-white truncate">{{ borderColor }}</span>
+              <span class="text-xs text-surface-400">{{ t('hexValue') }}:</span>
+              <span class="font-mono text-sm text-surface-500 truncate">{{ borderColor }}</span>
             </div>
           </div>
         </div>
@@ -48,7 +48,7 @@
 
     <!-- Sekcja kolorów stref na planszy -->
     <div class="mt-8">
-      <label class="block mb-3 text-sm font-medium text-white">{{ t('borderColors') }}</label>
+      <label class="block mb-3 text-sm font-medium text-surface-500">{{ t('borderColors') }}</label>
 
       <!-- Lista istniejących kolorów stref -->
       <div class="border border-surface-700 p-3 rounded-lg mb-4 bg-secondary">
@@ -67,8 +67,8 @@
               @input="(event) => handleBorderColorUpdate(event, index)"
             />
             <div class="flex flex-col flex-1 min-w-0">
-              <span class="text-xs text-surface-200-400">{{ t('zone') }} {{ index + 1 }}</span>
-              <span class="font-mono text-xs text-white truncate">{{ color }}</span>
+              <span class="text-xs text-surface-400">{{ t('zone') }} {{ index + 1 }}</span>
+              <span class="font-mono text-xs text-surface-500 truncate">{{ color }}</span>
             </div>
             <!-- Przycisk usuwania -->
             <Button
@@ -99,8 +99,8 @@
             class="w-14 h-14 p-0 bg-transparent cursor-pointer flex-shrink-0"
           />
           <div class="flex flex-col flex-1 min-w-0">
-            <span class="text-xs text-surface-200-400">{{ t('newColor') }}</span>
-            <span class="font-mono text-sm text-white truncate">{{ newColor }}</span>
+            <span class="text-xs text-surface-400">{{ t('newColor') }}</span>
+            <span class="font-mono text-sm text-surface-500 truncate">{{ newColor }}</span>
           </div>
         </div>
         <Button type="button" @click="addColor" class="sm:w-auto" :label="t('addColor')">

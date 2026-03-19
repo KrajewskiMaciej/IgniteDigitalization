@@ -2,7 +2,7 @@
   <div>
     <!-- Pole nazwy planszy -->
     <div class="mt-3 md:mt-5">
-      <label for="board-name" class="block mb-2 text-sm font-medium text-white">
+      <label for="board-name" class="block mb-2 text-sm font-medium text-surface-500">
         {{ t('boardName') }}
       </label>
       <InputText

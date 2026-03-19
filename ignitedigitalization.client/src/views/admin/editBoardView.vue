@@ -2,7 +2,7 @@
   <div class="w-full">
     <div class="grid grid-cols-1 md:grid-cols-[55fr_45fr]">
       <div
-        class="order-2 md:order-1 flex flex-col justify-start border-2 border-surface-700 py-6 px-4 m-4 rounded-lg text-white bg-tertiary"
+        class="order-2 md:order-1 flex flex-col justify-start border-2 border-surface-700 py-6 px-4 m-4 rounded-lg text-surface-500 bg-tertiary"
       >
         <div class="flex flex-row w-full items-center justify-center gap-5 flex-shrink-0">
           <Button
@@ -72,7 +72,7 @@
             />
 
             <div class="mt-3 md:mt-5 px-4">
-              <label class="block mb-3 text-sm font-medium text-white">
+              <label class="block mb-3 text-sm font-medium text-surface-500">
                 {{ t('quadrantNames') }}
                 <span class="text-xs text-surface-500 ml-2">{{ t('quadrantNamesHint') }}</span>
               </label>
@@ -114,7 +114,7 @@
       </div>
 
       <div
-        class="order-1 md:order-2 border-2 border-surface-700 py-6 px-8 m-4 rounded-lg text-white bg-tertiary flex flex-col md:sticky md:top-4 self-start md:max-h-[calc(100vh-2rem)]"
+        class="order-1 md:order-2 border-2 border-surface-700 py-6 px-8 m-4 rounded-lg text-surface-500 bg-tertiary flex flex-col md:sticky md:top-4 self-start md:max-h-[calc(100vh-2rem)]"
       >
         <h2 class="text-xl mb-4 text-center flex-shrink-0">{{ t('gameBoardPreview') }}</h2>
 

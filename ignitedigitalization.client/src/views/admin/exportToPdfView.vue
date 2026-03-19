@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2">
         {{ t('gameExportToPdf') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base">{{ t('generatePdfDescription') }}</p>
@@ -13,12 +13,12 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faFileExport" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('cardExport') }}</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('cardExport') }}</h2>
         </div>
 
         <div class="space-y-4">
           <div>
-            <label for="deck-select" class="block mb-2 text-sm font-semibold text-gray-300">
+            <label for="deck-select" class="block mb-2 text-sm font-semibold text-surface-300">
               {{ t('selectDeck') }}
             </label>
             <Dropdown
@@ -56,12 +56,12 @@
           <div class="bg-green-400/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faFileExport" class="h-6 text-green-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('boardExport') }}</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('boardExport') }}</h2>
         </div>
 
         <div class="space-y-4">
           <div>
-            <label for="board-select" class="block mb-2 text-sm font-semibold text-gray-300">
+            <label for="board-select" class="block mb-2 text-sm font-semibold text-surface-300">
               {{ t('tableBoard') }}
             </label>
             <Dropdown
@@ -80,7 +80,7 @@
           <div>
             <label
               for="opponent-board-select"
-              class="block mb-2 text-sm font-semibold text-gray-300"
+              class="block mb-2 text-sm font-semibold text-surface-300"
             >
               {{ t('opponentBoard') }}
             </label>
@@ -108,16 +108,16 @@
                     <font-awesome-icon :icon="faChessBoard" class="text-green-400" />
                   </div>
                   <div>
-                    <p class="text-sm text-gray-300 mb-2">{{ t('selectedBoards') }}</p>
+                    <p class="text-sm text-surface-300 mb-2">{{ t('selectedBoards') }}</p>
                   </div>
                 </div>
                 <ul class="space-y-1 text-sm">
-                  <li class="flex items-center gap-2 text-white">
+                  <li class="flex items-center gap-2 text-surface-500">
                     <span class="w-2 h-2 bg-green-400 rounded-full"></span>
                     <span class="font-medium">{{ t('tableLabel') }}</span>
                     <span>{{ boardsData.find((b) => b.boards_Id === selectedBoard)?.name }}</span>
                   </li>
-                  <li class="flex items-center gap-2 text-white">
+                  <li class="flex items-center gap-2 text-surface-500">
                     <span class="w-2 h-2 bg-green-400 rounded-full"></span>
                     <span class="font-medium">{{ t('opponentLabel') }}</span>
                     <span>{{

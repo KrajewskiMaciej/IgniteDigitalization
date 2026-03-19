@@ -2,7 +2,7 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <!-- Nagłówek -->
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2">
         {{ t('decisionPanel') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base">
@@ -20,12 +20,12 @@
               <div class="bg-primary-500/20 p-3 rounded-lg">
                 <font-awesome-icon :icon="faGamepad" class="h-6 text-primary-400" />
               </div>
-              <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('actionManagment') }}</h2>
+              <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('actionManagment') }}</h2>
             </div>
 
             <!-- Wybór stołu -->
             <div v-if="!teamId" class="mb-4">
-              <label class="block mb-2 text-sm font-semibold text-gray-300">{{
+              <label class="block mb-2 text-sm font-semibold text-surface-300">{{
                 t('selectTable')
               }}</label>
               <Dropdown
@@ -53,7 +53,7 @@
               </Dropdown>
             </div>
             <div class="mb-4">
-              <label class="block mb-2 text-sm font-semibold text-gray-300">{{
+              <label class="block mb-2 text-sm font-semibold text-surface-300">{{
                 t('selectCard')
               }}</label>
               <Dropdown
@@ -87,7 +87,7 @@
               class="bg-secondary rounded-lg p-4 border border-surface-700 mb-4"
             >
               <p class="text-sm text-surface-400 mb-1">{{ t('description') }}</p>
-              <p class="text-sm text-gray-300">{{ selectedCard?.description }}</p>
+              <p class="text-sm text-surface-300">{{ selectedCard?.description }}</p>
               <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-700">
                 <span class="text-sm text-surface-400">{{ t('cost') }}:</span>
                 <span class="text-lg font-bold text-green-400">
@@ -105,7 +105,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm text-surface-400">{{ t('teamBudget') }}:</p>
-                  <p class="text-sm font-semibold text-white">{{ selectedTeam?.teamName }}</p>
+                  <p class="text-sm font-semibold text-surface-500">{{ selectedTeam?.teamName }}</p>
                 </div>
                 <span class="text-2xl font-bold text-green-400"
                   >{{ currentBits }} {{ t('bits') }}</span
@@ -138,7 +138,7 @@
             <div class="bg-yellow-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faClock" class="h-6 text-yellow-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('decisionPanel') }}</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('decisionPanel') }}</h2>
           </div>
 
           <!-- Przełącznik widoku decyzji -->
@@ -196,7 +196,7 @@
             >
               <div class="flex items-start justify-between mb-2">
                 <div>
-                  <p class="text-white font-semibold">{{ entry.tableName }}</p>
+                  <p class="text-surface-500 font-semibold">{{ entry.tableName }}</p>
                   <p class="text-sm text-surface-400">{{ t('suggestsCard') }}</p>
                 </div>
                 <span
@@ -209,12 +209,12 @@
                 <p class="text-lg font-bold text-primary-400 leading-tight">
                   {{ entry.cardTitle }}
                 </p>
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="text-xs text-surface-300 mt-1">
                   {{ t('cardId') }}
                   <span class="font-semibold text-surface-400">{{ entry.cardId }}</span>
                 </p>
               </div>
-              <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
+              <p class="text-xs text-surface-300">{{ formatDate(entry.timestamp) }}</p>
 
               <div class="flex gap-2 mt-4">
                 <Button
@@ -271,8 +271,8 @@
                   <font-awesome-icon :icon="faBolt" class="h-5 text-blue-400" />
                   <h3 class="font-bold text-lg text-blue-300">{{ t('newEvent') }}</h3>
                 </div>
-                <p class="text-white mt-2">{{ entry.feedbackDescription }}</p>
-                <p class="text-xs text-gray-500 mt-2">{{ formatDate(entry.timestamp) }}</p>
+                <p class="text-surface-500 mt-2">{{ entry.feedbackDescription }}</p>
+                <p class="text-xs text-surface-300 mt-2">{{ formatDate(entry.timestamp) }}</p>
               </div>
 
               <div
@@ -288,7 +288,7 @@
                 </div>
                 <div class="flex items-start justify-between mb-2">
                   <div>
-                    <p class="text-white font-semibold">{{ entry.tableName }}</p>
+                    <p class="text-surface-500 font-semibold">{{ entry.tableName }}</p>
                     <p class="text-sm text-surface-400">{{ t('cardId') }}: {{ entry.cardId }}</p>
                   </div>
                   <span
@@ -303,10 +303,10 @@
                   </span>
                 </div>
                 <p class="text-lg font-bold text-primary-400 mb-2">{{ entry.cardTitle }}</p>
-                <p class="text-sm text-gray-300 mb-2">
+                <p class="text-sm text-surface-300 mb-2">
                   {{ entry.feedbackDescription || t('noFeedbackDescription') }}
                 </p>
-                <p class="text-xs text-gray-500">{{ formatDate(entry.timestamp) }}</p>
+                <p class="text-xs text-surface-300">{{ formatDate(entry.timestamp) }}</p>
               </div>
             </div>
           </div>

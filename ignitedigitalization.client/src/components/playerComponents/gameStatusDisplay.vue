@@ -1,16 +1,16 @@
 <template>
-  <div class="flex flex-col h-full justify-center items-center text-center text-white p-4">
+  <div class="flex flex-col h-full justify-center items-center text-center text-surface-500 p-4">
     <!-- Logo gry (skopiowane z mainView) -->
     <div class="mb-3 md:mb-4 lg:mb-6 inline-flex flex-col items-stretch">
             <h1 class="
-              text-white font-bold font-inter animate-glow w-full text-center
+              text-surface-500 font-bold font-inter animate-glow w-full text-center
               text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[190px]
               mb-1 sm:mb-2 md:mb-3 lg:mb-5 xl:mb-7
             ">
               IGNITE
             </h1>
             <h1 class="
-              text-white font-bold font-inter animate-glow w-full text-center
+              text-surface-500 font-bold font-inter animate-glow w-full text-center
               text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[78px]
               mb-1 sm:mb-2 md:mb-3 lg:mb-5 xl:mb-7
             ">
@@ -58,16 +58,16 @@ const goHome = () => {
 /*Animacja świecenia się napisu DIGITAL WARS, #a78bfa jest kolor akcentu z configu tailwind*/
 @keyframes glow {
   0%, 100% {
-    color: white;
+    color: #1e293b;
     text-shadow: none;
   }
   50% {
-    color: #3b82f6;
+    color: var(--color-primary);
     text-shadow: 
-      0 0 5px #3b82f6, 
-      0 0 10px #3b82f6, 
-      0 0 15px #3b82f6,
-      0 0 20px #3b82f6;
+      0 0 5px var(--color-primary), 
+      0 0 10px var(--color-primary), 
+      0 0 15px var(--color-primary),
+      0 0 20px var(--color-primary);
   }
 }
 
@@ -81,15 +81,15 @@ const goHome = () => {
 @media (max-width: 640px) {
   @keyframes glow {
     0%, 100% {
-      color: white;
+      color: #1e293b;
       text-shadow: none;
     }
     50% {
-      color: #3b82f6;
+      color: var(--color-primary);
       text-shadow: 
-        0 0 3px #3b82f6, 
-        0 0 6px #3b82f6, 
-        0 0 9px #3b82f6;
+        0 0 3px var(--color-primary), 
+        0 0 6px var(--color-primary), 
+        0 0 9px var(--color-primary);
     }
   }
 }

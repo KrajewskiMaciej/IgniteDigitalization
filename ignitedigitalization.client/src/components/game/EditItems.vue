@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2">
         {{ t('editItems') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base">{{ t('manageItemsInTheDeck') }}</p>
@@ -15,7 +15,7 @@
       >
         <!-- Pole inputa -->
         <div class="md:col-span-3 flex flex-col">
-          <label for="deck-name" class="mb-2 text-sm font-semibold text-gray-300">
+          <label for="deck-name" class="mb-2 text-sm font-semibold text-surface-300">
             {{ t('deckName') }}
           </label>
 
@@ -42,7 +42,7 @@
           <div class="bg-green-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faMicrochip" class="h-6 text-green-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('items') }}</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('items') }}</h2>
         </div>
 
         <div v-if="isLoadingItems" class="text-center py-8">
@@ -51,7 +51,7 @@
         </div>
 
         <div v-else>
-          <label for="item-select" class="block mb-2 text-sm font-semibold text-gray-300">
+          <label for="item-select" class="block mb-2 text-sm font-semibold text-surface-300">
             {{ t('selectItem') }}:
           </label>
           <Dropdown
@@ -89,13 +89,13 @@
           <div class="bg-blue-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('itemsEdition') }}</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('itemsEdition') }}</h2>
         </div>
 
         <form @submit.prevent="handleSaveItem" class="space-y-5">
           <!-- Tytuł przedmiotu -->
           <div>
-            <label for="item-title" class="block mb-2 text-sm font-semibold text-gray-300">
+            <label for="item-title" class="block mb-2 text-sm font-semibold text-surface-300">
               {{ t('itemName') }}
             </label>
             <InputText
@@ -108,7 +108,7 @@
 
           <!-- Opis przedmiotu -->
           <div>
-            <label for="item-description" class="block mb-2 text-sm font-semibold text-gray-300">
+            <label for="item-description" class="block mb-2 text-sm font-semibold text-surface-300">
               {{ t('itemDescription') }}
             </label>
             <Textarea

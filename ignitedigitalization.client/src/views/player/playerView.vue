@@ -392,22 +392,6 @@
       </div>
     </div>
   </div>
-  <div
-    class="bg-tertiary flex justify-center items-center px-2 py-2 fixed bottom-12 left-2 lg:left-6 h-14 w-14 z-50 rounded-full border cursor-pointer border-lgray-accent text-white transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-primary-400/60 hover:border-primary-400 hover:text-primary-400 hover:scale-110 hover:-translate-y-2"
-    @click="showChat = true"
-  >
-    <font-awesome-icon :icon="faCommentDots" class="h-10" />
-  </div>
-  <div
-    v-if="showChat"
-    class="fixed inset-0 z-50 bg-black bg-opacity-50 lg:flex lg:items-center lg:justify-start lg:pl-4"
-  >
-    <GameChat
-      ref="chatRef"
-      class="h-screen w-screen lg:h-3/4 lg:w-1/2 lg:max-w-2xl xl:w-1/5"
-      @close-chat="showChat = false"
-    />
-  </div>
 
   <IndependentTeam
     @close="showIndependentTeamModal = false"

@@ -1,8 +1,8 @@
 <template>
-  <div class="w-full h-full text-white flex flex-col">
+  <div class="w-full h-full text-surface-500 flex flex-col">
     <div class="m-4 px-2 py-2 flex-1 flex flex-col overflow-hidden">
       <h1
-        class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2 text-center mt-2"
+        class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2 text-center mt-2"
       >
         {{ t('gamesInSession') }}
       </h1>

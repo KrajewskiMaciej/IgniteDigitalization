@@ -1,8 +1,8 @@
 <template>
-  <div class="w-full text-white">
+  <div class="w-full text-surface-500">
     <div class="m-4 px-2 py-2">
       <h1
-        class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2 text-center mt-2"
+        class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2 text-center mt-2"
       >
         {{ t('tables') }}
       </h1>
@@ -22,7 +22,7 @@
           />
         </template>
         <template v-else>
-          <div class="text-center text-gray-300 mt-4 xl:col-span-3">
+          <div class="text-center text-surface-300 mt-4 xl:col-span-3">
             {{ t('noActiveGameOrInvalidGameId') }}
           </div>
         </template>

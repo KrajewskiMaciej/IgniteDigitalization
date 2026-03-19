@@ -35,7 +35,7 @@ const stddevData = [
 
 <template>
   <div class="p-8">
-    <h2 class="text-2xl font-bold mb-6 text-white">{{ t('gameStatistics') }}</h2>
+    <h2 class="text-2xl font-bold mb-6 text-surface-500">{{ t('gameStatistics') }}</h2>
 
     <div v-if="selectedStat === 'bits'">
       <BitsUsage :data="avgBitsUsageByTeam" xAxisLabel="Gra" />
@@ -47,7 +47,7 @@ const stddevData = [
       <StandardDeviationChart :data="stddevData" />
     </div>
     <div v-else>
-      <p class="text-white">{{ t('selectStatisticFromSidebar') }}</p>
+      <p class="text-surface-500">{{ t('selectStatisticFromSidebar') }}</p>
     </div>
   </div>
 </template>

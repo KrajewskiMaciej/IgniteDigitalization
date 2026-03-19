@@ -7,7 +7,7 @@
           class="w-16 h-16 border-4 border-accent/30 rounded-full animate-spin border-t-accent"
         ></div>
       </div>
-      <p class="text-white text-sm text-center mt-4">{{ message || t('pleaseWait') }}</p>
+      <p class="text-surface-500 text-sm text-center mt-4">{{ message || t('pleaseWait') }}</p>
     </div>
   </div>
 </template>

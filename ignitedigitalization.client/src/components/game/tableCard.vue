@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group relative w-full border rounded-lg bg-secondary p-3 flex flex-col gap-2 text-white shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
+    class="group relative w-full border rounded-lg bg-secondary p-3 flex flex-col gap-2 text-surface-500 shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
     :style="{ borderColor: props.color }"
     @dblclick="router.push(`/admin/game/${props.gameId}/${table.id}`)"
   >
@@ -51,7 +51,7 @@
     >
       <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
       <div
-        class="bg-secondary text-white rounded-xl relative z-10 border p-8 w-full max-w-md shadow-2xl"
+        class="bg-secondary text-surface-500 rounded-xl relative z-10 border p-8 w-full max-w-md shadow-2xl"
         :style="{ borderColor: props.color }"
         @click.stop
       >
@@ -62,7 +62,7 @@
         >
           <font-awesome-icon
             :icon="faXmark"
-            class="h-5 text-white group-hover:text-primary-400 transition-colors"
+            class="h-5 text-surface-500 group-hover:text-primary-400 transition-colors"
           />
         </button>
 

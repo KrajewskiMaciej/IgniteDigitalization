@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Pasek siły hasła -->
-    <div class="w-full h-2 bg-gray-700 rounded overflow-hidden">
+    <div class="w-full h-2 bg-surface-700 rounded overflow-hidden">
       <div
         class="h-full transition-all duration-300"
         :class="passwordStrengthColor"

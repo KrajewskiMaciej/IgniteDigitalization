@@ -3,7 +3,7 @@
     <div class="fixed inset-0 flex items-center justify-center z-50 p-4">
       <div class="absolute inset-0 bg-black/40 transition-opacity duration-300"></div>
       <div
-        class="bg-secondary text-white rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
+        class="bg-secondary text-surface-500 rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
       >
         <div v-if="isTokenValid">
           <h2 class="text-xl sm:text-2xl font-nasalization mb-4 text-center">
@@ -31,7 +31,7 @@
               />
               <button
                 @click="showPassword = !showPassword"
-                class="h-9 w-9 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
+                class="h-9 w-9 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-surface-500 transition-all duration-200"
                 type="button"
               >
                 <font-awesome-icon
@@ -63,7 +63,7 @@
               />
               <button
                 @click="showConfirmPassword = !showConfirmPassword"
-                class="h-9 w-9 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
+                class="h-9 w-9 flex-shrink-0 mr-1 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-surface-500 transition-all duration-200"
                 type="button"
               >
                 <font-awesome-icon
@@ -76,52 +76,52 @@
             <div class="bg-tertiary/50 rounded-lg px-4 py-3 mb-5 border border-white/5">
               <ul class="space-y-1.5 text-left pl-1">
                 <li
-                  :class="passwordRequirements.length ? 'text-green-400' : 'text-gray-500'"
+                  :class="passwordRequirements.length ? 'text-green-400' : 'text-surface-300'"
                   class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
                   <span
                     class="w-1.5 h-1.5 rounded-full"
-                    :class="passwordRequirements.length ? 'bg-green-400' : 'bg-gray-500'"
+                    :class="passwordRequirements.length ? 'bg-green-400' : 'bg-surface-300'"
                   ></span>
                   {{ t('passwordRequirementLength') }}
                 </li>
                 <li
-                  :class="passwordRequirements.uppercase ? 'text-green-400' : 'text-gray-500'"
+                  :class="passwordRequirements.uppercase ? 'text-green-400' : 'text-surface-300'"
                   class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
                   <span
                     class="w-1.5 h-1.5 rounded-full"
-                    :class="passwordRequirements.uppercase ? 'bg-green-400' : 'bg-gray-500'"
+                    :class="passwordRequirements.uppercase ? 'bg-green-400' : 'bg-surface-300'"
                   ></span>
                   {{ t('passwordRequirementUppercase') }}
                 </li>
                 <li
-                  :class="passwordRequirements.lowercase ? 'text-green-400' : 'text-gray-500'"
+                  :class="passwordRequirements.lowercase ? 'text-green-400' : 'text-surface-300'"
                   class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
                   <span
                     class="w-1.5 h-1.5 rounded-full"
-                    :class="passwordRequirements.lowercase ? 'bg-green-400' : 'bg-gray-500'"
+                    :class="passwordRequirements.lowercase ? 'bg-green-400' : 'bg-surface-300'"
                   ></span>
                   {{ t('passwordRequirementLowercase') }}
                 </li>
                 <li
-                  :class="passwordRequirements.special ? 'text-green-400' : 'text-gray-500'"
+                  :class="passwordRequirements.special ? 'text-green-400' : 'text-surface-300'"
                   class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
                   <span
                     class="w-1.5 h-1.5 rounded-full"
-                    :class="passwordRequirements.special ? 'bg-green-400' : 'bg-gray-500'"
+                    :class="passwordRequirements.special ? 'bg-green-400' : 'bg-surface-300'"
                   ></span>
                   {{ t('passwordRequirementSpecialChar') }}
                 </li>
                 <li
-                  :class="passwordRequirements.digit ? 'text-green-400' : 'text-gray-500'"
+                  :class="passwordRequirements.digit ? 'text-green-400' : 'text-surface-300'"
                   class="text-xs sm:text-sm transition-colors duration-300 flex items-center gap-2"
                 >
                   <span
                     class="w-1.5 h-1.5 rounded-full"
-                    :class="passwordRequirements.digit ? 'bg-green-400' : 'bg-gray-500'"
+                    :class="passwordRequirements.digit ? 'bg-green-400' : 'bg-surface-300'"
                   ></span>
                   {{ t('passwordRequirementNumber') }}
                 </li>
@@ -159,7 +159,7 @@
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
-          <div class="text-center text-sm sm:text-base text-gray-300 space-y-3">
+          <div class="text-center text-sm sm:text-base text-surface-300 space-y-3">
             <p>{{ t('linkExpiredMessage') }}</p>
             <p>
               {{ t('toGetNewResetLink') }}

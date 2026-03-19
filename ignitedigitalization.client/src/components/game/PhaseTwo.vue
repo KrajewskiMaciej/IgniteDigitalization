@@ -5,15 +5,15 @@
 
     <!-- Modal -->
     <div
-      class="bg-secondary z-20 text-white relative border border-surface-700 animate-jump-in w-full h-full flex flex-col justify-center p-6 sm:w-[90vw] sm:max-w-lg sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-8"
+      class="bg-secondary z-20 text-surface-500 relative border border-surface-700 animate-jump-in w-full h-full flex flex-col justify-center p-6 sm:w-[90vw] sm:max-w-lg sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-8"
     >
       <!-- Treść główna -->
       <div class="flex flex-col justify-center items-center text-center px-2">
-        <h1 class="text-white font-nasalization text-xl md:text-2xl mb-4">
+        <h1 class="text-surface-500 font-nasalization text-xl md:text-2xl mb-4">
           {{ t('phaseTwoTitle') }}
         </h1>
 
-        <p class="text-base text-gray-200">
+        <p class="text-base text-surface-300">
           {{ t('phaseTwoIntro') }}
           <span class="text-primary-400 font-semibold">{{ teamName }}</span
           >.

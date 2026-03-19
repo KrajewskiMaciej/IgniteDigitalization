@@ -216,7 +216,7 @@ const drawBoard = (animate = true) => {
       .attr('y', labelsUpPositions[i].y)
       .attr('text-anchor', 'middle')
       .attr('font-size', labelFontSm)
-      .attr('fill', 'white')
+      .attr('fill', '#1e293b')
       .text(label)
   })
 
@@ -237,7 +237,7 @@ const drawBoard = (animate = true) => {
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'middle')
       .attr('font-size', labelFontSm)
-      .attr('fill', 'white')
+      .attr('fill', '#1e293b')
       .text(label)
   })
 
@@ -249,14 +249,14 @@ const drawBoard = (animate = true) => {
     const xRight = centerX.value + (i + 0.5) * cellSize.value
     // Górny rząd (nad planszą)
     svg.append('text').attr('x', xLeft).attr('y', topEdgeY - 2)
-      .attr('text-anchor', 'middle').attr('font-size', labelFontSm).attr('fill', 'white').text(leftLetter)
+      .attr('text-anchor', 'middle').attr('font-size', labelFontSm).attr('fill', '#1e293b').text(leftLetter)
     svg.append('text').attr('x', xRight).attr('y', topEdgeY - 2)
-      .attr('text-anchor', 'middle').attr('font-size', labelFontSm).attr('fill', 'white').text(rightLetter)
+      .attr('text-anchor', 'middle').attr('font-size', labelFontSm).attr('fill', '#1e293b').text(rightLetter)
     // Dolny rząd (pod planszą)
     svg.append('text').attr('x', xLeft).attr('y', bottomEdgeY + 14)
-      .attr('text-anchor', 'middle').attr('font-size', labelFontSm).attr('fill', 'white').text(leftLetter)
+      .attr('text-anchor', 'middle').attr('font-size', labelFontSm).attr('fill', '#1e293b').text(leftLetter)
     svg.append('text').attr('x', xRight).attr('y', bottomEdgeY + 14)
-      .attr('text-anchor', 'middle').attr('font-size', labelFontSm).attr('fill', 'white').text(rightLetter)
+      .attr('text-anchor', 'middle').attr('font-size', labelFontSm).attr('fill', '#1e293b').text(rightLetter)
   }
 
   // Numery wierszy: górna połowa 4→1 (od góry do środka), dolna 1→4
@@ -268,17 +268,17 @@ const drawBoard = (animate = true) => {
     // lewa strona
     svg.append('text').attr('x', leftEdgeX - 4).attr('y', yTop)
       .attr('text-anchor', 'end').attr('dominant-baseline', 'middle')
-      .attr('font-size', labelFontSm).attr('fill', 'white').attr('opacity', 0.7).text(topNum)
+      .attr('font-size', labelFontSm).attr('fill', '#1e293b').attr('opacity', 0.7).text(topNum)
     svg.append('text').attr('x', leftEdgeX - 4).attr('y', yBot)
       .attr('text-anchor', 'end').attr('dominant-baseline', 'middle')
-      .attr('font-size', labelFontSm).attr('fill', 'white').attr('opacity', 0.7).text(botNum)
+      .attr('font-size', labelFontSm).attr('fill', '#1e293b').attr('opacity', 0.7).text(botNum)
     // prawa strona
     svg.append('text').attr('x', rightEdgeX + 4).attr('y', yTop)
       .attr('text-anchor', 'start').attr('dominant-baseline', 'middle')
-      .attr('font-size', labelFontSm).attr('fill', 'white').attr('opacity', 0.7).text(topNum)
+      .attr('font-size', labelFontSm).attr('fill', '#1e293b').attr('opacity', 0.7).text(topNum)
     svg.append('text').attr('x', rightEdgeX + 4).attr('y', yBot)
       .attr('text-anchor', 'start').attr('dominant-baseline', 'middle')
-      .attr('font-size', labelFontSm).attr('fill', 'white').attr('opacity', 0.7).text(botNum)
+      .attr('font-size', labelFontSm).attr('fill', '#1e293b').attr('opacity', 0.7).text(botNum)
   }
 
   // 3. Logo / Środek (rysujemy PRZED pionkami żeby pionki były na wierzchu)
@@ -343,7 +343,7 @@ const drawBoard = (animate = true) => {
           .append('line')
           .attr('x1', fromPoints[ai].x).attr('y1', fromPoints[ai].y)
           .attr('x2', fromPoints[bi].x).attr('y2', fromPoints[bi].y)
-          .attr('stroke', 'white')
+          .attr('stroke', '#475569')
           .attr('stroke-width', 1.5)
           .attr('stroke-opacity', 0.7)
 

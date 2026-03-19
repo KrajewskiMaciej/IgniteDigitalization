@@ -2,7 +2,7 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <!-- Nagłówek -->
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2">
         {{ t('editDecisionCards') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base">{{ t('manageCardsInTheDeck') }}</p>
@@ -17,7 +17,7 @@
       >
         <!-- Pole inputa -->
         <div class="md:col-span-3 flex flex-col">
-          <label for="deck-name" class="mb-2 text-sm font-semibold text-gray-300">
+          <label for="deck-name" class="mb-2 text-sm font-semibold text-surface-300">
             {{ t('deckName') }}
           </label>
 
@@ -43,7 +43,7 @@
             <div class="bg-blue-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('cardEdit') }}</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('cardEdit') }}</h2>
           </div>
 
           <div v-if="isLoadingCards" class="text-center py-8">
@@ -53,7 +53,7 @@
 
           <div v-else class="space-y-5">
             <div>
-              <label for="card-select" class="block mb-2 text-sm font-semibold text-gray-300">
+              <label for="card-select" class="block mb-2 text-sm font-semibold text-surface-300">
                 {{ t('selectCard') }}
               </label>
               <Dropdown
@@ -84,7 +84,7 @@
             <form v-if="selectedCardId && currentCard" @submit.prevent="saveCard" class="space-y-5">
               <!-- Tytuł karty -->
               <div>
-                <label for="title" class="block mb-2 text-sm font-semibold text-gray-300">
+                <label for="title" class="block mb-2 text-sm font-semibold text-surface-300">
                   {{ t('cardName') }}
                 </label>
                 <InputText
@@ -97,7 +97,7 @@
 
               <!-- Opis karty -->
               <div>
-                <label for="description" class="block mb-2 text-sm font-semibold text-gray-300">
+                <label for="description" class="block mb-2 text-sm font-semibold text-surface-300">
                   {{ t('cardDescription') }}
                 </label>
                 <Textarea
@@ -133,12 +133,12 @@
             <div class="bg-primary-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faComment" class="h-6 text-primary-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('feedbackEdit') }}</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('feedbackEdit') }}</h2>
           </div>
 
           <div class="space-y-5">
             <div>
-              <label for="feedback-select" class="block mb-2 text-sm font-semibold text-gray-300">
+              <label for="feedback-select" class="block mb-2 text-sm font-semibold text-surface-300">
                 {{ t('selectFeedback') }}
               </label>
               <Dropdown
@@ -225,7 +225,7 @@
               <div>
                 <label
                   for="feedbackDescription"
-                  class="block mb-2 text-sm font-semibold text-gray-300"
+                  class="block mb-2 text-sm font-semibold text-surface-300"
                 >
                   {{ t('feedbackDescription') }}
                 </label>

@@ -9,10 +9,10 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faLayerGroup" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl font-bold text-white">{{ t('deckSelection') }}</h2>
+          <h2 class="text-xl font-bold text-surface-500">{{ t('deckSelection') }}</h2>
         </div>
 
-        <label class="block mb-2 text-sm font-semibold text-gray-300">
+        <label class="block mb-2 text-sm font-semibold text-black">
           {{ t('selectDeck') }}
         </label>
         <Dropdown
@@ -26,7 +26,7 @@
         />
 
         <div class="mt-6 pt-5 border-t border-surface-700">
-          <p class="text-sm text-gray-400 mb-3">{{ t('orImportFromFile') }}</p>
+          <p class="text-sm text-black mb-3">{{ t('orImportFromFile') }}</p>
           <input
             type="file"
             accept=".xls,.xlsx"
@@ -68,7 +68,7 @@
         >
           <!-- Wybrane szkolenie + zmień -->
           <div class="flex items-center gap-3 pr-4 border-r border-surface-700">
-            <span class="text-sm text-gray-300">{{ selectedDeckTitle }}</span>
+            <span class="text-sm text-surface-300">{{ selectedDeckTitle }}</span>
             <Button
               :label="t('changeTraining')"
               size="small"

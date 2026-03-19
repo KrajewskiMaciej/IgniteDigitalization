@@ -17,7 +17,7 @@
           :type="showOldPassword ? 'text' : 'password'"
           v-model="changePasswordData.oldPassword"
           :placeholder="t('oldPasswordPlaceholder')"
-          class="w-full px-3 py-3 bg-tertiary border border-gray-700 rounded-md text-white focus:outline-none focus:border-accent"
+          class="w-full px-3 py-3 bg-tertiary border border-lgray-accent rounded-md text-white focus:outline-none focus:border-accent"
           required
         />
         <button
@@ -27,7 +27,7 @@
         >
           <font-awesome-icon
             :icon="showOldPassword ? faEye : faEyeSlash"
-            class="h-4 text-white hover:text-accent transition-all duration-300"
+            class="h-4 text-surface-500 hover:text-accent transition-all duration-300"
           />
         </button>
       </div>
@@ -38,7 +38,7 @@
           :type="showPassword ? 'text' : 'password'"
           v-model="changePasswordData.password"
           :placeholder="t('newPasswordPlaceholder')"
-          class="w-full px-3 py-3 bg-tertiary border border-gray-700 rounded-md text-white focus:outline-none focus:border-accent"
+          class="w-full px-3 py-3 bg-tertiary border border-lgray-accent rounded-md text-white focus:outline-none focus:border-accent"
           required
         />
         <button
@@ -48,7 +48,7 @@
         >
           <font-awesome-icon
             :icon="showPassword ? faEye : faEyeSlash"
-            class="h-4 text-white hover:text-accent transition-all duration-300"
+            class="h-4 text-surface-500 hover:text-accent transition-all duration-300"
           />
         </button>
       </div>
@@ -63,7 +63,7 @@
           :type="showConfirmPassword ? 'text' : 'password'"
           v-model="changePasswordData.confirmPassword"
           :placeholder="t('confirmPasswordPlaceholder')"
-          class="w-full px-3 py-3 bg-tertiary border border-gray-700 rounded-md text-white focus:outline-none focus:border-accent"
+          class="w-full px-3 py-3 bg-tertiary border border-lgray-accent rounded-md text-white focus:outline-none focus:border-accent"
           required
         />
         <button
@@ -73,17 +73,17 @@
         >
           <font-awesome-icon
             :icon="showConfirmPassword ? faEye : faEyeSlash"
-            class="h-4 text-white hover:text-accent transition-all duration-300"
+            class="h-4 text-surface-500 hover:text-accent transition-all duration-300"
           />
         </button>
       </div>
 
       <div class="mb-5">
-        <ul class="list-disc text-left text-white pl-5">
+        <ul class="list-disc text-left text-surface-500 pl-5">
           <li
             :class="{
               'text-green-500': passwordRequirements.length,
-              'text-gray-500': !passwordRequirements.length,
+              'text-surface-300': !passwordRequirements.length,
             }"
           >
             {{ t('passwordRequirementLength') }}
@@ -91,7 +91,7 @@
           <li
             :class="{
               'text-green-500': passwordRequirements.uppercase,
-              'text-gray-500': !passwordRequirements.uppercase,
+              'text-surface-300': !passwordRequirements.uppercase,
             }"
           >
             {{ t('passwordRequirementUppercase') }}
@@ -99,7 +99,7 @@
           <li
             :class="{
               'text-green-500': passwordRequirements.lowercase,
-              'text-gray-500': !passwordRequirements.lowercase,
+              'text-surface-300': !passwordRequirements.lowercase,
             }"
           >
             {{ t('passwordRequirementLowercase') }}
@@ -107,7 +107,7 @@
           <li
             :class="{
               'text-green-500': passwordRequirements.special,
-              'text-gray-500': !passwordRequirements.special,
+              'text-surface-300': !passwordRequirements.special,
             }"
           >
             {{ t('passwordRequirementSpecialChar') }}
@@ -115,7 +115,7 @@
           <li
             :class="{
               'text-green-500': passwordRequirements.digit,
-              'text-gray-500': !passwordRequirements.digit,
+              'text-surface-300': !passwordRequirements.digit,
             }"
           >
             {{ t('passwordRequirementNumber') }}

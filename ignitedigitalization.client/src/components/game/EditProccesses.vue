@@ -2,7 +2,7 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <!-- Nagłówek -->
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2">
         {{ t('editProcesses') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base">{{ t('manageProcessesInTheDeck') }}</p>
@@ -18,11 +18,11 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faChessPawn" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('processes') }}</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('processes') }}</h2>
         </div>
 
         <div>
-          <label for="process-select" class="block mb-2 text-sm font-semibold text-gray-300">
+          <label for="process-select" class="block mb-2 text-sm font-semibold text-surface-300">
             {{ t('selectProcess') }}
           </label>
 
@@ -99,7 +99,7 @@
           <div class="bg-blue-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faPenToSquare" class="h-6 text-blue-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">
+          <h2 class="text-xl md:text-2xl font-bold text-surface-500">
             {{ isAddingNewProcess ? t('newProcess') : t('processEdition') }}
           </h2>
         </div>
@@ -107,7 +107,7 @@
         <form @submit.prevent="saveProcessChanges" class="space-y-5">
           <!-- Skrót procesu -->
           <div>
-            <label for="process-short" class="block mb-2 text-sm font-semibold text-gray-300">
+            <label for="process-short" class="block mb-2 text-sm font-semibold text-surface-300">
               {{ t('processName') }}
             </label>
             <InputText
@@ -122,7 +122,7 @@
 
           <!-- Opis procesu -->
           <div>
-            <label for="process-long" class="block mb-2 text-sm font-semibold text-gray-300">
+            <label for="process-long" class="block mb-2 text-sm font-semibold text-surface-300">
               {{ t('processDescription') }}
             </label>
             <Textarea
@@ -147,7 +147,7 @@
                 />
 
                 <div class="text-center">
-                  <label class="block mb-2 text-sm font-semibold text-gray-300">{{
+                  <label class="block mb-2 text-sm font-semibold text-surface-300">{{
                     t('processColor')
                   }}</label>
                   <p class="text-primary-400 text-sm mb-3">
@@ -164,7 +164,7 @@
 
                 <div class="flex items-center gap-3">
                   <span class="text-sm text-surface-400">{{ t('selectedColor') }}</span>
-                  <span class="text-white text-sm">{{
+                  <span class="text-surface-500 text-sm">{{
                     editedProcess.processColor.toUpperCase()
                   }}</span>
                 </div>

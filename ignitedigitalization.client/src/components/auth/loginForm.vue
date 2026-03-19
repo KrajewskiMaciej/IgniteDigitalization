@@ -13,7 +13,7 @@
           type="email"
           id="email"
           v-model="loginData.email"
-          class="w-full px-3 py-2.5 sm:py-3 bg-tertiary border border-gray-600 rounded-lg text-white focus:outline-none focus:border-accent text-sm sm:text-base"
+          class="w-full px-3 py-2.5 sm:py-3 bg-tertiary border border-lgray-accent rounded-lg text-white focus:outline-none focus:border-accent text-sm sm:text-base"
           required
         />
       </div>
@@ -23,18 +23,18 @@
           {{ t('password') }}
         </label>
         <div
-          class="flex items-center gap-2 bg-tertiary border border-gray-600 rounded-lg transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent"
+          class="flex items-center gap-2 bg-tertiary border border-lgray-accent rounded-lg transition-all duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent"
         >
           <input
             :type="showPassword ? 'text' : 'password'"
             id="password"
             v-model="loginData.password"
-            class="w-full px-3 py-2.5 sm:py-3 bg-transparent focus:outline-none focus:ring-0 text-white placeholder-gray-400 flex-grow text-sm sm:text-base"
+            class="w-full px-3 py-2.5 sm:py-3 bg-transparent focus:outline-none focus:ring-0 text-white placeholder-surface-300 flex-grow text-sm sm:text-base"
             required
           />
           <button
             @click="showPassword = !showPassword"
-            class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 mr-1.5 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
+            class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 mr-1.5 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-surface-500 transition-all duration-200"
             type="button"
           >
             <font-awesome-icon

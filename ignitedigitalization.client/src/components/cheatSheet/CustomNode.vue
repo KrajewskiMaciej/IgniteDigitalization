@@ -13,7 +13,7 @@
             : 'bg-orange-400'
       "
     >
-      <div class="font-nasalization font-bold text-white text-lg">
+      <div class="font-nasalization font-bold text-surface-500 text-lg">
         {{ data.label }}
       </div>
       <div v-if="data.tables && data.tables.length > 0" class="flex gap-1 flex-wrap justify-center">

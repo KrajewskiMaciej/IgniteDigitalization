@@ -2,7 +2,7 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <!-- Nagłówek -->
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2">
         {{ t('cardEnablers') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base">
@@ -19,7 +19,7 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faDiagramProject" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('decisionTree') }}</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('decisionTree') }}</h2>
         </div>
         <div v-if="isEditMode">
           <span class="font-nasalization font-bold text-4xl text-primary-400">{{

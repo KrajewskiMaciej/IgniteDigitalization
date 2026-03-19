@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
@@ -7,11 +8,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        'secondary': '#141c21',
-        'tertiary': '#1e2931',
+        'secondary': '#ffffff',
+        'tertiary': '#f8fafc',
         'accent': '#3b82f6',
-        'lgray-blue': "#112931",
-        'lgray-accent': "#213741",
+        'lgray-blue': "#e2e8f0",
+        'lgray-accent': "#cbd5e1",
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
@@ -30,15 +31,15 @@ export default {
           50: '#f8fafc',
           100: '#f1f5f9',
           200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          850: '#172033',
-          900: '#0f172a',
-          950: '#020617',
+          300: '#475569',
+          400: '#334155',
+          500: '#1e293b',
+          600: '#0f172a',
+          700: '#cbd5e1',
+          800: '#e2e8f0',
+          850: '#f1f5f9',
+          900: '#f5f7fa',
+          950: '#f8fafc',
         }
       },
       fontFamily: {

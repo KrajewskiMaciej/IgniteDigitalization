@@ -194,7 +194,7 @@ const drawBoard = (animate = true) => {
       .attr('y', boardSizeY.value + marginTop.value + 20)
       .attr('text-anchor', 'middle')
       .attr('font-size', cellSize.value * 0.25)
-      .attr('fill', 'white')
+      .attr('fill', '#1e293b')
       .text(label)
   })
 
@@ -209,7 +209,7 @@ const drawBoard = (animate = true) => {
         .attr('y', baseY - (lines.length - 1) * 15)
         .attr('text-anchor', 'middle')
         .attr('font-size', cellSize.value * 0.25)
-        .attr('fill', 'white')
+        .attr('fill', '#1e293b')
       lines.forEach((line, j) => {
         textElement
           .append('tspan')
@@ -231,7 +231,7 @@ const drawBoard = (animate = true) => {
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'middle')
       .attr('font-size', cellSize.value * 0.25)
-      .attr('fill', 'white')
+      .attr('fill', '#1e293b')
       .text(label)
   })
 
@@ -246,7 +246,7 @@ const drawBoard = (animate = true) => {
         .attr('text-anchor', 'middle')
         .attr('dominant-baseline', 'middle')
         .attr('font-size', cellSize.value * 0.25)
-        .attr('fill', 'white')
+        .attr('fill', '#1e293b')
         .text(label)
     })
   }
@@ -263,7 +263,7 @@ const drawBoard = (animate = true) => {
     .attr('text-anchor', 'middle')
     .attr('font-size', cellSize.value * 0.3)
     .attr('font-weight', 'bold')
-    .attr('fill', 'white')
+    .attr('fill', '#1e293b')
     .text(descLeft)
 
   svg
@@ -273,7 +273,7 @@ const drawBoard = (animate = true) => {
     .attr('text-anchor', 'middle')
     .attr('font-size', cellSize.value * 0.3)
     .attr('font-weight', 'bold')
-    .attr('fill', 'white')
+    .attr('fill', '#1e293b')
     .text(descDown)
 
   const borderColors = (props.config as any).Borders_Colors || props.config.borderColors

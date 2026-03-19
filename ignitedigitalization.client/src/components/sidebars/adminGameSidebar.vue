@@ -1,11 +1,11 @@
 <template>
   <aside
-    class="h-container bg-secondary text-white flex flex-col rounded-r-md border-t-2 border-r-2 border-solid border-lgray-accent"
+    class="h-container bg-secondary text-surface-500 flex flex-col rounded-r-md border-t-2 border-r-2 border-solid border-lgray-accent"
     :class="isSideBarOpen ? 'w-64' : 'w-16'"
   >
     <div class="py-6 flex flex-row justify-between items-center px-4">
       <div></div>
-      <h1 v-if="isSideBarOpen" class="text-xl font-bold text-white font-nasalization">
+      <h1 v-if="isSideBarOpen" class="text-xl font-bold text-surface-500 font-nasalization">
         IGNITE DIGITALIZATION
       </h1>
       <div>

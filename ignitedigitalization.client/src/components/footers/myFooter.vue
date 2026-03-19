@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import logo from '@/assets/logos/Zasob_24x.png'
+import logo from '@/assets/logos/Zasob_24x.jpg'
 
 const { t } = useI18n()
 </script>

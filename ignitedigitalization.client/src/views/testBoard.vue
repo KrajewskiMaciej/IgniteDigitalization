@@ -1,7 +1,7 @@
 <template>
   <!-- Użyj klas podobnych do tych z admina -->
   <div
-    class="relative flex-grow overflow-hidden w-[800px] h-[600px] mx-auto bg-gray-800 rounded-lg border border-gray-600"
+    class="relative flex-grow overflow-hidden w-[800px] h-[600px] mx-auto bg-lgray-blue rounded-lg border border-lgray-accent"
   >
     <gameBoard
       :config="formData"

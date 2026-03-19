@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2">
         {{ t('tableManagementTitle') }}
       </h1>
     </div>
@@ -12,7 +12,7 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faUsers" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('teamSelection') }}</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('teamSelection') }}</h2>
         </div>
 
         <div v-if="loading.teams" class="text-center py-8">
@@ -21,7 +21,7 @@
         </div>
 
         <div v-else>
-          <label for="team-select" class="block mb-2 text-sm font-semibold text-gray-300">
+          <label for="team-select" class="block mb-2 text-sm font-semibold text-surface-300">
             {{ t('selectTeamLabel') }}
           </label>
           <Dropdown
@@ -49,7 +49,7 @@
             <div class="bg-green-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faCoins" class="h-6 text-green-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('teamBudget') }}</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('teamBudget') }}</h2>
           </div>
 
           <div v-if="selectedTeam" class="space-y-5">
@@ -62,7 +62,7 @@
 
             <form @submit.prevent="saveBudget" class="space-y-4">
               <div>
-                <label for="budget-input" class="block mb-2 text-sm font-semibold text-gray-300">
+                <label for="budget-input" class="block mb-2 text-sm font-semibold text-surface-300">
                   {{ t('newBudget') }}
                 </label>
                 <InputNumber
@@ -96,7 +96,7 @@
             <div class="bg-blue-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faLock" class="h-6 text-blue-400" />
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-white">
+            <h2 class="text-xl md:text-2xl font-bold text-surface-500">
               {{ t('unlockCardHeader') }}
             </h2>
           </div>
@@ -108,7 +108,7 @@
             </div>
 
             <div v-else-if="decisionCards.length > 0">
-              <label for="card-select" class="block mb-2 text-sm font-semibold text-gray-300">
+              <label for="card-select" class="block mb-2 text-sm font-semibold text-surface-300">
                 {{ t('selectCardToUnlockLabel') }}
               </label>
               <Dropdown
@@ -140,7 +140,7 @@
                 class="mt-4 bg-secondary rounded-lg p-4 border border-surface-700"
               >
                 <p class="text-sm text-surface-400 mb-2">{{ t('cardDescriptionLabel') }}</p>
-                <p class="text-sm text-gray-300">{{ selectedCard.description }}</p>
+                <p class="text-sm text-surface-300">{{ selectedCard.description }}</p>
               </div>
 
               <div class="flex justify-center mt-5">

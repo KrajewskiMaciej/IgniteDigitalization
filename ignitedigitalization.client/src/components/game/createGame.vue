@@ -1,23 +1,23 @@
-﻿<template>
+<template>
   <div v-if="props.isVisible" class="fixed inset-0 flex items-center justify-center z-10">
     <div class="absolute inset-0 bg-black/70" @click="closeModal"></div>
 
     <div
-      class="bg-secondary z-20 text-white relative border border-surface-700 animate-jump-in w-full h-full p-4 overflow-y-auto custom-scrollbar sm:w-[90vw] sm:max-w-4xl sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-6 md:p-8 lg:p-10"
+      class="bg-secondary z-20 text-surface-500 relative border border-surface-700 animate-jump-in w-full h-full p-4 overflow-y-auto custom-scrollbar sm:w-[90vw] sm:max-w-4xl sm:h-auto sm:max-h-[90vh] sm:rounded-lg sm:p-6 md:p-8 lg:p-10"
     >
       <button @click="closeModal" class="absolute top-3 right-3 sm:top-2 sm:right-2 w-8 h-8 z-10">
         <font-awesome-icon
           :icon="faXmark"
-          class="h-5 text-white hover:text-primary-400 transition-all duration-100"
+          class="h-5 text-surface-500 hover:text-primary-400 transition-all duration-100"
         />
       </button>
 
-      <h1 class="text-center text-white font-nasalization text-lg sm:text-xl md:text-2xl mt-1 mb-3">
+      <h1 class="text-center text-surface-500 font-nasalization text-lg sm:text-xl md:text-2xl mt-1 mb-3">
         {{ t('createNewGame') }}
       </h1>
       <hr class="my-3 border-surface-700" />
 
-      <!-- Wskaźnik: 2 kropki -->
+      <!-- Wska�nik: 2 kropki -->
       <div class="flex flex-row justify-center space-x-2">
         <div class="rounded-full bg-primary-400 h-3 w-3"></div>
         <div
@@ -64,7 +64,7 @@
             </p>
           </div>
 
-          <!-- Plansze – widoczne gdy szkolenie nie ma domyślnych -->
+          <!-- Plansze � widoczne gdy szkolenie nie ma domy�lnych -->
           <div
             v-if="selectedTrainingId && (!selectedTraining?.defaultTeamsBoardId || !selectedTraining?.defaultRivalsBoardId)"
             class="mb-3 space-y-2 border border-surface-700 rounded-lg p-3"
@@ -137,7 +137,7 @@
           </Button>
         </div>
 
-        <!-- Krok 2: Konfiguracja drużyn -->
+        <!-- Krok 2: Konfiguracja dru�yn -->
         <div
           v-if="step === 2"
           :class="direction === 'forwards' ? 'animate-fade-right' : 'animate-fade-left'"
@@ -172,7 +172,7 @@
           </div>
 
           <div class="mb-6 mt-4">
-            <label class="block text-left text-xs sm:text-sm font-bold text-white mb-2">
+            <label class="block text-left text-xs sm:text-sm font-bold text-surface-500 mb-2">
               {{ t('selectTeamToEdit') }}
             </label>
             <Dropdown
@@ -211,14 +211,14 @@
             v-if="selectedTeam"
             class="p-4 rounded-lg bg-secondary border border-surface-700 mb-4"
           >
-            <h3 class="font-bold text-center text-lg mb-4 text-white">
+            <h3 class="font-bold text-center text-lg mb-4 text-surface-500">
               {{ t('editing') }} <span class="text-primary-400">{{ selectedTeam.name }}</span>
             </h3>
             <div class="space-y-4">
               <div>
                 <label
                   :for="'editTeamName-' + selectedTeam.id"
-                  class="block text-sm font-medium text-gray-300 mb-1"
+                  class="block text-sm font-medium text-surface-300 mb-1"
                 >{{ t('teamName') }}</label>
                 <InputText
                   :id="'editTeamName-' + selectedTeam.id"
@@ -229,7 +229,7 @@
               <div class="flex flex-col items-center">
                 <label
                   :for="'editTeamColor-' + selectedTeam.id"
-                  class="block text-sm font-medium text-gray-300 mb-1"
+                  class="block text-sm font-medium text-surface-300 mb-1"
                 >{{ t('teamColor') }}</label>
                 <input
                   type="color"
@@ -241,7 +241,7 @@
             </div>
             <label
               :for="'decision-' + selectedTeam.id"
-              class="block text-sm font-medium text-gray-300 mb-2 mt-5 cursor-pointer"
+              class="block text-sm font-medium text-surface-300 mb-2 mt-5 cursor-pointer"
             >{{ t('canTeamMakeDecisions') }}</label>
             <div class="flex items-center gap-2">
               <label class="relative inline-block w-11 h-6">
@@ -252,7 +252,7 @@
                   class="sr-only peer"
                 />
                 <span
-                  class="absolute cursor-pointer inset-0 bg-tertiary rounded-full transition-all duration-300 peer-checked:bg-primary-400 peer-focus:ring-2 peer-focus:ring-primary-400"
+                  class="absolute cursor-pointer inset-0 bg-lgray-accent rounded-full transition-all duration-300 peer-checked:bg-primary-400 peer-focus:ring-2 peer-focus:ring-primary-400"
                 ></span>
                 <span
                   class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-5"
@@ -269,7 +269,7 @@
                   @mouseleave="showTip = false"
                 />
                 <div
-                  class="absolute border border-surface-700 rounded-md bottom-full left-1/2 -translate-x-1/2 mb-1 bg-secondary p-2 text-white text-sm z-20 w-96 flex items-center"
+                  class="absolute border border-surface-700 rounded-md bottom-full left-1/2 -translate-x-1/2 mb-1 bg-secondary p-2 text-surface-500 text-sm z-20 w-96 flex items-center"
                   v-show="showTip"
                 >
                   <div>
@@ -369,7 +369,7 @@ const step = ref(1)
 const direction = ref('')
 const data = reactive<{ trainings: Training[]; boards: Board[] }>({ trainings: [], boards: [] })
 
-// --- WŁAŚCIWOŚCI OBLICZENIOWE ---
+// --- W�A�CIWO�CI OBLICZENIOWE ---
 const selectedTraining = computed<Training | undefined>(() =>
   selectedTrainingId.value !== null
     ? data.trainings.find((tr) => tr.id === selectedTrainingId.value)
@@ -446,7 +446,7 @@ const fetchBoardsFromAPI = async () => {
     const response = await apiService.get<Board[]>(apiConfig.boards.getAll)
     data.boards = response.data
   } catch {
-    // plansze niedostępne – nie blokujemy
+    // plansze niedost�pne � nie blokujemy
   }
 }
 
@@ -524,7 +524,7 @@ watch(selectedTrainingId, async (newId) => {
         numberOfBits.value = response.data.map1_Starting_Budget
       }
     } catch {
-      // jeśli brak zasad ekonomii, zostaw domyślne
+      // je�li brak zasad ekonomii, zostaw domy�lne
     } finally {
       isLoadingEconomy.value = false
     }

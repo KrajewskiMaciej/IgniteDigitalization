@@ -2,7 +2,7 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <!-- Nagłówek -->
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2">
         {{ t('economySettings') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base">
@@ -20,29 +20,29 @@
             <div class="bg-blue-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faCoins" class="h-6 text-blue-400" />
             </div>
-            <h2 class="text-xl font-bold text-white">{{ t('map1Budget') }}</h2>
+            <h2 class="text-xl font-bold text-surface-500">{{ t('map1Budget') }}</h2>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('map1StartingBudget') }}
               </label>
               <InputNumber v-model="settings.map1_Starting_Budget" :min="0" :max="10000" showButtons class="w-full" />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('map1MandatoryCardsCost') }}
               </label>
               <InputNumber v-model="settings.map1_Mandatory_Cards_Cost" :min="0" :max="10000" showButtons class="w-full" />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('targetCardsMin') }}
               </label>
               <InputNumber v-model="settings.map1_Target_Cards_Min" :min="0" :max="100" showButtons class="w-full" />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('targetCardsMax') }}
               </label>
               <InputNumber v-model="settings.map1_Target_Cards_Max" :min="0" :max="100" showButtons class="w-full" />
@@ -56,35 +56,35 @@
             <div class="bg-green-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faChartLine" class="h-6 text-green-400" />
             </div>
-            <h2 class="text-xl font-bold text-white">{{ t('map2Budget') }}</h2>
+            <h2 class="text-xl font-bold text-surface-500">{{ t('map2Budget') }}</h2>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('map2BaseBudget') }}
               </label>
               <InputNumber v-model="settings.map2_Base_Budget" :min="0" :max="10000" showButtons class="w-full" />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('map2PrepBonusMaxBits') }}
               </label>
               <InputNumber v-model="settings.map2_Prep_Bonus_Max_Bits" :min="0" :max="10000" showButtons class="w-full" />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('map2PrepCardsTotalCount') }}
               </label>
               <InputNumber v-model="settings.map2_Prep_Cards_Total_Count" :min="1" :max="1000" showButtons class="w-full" />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('targetCardsMin') }}
               </label>
               <InputNumber v-model="settings.map2_Target_Cards_Min" :min="0" :max="100" showButtons class="w-full" />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('targetCardsMax') }}
               </label>
               <InputNumber v-model="settings.map2_Target_Cards_Max" :min="0" :max="100" showButtons class="w-full" />
@@ -98,11 +98,11 @@
             <div class="bg-yellow-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faSliders" class="h-6 text-yellow-400" />
             </div>
-            <h2 class="text-xl font-bold text-white">{{ t('prepMultiplier') }}</h2>
+            <h2 class="text-xl font-bold text-surface-500">{{ t('prepMultiplier') }}</h2>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('prepMultiplierMax') }}
               </label>
               <InputNumber
@@ -128,11 +128,11 @@
             <div class="bg-purple-500/20 p-3 rounded-lg">
               <font-awesome-icon :icon="faMap" class="h-6 text-purple-400" />
             </div>
-            <h2 class="text-xl font-bold text-white">{{ t('defaultBoards') }}</h2>
+            <h2 class="text-xl font-bold text-surface-500">{{ t('defaultBoards') }}</h2>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('defaultTeamsBoard') }} <span class="text-surface-500">{{ t('map1Label') }}</span>
               </label>
               <Dropdown
@@ -146,7 +146,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-300 mb-1">
+              <label class="block text-sm font-semibold text-surface-300 mb-1">
                 {{ t('defaultRivalsBoard') }} <span class="text-surface-500">{{ t('map2Label') }}</span>
               </label>
               <Dropdown

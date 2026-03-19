@@ -32,7 +32,7 @@
       >
         <div
           class="text-white rounded-2xl px-4 py-3 max-w-sm whitespace-pre-wrap leading-relaxed"
-          :class="message.isUser ? 'bg-accent rounded-br-md' : 'bg-gray-600 rounded-bl-md'"
+          :class="message.isUser ? 'bg-accent rounded-br-md' : 'bg-lgray-blue rounded-bl-md'"
           style="word-break: break-all; overflow-wrap: anywhere; hyphens: auto"
         >
           {{ message.text }}
@@ -51,7 +51,7 @@
         @keydown.enter.prevent="sendMessage"
       />
       <div
-        class="ml-2 h-10 w-10 rounded-full border border-lgray-accent bg-tertiary text-white flex items-center justify-center cursor-pointer hover:border-accent hover:text-accent transition-all duration-300 ease-in-out"
+        class="ml-2 h-10 w-10 rounded-full border border-lgray-accent bg-tertiary text-surface-500 flex items-center justify-center cursor-pointer hover:border-accent hover:text-accent transition-all duration-300 ease-in-out"
         @click="sendMessage"
       >
         <font-awesome-icon :icon="faPaperPlane" class="h-4" />

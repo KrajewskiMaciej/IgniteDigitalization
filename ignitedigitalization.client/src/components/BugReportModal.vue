@@ -10,8 +10,8 @@
   >
     <div v-if="!submitSuccess" class="flex flex-col gap-4">
       <div class="flex flex-col gap-1">
-        <label class="text-sm font-medium text-surface-300">
-          {{ t('bugReportEmail') }} <span class="text-red-400">*</span>
+        <label class="text-sm font-medium text-surface-500">
+          {{ t('bugReportEmail') }} <span class="text-red-500">*</span>
         </label>
         <InputText
           v-model="form.email"
@@ -21,12 +21,12 @@
           type="email"
           class="w-full"
         />
-        <small v-if="errors.email" class="text-red-400">{{ errors.email }}</small>
+        <small v-if="errors.email" class="text-red-500">{{ errors.email }}</small>
       </div>
 
       <div class="flex flex-col gap-1">
-        <label class="text-sm font-medium text-surface-300">
-          {{ t('bugReportDescription') }} <span class="text-red-400">*</span>
+        <label class="text-sm font-medium text-surface-500">
+          {{ t('bugReportDescription') }} <span class="text-red-500">*</span>
         </label>
         <Textarea
           v-model="form.description"
@@ -36,10 +36,10 @@
           rows="6"
           class="w-full resize-none"
         />
-        <small v-if="errors.description" class="text-red-400">{{ errors.description }}</small>
+        <small v-if="errors.description" class="text-red-500">{{ errors.description }}</small>
       </div>
 
-      <div v-if="submitError" class="rounded-md bg-red-900/30 px-4 py-3 text-sm text-red-300">
+      <div v-if="submitError" class="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
         {{ submitError }}
       </div>
     </div>
@@ -48,7 +48,7 @@
       <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary-500/20">
         <font-awesome-icon :icon="faCircleCheck" class="h-8 w-8 text-primary-400" />
       </div>
-      <p class="text-surface-200">{{ t('bugReportSuccess') }}</p>
+      <p class="text-surface-500">{{ t('bugReportSuccess') }}</p>
     </div>
 
     <template #footer>

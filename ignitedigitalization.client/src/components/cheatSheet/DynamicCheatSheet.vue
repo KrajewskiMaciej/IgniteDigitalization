@@ -2,7 +2,7 @@
   <div class="flex flex-col p-4 md:p-6 lg:p-8 gap-6">
     <!--Nagłówek-->
     <div class="text-center">
-      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-white mb-2">
+      <h1 class="font-nasalization text-3xl md:text-4xl lg:text-5xl text-surface-500 mb-2">
         {{ t('dynamicCheatSheet') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base">{{ t('lookHowTeamsAreDoing') }}</p>
@@ -17,7 +17,7 @@
           <div class="bg-primary-500/20 p-3 rounded-lg">
             <font-awesome-icon :icon="faDiagramProject" class="h-6 text-primary-400" />
           </div>
-          <h2 class="text-xl md:text-2xl font-bold text-white">{{ t('decisionTree') }}</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('decisionTree') }}</h2>
         </div>
         <div class="flex gap-2 bg-secondary border border-surface-700 p-2 rounded-lg">
           <Button @click="zoomIn()" outlined rounded size="small" v-tooltip.top="t('zoomIn')">
@@ -90,7 +90,7 @@
           >
             <div class="space-y-4">
               <div>
-                <h3 class="text-white font-bold text-sm mb-2 flex items-center gap-2">
+                <h3 class="text-surface-500 font-bold text-sm mb-2 flex items-center gap-2">
                   <font-awesome-icon :icon="faPeopleLine" class="text-xl text-primary-400" />
                   {{ t('tables') }}
                 </h3>
@@ -112,7 +112,7 @@
               <hr class="border-surface-700" />
 
               <div>
-                <h3 class="text-white font-bold text-sm mb-2 flex items-center gap-2">
+                <h3 class="text-surface-500 font-bold text-sm mb-2 flex items-center gap-2">
                   <font-awesome-icon :icon="faCircleInfo" class="text-xl text-primary-400" />
                   {{ t('legend') }}
                 </h3>

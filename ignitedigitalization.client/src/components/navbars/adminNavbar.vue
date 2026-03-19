@@ -25,7 +25,7 @@
       >
         <button
           @click="isVisible = true"
-          class="flex items-center w-full px-4 py-2 text-sm text-white hover:text-gray-500"
+          class="flex items-center w-full px-4 py-2 text-sm text-white hover:text-surface-300"
         >
           <span>{{ t('accountSettings') }}</span>
           <font-awesome-icon :icon="faGear" class="ml-2" />

@@ -1,10 +1,10 @@
 <template>
   <div class="w-full max-w-xl mx-auto mt-10">
-    <div v-if="loading" class="text-center text-white">{{ t('loadingCards') }}</div>
+    <div v-if="loading" class="text-center text-surface-500">{{ t('loadingCards') }}</div>
     <div v-else-if="fetchError" class="text-center text-red-500">
       {{ t('loadingCardsError') }} {{ fetchError }}
     </div>
-    <div v-else-if="!cards || cards.length === 0" class="text-center text-white">
+    <div v-else-if="!cards || cards.length === 0" class="text-center text-surface-500">
       {{ t('noCardsAvailable') }}
     </div>
 
@@ -39,7 +39,7 @@
             <h2 class="text-2xl font-bold mb-2">
               {{ cards[currentIndex].title }}
             </h2>
-            <p v-if="showDescriptions" class="text-base text-white/90 italic">
+            <p v-if="showDescriptions" class="text-base text-surface-500/90 italic">
               {{ cards[currentIndex].description }}
             </p>
             <p class="text-xs mt-2">ID: {{ cards[currentIndex].id }}</p>
@@ -70,8 +70,8 @@
           class="w-8 h-8 text-sm font-medium rounded-full flex items-center justify-center transition-all duration-300 border-2"
           :class="
             card.displayOrder === cards[currentIndex].displayOrder
-              ? 'bg-primary text-white border-white scale-110'
-              : 'bg-gray-200 text-gray-700 border-gray-400 hover:bg-gray-300'
+              ? 'bg-primary text-surface-500 border-white scale-110'
+              : 'bg-surface-700 text-surface-500 border-lgray-accent hover:bg-surface-800'
           "
         >
           {{ card.id }}
@@ -82,7 +82,7 @@
       <div class="flex justify-center mt-6">
         <button
           @click="sendCardSelection"
-          class="bg-black text-white px-6 py-2 rounded-full shadow-md hover:bg-gray-800 transition-colors duration-200"
+          class="bg-surface-500 text-secondary px-6 py-2 rounded-full shadow-md hover:bg-surface-400 transition-colors duration-200"
         >
           {{ t('selectCardButton') }}
         </button>

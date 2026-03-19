@@ -13,7 +13,7 @@
     />
 
     <form @submit.prevent="handleSendEmail" class="space-y-4 sm:space-y-5">
-      <div class="text-sm sm:text-base text-gray-300 text-center space-y-1">
+      <div class="text-sm sm:text-base text-surface-300 text-center space-y-1">
         <p>{{ t('enterYourEmail') }}</p>
         <p>{{ t('weWillSendPasswordResetLink') }}</p>
       </div>
@@ -26,7 +26,7 @@
           type="email"
           id="email"
           v-model="email"
-          class="w-full px-3 py-2.5 sm:py-3 bg-tertiary border border-gray-600 rounded-lg text-white focus:outline-none focus:border-accent text-sm sm:text-base"
+          class="w-full px-3 py-2.5 sm:py-3 bg-tertiary border border-lgray-accent rounded-lg text-white focus:outline-none focus:border-accent text-sm sm:text-base"
           required
         />
       </div>
@@ -69,12 +69,12 @@
       class="h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent mb-4 sm:mb-6"
     />
 
-    <div class="text-sm sm:text-base text-gray-300 text-center space-y-1.5 mb-4 sm:mb-6">
+    <div class="text-sm sm:text-base text-surface-300 text-center space-y-1.5 mb-4 sm:mb-6">
       <p>{{ t('weHaveSentPasswordResetInstructions') }}</p>
       <p>
-        {{ t('toAddress') }} <b class="text-white">{{ email }}</b>
+        {{ t('toAddress') }} <b class="text-surface-500">{{ email }}</b>
       </p>
-      <p class="text-xs sm:text-sm text-gray-400">{{ t('checkSpamFolder') }}</p>
+      <p class="text-xs sm:text-sm text-surface-300">{{ t('checkSpamFolder') }}</p>
     </div>
 
     <button

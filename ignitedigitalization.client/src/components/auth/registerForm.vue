@@ -48,7 +48,7 @@
             />
             <button
               @click="showPassword = !showPassword"
-              class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 mr-1.5 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
+              class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 mr-1.5 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-surface-500 transition-all duration-200"
               type="button"
             >
               <font-awesome-icon
@@ -78,7 +78,7 @@
             />
             <button
               @click="showConfirmPassword = !showConfirmPassword"
-              class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 mr-1.5 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-white transition-all duration-200"
+              class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 mr-1.5 flex items-center justify-center rounded-full text-surface-400 hover:bg-white/10 hover:text-surface-500 transition-all duration-200"
               type="button"
             >
               <font-awesome-icon
@@ -95,11 +95,11 @@
       </div>
 
       <div class="bg-tertiary rounded-lg px-3 py-2.5 sm:px-4 sm:py-3">
-        <ul class="list-disc text-left text-white pl-4 space-y-0.5">
+        <ul class="list-disc text-left text-surface-500 pl-4 space-y-0.5">
           <li
             :class="{
               'text-green-500': passwordRequirements.length,
-              'text-gray-500': !passwordRequirements.length,
+              'text-surface-300': !passwordRequirements.length,
             }"
             class="text-xs sm:text-sm transition-colors duration-300"
           >
@@ -108,7 +108,7 @@
           <li
             :class="{
               'text-green-500': passwordRequirements.uppercase,
-              'text-gray-500': !passwordRequirements.uppercase,
+              'text-surface-300': !passwordRequirements.uppercase,
             }"
             class="text-xs sm:text-sm transition-colors duration-300"
           >
@@ -117,7 +117,7 @@
           <li
             :class="{
               'text-green-500': passwordRequirements.lowercase,
-              'text-gray-500': !passwordRequirements.lowercase,
+              'text-surface-300': !passwordRequirements.lowercase,
             }"
             class="text-xs sm:text-sm transition-colors duration-300"
           >
@@ -126,7 +126,7 @@
           <li
             :class="{
               'text-green-500': passwordRequirements.special,
-              'text-gray-500': !passwordRequirements.special,
+              'text-surface-300': !passwordRequirements.special,
             }"
             class="text-xs sm:text-sm transition-colors duration-300"
           >
@@ -135,7 +135,7 @@
           <li
             :class="{
               'text-green-500': passwordRequirements.digit,
-              'text-gray-500': !passwordRequirements.digit,
+              'text-surface-300': !passwordRequirements.digit,
             }"
             class="text-xs sm:text-sm transition-colors duration-300"
           >

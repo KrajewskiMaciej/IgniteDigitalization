@@ -3,7 +3,7 @@
     <div class="fixed inset-0 flex items-center justify-center z-50 p-4">
       <div class="absolute inset-0 bg-black/40 transition-opacity duration-300"></div>
       <div
-        class="bg-secondary text-white rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
+        class="bg-secondary text-surface-500 rounded-xl relative z-10 border-2 border-accent transition-all duration-300 p-5 sm:p-8 md:p-10 max-h-[90vh] w-full max-w-md overflow-y-auto"
       >
         <div v-if="isTokenValid">
           <font-awesome-icon
@@ -17,10 +17,10 @@
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
-          <div class="text-center text-sm sm:text-base text-gray-300 space-y-3">
+          <div class="text-center text-sm sm:text-base text-surface-300 space-y-3">
             <p>{{ t('accountIsActiveYouCanUseTheApp') }}</p>
             <p>{{ t('returnToLoginPageAndSignIn') }}</p>
-            <p class="text-gray-400">
+            <p class="text-surface-300">
               {{ t('automaticRedirectIn') }}
               <span class="text-accent font-bold text-lg">{{ time }}{{ t('seconds') }}</span>
             </p>
@@ -49,7 +49,7 @@
 
           <div class="w-full h-0.5 mb-5 bg-accent/60 rounded-full"></div>
 
-          <div class="text-center text-sm sm:text-base text-gray-300 space-y-3">
+          <div class="text-center text-sm sm:text-base text-surface-300 space-y-3">
             <p>{{ t('linkExpiredMessage') }}</p>
             <p>{{ t('toGetNewResetLink') }}</p>
           </div>

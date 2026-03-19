@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group relative w-full border-2 rounded-lg bg-secondary p-3 flex flex-col gap-2 text-white shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
+    class="group relative w-full border-2 rounded-lg bg-secondary p-3 flex flex-col gap-2 text-surface-500 shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
     :style="{ borderColor: props.color }"
     @dblclick="router.push(`/admin/game/market/${game.id}`)"
   >

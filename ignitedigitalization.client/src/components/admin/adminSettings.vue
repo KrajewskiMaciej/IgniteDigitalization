@@ -2,7 +2,7 @@
   <div v-if="props.isVisible" class="fixed inset-0 flex items-center justify-center z-50">
     <div class="absolute inset-0 bg-black/70" @click="closeModal"></div>
     <div
-      class="bg-secondary text-white rounded-lg w-[90%] max-w-5xl relative z-10 border border-surface-700 p-8 animate-jump-in"
+      class="bg-secondary text-surface-500 rounded-lg w-[90%] max-w-5xl relative z-10 border border-surface-700 p-8 animate-jump-in"
     >
       <button
         @click="closeModal"
@@ -10,7 +10,7 @@
       >
         <font-awesome-icon
           :icon="faXmark"
-          class="h-5 text-white hover:text-accent transition-all duration-100"
+          class="h-5 text-surface-500 hover:text-accent transition-all duration-100"
         />
       </button>
       <div class="grid grid-cols-[0.5fr_1px_1.5fr] gap-6">
@@ -50,7 +50,7 @@
             <hr class="border-lgray-accent w-full mx-auto" />
             <li
               class="w-full flex items-center hover:text-accent ml-2"
-              :class="{ 'text-accent font-bold': activeView === 'licenses' }"
+              :class="{ 'text-accent font-bold': activeView === 'language' }"
             >
               <font-awesome-icon :icon="faEarthEurope" class="text-md mr-2" />
               <button @click="activeView = 'language'" class="text-left w-full">

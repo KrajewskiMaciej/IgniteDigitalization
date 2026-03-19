@@ -59,7 +59,7 @@
         <div
           class="relative z-10 bg-secondary border border-surface-700 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md p-6 flex flex-col gap-4 animate-jump-in"
         >
-          <h2 class="text-white font-nasalization text-lg text-center">
+          <h2 class="text-surface-500 font-nasalization text-lg text-center">
             {{ t('confirmCardPlay') }}
           </h2>
 

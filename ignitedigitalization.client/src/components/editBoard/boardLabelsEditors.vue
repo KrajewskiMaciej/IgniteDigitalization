@@ -2,7 +2,7 @@
   <div class="flex flex-col lg:flex-row w-full gap-4 mt-3 md:mt-5">
     <!-- Etykiety górne -->
     <div class="flex-1">
-      <label class="block mb-2 text-sm font-medium text-white">{{ t('labelsTop') }}</label>
+      <label class="block mb-2 text-sm font-medium text-surface-500">{{ t('labelsTop') }}</label>
 
       <!-- Lista istniejących etykiet górnych -->
       <div class="border-2 border-surface-700 px-3 py-3 rounded-lg mb-4 bg-secondary">
@@ -53,7 +53,7 @@
 
     <!-- Etykiety prawe -->
     <div class="flex-1">
-      <label class="block mb-2 text-sm font-medium text-white">{{ t('labelsRight') }}</label>
+      <label class="block mb-2 text-sm font-medium text-surface-500">{{ t('labelsRight') }}</label>
 
       <!-- Lista istniejących etykiet prawych -->
       <div class="border-2 border-surface-700 px-3 py-3 rounded-lg mb-4 bg-secondary">
