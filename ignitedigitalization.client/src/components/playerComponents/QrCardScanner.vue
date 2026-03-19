@@ -109,6 +109,7 @@ const toast = useToast()
 
 interface Card {
   id: number
+  cardsId: number
   title: string
   description: string
   cost: number
@@ -195,13 +196,13 @@ const onDetect = (detected: DetectedBarcode[]) => {
   const raw = detected?.[0]?.rawValue?.trim()
   if (!raw) return
 
-  const cardId = parseInt(raw, 10)
-  if (isNaN(cardId)) {
+  const scannedCardsId = parseInt(raw, 10)
+  if (isNaN(scannedCardsId)) {
     toast.warning(t('qrNotACard'))
     return
   }
 
-  const found = allCards.value.find((c) => c.id === cardId)
+  const found = allCards.value.find((c) => c.cardsId === scannedCardsId)
   if (!found) {
     toast.warning(t('cardNotFound'))
     return
@@ -220,13 +221,13 @@ const confirmPlay = async () => {
   if (!pendingCard.value || isSubmitting.value) return
   isSubmitting.value = true
 
-  const { id: cardId, cost, enablers } = pendingCard.value
+  const { cardsId, cost, enablers } = pendingCard.value
   const hasEnablers = Array.isArray(enablers) && enablers.length > 0
   const hasSufficientBudget = props.currentBudget >= cost
   const isSuccess = !hasEnablers && hasSufficientBudget
   const apiUrl = isSuccess
-    ? apiConfig.player.playCardSuccess(cardId)
-    : apiConfig.player.playCardFailure(cardId)
+    ? apiConfig.player.playCardSuccess(cardsId)
+    : apiConfig.player.playCardFailure(cardsId)
 
   const cardPlayData = {
     gameId: props.gameId,
@@ -244,8 +245,11 @@ const confirmPlay = async () => {
     pendingCard.value = null
     setTimeout(() => { detectLocked = false }, 2000)
   } catch (err: any) {
-    if (err.response?.data?.errorCode === 'NotEnoughBudget') {
+    const errorCode = err.response?.data?.errorCode
+    if (errorCode === 'NotEnoughBudget') {
       toast.warning(t('warningNotEnoughBudget'))
+    } else if (errorCode === 'CardNotInTraining') {
+      toast.error(t('cardNotInThisTraining'))
     } else {
       toast.error(err.response?.data?.message ?? t('errorServerUnavailable'))
     }

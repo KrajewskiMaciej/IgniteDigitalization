@@ -138,6 +138,7 @@ const { t } = useI18n()
 // --- DEFINICJE INTERFEJSÓW ---
 interface Card {
   id: number
+  cardsId: number
   title: string
   description: string
   cost: number
@@ -290,13 +291,13 @@ const sendCardSelection = async () => {
   }
   if(isSubmitting.value) return
   isSubmitting.value = true
-  const { id: cardId, cost, enablers } = selectedCard.value
+  const { cardsId, cost, enablers } = selectedCard.value
   const hasEnablers = Array.isArray(enablers) && enablers.length > 0
   const hasSufficientBudget = props.currentBudget >= cost
   const isSuccess = !hasEnablers && hasSufficientBudget
   const apiUrl = isSuccess
-    ? apiConfig.player.playCardSuccess(cardId)
-    : apiConfig.player.playCardFailure(cardId)
+    ? apiConfig.player.playCardSuccess(cardsId)
+    : apiConfig.player.playCardFailure(cardsId)
 
   const cardPlayData = {
     gameId: props.gameId,

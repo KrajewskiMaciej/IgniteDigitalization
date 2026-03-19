@@ -51,7 +51,8 @@ namespace backend.Controllers
                 .Where(d => d.Card.Decks_Id == deckId)
                 .Select(d => new CardPdfModel
                 {
-                    Id = d.Cards_Id,
+                    Id = d.Card.Card_Id,
+                    CardsId = d.Cards_Id,
                     Title = d.Decisions_Short_Desc,
                     Description = d.Decisions_Long_Desc,
                     Cost = d.Decisions_Cost_Bits,

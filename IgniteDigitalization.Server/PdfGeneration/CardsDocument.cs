@@ -11,7 +11,8 @@ namespace backend.PdfGeneration
 {
     public class CardPdfModel
     {
-        public int Id { get; set; }
+        public int Id { get; set; }       // Card_Id — numer widoczny na karcie
+        public int CardsId { get; set; }  // Cards_Id — unikalny identyfikator egzemplarza (do QR)
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public double Cost { get; set; }
@@ -156,7 +157,7 @@ namespace backend.PdfGeneration
 
                 // --- KOD QR (X: 454, Y: 168) ---
                 layers.Layer().TranslateX(435).TranslateY(168).Width(90).Height(90)
-                    .Image(GenerateQrCode(card.Id));
+                    .Image(GenerateQrCode(card.CardsId));
             });
         }
 

@@ -217,7 +217,8 @@ const exportDeckToPDF = async () => {
   try {
     const url = apiConfig.admin.export.cards(selectedDeck.value!)
     const response = await apiService.getFile(url)
-    downloadFileFromResponse(response, 'IgniteDigitalization - Karty.pdf')
+    const deckTitle = decksData.value.find((d) => d.id === selectedDeck.value)?.title ?? 'Talia'
+    downloadFileFromResponse(response, `IgniteDigitalization - Karty - ${deckTitle}.pdf`)
   } catch (error: any) {
     toast.error(t('errorGeneratingCardPdf') + error)
     console.error('Błąd generowania PDF z kartami:', error.response?.data || error.message)

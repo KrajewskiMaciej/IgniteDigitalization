@@ -255,6 +255,7 @@ export const en = {
   confirmCardPlay: 'Confirm card play',
   confirmCardPlayHint: 'Is this the card you want to play?',
   cardNotFound: 'Card with this number not found',
+  cardNotInThisTraining: 'This card does not belong to the current training',
   qrNotACard: 'Scanned code is not a card',
   cardPlayed: 'Card played successfully',
   cameraError: 'Cannot start camera. Check permissions.',

@@ -104,6 +104,7 @@ namespace backend.Services
                 .Select(d => new UnifiedCardDto
                 {
                     Id = d.Card.Card_Id,
+                    CardsId = d.Cards_Id,
                     DeckId = deckId,
                     Title = d.Decisions_Short_Desc,
                     Description = d.Decisions_Long_Desc,
@@ -123,6 +124,7 @@ namespace backend.Services
                 .Select(h => new UnifiedCardDto
                 {
                     Id = h.Cards.Card_Id,
+                    CardsId = h.Cards_Id,
                     DeckId = deckId,
                     Title = h.Hardwares_Short_Desc,
                     Description = h.Hardwares_Long_Desc,
@@ -140,6 +142,7 @@ namespace backend.Services
                 .Select(s => new UnifiedCardDto
                 {
                     Id = s.Cards.Card_Id,
+                    CardsId = s.Cards_Id,
                     DeckId = deckId,
                     Title = s.Softwares_Short_Desc,
                     Description = s.Softwares_Long_Desc,

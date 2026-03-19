@@ -12,7 +12,7 @@ namespace backend.Services
 {
     public interface IPlayerActionService
     {
-        Task<object> PlayCardAsync(int cardId, int? enablerId, CardDataDto cardData, bool wasSuccess);
+        Task<object> PlayCardAsync(int cardsId, int? enablerId, CardDataDto cardData, bool wasSuccess);
         Task ApproveLogAsync(int logId);
         Task RejectLogAsync(int logId);
     }
@@ -34,18 +34,26 @@ namespace backend.Services
             _economyService = economyService;
         }
 
-        public async Task<object> PlayCardAsync(int cardId, int? enablerId, CardDataDto cardData, bool wasSuccess)
+        public async Task<object> PlayCardAsync(int cardsId, int? enablerId, CardDataDto cardData, bool wasSuccess)
         {
-            _logger.LogInformation("[ActionService_PlayCardAsync] Rozpoczęcie przetwarzania. CardId: {CardId}, TeamId: {TeamId}, WasSuccess: {WasSuccess}, BaseCost: {Cost}",
-                cardId, cardData.TeamId, wasSuccess, cardData.Cost);
+            _logger.LogInformation("[ActionService_PlayCardAsync] Rozpoczęcie przetwarzania. CardsId: {CardsId}, TeamId: {TeamId}, WasSuccess: {WasSuccess}, BaseCost: {Cost}",
+                cardsId, cardData.TeamId, wasSuccess, cardData.Cost);
 
             var cardEntity = await _context.Cards
                 .Include(c => c.Phase)
-                .FirstOrDefaultAsync(c => c.Card_Id == cardId && c.Decks_Id == cardData.DeckId);
+                .FirstOrDefaultAsync(c => c.Cards_Id == cardsId);
             if (cardEntity == null)
             {
-                _logger.LogError("[ActionService_PlayCardAsync] Karta nie znaleziona: {CardId}", cardId);
-                throw new Exception($"Karta o identyfikatorze (Card_Id) {cardId} nie została znaleziona.");
+                _logger.LogError("[ActionService_PlayCardAsync] Karta nie znaleziona: {CardsId}", cardsId);
+                throw new Exception($"Karta o identyfikatorze (Cards_Id) {cardsId} nie istnieje.");
+            }
+            if (cardEntity.Decks_Id != cardData.DeckId)
+            {
+                _logger.LogWarning("[ActionService_PlayCardAsync] Karta {CardsId} należy do talii {CardDeckId}, a nie do bieżącego szkolenia {DeckId}.",
+                    cardsId, cardEntity.Decks_Id, cardData.DeckId);
+                throw new GameException(
+                    "Ta karta nie należy do bieżącego szkolenia.",
+                    "CardNotInTraining");
             }
 
             var team = await _context.Teams

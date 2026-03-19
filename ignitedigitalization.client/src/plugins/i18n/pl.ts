@@ -252,6 +252,7 @@ export const pl = {
   confirmCardPlay: 'Potwierdź zagranie karty',
   confirmCardPlayHint: 'Czy to jest karta, którą chcesz zagrać?',
   cardNotFound: 'Nie znaleziono karty o podanym numerze',
+  cardNotInThisTraining: 'Ta karta nie należy do bieżącego szkolenia',
   qrNotACard: 'Zeskanowany kod nie jest kartą',
   cardPlayed: 'Karta zagrana pomyślnie',
   cameraError: 'Nie można uruchomić kamery. Sprawdź uprawnienia.',

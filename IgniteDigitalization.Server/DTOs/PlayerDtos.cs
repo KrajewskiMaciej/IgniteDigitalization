@@ -35,7 +35,8 @@ namespace backend.Dtos
     // --- ISTNIEJĄCE DTOs (BEZ ZMIAN) ---
     public class UnifiedCardDto
     {
-        public int Id { get; set; }
+        public int Id { get; set; }       // Card_Id — numer widoczny na karcie
+        public int CardsId { get; set; }  // Cards_Id — unikalny identyfikator egzemplarza (do QR)
         public int DeckId { get; set; }
         public int DisplayOrder { get; set; }
         public string Title { get; set; } = string.Empty;
