@@ -119,6 +119,9 @@ const endpoints = {
     deleteProcess: (processId: number) => `/processes/delete/${processId}`,
     addProcess: '/processes/add',
   },
+  bugReport: {
+    submit: (lang: string) => `/bugReport?lang=${lang}`,
+  },
 }
 
 export default {

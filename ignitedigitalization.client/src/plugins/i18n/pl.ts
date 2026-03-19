@@ -653,4 +653,20 @@ export const pl = {
 
   orImportFromFile: 'lub zaimportuj z pliku',
   changeTraining: 'Zmień szkolenie',
+
+  //BugReport
+  bugReportTitle: 'Zgłoś błąd',
+  bugReportButtonTitle: 'Zgłoś błąd',
+  bugReportEmail: 'Twój adres e-mail',
+  bugReportEmailPlaceholder: 'Wprowadź swój adres e-mail',
+  bugReportDescription: 'Opis błędu',
+  bugReportDescriptionPlaceholder: 'Opisz szczegółowo napotkany błąd...',
+  bugReportSubmit: 'Wyślij zgłoszenie',
+  bugReportSubmitting: 'Wysyłanie...',
+  bugReportSuccess: 'Zgłoszenie zostało wysłane. Sprawdź swoją skrzynkę e-mail.',
+  bugReportError: 'Wystąpił błąd podczas wysyłania zgłoszenia. Spróbuj ponownie.',
+  bugReportEmailRequired: 'Adres e-mail jest wymagany.',
+  bugReportEmailInvalid: 'Podaj prawidłowy adres e-mail.',
+  bugReportDescriptionRequired: 'Opis błędu jest wymagany.',
+  bugReportDescriptionTooShort: 'Opis musi zawierać co najmniej 10 znaków.',
 }

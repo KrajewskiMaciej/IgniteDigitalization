@@ -652,4 +652,20 @@ export const en = {
 
   orImportFromFile: 'or import from file',
   changeTraining: 'Change training',
+
+  //BugReport
+  bugReportTitle: 'Report a Bug',
+  bugReportButtonTitle: 'Report a Bug',
+  bugReportEmail: 'Your email address',
+  bugReportEmailPlaceholder: 'Enter your email address',
+  bugReportDescription: 'Bug description',
+  bugReportDescriptionPlaceholder: 'Describe the bug you encountered in detail...',
+  bugReportSubmit: 'Submit Report',
+  bugReportSubmitting: 'Submitting...',
+  bugReportSuccess: 'Your report has been submitted. Please check your email inbox.',
+  bugReportError: 'An error occurred while submitting the report. Please try again.',
+  bugReportEmailRequired: 'Email address is required.',
+  bugReportEmailInvalid: 'Please enter a valid email address.',
+  bugReportDescriptionRequired: 'Bug description is required.',
+  bugReportDescriptionTooShort: 'Description must be at least 10 characters long.',
 }
