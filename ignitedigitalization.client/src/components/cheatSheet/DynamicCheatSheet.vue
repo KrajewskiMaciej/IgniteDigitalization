@@ -150,7 +150,6 @@ import {
   type ICardTypes,
   type IEnablersMapResponse,
   type IDecisonCard,
-  type IItemCard,
 } from '@/types/Game'
 import type { ICardNode, ICardEdge } from '@/types/Nodes'
 import { Background } from '@vue-flow/background'
@@ -191,7 +190,6 @@ const tables = ref<ITeamManagmentResponse[]>([])
 const deckId = ref<number>()
 const currentLayout = useStorage<'TB' | 'LR'>('prefferedLayour', 'TB')
 const decisionCardsData = ref<IDecisonCard[]>([])
-const itemsData = ref<IItemCard[]>([])
 const tableEntries = ref<
   Record<number, Array<{ teamId: number; teamColor: string; teamName: string }>>
 >({})
@@ -369,14 +367,7 @@ const fetchDecisionCards = async () => {
 }
 
 const fetchItems = async () => {
-  try {
-    const response = await apiServices.get<IItemCard[]>(apiConfig.admin.deck.items(deckId.value!))
-
-    itemsData.value = response.data
-
-  } catch {
-    toast.error(t('errorFetchingItems'))
-  }
+  // Usunięto - przedmioty zostały usunięte z aplikacji
 }
 
 const onCheatSheetUpdated = async () => {
@@ -414,7 +405,7 @@ onMounted(async () => {
   signalRService.connection.on('CheatSheetUpdated', () => onCheatSheetUpdated())
   await Promise.all([fetchDeckId(), fetchTemasInfo()])
 
-  await Promise.all([fetchEnablersMap(), fetchDecisionCards(), fetchItems()])
+  await Promise.all([fetchEnablersMap(), fetchDecisionCards()])
   ;(await fetchAllTeamsEntries(), createNodesFromCards(cardTypes.value))
   createEdgesFromEnablers(enablers.value!, cardTypes.value)
 })

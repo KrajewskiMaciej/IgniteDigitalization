@@ -215,7 +215,6 @@ interface DecisionCard {
 
 interface CardsApiResponse {
   decisionCards: DecisionCard[]
-  itemCards: any[]
 }
 
 // --- ZMIENNE REAKTYWNE ---

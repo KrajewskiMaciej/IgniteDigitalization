@@ -154,7 +154,6 @@ import {
   type ICardTypes,
   type IEnablersMapResponse,
   type IDecisonCard,
-  type IItemCard,
   type IPendingEnablerChange,
 } from '@/types/Game'
 import type { ICardNode, ICardEdge } from '@/types/Nodes'
@@ -193,7 +192,6 @@ const toast = useToast()
 const selectedDeckId = defineModel<number | undefined>()
 const currentLayout = useStorage<'TB' | 'LR'>('prefferedLayour', 'TB')
 const decisionCardsData = ref<IDecisonCard[]>([])
-const itemsData = ref<IItemCard[]>([])
 const isCreatingNodes = ref<boolean>(false)
 const isCreatingEdges = ref<boolean>(false)
 const isEditMode = ref<boolean>(false)
@@ -422,13 +420,8 @@ const fetchDecisionCards = async (deckId: number) => {
   }
 }
 
-const fetchItems = async (deckId: number) => {
-  try {
-    const response = await apiServices.get<IItemCard[]>(apiConfig.admin.deck.items(deckId))
-    itemsData.value = response.data
-  } catch {
-    toast.error(t('errorFetchingItems'))
-  }
+const fetchItems = async (_deckId: number) => {
+  // Usunięto - przedmioty zostały usunięte z aplikacji
 }
 
 watch(selectedDeckId, async (newSelectedDeckId) => {

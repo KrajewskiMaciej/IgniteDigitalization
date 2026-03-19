@@ -95,18 +95,6 @@
           </Button>
 
           <Button
-            :label="t('items')"
-            @click="currentView = 'items'"
-            outlined
-            size="large"
-            :severity="currentView === 'items' ? undefined : 'secondary'"
-          >
-            <template #icon>
-              <font-awesome-icon :icon="faMicrochip" class="mr-2" />
-            </template>
-          </Button>
-
-          <Button
             :label="t('processes')"
             @click="currentView = 'processes'"
             outlined
@@ -146,7 +134,6 @@
 
       <div class="mt-6">
         <EditDecisionCards v-model="selectedDeckId" v-if="currentView === 'decisions'" />
-        <EditItems v-model="selectedDeckId" v-else-if="currentView === 'items'" />
         <EditProccesses v-model="selectedDeckId" v-else-if="currentView === 'processes'" />
         <DynamicCheatSheetEdit v-model="selectedDeckId" v-else-if="currentView === 'enablers'" />
         <DeckEconomySettings v-model="selectedDeckId" v-else-if="currentView === 'economy'" />
@@ -158,13 +145,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import EditDecisionCards from '@/components/game/EditDecisionCards.vue'
-import EditItems from '@/components/game/EditItems.vue'
 import EditProccesses from '@/components/game/EditProccesses.vue'
 import DeckEconomySettings from '@/components/game/DeckEconomySettings.vue'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
 import {
-  faMicrochip,
   faChessPawn,
   faClone,
   faLock,
@@ -188,7 +173,7 @@ interface Deck {
   title: string
 }
 
-const currentView = ref<'items' | 'decisions' | 'processes' | 'enablers' | 'economy'>('decisions')
+const currentView = ref<'decisions' | 'processes' | 'enablers' | 'economy'>('decisions')
 const selectedDeckId = ref<number | undefined>(undefined)
 const decksData = ref<Deck[]>([])
 const isLoadingDecks = ref(false)

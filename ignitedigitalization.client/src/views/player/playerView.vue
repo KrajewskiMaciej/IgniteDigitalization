@@ -131,31 +131,6 @@
 
               <!-- Tryb karuzelowy -->
               <template v-if="cardMode === 'carousel'">
-                <div class="flex gap-2 my-4" v-if="cardCarouselRef?.hasItemCards">
-                  <button
-                    @click="showingDecisionCards = true"
-                    class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
-                    :class="
-                      showingDecisionCards
-                        ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                        : 'bg-secondary text-surface-300 border border-primary-500/30'
-                    "
-                  >
-                    {{ t('decisions') }}
-                  </button>
-                  <button
-                    @click="showingDecisionCards = false"
-                    class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
-                    :class="
-                      !showingDecisionCards
-                        ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                        : 'bg-secondary text-surface-300 border border-primary-500/30'
-                    "
-                  >
-                    {{ t('items') }}
-                  </button>
-                </div>
-
                 <Suspense>
                   <template #default>
                     <CardCarousel
@@ -166,7 +141,6 @@
                       :game-id="gameData.gameId"
                       :board-id="gameData.boardConfig?.boardId"
                       :current-budget="currentGlobalBudget"
-                      :showing-decision-cards="showingDecisionCards"
                       :is-online-game="gameData.isOnline"
                       :is-independent-team="gameData.isIndependent"
                     />
@@ -259,31 +233,6 @@
 
             <!-- Tryb karuzelowy -->
             <template v-if="cardMode === 'carousel' || isDesktop">
-            <div class="flex gap-2 my-4" v-if="cardCarouselRef?.hasItemCards">
-              <button
-                @click="showingDecisionCards = true"
-                class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
-                :class="
-                  showingDecisionCards
-                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                    : 'bg-secondary text-surface-300 border border-primary-500/30'
-                "
-              >
-                {{ t('decisions') }}
-              </button>
-              <button
-                @click="showingDecisionCards = false"
-                class="flex-1 py-3 rounded-xl font-semibold transition-all duration-300"
-                :class="
-                  !showingDecisionCards
-                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                    : 'bg-secondary text-surface-300 border border-primary-500/30'
-                "
-              >
-                {{ t('items') }}
-              </button>
-            </div>
-
             <Suspense>
               <template #default>
                 <CardCarousel
@@ -294,7 +243,6 @@
                   :game-id="gameData.gameId"
                   :board-id="gameData.boardConfig?.boardId"
                   :current-budget="currentGlobalBudget"
-                  :showing-decision-cards="showingDecisionCards"
                   :is-online-game="gameData.isOnline"
                   :is-independent-team="gameData.isIndependent"
                 />
@@ -459,7 +407,6 @@ const props = defineProps({
 
 // --- ZMIENNE STANU ---
 const mobileView = ref('cards')
-const showingDecisionCards = ref(true)
 const currentPanel = ref('menu')
 const leftOpen = ref(true)
 const rightOpen = ref(true)

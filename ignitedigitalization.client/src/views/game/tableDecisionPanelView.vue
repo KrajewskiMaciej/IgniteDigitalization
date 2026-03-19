@@ -5,7 +5,7 @@
         {{ t('decisionPanel') }}
       </h1>
       <p class="text-surface-400 text-sm md:text-base mb-3">
-        {{ t('manageDecisionsAndItemsForTeam') }}
+        {{ t('manageDecisionsForTeam') }}
       </p>
       <div
         class="inline-flex gap-3 items-center px-6 py-3 bg-secondary border border-surface-700 rounded-xl shadow-lg cursor-pointer hover:border-primary-500 hover:bg-primary-500/10 transition-all duration-200"
@@ -485,15 +485,6 @@ interface Card {
 
 interface ICardsResponse {
   decisionCards: Card[]
-  hardwareCards: Card[]
-  softwareCards: Card[]
-}
-interface Item {
-  id: number
-  title: string
-  description: string
-  cost?: number
-  type?: string
 }
 interface DecisionLog {
   isEventNotification: boolean

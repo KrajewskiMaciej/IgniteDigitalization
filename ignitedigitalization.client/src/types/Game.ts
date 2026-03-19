@@ -32,14 +32,6 @@ export interface IDecisonCard {
   description: string
 }
 
-export interface IItemCard {
-  id: number
-  deckId: number
-  shortDesc: string
-  longDesc: string
-  itemType: 'Software' | 'Hardware'
-}
-
 export interface IPendingEnablerChange {
   cardId: number
   cardsId: number

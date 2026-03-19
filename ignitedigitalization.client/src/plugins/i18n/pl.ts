@@ -383,7 +383,7 @@ export const pl = {
   approve: 'Zatwierdź',
   reject: 'Odrzuć',
   eventDescription: 'Opis zdarzenia',
-  manageDecisionsAndItemsForTeam: 'Zarządzaj decyzjami dla drużyny',
+  manageDecisionsForTeam: 'Zarządzaj decyzjami dla drużyny',
   noFeedbackDescription: 'Brak opisu feedbacku.',
 
   //Items
@@ -513,10 +513,10 @@ export const pl = {
   generating: 'Generowanie...',
   generateCardPdf: 'Generuj PDF z kartami',
   boardExport: 'Eksport plansz',
-  tableBoard: 'Plansza stołu:',
-  selectTableBoardPlaceholder: 'Wybierz planszę stołu...',
-  opponentBoard: 'Plansza konkurencji:',
-  selectOpponentBoardPlaceholder: 'Wybierz planszę konkurencji...',
+  tableBoard: 'Plansza Rynku:',
+  selectTableBoardPlaceholder: 'Wybierz planszę Rynku...',
+  opponentBoard: 'Plansza przygotowawcza:',
+  selectOpponentBoardPlaceholder: 'Wybierz planszę przygotowawczą...',
   selectedBoards: 'Wybrano plansze:',
   tableLabel: 'Stół:',
   opponentLabel: 'Konkurencja:',

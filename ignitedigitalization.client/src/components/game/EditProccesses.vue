@@ -61,31 +61,6 @@
                 </div>
               </template>
             </Dropdown>
-
-            <Button
-              type="button"
-              @click="addNewProcess"
-              severity="success"
-              rounded
-              v-tooltip.top="t('addNewProcess')"
-            >
-              <template #icon>
-                <font-awesome-icon :icon="faPlus" class="h-4" />
-              </template>
-            </Button>
-
-            <Button
-              type="button"
-              @click="deleteSelectedProcess"
-              :disabled="!selectedProcess"
-              severity="danger"
-              rounded
-              v-tooltip.top="t('deleteProcess')"
-            >
-              <template #icon>
-                <font-awesome-icon :icon="faTrash" class="h-4" />
-              </template>
-            </Button>
           </div>
         </div>
       </div>

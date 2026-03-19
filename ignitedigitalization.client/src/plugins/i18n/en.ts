@@ -378,7 +378,7 @@ export const en = {
   approve: 'Approve',
   reject: 'Reject',
   eventDescription: 'Event description',
-  manageDecisionsAndItemsForTeam: 'Manage decisions for team',
+  manageDecisionsForTeam: 'Manage decisions for team',
   noFeedbackDescription: 'No feedback description.',
 
   //Items
@@ -511,10 +511,10 @@ export const en = {
   generating: 'Generating...',
   generateCardPdf: 'Generate card PDF',
   boardExport: 'Board export',
-  tableBoard: 'Table board:',
-  selectTableBoardPlaceholder: 'Select table board...',
-  opponentBoard: 'Opponent board:',
-  selectOpponentBoardPlaceholder: 'Select opponent board...',
+  tableBoard: 'Market board:',
+  selectTableBoardPlaceholder: 'Select market board...',
+  opponentBoard: 'Preparation board:',
+  selectOpponentBoardPlaceholder: 'Select preparation board...',
   selectedBoards: 'Selected boards:',
   tableLabel: 'Table:',
   opponentLabel: 'Opponent:',

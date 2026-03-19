@@ -114,13 +114,11 @@ interface Card {
   description: string
   cost: number
   enablers: any[]
-  type: 'decision' | 'hardware' | 'software'
+  type: 'decision'
 }
 
 interface CardsApiResponse {
   decisionCards: Card[]
-  hardwareCards: Card[]
-  softwareCards: Card[]
 }
 
 const props = defineProps({
@@ -157,12 +155,7 @@ let detectLocked = false
 
 const pendingCardStyle = computed(() => {
   if (!pendingCard.value) return {}
-  switch (pendingCard.value.type) {
-    case 'decision': return { background: 'linear-gradient(135deg, #00b1eb, #008bb5)' }
-    case 'software': return { background: 'linear-gradient(135deg, #009641, #007534)' }
-    case 'hardware': return { background: 'linear-gradient(135deg, #ef7d00, #c06400)' }
-    default: return { background: 'linear-gradient(135deg, #5DBB63, #607D3B)' }
-  }
+  return { background: 'linear-gradient(135deg, #00b1eb, #008bb5)' }
 })
 
 const buttonLabel = computed(() =>
@@ -179,9 +172,7 @@ async function fetchCards() {
       apiConfig.player.getCards(deckId, gameId, teamId),
     )
     const decisions: Card[] = (response.data?.decisionCards ?? []).map((c) => ({ ...c, type: 'decision' as const }))
-    const hardware: Card[] = (response.data?.hardwareCards ?? []).map((c) => ({ ...c, type: 'hardware' as const }))
-    const software: Card[] = (response.data?.softwareCards ?? []).map((c) => ({ ...c, type: 'software' as const }))
-    allCards.value = [...decisions, ...hardware, ...software]
+    allCards.value = [...decisions]
   } catch (err) {
     console.error('[QrCardScanner] Błąd pobierania kart:', err)
   }

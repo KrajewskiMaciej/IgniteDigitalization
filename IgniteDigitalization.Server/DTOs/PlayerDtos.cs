@@ -93,8 +93,6 @@ namespace backend.Dtos
     public class CategorizedCardsDto
     {
         public List<UnifiedCardDto> DecisionCards { get; set; } = new List<UnifiedCardDto>();
-        public List<UnifiedCardDto> HardwareCards { get; set; } = new List<UnifiedCardDto>();
-        public List<UnifiedCardDto> SoftwareCards { get; set; } = new List<UnifiedCardDto>();
     }
 
     public class GameEventDto

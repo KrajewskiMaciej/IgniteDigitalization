@@ -1,5 +1,4 @@
 using backend.Data;
-using backend.DTOs; // Upewnij się, że ten plik istnieje i zawiera UpdateItemDto
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -252,68 +251,6 @@ namespace backend.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Feedbacki zostały pomyślnie zaktualizowane." });
-        }
-
-        [HttpGet("items")]
-        public async Task<IActionResult> GetItemsForDeck([FromQuery] int deckId)
-        {
-            var hardwareItems = await _context.Hardwares
-                .Include(h => h.Cards)
-                .Where(h => h.Cards.Decks_Id == deckId)
-                .Select(h => new
-                {
-                    id = h.Cards.Card_Id,
-                    deckId = h.Cards.Decks_Id,
-                    shortDesc = h.Hardwares_Short_Desc,
-                    longDesc = h.Hardwares_Long_Desc,
-                    type = "Hardware"
-                }).ToListAsync();
-
-            var softwareItems = await _context.Softwares
-                .Include(s => s.Cards)
-                .Where(s => s.Cards.Decks_Id == deckId)
-                .Select(s => new
-                {
-                    id = s.Cards.Card_Id,
-                    deckId = s.Cards.Decks_Id,
-                    shortDesc = s.Softwares_Short_Desc,
-                    longDesc = s.Softwares_Long_Desc,
-                    type = "Software"
-                }).ToListAsync();
-
-            var allItems = hardwareItems
-                .AsEnumerable()
-                .Concat(softwareItems)
-                .OrderBy(i => i.id);
-
-            return Ok(allItems);
-        }
-
-        [HttpPut("items/{cardId}")]
-        public async Task<IActionResult> UpdateItem([FromBody] UpdateCardDto dto)
-        {
-            var hardware = await _context.Hardwares.FirstOrDefaultAsync(h => h.Cards.Card_Id == dto.CardId);
-            if (hardware != null)
-            {
-                hardware.Hardwares_Short_Desc = dto.ShortDesc;
-                hardware.Hardwares_Long_Desc = dto.LongDesc;
-            }
-            else
-            {
-                var software = await _context.Softwares.FirstOrDefaultAsync(s => s.Cards.Card_Id == dto.CardId);
-                if (software != null)
-                {
-                    software.Softwares_Short_Desc = dto.ShortDesc;
-                    software.Softwares_Long_Desc = dto.LongDesc;
-                }
-                else
-                {
-                    return NotFound("Przedmiot o podanym ID nie został znaleziony.");
-                }
-            }
-
-            await _context.SaveChangesAsync();
-            return Ok(new { message = "Przedmiot został pomyślnie zaktualizowany." });
         }
 
         // --- Zasady ekonomii Szkolenia ---

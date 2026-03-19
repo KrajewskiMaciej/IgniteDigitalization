@@ -143,19 +143,16 @@ interface Card {
   description: string
   cost: number
   enablers: any[]
-  type: 'decision' | 'hardware' | 'software'
+  type: 'decision'
 }
 
 interface CardsApiResponse {
   decisionCards: Card[]
-  hardwareCards: Card[]
-  softwareCards: Card[]
 }
 
 // --- Reaktywne referencje i stałe ---
 const toast = useToast()
 const decisionCards = ref<Card[]>([])
-const itemCards = ref<Card[]>([])
 const currentIndex = ref(0)
 const loading = ref(true)
 const fetchError = ref<string | null>(null)
@@ -174,7 +171,6 @@ const props = defineProps({
   boardId: Number,
   gameProcessId: Number,
   currentBudget: { type: Number, default: 0 },
-  showingDecisionCards: { type: Boolean, required: true },
   isOnlineGame: { type: Boolean, default: true },
   isIndependentTeam: { type: Boolean, required: true },
 })
@@ -194,9 +190,7 @@ useSwipe(cardRef, {
   },
 })
 
-const displayCards = computed<Card[]>(() => {
-  return props.showingDecisionCards ? decisionCards.value : itemCards.value
-})
+const displayCards = computed<Card[]>(() => decisionCards.value)
 
 const selectedCard = computed<Card | null>(() => {
   if (!displayCards.value || currentIndex.value >= displayCards.value.length) {
@@ -208,24 +202,7 @@ const selectedCard = computed<Card | null>(() => {
 const cardStyle = computed(() => {
   if (!selectedCard.value) return {}
 
-  let colorFrom = '#5DBB63'
-  let colorTo = '#607D3B'
-
-  switch (selectedCard.value.type) {
-    case 'decision':
-      colorFrom = '#00b1eb'
-      colorTo = '#008bb5'
-      break
-    case 'software':
-      colorFrom = '#009641'
-      colorTo = '#007534'
-      break
-    case 'hardware':
-      colorFrom = '#ef7d00'
-      colorTo = '#c06400'
-      break
-  }
-  return { '--tw-gradient-from': colorFrom, '--tw-gradient-to': colorTo }
+  return { '--tw-gradient-from': '#00b1eb', '--tw-gradient-to': '#008bb5' }
 })
 
 const buttonLabel = computed(() => {
@@ -252,20 +229,8 @@ async function fetchCards() {
       ...card,
       type: 'decision',
     }))
-
-    const hardware: Card[] = (response.data?.hardwareCards ?? []).map((card) => ({
-      ...card,
-      type: 'hardware',
-    }))
-    const software: Card[] = (response.data?.softwareCards ?? []).map((card) => ({
-      ...card,
-      type: 'software',
-    }))
-
-    itemCards.value = [...software, ...hardware]
   } catch (error: any) {
     decisionCards.value = []
-    itemCards.value = []
     fetchError.value = t('errorFetchingCards')
     console.error('[CardCarousel] Błąd pobierania kart:', error)
   } finally {
@@ -328,7 +293,6 @@ const sendCardSelection = async () => {
 
 defineExpose({
   fetchCards,
-  hasItemCards: computed(() => itemCards.value.length > 0),
 })
 
 watch(displayCards, () => {

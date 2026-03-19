@@ -114,49 +114,10 @@ namespace backend.Services
                                 : (enablersMap.ContainsKey(d.Cards_Id) ? enablersMap[d.Cards_Id] : new List<int>())
                 }).ToListAsync();
 
-            // Krok 5: Pobierz karty Sprzętu (Hardware)
-            var hardwareCards = await _context.Hardwares
-                .AsNoTracking()
-                .Include(h => h.Cards)
-                .Where(h => h.Cards.Decks_Id == deckId && !blockedCardInternalIds.Contains(h.Cards_Id))
-                .Where(h => isInRynkowaPhase || !h.Cards.Phases_Id.HasValue || !rynkowaPhaseIds.Contains(h.Cards.Phases_Id.Value))
-                .OrderBy(h => h.Cards.Card_Id) // Dodano sortowanie dla spójności
-                .Select(h => new UnifiedCardDto
-                {
-                    Id = h.Cards.Card_Id,
-                    CardsId = h.Cards_Id,
-                    DeckId = deckId,
-                    Title = h.Hardwares_Short_Desc,
-                    Description = h.Hardwares_Long_Desc,
-                    Cost = h.Hardwares_Cost_Bits,
-                    Enablers = new List<int>()
-                }).ToListAsync();
-
-            // Krok 6: Pobierz karty Oprogramowania (Software)
-            var softwareCards = await _context.Softwares
-                .AsNoTracking()
-                .Include(s => s.Cards)
-                .Where(s => s.Cards.Decks_Id == deckId && !blockedCardInternalIds.Contains(s.Cards_Id))
-                .Where(s => isInRynkowaPhase || !s.Cards.Phases_Id.HasValue || !rynkowaPhaseIds.Contains(s.Cards.Phases_Id.Value))
-                .OrderBy(s => s.Cards.Card_Id) // Dodano sortowanie dla spójności
-                .Select(s => new UnifiedCardDto
-                {
-                    Id = s.Cards.Card_Id,
-                    CardsId = s.Cards_Id,
-                    DeckId = deckId,
-                    Title = s.Softwares_Short_Desc,
-                    Description = s.Softwares_Long_Desc,
-                    Cost = s.Softwares_Cost_Bits,
-                    Enablers = new List<int>()
-                }).ToListAsync();
-
-            // Krok 7: Zwróć obiekt DTO z trzema oddzielnymi listami
+            // Krok 5: Zwróć obiekt DTO z listą kart decyzji
             return new CategorizedCardsDto
             {
                 DecisionCards = decisionCards,
-                SoftwareCards = softwareCards,
-                HardwareCards = hardwareCards,
-
             };
         }
         public async Task<object> GetPlayerSessionDataAsync(string teamToken)
@@ -251,13 +212,13 @@ namespace backend.Services
                     gb.Games_Processes.Processes != null)
                 .Select(gb => new
                 {
-                    GPId      = gb.Games_Processes_Id,
-                    PosX      = gb.Poz_X,
-                    PosY      = gb.Poz_Y,
-                    Color     = gb.Games_Processes!.Processes!.Processes_Color,
-                    Name      = gb.Games_Processes!.Processes!.Processes_Desc,
+                    GPId = gb.Games_Processes_Id,
+                    PosX = gb.Poz_X,
+                    PosY = gb.Poz_Y,
+                    Color = gb.Games_Processes!.Processes!.Processes_Color,
+                    Name = gb.Games_Processes!.Processes!.Processes_Desc,
                     ProcessId = gb.Games_Processes!.Processes!.Processes_Id,
-                    DecksId   = gb.Games_Processes!.Processes!.Decks_Id,
+                    DecksId = gb.Games_Processes!.Processes!.Decks_Id,
                 })
                 .ToListAsync();
 
@@ -304,11 +265,11 @@ namespace backend.Services
 
                 return (object)new
                 {
-                    GPId    = pawn.GPId,
-                    PosX    = pawn.PosX,
-                    PosY    = pawn.PosY,
-                    Color   = pawn.Color,
-                    Name    = pawn.Name,
+                    GPId = pawn.GPId,
+                    PosX = pawn.PosX,
+                    PosY = pawn.PosY,
+                    Color = pawn.Color,
+                    Name = pawn.Name,
                     MaxPosX = maxPosX,
                     MaxPosY = maxPosY,
                 };
@@ -325,11 +286,11 @@ namespace backend.Services
                 .Where(gb => gb.Games_Id == gameId && gb.Boards_Id == boardId && gb.Games_Processes_Id == null)
                 .Select(gb => new
                 {
-                    PosX      = gb.Poz_X,
-                    PosY      = gb.Poz_Y,
+                    PosX = gb.Poz_X,
+                    PosY = gb.Poz_Y,
                     TeamColor = gb.Teams.Teams_Color,
-                    TeamId    = gb.Teams.Teams_Id,
-                    TeamName  = gb.Teams.Teams_Name
+                    TeamId = gb.Teams.Teams_Id,
+                    TeamName = gb.Teams.Teams_Name
                 })
                 .ToListAsync();
 
@@ -349,7 +310,7 @@ namespace backend.Services
                 {
                     gb.Teams_Id,
                     ProcessId = gb.Games_Processes!.Processes!.Processes_Id,
-                    DecksId   = gb.Games_Processes!.Processes!.Decks_Id,
+                    DecksId = gb.Games_Processes!.Processes!.Decks_Id,
                 })
                 .ToListAsync();
 
@@ -415,13 +376,13 @@ namespace backend.Services
                 var (maxX, maxY) = maxPosByTeam.GetValueOrDefault(tp.TeamId, (1.0, 1.0));
                 return (object)new
                 {
-                    PosX      = tp.PosX,
-                    PosY      = tp.PosY,
+                    PosX = tp.PosX,
+                    PosY = tp.PosY,
                     TeamColor = tp.TeamColor,
-                    TeamId    = tp.TeamId,
-                    TeamName  = tp.TeamName,
-                    MaxPosX   = maxX,
-                    MaxPosY   = maxY,
+                    TeamId = tp.TeamId,
+                    TeamName = tp.TeamName,
+                    MaxPosX = maxX,
+                    MaxPosY = maxY,
                 };
             }).ToList();
 

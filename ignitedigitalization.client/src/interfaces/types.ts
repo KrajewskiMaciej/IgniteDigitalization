@@ -207,9 +207,6 @@ export interface BitsDataPoint {
 
 export interface CardsApiResponse {
   decisionCards: DecisionCard[]
-  itemCards: any[]
-  hardwareCards?: Card[] // Zakładamy, że API rozdziela karty przedmiotów
-  softwareCards?: Card[]
 }
 
 export interface DecisionCard {
