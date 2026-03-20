@@ -1,0 +1,276 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Global CSS custom properties === */
+:root {
+  --color-primary: #3b82f6;
+}
+
+@font-face {
+  font-family: 'Mulish';
+  src: url('/fonts/Mulish-VariableFont.ttf') format('truetype');
+}
+
+/* === Light theme defaults === */
+body {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+/*
+  text-white, text-surface-0 through text-surface-200 were designed for dark
+  backgrounds. On the new light theme they are invisible — override globally.
+  Exceptions: inside gradient/colored backgrounds (buttons, banners) the
+  text remains readable regardless since colored bg ≠ white.
+*/
+.text-white,
+.text-surface-0,
+.text-surface-0\/80,
+.text-surface-50,
+.text-surface-100,
+.text-surface-200 {
+  color: #1e293b;
+}
+
+/* Surface-300 and 400 were previously medium-gray subtext on dark bg.
+   In our new scale they map to dark — already correct — but enforce
+   readable contrast. */
+.text-surface-300 {
+  color: #475569;
+}
+.text-surface-400 {
+  color: #334155;
+}
+
+/* Restore white text INSIDE genuinely colored (non-white) backgrounds:
+   gradient headers, primary buttons, colored chips etc.
+   Use [class*=' bg-X'] (space-prefixed) so hover:bg-X does NOT match.       */
+[class*='from-primary-'].text-white,
+[class*=' bg-primary-'].text-white,
+[class^='bg-primary-'].text-white,
+[class*=' bg-accent'].text-white,
+[class^='bg-accent'].text-white,
+[class*=' bg-purple-'].text-white,
+[class^='bg-purple-'].text-white,
+[class*=' bg-blue-'].text-white,
+[class^='bg-blue-'].text-white,
+[class*=' bg-red-'].text-white,
+[class^='bg-red-'].text-white,
+[class*='from-lime-'].text-white,
+/* children of primary-gradient containers */
+[class*='bg-primary-'] .text-white,
+[class*='bg-primary-'] .text-surface-0,
+[class*='from-primary-'] .text-white {
+  color: #ffffff;
+}
+
+/* PrimeVue Wind preset buttons keep their text color intact */
+.p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link) .p-button-label {
+  color: inherit;
+}
+
+/*
+  ============================================================
+  INVERTED SURFACE SCALE FIX
+  In our light-mode surface scale the HIGH numbers (700–950)
+  map to LIGHT colours (#cbd5e1 → #f8fafc).  PrimeVue Wind
+  preset uses text-surface-700/800/900/950 for dark labels on
+  light backgrounds — in our scale those become near-invisible.
+  Force them to readable dark values.
+  ============================================================
+*/
+.text-surface-700 { color: #334155; }
+.text-surface-800 { color: #1e293b; }
+.text-surface-900 { color: #1e293b; }
+.text-surface-950 { color: #0f172a; }
+
+/*
+  bg-surface-700/800/900/950 are used for the PANEL background
+  of dropdowns/overlays — keep those as-is (they are light, good).
+  Only the TEXT on top of them needs dark colour (handled above).
+*/
+
+/*
+  PrimeVue Wind preset — input & dropdown text overrides.
+  These target the rendered DOM elements regardless of which
+  surface-* class is applied to them by the preset.
+*/
+
+/* ── Text inputs ── */
+.p-inputtext,
+.p-inputnumber-input,
+.p-textarea,
+.p-password > input,
+.p-autocomplete-input {
+  color: #1e293b !important;
+  background-color: #f8fafc;
+}
+
+/* ── Dropdown / Select ── */
+.p-dropdown,
+.p-select {
+  background-color: #f8fafc;
+}
+.p-dropdown-label,
+.p-select-label {
+  color: #1e293b !important;
+}
+/* Placeholder */
+.p-dropdown-label.p-placeholder,
+.p-select-label.p-placeholder {
+  color: #94a3b8 !important;
+}
+/* Panel */
+.p-dropdown-panel,
+.p-select-panel,
+.p-select-overlay {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+/* Items */
+.p-dropdown-item,
+.p-select-option {
+  color: #1e293b !important;
+}
+.p-dropdown-item:hover,
+.p-select-option:hover,
+.p-dropdown-item.p-highlight,
+.p-select-option.p-highlight {
+  background-color: #eff6ff;
+  color: #1d4ed8 !important;
+}
+/* Empty message */
+.p-dropdown-empty-message,
+.p-select-empty-message {
+  color: #64748b !important;
+}
+/* Filter input inside dropdown panel */
+.p-dropdown-filter {
+  color: #1e293b !important;
+  background-color: #f8fafc;
+}
+
+/* ── Multiselect ── */
+.p-multiselect {
+  background-color: #f8fafc;
+}
+.p-multiselect-label,
+.p-multiselect-label.p-placeholder {
+  color: #1e293b !important;
+}
+.p-multiselect-panel {
+  background-color: #ffffff;
+  color: #1e293b;
+}
+.p-multiselect-item {
+  color: #1e293b !important;
+}
+
+/* ── Listbox ── */
+.p-listbox {
+  background-color: #ffffff;
+  color: #1e293b;
+}
+.p-listbox-item {
+  color: #1e293b !important;
+}
+
+/* ── DataTable ── */
+.p-datatable .p-datatable-thead > tr > th,
+.p-datatable .p-datatable-tbody > tr > td {
+  color: #1e293b;
+}
+.p-datatable .p-datatable-tbody > tr {
+  background-color: #ffffff;
+  color: #1e293b;
+}
+.p-datatable .p-datatable-tbody > tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+/* ── Dialog / Overlay panels ── */
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-content,
+.p-dialog .p-dialog-footer {
+  background-color: #ffffff;
+  color: #1e293b;
+}
+
+/* ── Chip / Tag ── */
+.p-chip,
+.p-tag {
+  color: inherit;
+}
+
+/* ── Tooltip ── */
+.p-tooltip .p-tooltip-text {
+  background-color: #1e293b;
+  color: #ffffff;
+}
+
+/*
+  ============================================================
+  DISABLED BUTTONS
+  PrimeVue Wind unstyled mode does NOT add .p-button class —
+  it applies Tailwind `opacity-60` directly to the <button>.
+  Target via the native HTML `disabled` attribute instead.
+  Makes button clearly visible as "grayed out / inactive".
+  ============================================================
+*/
+button[disabled],
+button:disabled {
+  opacity: 1 !important;
+  background-color: #e2e8f0 !important;
+  background-image: none !important;
+  border-color: #cbd5e1 !important;
+  color: #94a3b8 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+/* Child text / icons inside disabled button */
+button[disabled] *,
+button:disabled * {
+  color: #94a3b8 !important;
+}
+
+/*
+  ============================================================
+  TOGGLE SWITCH (CSS-only checkbox+peer pattern)
+  Ensure the unchecked track has visible contrast on white bg.
+  ============================================================
+*/
+input[type='checkbox'].peer:not(:checked) ~ span.rounded-full:first-of-type {
+  background-color: #cbd5e1;
+}
+
+/*
+  ============================================================
+  HTML5 RANGE INPUT (native sliders)
+  ============================================================
+*/
+input[type='range'] {
+  accent-color: #3b82f6;
+  background: transparent;
+}
+input[type='range']::-webkit-slider-runnable-track {
+  background: #cbd5e1;
+  border-radius: 9999px;
+  height: 4px;
+}
+input[type='range']::-webkit-slider-thumb {
+  background: #3b82f6;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+input[type='range']::-moz-range-track {
+  background: #cbd5e1;
+  border-radius: 9999px;
+  height: 4px;
+}
+input[type='range']::-moz-range-thumb {
+  background: #3b82f6;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px #3b82f6;
+}

@@ -1,0 +1,21 @@
+# Git
+.git
+.gitignore
+
+# Node
+ignitedigitalization.client/node_modules
+ignitedigitalization.client/dist
+
+# .NET
+IgniteDigitalization.Server/bin
+IgniteDigitalization.Server/obj
+
+# VS / IDE
+.vs
+*.user
+*.suo
+.vscode
+
+# Logi i tymczasowe
+**/*.log
+**/tmp
