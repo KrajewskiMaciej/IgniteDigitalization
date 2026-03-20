@@ -1,5 +1,7 @@
-- step:
-    name: Test SSH
-    image: atlassian/default-image:3
-    script:
-      - ssh -T git@bitbucket.org
+pipelines:
+  default:
+   - step:
+      name: Test SSH
+      image: atlassian/default-image:3
+      script:
+        - ssh -T git@bitbucket.org
