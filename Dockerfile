@@ -1,56 +1,58 @@
-# =============================================================================
-# Etap 1: Budowanie frontendu (Vue + Vite)
-# =============================================================================
-FROM node:22-alpine AS frontend-build
+# --- Base Stage ---
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 
-WORKDIR /app/client
+USER root 
+# 2. Zainstaluj wymagane biblioteki
+RUN apt-get update && apt-get install -y \
+    libgssapi-krb5-2 \
+    gss-ntlmssp \
+    krb5-user \
+    libkrb5-dev \
+    iputils-ping \
+    && rm -rf /var/lib/apt/lists/*
 
-# Kopiuj pliki zależności i pobierz paczki
-COPY ignitedigitalization.client/package.json ignitedigitalization.client/package-lock.json ./
-RUN npm ci
-
-# Kopiuj resztę kodu frontendu i zbuduj
-COPY ignitedigitalization.client/ ./
-RUN npm run build-only
-
-# =============================================================================
-# Etap 2: Budowanie backendu (.NET 8)
-# =============================================================================
-FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS backend-build
-
-WORKDIR /app/server
-
-# Kopiuj plik projektu i przywróć zależności (cache-friendly)
-COPY IgniteDigitalization.Server/IgniteDigitalization.Server.csproj ./
-RUN dotnet restore
-
-# Kopiuj resztę kodu i opublikuj w trybie Release
-COPY IgniteDigitalization.Server/ ./
-RUN dotnet publish IgniteDigitalization.Server.csproj -c Release -o /publish --no-restore /p:SkipFrontendBuild=true
-
-# Skopiuj zbudowany frontend do wwwroot publikacji
-COPY --from=frontend-build /app/client/dist /publish/wwwroot
-
-# =============================================================================
-# Etap 3: Obraz produkcyjny (runtime only – bez SDK)
-# =============================================================================
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS runtime
-
-# Zainstaluj libicu (wymagane przez .NET globalizację) i icu-data-full (dla pełnej obsługi locale)
-RUN apk add --no-cache icu-libs
-
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-
+USER app
 WORKDIR /app
-
-# Skopiuj opublikowaną aplikację z etapu 2
-COPY --from=backend-build /publish ./
-
-# Domyślny port ASP.NET Core
-ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
+EXPOSE 8081
 
-# Włącz serwowanie plików statycznych frontendu
-ENV FrontendSettings__ServeStaticFiles=true
+# --- Build Stage ---
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
+# Instalacja Node.js
+RUN apt-get update && apt-get install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_22.x | bash -
+RUN apt-get install -y nodejs
+
+WORKDIR /src
+
+# Kopiujemy pliki projektów i package.json
+COPY ["IgniteDigitalization.Server/IgniteDigitalization.Server.csproj", "IgniteDigitalization.Server/"]
+COPY ["ignitedigitalization.client/ignitedigitalization.client.esproj", "ignitedigitalization.client/"]
+COPY ["ignitedigitalization.client/package.json", "ignitedigitalization.client/package-lock.json", "ignitedigitalization.client/"]
+
+
+RUN dotnet nuget add source /src --name docker-local-packages
+
+# Przywracamy zależności .NET
+RUN dotnet restore "IgniteDigitalization.Server/IgniteDigitalization.Server.csproj"
+
+WORKDIR /src/ignitedigitalization.client
+RUN npm ci
+RUN npm install --save-dev @rollup/rollup-linux-x64-gnu
+
+# Kopiujemy resztę kodu źródłowego
+WORKDIR /src
+COPY . .
+
+# --- Publish Stage ---
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src/IgniteDigitalization.Server
+RUN dotnet publish "IgniteDigitalization.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish
+
+# --- Final Stage ---
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "IgniteDigitalization.Server.dll"]

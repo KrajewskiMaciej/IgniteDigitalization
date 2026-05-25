@@ -1,10 +1,54 @@
-pipelines:
-  default:
-    - step:
-        name: Mirror to GitHub
+definitions:
+  services:
+    docker:
+      image: docker:dind
+      memory: 2048
+  steps:
+    - step: &get-version
+        runs-on:
+          - self.hosted
+          - linux.shell
+        name: 'Get build version'
+        script:
+          # Zaktualizowana ścieżka do package.json dla frontendu IgniteDigitalization
+          - version=$(jq -r '.version' ./ignitedigitalization.client/package.json)
+          - echo "VERSION=$version" >> $BITBUCKET_PIPELINES_VARIABLES_PATH
+        output-variables:
+          - VERSION
+          
+    - step: &build-docker
+        runs-on:
+          - self.hosted
+          - linux
+          - docker
+        name: 'Build and push docker image'
+        script:
+          # Deklaracja zmiennej zgodnie z prośbą
+          - export MODULE_NAME="ignitedigitalization"
+          - git clone git@bitbucket.org:itm_ol_workspace/scriptsplan.git ./scripts
+          - cp ./scripts/BuildDockerWS.sh ./
+          - chmod +x ./BuildDockerWS.sh
+          - ./BuildDockerWS.sh ${MODULE_NAME} ${VERSION}
+        services:
+          - docker
+        caches:
+          - docker
+          
+    - step: &mirror-to-github
+        name: 'Mirror to GitHub'
         image: atlassian/default-image:3
         script:
           - git clone --mirror $BITBUCKET_GIT_SSH_ORIGIN repo.git
           - cd repo.git
           - git remote add github git@github.com:KrajewskiMaciej/IgniteDigitalization.git
           - git push --mirror github
+
+pipelines:
+  default:
+    - stage:
+        name: 'BuildDockerAndPush'
+        steps:
+          - step: *get-version
+          - step: *build-docker
+    # Mirrorowanie odpali się po udanym zbudowaniu i wypchnięciu obrazu
+    - step: *mirror-to-github
