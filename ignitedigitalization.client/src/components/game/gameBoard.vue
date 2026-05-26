@@ -14,6 +14,7 @@ import type { PropType, Ref } from 'vue'
 import type { BoardConfig, Pawn } from '@/interfaces/types'
 const jumpSound = new Audio('/jump.mp3')
 jumpSound.volume = 0.2
+jumpSound.addEventListener('error', () => {})
 
 const props = defineProps({
   config: {
@@ -138,7 +139,7 @@ const animatePawnMove = (
   baseScale: number,
   delay: number = 0,
 ) => {
-  jumpSound.play()
+  jumpSound.play().catch(() => {})
   pawnGroup
     .transition()
     .delay(delay)

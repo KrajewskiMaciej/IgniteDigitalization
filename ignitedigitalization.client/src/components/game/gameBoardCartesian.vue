@@ -14,6 +14,7 @@ import type { BoardConfig, Pawn } from '@/interfaces/types'
 
 const jumpSound = new Audio('/jump.mp3')
 jumpSound.volume = 0.2
+jumpSound.addEventListener('error', () => {})
 
 const props = defineProps({
   config: {
