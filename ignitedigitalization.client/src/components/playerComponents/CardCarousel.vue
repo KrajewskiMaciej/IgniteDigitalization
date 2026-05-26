@@ -1,5 +1,73 @@
 <template>
   <div class="w-full max-w-xl mx-auto mt-10">
+
+  <!-- Popup potwierdzenia zagrania karty -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0 scale-90 translate-y-4"
+      enter-to-class="opacity-100 scale-100 translate-y-0"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100 scale-100 translate-y-0"
+      leave-to-class="opacity-0 scale-90 translate-y-4"
+    >
+      <div
+        v-if="cardPopup.visible"
+        class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+      >
+        <div
+          class="pointer-events-auto mx-4 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
+          :class="cardPopup.isIndependent
+            ? 'bg-gradient-to-br from-emerald-900/95 to-emerald-800/95 border border-emerald-500/50'
+            : 'bg-gradient-to-br from-primary-900/95 to-primary-800/95 border border-primary-500/50'"
+        >
+          <!-- Pasek postępu auto-zamknięcia -->
+          <div class="h-1 w-full bg-white/10">
+            <div
+              class="h-full transition-all ease-linear"
+              :class="cardPopup.isIndependent ? 'bg-emerald-400' : 'bg-primary-400'"
+              :style="{ width: `${cardPopup.progress}%`, transitionDuration: '100ms' }"
+            />
+          </div>
+
+          <div class="p-5">
+            <div class="flex items-start gap-4">
+              <!-- Ikona -->
+              <div
+                class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+                :class="cardPopup.isIndependent ? 'bg-emerald-500/30' : 'bg-primary-500/30'"
+              >
+                <span v-if="cardPopup.isIndependent">✓</span>
+                <span v-else>⏳</span>
+              </div>
+
+              <!-- Treść -->
+              <div class="flex-1 min-w-0">
+                <p
+                  class="font-bold text-lg leading-tight"
+                  :class="cardPopup.isIndependent ? 'text-emerald-300' : 'text-primary-300'"
+                >
+                  {{ cardPopup.isIndependent ? t('cardPlayedTitle') : t('cardPendingTitle') }}
+                </p>
+                <p class="text-white font-semibold mt-0.5 truncate">{{ cardPopup.cardTitle }}</p>
+                <p class="text-white/60 text-sm mt-1">
+                  {{ cardPopup.isIndependent ? t('cardPlayedDesc') : t('cardPendingDesc') }}
+                </p>
+              </div>
+
+              <!-- Przycisk zamknięcia -->
+              <button
+                @click="closeCardPopup"
+                class="flex-shrink-0 text-white/40 hover:text-white/80 transition-colors text-xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
     <div v-if="loading" class="text-center text-surface-500">{{ t('loadingCards') }}</div>
 
     <div v-else-if="!displayCards || displayCards.length === 0" class="text-center text-surface-500">
@@ -119,7 +187,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, watchEffect, onMounted } from 'vue'
+import { ref, computed, watch, watchEffect, onMounted, onUnmounted, reactive } from 'vue'
 import {
   faChevronLeft,
   faChevronRight,
@@ -149,6 +217,32 @@ interface Card {
 interface CardsApiResponse {
   decisionCards: Card[]
 }
+
+// --- Popup po zagraniu karty ---
+const POPUP_DURATION = 4000
+const cardPopup = reactive({ visible: false, isIndependent: false, cardTitle: '', progress: 100 })
+let popupTimer: ReturnType<typeof setTimeout> | null = null
+let popupInterval: ReturnType<typeof setInterval> | null = null
+
+const showCardPopup = (cardTitle: string, isIndependent: boolean) => {
+  if (popupTimer) clearTimeout(popupTimer)
+  if (popupInterval) clearInterval(popupInterval)
+  cardPopup.visible = true
+  cardPopup.isIndependent = isIndependent
+  cardPopup.cardTitle = cardTitle
+  cardPopup.progress = 100
+  const step = 100 / (POPUP_DURATION / 100)
+  popupInterval = setInterval(() => { cardPopup.progress = Math.max(0, cardPopup.progress - step) }, 100)
+  popupTimer = setTimeout(closeCardPopup, POPUP_DURATION)
+}
+
+const closeCardPopup = () => {
+  cardPopup.visible = false
+  if (popupTimer) { clearTimeout(popupTimer); popupTimer = null }
+  if (popupInterval) { clearInterval(popupInterval); popupInterval = null }
+}
+
+onUnmounted(() => { closeCardPopup() })
 
 // --- Reaktywne referencje i stałe ---
 const toast = useToast()
@@ -274,11 +368,13 @@ const sendCardSelection = async () => {
     enablerId: hasEnablers ? Math.min(...(enablers as number[])) : undefined,
   }
 
+  const playedCardTitle = selectedCard.value.title
   try {
     const response = await apiServices.post<{ message?: string; newTeamBudget: number }>(
       apiUrl,
       cardPlayData,
     )
+    showCardPopup(playedCardTitle, props.isIndependentTeam ?? false)
     await fetchCards()
   } catch (err: any) {
     if (err.response?.data?.errorCode === 'NotEnoughBudget') {

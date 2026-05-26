@@ -75,10 +75,7 @@
               class="w-4 h-4 flex-shrink-0 cursor-pointer accent-primary-500"
               :title="t('alsoManage')"
             />
-            <div
-              class="flex items-center gap-3 flex-1 cursor-pointer"
-              @click="selectTeam(team)"
-            >
+            <div class="flex items-center gap-3 flex-1">
               <div
                 class="w-4 h-4 rounded-full ring-2 ring-surface-600 flex-shrink-0"
                 :style="{ backgroundColor: team.teamColor }"

@@ -258,6 +258,11 @@ export const en = {
   cardNotInThisTraining: 'This card does not belong to the current training',
   qrNotACard: 'Scanned code is not a card',
   cardPlayed: 'Card played successfully',
+  cardRequiresEnablers: 'Card requires these cards to be played first: {enablers}',
+  cardPlayedTitle: 'Card played!',
+  cardPlayedDesc: 'Card effects have been applied.',
+  cardPendingTitle: 'Sent for approval',
+  cardPendingDesc: 'The Game Master must approve the card before effects are applied.',
   cameraError: 'Cannot start camera. Check permissions.',
 
   //Auth password requirements

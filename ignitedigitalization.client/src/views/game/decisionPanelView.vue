@@ -116,9 +116,9 @@
             <!-- Przyciski akcji -->
             <div class="flex justify-center">
               <Button
-                :disabled="!selectedCardId || !selectedTableId"
+                :disabled="!selectedCardId || !selectedTableId || isSubmitting"
                 @click="playCard"
-                :label="t('playCard')"
+                :label="isSubmitting ? t('sending') : t('playCard')"
                 size="large"
                 class="w-full"
               >
@@ -346,10 +346,11 @@ interface Team {
 }
 interface Card {
   id: number
+  cardsId: number
   title: string
   description: string
   cost?: number
-  enablers?: unknown[]
+  enablers?: number[]
 }
 interface Item {
   id: number
@@ -468,6 +469,7 @@ const decisions = ref<DecisionLog[]>([])
 const loadingHistory = ref(true)
 const selectedCardId = ref<number | null>(null)
 const selectedTableId = ref<number | null>(null)
+const isSubmitting = ref(false)
 const tables = ref<Team[]>([])
 const cards = ref<Card[]>([])
 const { t } = useI18n()
@@ -659,20 +661,22 @@ async function playCard() {
     return
   }
 
-  const wasSuccess = !(
-    entity.enablers &&
-    Array.isArray(entity.enablers) &&
-    entity.enablers.length > 0
-  )
+  const hasEnablers = Array.isArray(entity.enablers) && entity.enablers.length > 0
+  if (hasEnablers) {
+    const enablerTitles = entity.enablers!
+      .map((id) => cards.value.find((c) => c.id === id)?.title ?? `ID ${id}`)
+      .join(', ')
+    toast.warning(t('cardRequiresEnablers', { enablers: enablerTitles }))
+  }
 
-  const minEnablerId =
-    !wasSuccess && Array.isArray(entity.enablers) && entity.enablers.length > 0
-      ? Math.min(...(entity.enablers as number[]))
-      : undefined
+  const wasSuccess = !hasEnablers
+  const minEnablerId = hasEnablers
+    ? Math.min(...entity.enablers!)
+    : undefined
 
   const endpoint = wasSuccess
-    ? apiConfig.player.playCardSuccess(entity.id)
-    : apiConfig.player.playCardFailure(entity.id)
+    ? apiConfig.player.playCardSuccess(entity.cardsId)
+    : apiConfig.player.playCardFailure(entity.cardsId)
 
   const payload = {
     gameId: gameId,
@@ -684,6 +688,7 @@ async function playCard() {
     enablerId: minEnablerId,
   }
 
+  isSubmitting.value = true
   try {
     const response = await apiServices.post<{ message?: string; newTeamBudget: number }>(
       endpoint,
@@ -698,6 +703,7 @@ async function playCard() {
     }
 
     await fetchAvailableCardsForTeam()
+    selectedCardId.value = null
   } catch (error: any) {
     if (error.response?.data?.errorCode === 'NotEnoughBudget') {
       toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }))
@@ -705,8 +711,9 @@ async function playCard() {
     }
     toast.error(error.response?.data?.message || t('actionExecutionError'))
     console.error('Błąd akcji karty:', error.response?.data || error.message)
+  } finally {
+    isSubmitting.value = false
   }
-  selectedCardId.value = null
 }
 
 const approveDecision = async (logId: number) => {

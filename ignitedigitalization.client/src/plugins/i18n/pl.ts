@@ -255,6 +255,11 @@ export const pl = {
   cardNotInThisTraining: 'Ta karta nie należy do bieżącego szkolenia',
   qrNotACard: 'Zeskanowany kod nie jest kartą',
   cardPlayed: 'Karta zagrana pomyślnie',
+  cardRequiresEnablers: 'Karta wymaga zagrania wcześniejszych kart: {enablers}',
+  cardPlayedTitle: 'Karta zagrana!',
+  cardPlayedDesc: 'Efekty karty zostały zastosowane.',
+  cardPendingTitle: 'Zlecono do zatwierdzenia',
+  cardPendingDesc: 'Game Master musi zatwierdzić kartę zanim efekty zostaną zastosowane.',
   cameraError: 'Nie można uruchomić kamery. Sprawdź uprawnienia.',
 
   //Auth password requirements

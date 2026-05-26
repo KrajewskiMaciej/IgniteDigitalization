@@ -15,13 +15,6 @@
             ">
               IGNITE
             </h1>
-            <h1 class="
-              text-surface-500 font-bold font-inter animate-glow w-full text-center
-              text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[78px]
-              mb-1 sm:mb-2 md:mb-3 lg:mb-5 xl:mb-7
-            ">
-              DIGITALIZATION
-            </h1>
           </div>
 
           <div class="absolute inset-0 flex flex-col justify-end items-center pb-16">
@@ -113,9 +106,9 @@ const handleGameMasterClick = () => {
   }
   50% {
     color: var(--color-primary);
-    text-shadow: 
-      0 0 5px var(--color-primary), 
-      0 0 10px var(--color-primary), 
+    text-shadow:
+      0 0 5px var(--color-primary),
+      0 0 10px var(--color-primary),
       0 0 15px var(--color-primary),
       0 0 20px var(--color-primary);
   }
@@ -136,9 +129,9 @@ const handleGameMasterClick = () => {
     }
     50% {
       color: var(--color-primary);
-      text-shadow: 
-        0 0 3px var(--color-primary), 
-        0 0 6px var(--color-primary), 
+      text-shadow:
+        0 0 3px var(--color-primary),
+        0 0 6px var(--color-primary),
         0 0 9px var(--color-primary);
     }
   }
