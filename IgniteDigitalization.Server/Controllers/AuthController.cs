@@ -30,7 +30,8 @@ namespace backend.Controllers
         {
             try
             {
-                var (user, claims) = await _authService.ValidateUserCredentialsAsync(request.Username, request.Password);
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                var (user, claims) = await _authService.ValidateUserCredentialsAsync(request.Username, request.Password, baseUrl);
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
@@ -48,7 +49,8 @@ namespace backend.Controllers
         {
             try
             {
-                var result = await _authService.RegisterUserAsync(request.Username, request.Email, request.Password);
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                var result = await _authService.RegisterUserAsync(request.Username, request.Email, request.Password, baseUrl);
 
                 if (result is ErrorResponseDto error)
                 {

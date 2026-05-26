@@ -10,7 +10,7 @@
           {{ t('emailOrUsername') }}
         </label>
         <input
-          type="email"
+          type="text"
           id="email"
           v-model="loginData.email"
           class="w-full px-3 py-2.5 sm:py-3 bg-tertiary border border-lgray-accent rounded-lg text-white focus:outline-none focus:border-accent text-sm sm:text-base"
@@ -112,11 +112,7 @@ const validateEmail = (email: string) => {
 }
 
 const isLoginFormValid = computed(() => {
-  return (
-    loginData.value.email.trim() !== '' &&
-    loginData.value.password.trim() !== '' &&
-    validateEmail(loginData.value.email)
-  )
+  return loginData.value.email.trim() !== '' && loginData.value.password.trim() !== ''
 })
 
 const handleLogin = async () => {

@@ -9,7 +9,7 @@ namespace backend.Services
     public interface IEmailService
     {
         Task SendEmailAsync(string to, string subject, string body);
-        Task SendConfirmationEmailAsync(string userEmail, string confirmationToken, DateTime? dateTime);
+        Task SendConfirmationEmailAsync(string userEmail, string confirmationToken, DateTime? dateTime, string? baseUrl = null);
         Task SendPasswordResetEmailAsync(string userEmail, string resetToken, DateTime? dateTime);
         Task SendBugReportEmailsAsync(string reporterEmail, string description, string language);
     }
@@ -107,7 +107,7 @@ namespace backend.Services
             }
         }
 
-        public async Task SendConfirmationEmailAsync(string userEmail, string confirmationToken, DateTime? expireDate)
+        public async Task SendConfirmationEmailAsync(string userEmail, string confirmationToken, DateTime? expireDate, string? baseUrl = null)
         {
             // Krok 1: Zdefiniuj ścieżkę do szablonu
             var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "ConfirmationEmail.html");
@@ -123,7 +123,8 @@ namespace backend.Services
             var emailBody = await File.ReadAllTextAsync(templatePath);
 
             // Krok 3: Przygotuj dynamiczne dane do wstawienia
-            var confirmationLink = $"{_frontendSettings.BaseUrl}/confirm/{confirmationToken}";
+            var effectiveBaseUrl = !string.IsNullOrEmpty(baseUrl) ? baseUrl : _frontendSettings.BaseUrl;
+            var confirmationLink = $"{effectiveBaseUrl.TrimEnd('/')}/confirm/{confirmationToken}";
             string expireDateString = expireDate.HasValue ? $"{expireDate.Value:dd.MM.yyyy HH:mm}" : "brak daty";
             // Lub jeśli jesteś pewien, że wartość istnieje:
             if (expireDate.HasValue)

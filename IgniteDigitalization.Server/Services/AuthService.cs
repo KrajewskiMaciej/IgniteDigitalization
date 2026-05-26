@@ -12,8 +12,8 @@ namespace backend.Services
 {
     public interface IAuthService
     {
-        Task<(User user, List<Claim> claims)> ValidateUserCredentialsAsync(string username, string password);
-        Task<ErrorResponseDto?> RegisterUserAsync(string username, string email, string password);
+        Task<(User user, List<Claim> claims)> ValidateUserCredentialsAsync(string username, string password, string? baseUrl = null);
+        Task<ErrorResponseDto?> RegisterUserAsync(string username, string email, string password, string? baseUrl = null);
         Task ConfirmUserEmailAsync(string token);
         Task<bool> InitiatePasswordResetAsync(string email);
         Task<bool> IsPasswordResetTokenValidAsync(string token);
@@ -38,7 +38,7 @@ namespace backend.Services
             _scopeFactory = scopeFactory;
         }
 
-        public async Task<(User user, List<Claim> claims)> ValidateUserCredentialsAsync(string username, string password)
+        public async Task<(User user, List<Claim> claims)> ValidateUserCredentialsAsync(string username, string password, string? baseUrl = null)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == username || u.Names == username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
@@ -49,7 +49,7 @@ namespace backend.Services
                 user.Link_Token = Guid.NewGuid().ToString();
                 user.Token_Expire_Date = DateTime.UtcNow.AddMinutes(15);
                 await _context.SaveChangesAsync();
-                await _emailService.SendConfirmationEmailAsync(user.Email, user.Link_Token, user.Token_Expire_Date);
+                await _emailService.SendConfirmationEmailAsync(user.Email, user.Link_Token, user.Token_Expire_Date, baseUrl);
                 throw new Exception("E-mail nie został potwierdzony. Wysłano ponownie link aktywacyjny.");
             }
 
@@ -57,7 +57,7 @@ namespace backend.Services
             return (user, claims);
         }
 
-        public async Task<ErrorResponseDto?> RegisterUserAsync(string username, string email, string password)
+        public async Task<ErrorResponseDto?> RegisterUserAsync(string username, string email, string password, string? baseUrl = null)
         {
             if (await _context.Users.AnyAsync(u => u.Email == email))
             {
@@ -78,6 +78,12 @@ namespace backend.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
+            var capturedEmail = user.Email;
+            var capturedToken = user.Link_Token;
+            var capturedExpire = user.Token_Expire_Date;
+            var capturedUserId = user.Users_Id;
+            var capturedBaseUrl = baseUrl;
+
             _backgroundTaskQueue.QueueBackgroundWorkItem(async token =>
             {
                 using var scope = _scopeFactory.CreateScope();
@@ -86,8 +92,8 @@ namespace backend.Services
 
                 try
                 {
-                    await scopedProvisioningService.InitializeNewUserAsync(user.Users_Id);
-                    await scopedEmailService.SendConfirmationEmailAsync(user.Email, user.Link_Token, user.Token_Expire_Date);
+                    await scopedProvisioningService.InitializeNewUserAsync(capturedUserId);
+                    await scopedEmailService.SendConfirmationEmailAsync(capturedEmail, capturedToken, capturedExpire, capturedBaseUrl);
                 }
                 catch (Exception ex)
                 {

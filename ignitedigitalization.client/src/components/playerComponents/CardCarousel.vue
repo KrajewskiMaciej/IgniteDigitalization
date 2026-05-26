@@ -279,6 +279,7 @@ const sendCardSelection = async () => {
       apiUrl,
       cardPlayData,
     )
+    await fetchCards()
   } catch (err: any) {
     if (err.response?.data?.errorCode === 'NotEnoughBudget') {
       toast.warning(t('warningNotEnoughBudget'))
