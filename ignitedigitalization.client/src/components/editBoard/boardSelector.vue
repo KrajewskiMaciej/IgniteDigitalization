@@ -39,7 +39,7 @@
 import type { PropType } from 'vue'
 import Dropdown from 'primevue/dropdown'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

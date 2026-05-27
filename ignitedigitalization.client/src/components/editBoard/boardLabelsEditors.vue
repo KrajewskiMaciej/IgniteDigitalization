@@ -110,7 +110,7 @@ import type { PropType } from 'vue'
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 import { useToast } from 'vue-toastification'
 import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

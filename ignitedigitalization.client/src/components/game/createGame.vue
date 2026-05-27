@@ -293,7 +293,7 @@
           </div>
 
           <div class="flex gap-2">
-            <Button @click="handlePreviousStep" type="button" severity="secondary" class="w-full">
+            <Button @click="handlePreviousStep" type="button" outlined class="w-full">
               <font-awesome-icon :icon="faArrowLeft" class="mr-2" />
               <span>{{ t('previous') }}</span>
             </Button>
@@ -319,7 +319,7 @@ import { useToast } from 'vue-toastification'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 import apiConfig from '@/services/apiConfig'
 import apiService from '@/services/apiServices'
 import { useI18n } from 'vue-i18n'

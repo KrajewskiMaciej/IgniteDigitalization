@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 
 const { t } = useI18n()
 

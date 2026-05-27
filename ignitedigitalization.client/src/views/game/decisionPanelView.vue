@@ -329,7 +329,7 @@ import {
   faTimes,
 } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 import ProgressSpinner from 'primevue/progressspinner'
 import GameBoard from '@/components/game/gameBoard.vue'
 import apiConfig from '@/services/apiConfig'

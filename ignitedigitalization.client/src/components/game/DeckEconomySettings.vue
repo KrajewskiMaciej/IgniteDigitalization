@@ -203,7 +203,7 @@ import { ref, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 import {
   faLayerGroup,
   faCoins,

@@ -173,7 +173,7 @@ import {
   faCheck,
   faX,
 } from '@fortawesome/free-solid-svg-icons'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 import { VueFlow, MarkerType, useVueFlow } from '@vue-flow/core'
 // @ts-ignore
 import { useLayout } from '@/composables/useLayout'

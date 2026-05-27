@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

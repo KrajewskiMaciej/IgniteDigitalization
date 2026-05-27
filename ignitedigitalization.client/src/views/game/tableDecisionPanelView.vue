@@ -436,7 +436,7 @@ import {
   faChevronDown,
 } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 import Dialog from 'primevue/dialog'
 import ProgressSpinner from 'primevue/progressspinner'
 

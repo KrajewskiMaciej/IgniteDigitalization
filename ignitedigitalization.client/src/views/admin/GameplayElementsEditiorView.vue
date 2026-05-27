@@ -147,7 +147,7 @@ import { ref, computed, onMounted } from 'vue'
 import EditDecisionCards from '@/components/game/EditDecisionCards.vue'
 import EditProccesses from '@/components/game/EditProccesses.vue'
 import DeckEconomySettings from '@/components/game/DeckEconomySettings.vue'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 import Dropdown from 'primevue/dropdown'
 import {
   faChessPawn,

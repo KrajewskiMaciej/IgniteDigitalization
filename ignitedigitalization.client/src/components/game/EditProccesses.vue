@@ -190,7 +190,7 @@ import {
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
-import Button from 'primevue/button'
+import Button from '@/components/base/AppButton.vue'
 import { useConfirm } from 'primevue/useconfirm'
 import apiConfig from '@/services/apiConfig'
 import apiServices from '@/services/apiServices'

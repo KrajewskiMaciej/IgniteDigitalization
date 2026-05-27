@@ -16,22 +16,12 @@
         class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
       >
         <div
-          class="pointer-events-auto mx-4 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
-          :class="{
-            'bg-gradient-to-br from-emerald-900/95 to-emerald-800/95 border border-emerald-500/50': cardPopup.mode === 'played',
-            'bg-gradient-to-br from-primary-900/95 to-primary-800/95 border border-primary-500/50': cardPopup.mode === 'pending',
-            'bg-gradient-to-br from-blue-900/95 to-blue-800/95 border border-blue-500/50': cardPopup.mode === 'approved',
-          }"
+          class="pointer-events-auto mx-4 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden bg-gradient-to-br from-primary-900/95 to-primary-800/95 border border-primary-500/50"
         >
           <!-- Pasek postępu auto-zamknięcia -->
           <div class="h-1 w-full bg-white/10">
             <div
-              class="h-full transition-all ease-linear"
-              :class="{
-                'bg-emerald-400': cardPopup.mode === 'played',
-                'bg-primary-400': cardPopup.mode === 'pending',
-                'bg-blue-400': cardPopup.mode === 'approved',
-              }"
+              class="h-full bg-primary-400 transition-all ease-linear"
               :style="{ width: `${cardPopup.progress}%`, transitionDuration: '100ms' }"
             />
           </div>
@@ -39,34 +29,17 @@
           <div class="p-5">
             <div class="flex items-start gap-4">
               <!-- Ikona -->
-              <div
-                class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-                :class="{
-                  'bg-emerald-500/30': cardPopup.mode === 'played',
-                  'bg-primary-500/30': cardPopup.mode === 'pending',
-                  'bg-blue-500/30': cardPopup.mode === 'approved',
-                }"
-              >
-                <span v-if="cardPopup.mode === 'pending'">⏳</span>
-                <span v-else>✓</span>
+              <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl bg-primary-500/30">
+                <span>⏳</span>
               </div>
 
               <!-- Treść -->
               <div class="flex-1 min-w-0">
-                <p
-                  class="font-bold text-lg leading-tight"
-                  :class="{
-                    'text-emerald-300': cardPopup.mode === 'played',
-                    'text-primary-300': cardPopup.mode === 'pending',
-                    'text-blue-300': cardPopup.mode === 'approved',
-                  }"
-                >
-                  {{ cardPopup.mode === 'played' ? t('cardPlayedTitle') : cardPopup.mode === 'pending' ? t('cardPendingTitle') : t('cardApprovedTitle') }}
+                <p class="font-bold text-lg leading-tight text-primary-300">
+                  {{ t('cardPendingTitle') }}
                 </p>
-                <p v-if="cardPopup.cardTitle" class="text-white font-semibold mt-0.5 truncate">{{ cardPopup.cardTitle }}</p>
-                <p class="text-white/60 text-sm mt-1">
-                  {{ cardPopup.mode === 'played' ? t('cardPlayedDesc') : cardPopup.mode === 'pending' ? t('cardPendingDesc') : t('cardApprovedByGm') }}
-                </p>
+                <p class="text-white font-semibold mt-0.5 truncate">{{ cardPopup.cardTitle }}</p>
+                <p class="text-white/60 text-sm mt-1">{{ t('cardPendingDesc') }}</p>
               </div>
 
               <!-- Przycisk zamknięcia -->
@@ -232,11 +205,9 @@ interface CardsApiResponse {
   decisionCards: Card[]
 }
 
-// --- Popup po zagraniu karty ---
+// --- Popup po zagraniu karty (tylko tryb pending) ---
 const POPUP_DURATION = 4000
-const cardPopup = reactive<{ visible: boolean; mode: 'played' | 'pending' | 'approved'; cardTitle: string; progress: number }>({
-  visible: false, mode: 'played', cardTitle: '', progress: 100,
-})
+const cardPopup = reactive({ visible: false, cardTitle: '', progress: 100 })
 let popupTimer: ReturnType<typeof setTimeout> | null = null
 let popupInterval: ReturnType<typeof setInterval> | null = null
 
@@ -250,17 +221,17 @@ const startPopupTimer = () => {
 }
 
 const showCardPopup = (cardTitle: string, isIndependent: boolean) => {
-  cardPopup.mode = isIndependent ? 'played' : 'pending'
+  if (isIndependent) {
+    toast.success(t('cardPlayedTitle'), { timeout: 5000 })
+    return
+  }
   cardPopup.cardTitle = cardTitle
   cardPopup.visible = true
   startPopupTimer()
 }
 
 const showApprovedPopup = () => {
-  cardPopup.mode = 'approved'
-  cardPopup.cardTitle = ''
-  cardPopup.visible = true
-  startPopupTimer()
+  toast.success(t('cardApprovedTitle'), { timeout: 5000 })
 }
 
 const closeCardPopup = () => {

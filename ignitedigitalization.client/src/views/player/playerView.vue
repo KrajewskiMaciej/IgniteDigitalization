@@ -605,11 +605,7 @@ const onHistoryUpdate = () => {
     playerMenuRef.value.fetchGameLog()
   }
   if (!gameData.value?.isIndependent) {
-    if (cardCarouselRef.value) {
-      cardCarouselRef.value.showApprovedPopup()
-    } else {
-      toast.success(t('cardApprovedByGm'), { timeout: 6000 })
-    }
+    toast.success(t('cardApprovedTitle'), { timeout: 6000 })
   }
 }
 
