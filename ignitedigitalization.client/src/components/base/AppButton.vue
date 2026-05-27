@@ -1,8 +1,8 @@
 <template>
   <Button
     v-bind="filteredAttrs"
-    :loading="isRunning || attrs.loading"
-    :disabled="isRunning || !!attrs.disabled"
+    :loading="isLoading"
+    :disabled="isDisabled"
     @click="handleClick"
   >
     <template v-for="(_, name) in $slots" #[name]="slotProps">
@@ -24,6 +24,9 @@ const filteredAttrs = computed(() => {
   const { onClick, loading, disabled, ...rest } = attrs as Record<string, unknown>
   return rest
 })
+
+const isLoading = computed(() => isRunning.value || !!(attrs.loading as boolean | undefined))
+const isDisabled = computed(() => isRunning.value || !!(attrs.disabled as boolean | undefined))
 
 const handleClick = async (event: MouseEvent) => {
   if (isRunning.value) return
