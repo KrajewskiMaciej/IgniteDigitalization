@@ -983,6 +983,7 @@ const approveDecision = async (logId: number) => {
   try {
     await apiServices.post(apiConfig.player.approveLog(logId), {})
     toast.success(t('decisionApprovedSuccess'))
+    selectedCardId.value = null
     await fetchAllDataForTeam()
   } catch (error) {
     toast.error(t('errorApprovingSuggestion'))

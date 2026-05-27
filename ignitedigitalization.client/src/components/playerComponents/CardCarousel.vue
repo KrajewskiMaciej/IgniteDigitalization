@@ -17,15 +17,21 @@
       >
         <div
           class="pointer-events-auto mx-4 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
-          :class="cardPopup.isIndependent
-            ? 'bg-gradient-to-br from-emerald-900/95 to-emerald-800/95 border border-emerald-500/50'
-            : 'bg-gradient-to-br from-primary-900/95 to-primary-800/95 border border-primary-500/50'"
+          :class="{
+            'bg-gradient-to-br from-emerald-900/95 to-emerald-800/95 border border-emerald-500/50': cardPopup.mode === 'played',
+            'bg-gradient-to-br from-primary-900/95 to-primary-800/95 border border-primary-500/50': cardPopup.mode === 'pending',
+            'bg-gradient-to-br from-blue-900/95 to-blue-800/95 border border-blue-500/50': cardPopup.mode === 'approved',
+          }"
         >
           <!-- Pasek postępu auto-zamknięcia -->
           <div class="h-1 w-full bg-white/10">
             <div
               class="h-full transition-all ease-linear"
-              :class="cardPopup.isIndependent ? 'bg-emerald-400' : 'bg-primary-400'"
+              :class="{
+                'bg-emerald-400': cardPopup.mode === 'played',
+                'bg-primary-400': cardPopup.mode === 'pending',
+                'bg-blue-400': cardPopup.mode === 'approved',
+              }"
               :style="{ width: `${cardPopup.progress}%`, transitionDuration: '100ms' }"
             />
           </div>
@@ -35,23 +41,31 @@
               <!-- Ikona -->
               <div
                 class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-                :class="cardPopup.isIndependent ? 'bg-emerald-500/30' : 'bg-primary-500/30'"
+                :class="{
+                  'bg-emerald-500/30': cardPopup.mode === 'played',
+                  'bg-primary-500/30': cardPopup.mode === 'pending',
+                  'bg-blue-500/30': cardPopup.mode === 'approved',
+                }"
               >
-                <span v-if="cardPopup.isIndependent">✓</span>
-                <span v-else>⏳</span>
+                <span v-if="cardPopup.mode === 'pending'">⏳</span>
+                <span v-else>✓</span>
               </div>
 
               <!-- Treść -->
               <div class="flex-1 min-w-0">
                 <p
                   class="font-bold text-lg leading-tight"
-                  :class="cardPopup.isIndependent ? 'text-emerald-300' : 'text-primary-300'"
+                  :class="{
+                    'text-emerald-300': cardPopup.mode === 'played',
+                    'text-primary-300': cardPopup.mode === 'pending',
+                    'text-blue-300': cardPopup.mode === 'approved',
+                  }"
                 >
-                  {{ cardPopup.isIndependent ? t('cardPlayedTitle') : t('cardPendingTitle') }}
+                  {{ cardPopup.mode === 'played' ? t('cardPlayedTitle') : cardPopup.mode === 'pending' ? t('cardPendingTitle') : t('cardApprovedTitle') }}
                 </p>
-                <p class="text-white font-semibold mt-0.5 truncate">{{ cardPopup.cardTitle }}</p>
+                <p v-if="cardPopup.cardTitle" class="text-white font-semibold mt-0.5 truncate">{{ cardPopup.cardTitle }}</p>
                 <p class="text-white/60 text-sm mt-1">
-                  {{ cardPopup.isIndependent ? t('cardPlayedDesc') : t('cardPendingDesc') }}
+                  {{ cardPopup.mode === 'played' ? t('cardPlayedDesc') : cardPopup.mode === 'pending' ? t('cardPendingDesc') : t('cardApprovedByGm') }}
                 </p>
               </div>
 
@@ -220,20 +234,33 @@ interface CardsApiResponse {
 
 // --- Popup po zagraniu karty ---
 const POPUP_DURATION = 4000
-const cardPopup = reactive({ visible: false, isIndependent: false, cardTitle: '', progress: 100 })
+const cardPopup = reactive<{ visible: boolean; mode: 'played' | 'pending' | 'approved'; cardTitle: string; progress: number }>({
+  visible: false, mode: 'played', cardTitle: '', progress: 100,
+})
 let popupTimer: ReturnType<typeof setTimeout> | null = null
 let popupInterval: ReturnType<typeof setInterval> | null = null
 
-const showCardPopup = (cardTitle: string, isIndependent: boolean) => {
+const startPopupTimer = () => {
   if (popupTimer) clearTimeout(popupTimer)
   if (popupInterval) clearInterval(popupInterval)
-  cardPopup.visible = true
-  cardPopup.isIndependent = isIndependent
-  cardPopup.cardTitle = cardTitle
   cardPopup.progress = 100
   const step = 100 / (POPUP_DURATION / 100)
   popupInterval = setInterval(() => { cardPopup.progress = Math.max(0, cardPopup.progress - step) }, 100)
   popupTimer = setTimeout(closeCardPopup, POPUP_DURATION)
+}
+
+const showCardPopup = (cardTitle: string, isIndependent: boolean) => {
+  cardPopup.mode = isIndependent ? 'played' : 'pending'
+  cardPopup.cardTitle = cardTitle
+  cardPopup.visible = true
+  startPopupTimer()
+}
+
+const showApprovedPopup = () => {
+  cardPopup.mode = 'approved'
+  cardPopup.cardTitle = ''
+  cardPopup.visible = true
+  startPopupTimer()
 }
 
 const closeCardPopup = () => {
@@ -393,6 +420,7 @@ const sendCardSelection = async () => {
 
 defineExpose({
   fetchCards,
+  showApprovedPopup,
 })
 
 watch(displayCards, () => {

@@ -263,6 +263,7 @@ export const en = {
   cardPlayedDesc: 'Card effects have been applied.',
   cardPendingTitle: 'Sent for approval',
   cardPendingDesc: 'The Game Master must approve the card before effects are applied.',
+  cardApprovedTitle: 'Decision approved!',
   cardApprovedByGm: 'Game Master approved your decision. Card effects have been applied.',
   decisionApprovedSuccess: 'Decision approved successfully!',
   cameraError: 'Cannot start camera. Check permissions.',
