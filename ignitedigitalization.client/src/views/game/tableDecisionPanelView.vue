@@ -481,9 +481,6 @@ interface Card {
   enablers?: unknown[]
 }
 
-interface ICardsResponse {
-  decisionCards: Card[]
-}
 interface DecisionLog {
   isEventNotification: boolean
   timestamp: string
@@ -504,11 +501,6 @@ interface PendingDecision {
   tableName: string
   teamColor?: string
   timestamp: string
-}
-interface GameEvent {
-  eventId: number | null
-  shortDesc: string
-  longDesc: string
 }
 interface Pawn {
   id: number
@@ -544,14 +536,6 @@ interface RawHistoryLog {
   enablerDescription?: string
   status: boolean
   gameEventId: number | null
-}
-interface RawPendingLog {
-  logId: number
-  cardId: number
-  cardTitle: string
-  teamId: number
-  teamName: string
-  timestamp: string
 }
 interface RawPawn {
   gpId: number
@@ -708,20 +692,6 @@ const fetchTeams = async () => {
     console.error('Błąd pobierania drużyn:', error)
   } finally {
     loadingTeams.value = false
-  }
-}
-
-const selectTeam = async (team: AvailableTeam) => {
-  showTeamPicker.value = false
-  const wasPrimary = team.teamId === currentTeamId.value
-  currentTeamId.value = team.teamId
-  selectedPlayTeamId.value = team.teamId
-  if (!managedTeamIds.value.includes(team.teamId)) {
-    managedTeamIds.value.push(team.teamId)
-  }
-  router.replace({ name: 'table-decision-panel', params: { gameId: props.gameId, teamId: team.teamId } })
-  if (!wasPrimary) {
-    await fetchAllDataForTeam()
   }
 }
 
@@ -1012,6 +982,7 @@ const approveDecision = async (logId: number) => {
   approvingLogIds.value = new Set(approvingLogIds.value).add(logId)
   try {
     await apiServices.post(apiConfig.player.approveLog(logId), {})
+    await fetchAllDataForTeam()
   } catch (error) {
     toast.error(t('errorApprovingSuggestion'))
   } finally {
@@ -1027,6 +998,7 @@ const rejectDecision = async (logId: number) => {
   try {
     await apiServices.delete(apiConfig.player.rejectLog(logId))
     toast.info(t('suggestionRejected'))
+    await fetchPendingDecisions()
   } catch (error) {
     toast.error(t('errorRejectingSuggestion'))
   } finally {
@@ -1038,6 +1010,8 @@ const rejectDecision = async (logId: number) => {
 
 const formatDate = (timestamp: string) => new Date(timestamp).toLocaleString('pl-PL')
 
+const isViewMounted = ref(true)
+
 onMounted(async () => {
   const gameIdNum = Number(props.gameId)
   if (isNaN(gameIdNum)) {
@@ -1046,7 +1020,6 @@ onMounted(async () => {
   }
 
   if (props.allTeams) {
-    // First fetch all teams, then mark every one as managed
     await Promise.all([fetchTeams(), fetchRivalBoard()])
     if (availableTeams.value.length > 0) {
       const firstTeam = availableTeams.value[0]
@@ -1067,22 +1040,30 @@ onMounted(async () => {
     if (managedTeamIds.value.length > 1) fetchAllManagedPawns()
   })
   signalService.connection.on('BudgetUpdated', () => fetchAllDataForTeam())
+  signalService.connection.on('PhaseUpdated', () => fetchAllDataForTeam())
 
   try {
     await signalService.start()
     await signalService.joinGameRoomAsPlayer(String(gameIdNum), String(currentTeamId.value))
+    signalService.connection.onreconnected(async () => {
+      if (!isViewMounted.value) return
+      await signalService.joinGameRoomAsPlayer(String(gameIdNum), String(currentTeamId.value))
+      await fetchAllDataForTeam()
+    })
   } catch (err) {
     console.error('Błąd połączenia SignalR: ', err)
   }
 })
 
 onUnmounted(() => {
+  isViewMounted.value = false
   if (props.gameId) {
     signalService.leaveGameRoomAsPlayer(String(props.gameId), String(currentTeamId.value))
     signalService.connection.off('HistoryUpdated')
     signalService.connection.off('PendingUpdated')
     signalService.connection.off('BoardUpdated')
     signalService.connection.off('BudgetUpdated')
+    signalService.connection.off('PhaseUpdated')
   }
 })
 </script>

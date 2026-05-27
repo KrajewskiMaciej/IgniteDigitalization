@@ -257,6 +257,8 @@ const selectCard = (index: number) => {
   isDropdownOpen.value = false
 }
 
+const emit = defineEmits<{ 'card-played': [newBudget: number] }>()
+
 // --- Definiowanie propsów i emitów ---
 const props = defineProps({
   deckId: Number,
@@ -375,6 +377,7 @@ const sendCardSelection = async () => {
       cardPlayData,
     )
     showCardPopup(playedCardTitle, props.isIndependentTeam ?? false)
+    emit('card-played', response.data.newTeamBudget)
     await fetchCards()
   } catch (err: any) {
     if (err.response?.data?.errorCode === 'NotEnoughBudget') {

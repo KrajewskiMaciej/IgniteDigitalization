@@ -702,7 +702,7 @@ async function playCard() {
       await fetchTeams()
     }
 
-    await fetchAvailableCardsForTeam()
+    await Promise.all([fetchAvailableCardsForTeam(), fetchDecisionHistory()])
     selectedCardId.value = null
   } catch (error: any) {
     if (error.response?.data?.errorCode === 'NotEnoughBudget') {
@@ -718,7 +718,14 @@ async function playCard() {
 
 const approveDecision = async (logId: number) => {
   try {
-    const response = await apiServices.post(apiConfig.player.approveLog(logId), {})
+    await apiServices.post(apiConfig.player.approveLog(logId), {})
+    await Promise.all([
+      fetchDecisionHistory(),
+      fetchPendingDecisions(),
+      fetchTeams(),
+      fetchRivalPawns(),
+      fetchAvailableCardsForTeam(),
+    ])
   } catch (error: any) {
     toast.error(t('errorApprovingSuggestion') + error)
     console.error('Błąd zatwierdzania:', error.response?.data || error.message)
@@ -728,6 +735,7 @@ const approveDecision = async (logId: number) => {
 const rejectDecision = async (logId: number) => {
   try {
     await apiServices.delete(apiConfig.player.rejectLog(logId))
+    await fetchPendingDecisions()
   } catch (error: any) {
     toast.error(t('errorRejectingSuggestion') + error)
     console.error('Błąd odrzucania:', error.response?.data || error.message)
@@ -736,27 +744,22 @@ const rejectDecision = async (logId: number) => {
 
 const formatDate = (timestamp: string) => new Date(timestamp).toLocaleString('pl-PL')
 
+const isViewMounted = ref(true)
+
+const refreshAllData = () =>
+  Promise.all([fetchTeams(), fetchDecisionHistory(), fetchPendingDecisions(), fetchRivalPawns()])
+
 onMounted(async () => {
   if (!gameId) return
 
   await fetchGameDetails()
 
-  if (deckId.value) {
-    await Promise.all([
-      fetchTeams(),
-      fetchDecisionHistory(),
-      fetchPendingDecisions(),
-      fetchRivalBoard(),
-    ])
-  } else {
-    toast.error(t('noDeckId'))
-    await Promise.all([
-      fetchTeams(),
-      fetchDecisionHistory(),
-      fetchPendingDecisions(),
-      fetchRivalBoard(),
-    ])
-  }
+  await Promise.all([
+    fetchTeams(),
+    fetchDecisionHistory(),
+    fetchPendingDecisions(),
+    fetchRivalBoard(),
+  ])
 
   if (teamId.value) {
     selectedTableId.value = teamId.value
@@ -769,17 +772,27 @@ onMounted(async () => {
     signalService.connection.on('PendingUpdated', () => fetchPendingDecisions())
     signalService.connection.on('BoardUpdated', () => fetchRivalPawns())
     signalService.connection.on('BudgetUpdated', () => fetchTeams())
+    signalService.connection.on('PhaseUpdated', () =>
+      Promise.all([fetchTeams(), fetchAvailableCardsForTeam(), fetchRivalPawns()]),
+    )
+    signalService.connection.onreconnected(async () => {
+      if (!isViewMounted.value) return
+      await signalService.joinGameRoomAsAdmin(String(gameId))
+      await refreshAllData()
+    })
   } catch (err: any) {
     console.error('Błąd połączenia SignalR: ', err)
   }
 })
 
 onUnmounted(() => {
+  isViewMounted.value = false
   if (gameId) signalService.leaveGameRoomAsAdmin(String(gameId))
   signalService.connection.off('HistoryUpdated')
   signalService.connection.off('PendingUpdated')
   signalService.connection.off('BoardUpdated')
   signalService.connection.off('BudgetUpdated')
+  signalService.connection.off('PhaseUpdated')
 })
 </script>
 

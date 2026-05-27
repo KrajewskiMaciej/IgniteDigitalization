@@ -143,6 +143,7 @@
                       :current-budget="currentGlobalBudget"
                       :is-online-game="gameData.isOnline"
                       :is-independent-team="gameData.isIndependent"
+                      @card-played="handleCardPlayed"
                     />
                   </template>
                   <template #fallback>
@@ -245,6 +246,7 @@
                   :current-budget="currentGlobalBudget"
                   :is-online-game="gameData.isOnline"
                   :is-independent-team="gameData.isIndependent"
+                  @card-played="handleCardPlayed"
                 />
               </template>
               <template #fallback>
@@ -599,7 +601,13 @@ const onBoardUpdate = (data: any) => {
 const onHistoryUpdate = () => {
   if (playerMenuRef.value) {
     playerMenuRef.value.fetchGameLog()
-    playerMenuRef.value.fetchTeamBud()
+  }
+}
+
+const handleCardPlayed = (newBudget: number) => {
+  currentGlobalBudget.value = newBudget
+  if (playerMenuRef.value) {
+    playerMenuRef.value.fetchGameLog()
   }
 }
 
@@ -624,6 +632,7 @@ const onPhaseUpdate = async () => {
   }
 }
 let isSignalRInitialized = false
+const isViewMounted = ref(true)
 
 watch(
   () => props.teamToken,
@@ -643,6 +652,19 @@ watch(
         signalrService.connection.on('PendingUpdated', onPendingUpdate)
         signalrService.connection.on('BudgetUpdated', onBudgetUpdate)
         signalrService.connection.on('PhaseUpdated', onPhaseUpdate)
+        signalrService.connection.onreconnected(async () => {
+          if (!isViewMounted.value || !gameData.value?.gameId) return
+          await signalrService.joinGameRoomAsPlayer(
+            String(gameData.value.gameId),
+            String(gameData.value.teamId),
+          )
+          await fetchGameDataByToken(newToken, true)
+          if (cardCarouselRef.value) cardCarouselRef.value.fetchCards()
+          if (playerMenuRef.value) {
+            playerMenuRef.value.fetchGameLog()
+            playerMenuRef.value.handleFetchBudget()
+          }
+        })
       } catch (err) {
         console.error('Błąd połączenia SignalR w playerView: ', err)
       }
@@ -653,6 +675,7 @@ watch(
 
 
 onUnmounted(() => {
+  isViewMounted.value = false
   if (gameData.value?.gameId) {
     signalrService.leaveGameRoomAsPlayer(
       String(gameData.value.gameId),
