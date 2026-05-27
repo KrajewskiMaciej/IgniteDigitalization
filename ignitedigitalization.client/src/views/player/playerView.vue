@@ -385,8 +385,10 @@ import { useBreakpoints } from '@vueuse/core'
 import { faCommentDots } from '@fortawesome/free-solid-svg-icons'
 import { onClickOutside } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
+import { useToast } from 'vue-toastification'
 
 const { t } = useI18n()
+const toast = useToast()
 
 const chatRef = ref<HTMLElement | null>(null)
 
@@ -601,6 +603,9 @@ const onBoardUpdate = (data: any) => {
 const onHistoryUpdate = () => {
   if (playerMenuRef.value) {
     playerMenuRef.value.fetchGameLog()
+  }
+  if (!gameData.value?.isIndependent) {
+    toast.success(t('cardApprovedByGm'), { timeout: 6000 })
   }
 }
 

@@ -260,6 +260,8 @@ export const pl = {
   cardPlayedDesc: 'Efekty karty zostały zastosowane.',
   cardPendingTitle: 'Zlecono do zatwierdzenia',
   cardPendingDesc: 'Game Master musi zatwierdzić kartę zanim efekty zostaną zastosowane.',
+  cardApprovedByGm: 'Game Master zatwierdził Twoją decyzję. Efekty karty zostały zastosowane.',
+  decisionApprovedSuccess: 'Decyzja zatwierdzona pomyślnie!',
   cameraError: 'Nie można uruchomić kamery. Sprawdź uprawnienia.',
 
   //Auth password requirements

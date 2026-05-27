@@ -719,6 +719,7 @@ async function playCard() {
 const approveDecision = async (logId: number) => {
   try {
     await apiServices.post(apiConfig.player.approveLog(logId), {})
+    toast.success(t('decisionApprovedSuccess'))
     await Promise.all([
       fetchDecisionHistory(),
       fetchPendingDecisions(),
