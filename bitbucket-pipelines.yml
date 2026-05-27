@@ -23,7 +23,7 @@ definitions:
           - docker
         name: 'Build and push docker image'
         script:
-          # Deklaracja zmiennej zgodnie z prośbą
+          - export DOCKER_BUILDKIT=1
           - export MODULE_NAME="ignitedigitalization"
           - git clone git@bitbucket.org:itm_ol_workspace/scriptsplan.git ./scripts
           - cp ./scripts/BuildDockerWS.sh ./

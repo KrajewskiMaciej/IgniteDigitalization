@@ -993,7 +993,7 @@ async function playCard() {
       if (managedTeam) managedTeam.teamBud = response.data.newTeamBudget
     }
 
-    await fetchAvailableCardsAndItems()
+    await Promise.all([fetchAvailableCardsAndItems(), fetchDecisionHistory()])
     selectedCardId.value = null
   } catch (error: any) {
     if (error.response?.data?.errorCode === 'NotEnoughBudget') {
