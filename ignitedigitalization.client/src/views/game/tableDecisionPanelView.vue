@@ -184,9 +184,9 @@
 
             <div class="flex justify-center">
               <Button
-                :disabled="!selectedCardId"
+                :disabled="!selectedCardId || isSubmitting"
                 @click="playCard"
-                :label="t('playCard')"
+                :label="isSubmitting ? t('sending') : t('playCard')"
                 size="large"
                 class="w-full"
               />
@@ -472,6 +472,7 @@ interface AvailableTeam {
 }
 interface Card {
   id: number
+  cardsId: number
   deckId: number
   displayOrder: number
   title: string
@@ -641,6 +642,7 @@ const pawns = ref<Pawn[]>([])
 
 const decisionMode = ref<'pending' | 'history'>('history')
 const selectedCardId = ref<number | null>(null)
+const isSubmitting = ref(false)
 const selectedPlayTeamId = ref<number>(props.teamId ? Number(props.teamId) : 0)
 const allManagedPawns = ref<Pawn[]>([])
 
@@ -677,7 +679,17 @@ const toggleManagedTeam = (team: AvailableTeam) => {
     fetchPendingDecisions()
     fetchAllManagedPawns()
   } else {
-    if (team.teamId === currentTeamId.value) return // cannot remove primary
+    if (team.teamId === currentTeamId.value) {
+      const remaining = managedTeamIds.value.filter((id) => id !== team.teamId)
+      if (remaining.length === 0) return // ostatnia drużyna — nie można usunąć
+      managedTeamIds.value.splice(idx, 1)
+      const nextTeamId = remaining[0]
+      currentTeamId.value = nextTeamId
+      selectedPlayTeamId.value = nextTeamId
+      router.replace({ name: 'table-decision-panel', params: { gameId: props.gameId, teamId: nextTeamId } })
+      fetchAllDataForTeam()
+      return
+    }
     managedTeamIds.value.splice(idx, 1)
     fetchDecisionHistory()
     fetchPendingDecisions()
@@ -940,20 +952,22 @@ async function playCard() {
     return
   }
 
-  const wasSuccess = !(
-    entity.enablers &&
-    Array.isArray(entity.enablers) &&
-    entity.enablers.length > 0
-  )
+  const hasEnablers = Array.isArray(entity.enablers) && entity.enablers.length > 0
+  if (hasEnablers) {
+    const enablerTitles = (entity.enablers as number[])
+      .map((id) => cards.value.find((c) => c.id === id)?.title ?? `ID ${id}`)
+      .join(', ')
+    toast.warning(t('cardRequiresEnablers', { enablers: enablerTitles }))
+  }
 
-  const minEnablerId =
-    !wasSuccess && Array.isArray(entity.enablers) && entity.enablers.length > 0
-      ? Math.min(...(entity.enablers as number[]))
-      : undefined
+  const wasSuccess = !hasEnablers
+  const minEnablerId = hasEnablers
+    ? Math.min(...(entity.enablers as number[]))
+    : undefined
 
   const endpoint = wasSuccess
-    ? apiConfig.player.playCardSuccess(entity.id)
-    : apiConfig.player.playCardFailure(entity.id)
+    ? apiConfig.player.playCardSuccess(entity.cardsId)
+    : apiConfig.player.playCardFailure(entity.cardsId)
 
   const payload = {
     gameId: Number(props.gameId),
@@ -965,6 +979,7 @@ async function playCard() {
     enablerId: minEnablerId,
   }
 
+  isSubmitting.value = true
   try {
     const response = await apiServices.post<{ message?: string; newTeamBudget: number }>(
       endpoint,
@@ -979,6 +994,7 @@ async function playCard() {
     }
 
     await fetchAvailableCardsAndItems()
+    selectedCardId.value = null
   } catch (error: any) {
     if (error.response?.data?.errorCode === 'NotEnoughBudget') {
       toast.warning(t('teamHasNotEnoughBits', { teamName: team.teamName }))
@@ -986,8 +1002,9 @@ async function playCard() {
     }
     toast.error(error.response?.data?.message || t('actionExecutionError'))
     console.error('Błąd akcji karty:', error.response?.data || error.message)
+  } finally {
+    isSubmitting.value = false
   }
-  selectedCardId.value = null
 }
 
 const approveDecision = async (logId: number) => {
