@@ -326,7 +326,7 @@ namespace backend.Services
             // Na koniec potrąć finalny, przeliczony koszt z budżetu
             team.Teams_Bud -= logEntryWithSpecs.Costs ?? 0;
 
-            if(logEntryWithSpecs.Cards?.Phase?.Phase_Name == "Wejście na rynek")
+            if(logEntryWithSpecs.Cards?.Phase?.Phase_Name == "Wejście na rynek" && logEntryWithSpecs.Status == true)
             {
                 var deckId = logEntryWithSpecs.Cards.Decks_Id;
                 var rynkowaPhase = await _context.Phases.FirstOrDefaultAsync(p => p.Decks_Id == deckId && p.Phase_Name == "Rynkowa");
