@@ -266,6 +266,8 @@ export const en = {
   cardApprovedTitle: 'Decision approved!',
   cardApprovedByGm: 'Game Master approved your decision. Card effects have been applied.',
   decisionApprovedSuccess: 'Decision approved successfully!',
+  teamGameOverTitle: 'Game Finished',
+  teamGameOverMessage: 'Your team has finished the game. Cards are no longer available.',
   cameraError: 'Cannot start camera. Check permissions.',
 
   //Auth password requirements

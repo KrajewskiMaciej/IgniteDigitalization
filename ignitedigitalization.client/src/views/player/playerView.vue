@@ -90,66 +90,80 @@
             <div v-if="mobileView === 'cards'" class="h-full">
               <RouterView />
 
-              <!-- Przełącznik trybu: QR / Lista kart -->
-              <div class="flex gap-2 mb-4">
-                <button
-                  @click="cardMode = 'qr'"
-                  class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
-                  :class="
-                    cardMode === 'qr'
-                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                      : 'bg-secondary text-surface-300 border border-primary-500/30'
-                  "
-                >
-                  {{ t('switchToScanner') }}
-                </button>
-                <button
-                  @click="cardMode = 'carousel'"
-                  class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
-                  :class="
-                    cardMode === 'carousel'
-                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                      : 'bg-secondary text-surface-300 border border-primary-500/30'
-                  "
-                >
-                  {{ t('switchToCardList') }}
-                </button>
+              <!-- KONIEC GRY: blokada kart -->
+              <div
+                v-if="isGameOver"
+                class="flex flex-col items-center justify-center py-12 gap-3 text-center"
+              >
+                <div class="w-16 h-16 rounded-full flex items-center justify-center bg-primary-500/20 border border-primary-500/30">
+                  <font-awesome-icon :icon="faFlagCheckered" class="text-2xl text-primary-400" />
+                </div>
+                <h2 class="text-xl font-bold text-surface-0">{{ t('teamGameOverTitle') }}</h2>
+                <p class="text-surface-400 text-sm max-w-xs">{{ t('teamGameOverMessage') }}</p>
               </div>
 
-              <!-- Tryb QR -->
-              <QrCardScanner
-                v-if="cardMode === 'qr'"
-                :deck-id="gameData.deckId"
-                :team-id="gameData.teamId"
-                :game-id="gameData.gameId"
-                :board-id="gameData.boardConfig?.boardId"
-                :current-budget="currentGlobalBudget"
-                :is-online-game="gameData.isOnline"
-                :is-independent-team="gameData.isIndependent"
-                @switch-to-carousel="cardMode = 'carousel'"
-              />
+              <template v-else>
+                <!-- Przełącznik trybu: QR / Lista kart -->
+                <div class="flex gap-2 mb-4">
+                  <button
+                    @click="cardMode = 'qr'"
+                    class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
+                    :class="
+                      cardMode === 'qr'
+                        ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                        : 'bg-secondary text-surface-300 border border-primary-500/30'
+                    "
+                  >
+                    {{ t('switchToScanner') }}
+                  </button>
+                  <button
+                    @click="cardMode = 'carousel'"
+                    class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
+                    :class="
+                      cardMode === 'carousel'
+                        ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                        : 'bg-secondary text-surface-300 border border-primary-500/30'
+                    "
+                  >
+                    {{ t('switchToCardList') }}
+                  </button>
+                </div>
 
-              <!-- Tryb karuzelowy -->
-              <template v-if="cardMode === 'carousel'">
-                <Suspense>
-                  <template #default>
-                    <CardCarousel
-                      ref="cardCarouselRef"
-                      v-show="gameData && gameData.deckId"
-                      :deck-id="gameData.deckId"
-                      :team-id="gameData.teamId"
-                      :game-id="gameData.gameId"
-                      :board-id="gameData.boardConfig?.boardId"
-                      :current-budget="currentGlobalBudget"
-                      :is-online-game="gameData.isOnline"
-                      :is-independent-team="gameData.isIndependent"
-                      @card-played="handleCardPlayed"
-                    />
-                  </template>
-                  <template #fallback>
-                    <div class="text-center text-surface-300">{{ t('loadingCards') }}</div>
-                  </template>
-                </Suspense>
+                <!-- Tryb QR -->
+                <QrCardScanner
+                  v-if="cardMode === 'qr'"
+                  :deck-id="gameData.deckId"
+                  :team-id="gameData.teamId"
+                  :game-id="gameData.gameId"
+                  :board-id="gameData.boardConfig?.boardId"
+                  :current-budget="currentGlobalBudget"
+                  :is-online-game="gameData.isOnline"
+                  :is-independent-team="gameData.isIndependent"
+                  @switch-to-carousel="cardMode = 'carousel'"
+                />
+
+                <!-- Tryb karuzelowy -->
+                <template v-if="cardMode === 'carousel'">
+                  <Suspense>
+                    <template #default>
+                      <CardCarousel
+                        ref="cardCarouselRef"
+                        v-show="gameData && gameData.deckId"
+                        :deck-id="gameData.deckId"
+                        :team-id="gameData.teamId"
+                        :game-id="gameData.gameId"
+                        :board-id="gameData.boardConfig?.boardId"
+                        :current-budget="currentGlobalBudget"
+                        :is-online-game="gameData.isOnline"
+                        :is-independent-team="gameData.isIndependent"
+                        @card-played="handleCardPlayed"
+                      />
+                    </template>
+                    <template #fallback>
+                      <div class="text-center text-surface-300">{{ t('loadingCards') }}</div>
+                    </template>
+                  </Suspense>
+                </template>
               </template>
             </div>
 
@@ -193,66 +207,80 @@
             <RouterView />
             <!-- <QuestionBox /> -->
 
-            <!-- Przełącznik trybu: QR / Lista kart -->
-            <div v-if="!isDesktop" class="flex gap-2 mb-4">
-              <button
-                @click="cardMode = 'qr'"
-                class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
-                :class="
-                  cardMode === 'qr'
-                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                    : 'bg-secondary text-surface-300 border border-primary-500/30'
-                "
-              >
-                {{ t('switchToScanner') }}
-              </button>
-              <button
-                @click="cardMode = 'carousel'"
-                class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
-                :class="
-                  cardMode === 'carousel'
-                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
-                    : 'bg-secondary text-surface-300 border border-primary-500/30'
-                "
-              >
-                {{ t('switchToCardList') }}
-              </button>
+            <!-- KONIEC GRY: blokada kart -->
+            <div
+              v-if="isGameOver"
+              class="flex flex-col items-center justify-center py-12 gap-3 text-center"
+            >
+              <div class="w-16 h-16 rounded-full flex items-center justify-center bg-primary-500/20 border border-primary-500/30">
+                <font-awesome-icon :icon="faFlagCheckered" class="text-2xl text-primary-400" />
+              </div>
+              <h2 class="text-xl font-bold text-surface-0">{{ t('teamGameOverTitle') }}</h2>
+              <p class="text-surface-400 text-sm max-w-xs">{{ t('teamGameOverMessage') }}</p>
             </div>
 
-            <!-- Tryb QR -->
-            <QrCardScanner
-              v-if="cardMode === 'qr' && !isDesktop"
-              :deck-id="gameData.deckId"
-              :team-id="gameData.teamId"
-              :game-id="gameData.gameId"
-              :board-id="gameData.boardConfig?.boardId"
-              :current-budget="currentGlobalBudget"
-              :is-online-game="gameData.isOnline"
-              :is-independent-team="gameData.isIndependent"
-              @switch-to-carousel="cardMode = 'carousel'"
-            />
+            <template v-else>
+              <!-- Przełącznik trybu: QR / Lista kart -->
+              <div v-if="!isDesktop" class="flex gap-2 mb-4">
+                <button
+                  @click="cardMode = 'qr'"
+                  class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
+                  :class="
+                    cardMode === 'qr'
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                      : 'bg-secondary text-surface-300 border border-primary-500/30'
+                  "
+                >
+                  {{ t('switchToScanner') }}
+                </button>
+                <button
+                  @click="cardMode = 'carousel'"
+                  class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-300"
+                  :class="
+                    cardMode === 'carousel'
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-surface-0 shadow-lg shadow-primary-500/50'
+                      : 'bg-secondary text-surface-300 border border-primary-500/30'
+                  "
+                >
+                  {{ t('switchToCardList') }}
+                </button>
+              </div>
 
-            <!-- Tryb karuzelowy -->
-            <template v-if="cardMode === 'carousel' || isDesktop">
-            <Suspense>
-              <template #default>
-                <CardCarousel
-                  ref="cardCarouselRef"
-                  v-if="gameData && gameData.deckId"
-                  :deck-id="gameData.deckId"
-                  :team-id="gameData.teamId"
-                  :game-id="gameData.gameId"
-                  :board-id="gameData.boardConfig?.boardId"
-                  :current-budget="currentGlobalBudget"
-                  :is-online-game="gameData.isOnline"
-                  :is-independent-team="gameData.isIndependent"
-                  @card-played="handleCardPlayed"
-                />
+              <!-- Tryb QR -->
+              <QrCardScanner
+                v-if="cardMode === 'qr' && !isDesktop"
+                :deck-id="gameData.deckId"
+                :team-id="gameData.teamId"
+                :game-id="gameData.gameId"
+                :board-id="gameData.boardConfig?.boardId"
+                :current-budget="currentGlobalBudget"
+                :is-online-game="gameData.isOnline"
+                :is-independent-team="gameData.isIndependent"
+                @switch-to-carousel="cardMode = 'carousel'"
+              />
+
+              <!-- Tryb karuzelowy -->
+              <template v-if="cardMode === 'carousel' || isDesktop">
+                <Suspense>
+                  <template #default>
+                    <CardCarousel
+                      ref="cardCarouselRef"
+                      v-if="gameData && gameData.deckId"
+                      :deck-id="gameData.deckId"
+                      :team-id="gameData.teamId"
+                      :game-id="gameData.gameId"
+                      :board-id="gameData.boardConfig?.boardId"
+                      :current-budget="currentGlobalBudget"
+                      :is-online-game="gameData.isOnline"
+                      :is-independent-team="gameData.isIndependent"
+                      @card-played="handleCardPlayed"
+                    />
+                  </template>
+                  <template #fallback>
+                    <div class="text-center text-surface-300">{{ t('loadingCards') }}</div>
+                  </template>
+                </Suspense>
               </template>
-              <template #fallback>
-                <div class="text-center text-surface-300">{{ t('loadingCards') }}</div>
-              </template>
-            </Suspense>
             </template>
           </div>
 
@@ -382,7 +410,7 @@ import PhaseTwo from '@/components/game/PhaseTwo.vue'
 import QrCardScanner from '@/components/playerComponents/QrCardScanner.vue'
 import type { BoardConfig, GameData, Pawn, RawPawnData, GameStatusError } from '@/interfaces/types'
 import { useBreakpoints } from '@vueuse/core'
-import { faCommentDots } from '@fortawesome/free-solid-svg-icons'
+import { faCommentDots, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
 import { onClickOutside } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
@@ -433,6 +461,7 @@ const pawns = ref<Pawn[]>([])
 const enemypawns = ref<Pawn[]>([])
 
 const isMarketPhaseOnly = computed(() => gameData.value?.currentPhaseName !== 'Rynkowa')
+const isGameOver = computed(() => gameData.value?.currentPhaseName === 'KONIEC GRY')
 
 const playerMenuRef = ref<{
   fetchGameLog: () => void

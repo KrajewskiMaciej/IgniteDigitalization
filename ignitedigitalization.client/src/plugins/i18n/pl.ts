@@ -263,6 +263,8 @@ export const pl = {
   cardApprovedTitle: 'Decyzja zatwierdzona!',
   cardApprovedByGm: 'Game Master zatwierdził Twoją decyzję. Efekty karty zostały zastosowane.',
   decisionApprovedSuccess: 'Decyzja zatwierdzona pomyślnie!',
+  teamGameOverTitle: 'Rozgrywka zakończona',
+  teamGameOverMessage: 'Twoja drużyna zakończyła rozgrywkę. Karty nie są już dostępne.',
   cameraError: 'Nie można uruchomić kamery. Sprawdź uprawnienia.',
 
   //Auth password requirements

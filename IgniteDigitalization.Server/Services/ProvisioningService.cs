@@ -171,6 +171,39 @@ namespace backend.Services
         /// </summary>
         public async Task HealExistingCardPhasesAsync()
         {
+            // Krok 1: Upewnij się, że każda talia ma fazę "KONIEC GRY"
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                var deckIdsWithPhases = await context.Phases
+                    .Select(p => p.Decks_Id)
+                    .Distinct()
+                    .ToListAsync();
+
+                int added = 0;
+                foreach (var deckId in deckIdsWithPhases)
+                {
+                    var hasEndPhase = await context.Phases
+                        .AnyAsync(p => p.Decks_Id == deckId && p.Phase_Name == "KONIEC GRY");
+
+                    if (!hasEndPhase)
+                    {
+                        context.Phases.Add(new Phase { Decks_Id = deckId, Phase_Name = "KONIEC GRY" });
+                        added++;
+                    }
+                }
+
+                if (added > 0)
+                {
+                    await context.SaveChangesAsync();
+                    _logger.LogInformation(
+                        "[HealExistingCardPhasesAsync] Dodano fazę 'KONIEC GRY' dla {Count} talii.",
+                        added);
+                }
+            }
+
+            // Krok 2: Uzupełnij brakujące Phases_Id kart
             var scenarios = new[]
             {
                 (FileName: "IGNITE_S1_Digitalizacja.xlsx",  DeckName: "IGNITE S1 - Digitalizacja"),
@@ -300,8 +333,8 @@ namespace backend.Services
 
         private async Task<Dictionary<string, int>> CreatePhaseMapAsync(AppDbContext context, int deckId)
         {
-            _logger.LogInformation("[ProvisioningService_CreatePhaseMapAsync] Tworzenie 3 faz dla talii {DeckId}.", deckId);
-            var phaseNames = new[] { "Przygotowawcza", "Wejście na rynek", "Rynkowa" };
+            _logger.LogInformation("[ProvisioningService_CreatePhaseMapAsync] Tworzenie 4 faz dla talii {DeckId}.", deckId);
+            var phaseNames = new[] { "Przygotowawcza", "Wejście na rynek", "Rynkowa", "KONIEC GRY" };
             var phases = phaseNames.Select(name => new Phase { Decks_Id = deckId, Phase_Name = name }).ToList();
             await context.Phases.AddRangeAsync(phases);
             await context.SaveChangesAsync();
@@ -309,7 +342,7 @@ namespace backend.Services
             var map = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             for (int i = 0; i < phases.Count; i++)
             {
-                map[(i + 1).ToString()] = phases[i].Phases_Id;             // "1", "2", "3"
+                map[(i + 1).ToString()] = phases[i].Phases_Id;             // "1", "2", "3", "4"
                 map[phases[i].Phase_Name.ToLowerInvariant()] = phases[i].Phases_Id; // "przygotowawcza" etc.
             }
             _logger.LogInformation("[ProvisioningService_CreatePhaseMapAsync] Utworzono mapę faz ({Count} kluczy) dla talii {DeckId}.", map.Count, deckId);
