@@ -191,12 +191,12 @@ namespace backend.Controllers
         }
 
         [HttpGet("feedbacks")]
-        public async Task<IActionResult> GetCardFeedbacks([FromQuery] int cardId)
+        public async Task<IActionResult> GetCardFeedbacks([FromQuery] int cardId, [FromQuery] int deckId)
         {
             var feedbacks = await _context.Feedbacks
                 .AsNoTracking()
                 .Include(f => f.Cards)
-                .Where(f => f.Cards.Card_Id == cardId)
+                .Where(f => f.Cards.Card_Id == cardId && f.Cards.Decks_Id == deckId)
                 .ToListAsync();
 
             var positive = feedbacks.FirstOrDefault(f => f.Status == true);
@@ -221,15 +221,15 @@ namespace backend.Controllers
         }
 
         [HttpPut("feedbacks/edit")]
-        public async Task<IActionResult> UpdateCardFeedbacks([FromQuery] int cardId, [FromBody] UpdateCardFeedbacksDto dto)
+        public async Task<IActionResult> UpdateCardFeedbacks([FromQuery] int cardId, [FromQuery] int deckId, [FromBody] UpdateCardFeedbacksDto dto)
         {
             var card = await _context.Cards
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Card_Id == cardId);
+                .FirstOrDefaultAsync(c => c.Card_Id == cardId && c.Decks_Id == deckId);
 
             if (card == null)
             {
-                return NotFound($"Karta o ID {cardId} nie została znaleziona.");
+                return NotFound($"Karta o ID {cardId} w talii {deckId} nie została znaleziona.");
             }
 
             var positiveFeedback = await _context.Feedbacks.FirstOrDefaultAsync(f => f.Cards_Id == card.Cards_Id && f.Status == true);

@@ -330,11 +330,11 @@ const isSavingFeedback = ref(false)
 
 // --- FUNKCJE ---
 const fetchFeedbacks = async () => {
-  if (!currentCard.value?.id) return
+  if (!currentCard.value?.id || !selectedDeckId.value) return
 
   try {
     const response = await apiService.get<IFeedbacksResponse>(
-      apiConfig.admin.deck.getFeedbacks(currentCard.value.id),
+      apiConfig.admin.deck.getFeedbacks(currentCard.value.id, selectedDeckId.value),
     )
 
     const data = response.data
@@ -395,14 +395,14 @@ async function saveCard(): Promise<void> {
 }
 
 async function saveFeedback(): Promise<void> {
-  if (!selectedFeedback.value) return
+  if (!selectedFeedback.value || !selectedCardId.value || !selectedDeckId.value) return
   isSavingFeedback.value = true
   try {
-    const negativeDescription = feedbacksData.value[0].feedbacks_Long_Description
-    const positiveDescription = feedbacksData.value[1].feedbacks_Long_Description
-    apiServices.put(apiConfig.admin.deck.updateFeedbacks(selectedCardId.value!), {
-      positiveDescription: positiveDescription,
-      negativeDescription: negativeDescription,
+    const negativeDescription = feedbacksData.value.find(f => f.status === 'negative')?.feedbacks_Long_Description ?? ''
+    const positiveDescription = feedbacksData.value.find(f => f.status === 'positive')?.feedbacks_Long_Description ?? ''
+    await apiServices.put(apiConfig.admin.deck.updateFeedbacks(selectedCardId.value, selectedDeckId.value), {
+      positiveDescription,
+      negativeDescription,
     })
   } catch (error) {
     toast.error(t('errorSavingFeedback') + error)
