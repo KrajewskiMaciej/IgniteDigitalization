@@ -1,10 +1,10 @@
 <template>
   <nav
-    class="w-full bg-secondary py-3 px-6 flex flex-row justify-between items-center border-b border-surface-700"
+    class="w-full bg-secondary py-2 px-4  flex flex-row justify-between items-center border-b border-surface-700"
   >
     <div>
       <RouterLink to="/">
-        <img :src="logo" class="h-12" alt="Game Logo" />
+        <img :src="logo" class="h-10" alt="IGNITE" />
       </RouterLink>
     </div>
     <div class="relative">
@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import logo from '@/assets/logos/Zasob_14x.png'
+import logo from '@/assets/logos/ignite_logo.svg'
 // BŁĄD TS2307: Jeśli TS nie widzi modułu, upewnij się, że masz go zainstalowanego:
 // npm install @fortawesome/free-solid-svg-icons
 import { faCircleUser, faRightFromBracket, faGear } from '@fortawesome/free-solid-svg-icons'

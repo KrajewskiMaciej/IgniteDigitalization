@@ -6,7 +6,7 @@
     <!-- Logo -->
     <div>
       <RouterLink to="/">
-        <img :src="logo" class="h-12" alt="ITM logo" />
+        <img :src="logo" class="h-10" alt="IGNITE" />
       </RouterLink>
     </div>
 
@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import logo from '@/assets/logos/Zasob_14x.png'
+import logo from '@/assets/logos/ignite_logo.svg'
 
 const props = defineProps({
   teamName: {

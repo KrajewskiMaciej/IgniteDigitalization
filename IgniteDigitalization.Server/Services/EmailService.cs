@@ -76,7 +76,7 @@ namespace backend.Services
                 mailMessage.To.Add(to);
 
                 var alternateView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
-                var logoPath = Path.Combine(AppContext.BaseDirectory, "Templates", "Zasob_14x.png");
+                var logoPath = Path.Combine(AppContext.BaseDirectory, "Templates", "ignite_logo.png");
 
                 if (File.Exists(logoPath))
                 {

@@ -3,13 +3,13 @@
     class="w-full bg-secondary py-2 px-4 flex flex-row md:justify-between items-center shadow-[0_2px_4px_theme(colors.primary.400/0.5)]"
   >
     <div class="flex items-center w-full" :class="isMdOrLarger ? '' : 'justify-center'">
-      <img @click="onClickIgniteDigitalizationLogo" :src="logo" class="h-16" alt="ITM logo" />
+      <img @click="onClickIgniteDigitalizationLogo" :src="logo" class="h-10" alt="IGNITE" />
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-import logo from '@/assets/logos/Zasob_14x.png'
+import logo from '@/assets/logos/ignite_logo.svg'
 import { useBreakpoints } from '@vueuse/core'
 import { ref } from 'vue'
 
