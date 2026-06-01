@@ -59,6 +59,13 @@ namespace backend.Services
                 .Select(p => p.Phases_Id)
                 .ToListAsync();
 
+            // Faza "KONIEC GRY" – widoczna dopiero po przejściu na Rynkową (tak jak karty Rynkowej)
+            var koniecGryPhaseIds = await _context.Phases
+                .AsNoTracking()
+                .Where(p => p.Decks_Id == deckId && p.Phase_Name == "KONIEC GRY")
+                .Select(p => p.Phases_Id)
+                .ToListAsync();
+
             var teamCurrentPhaseId = await _context.Teams
                 .AsNoTracking()
                 .Where(t => t.Teams_Id == teamId)
@@ -93,13 +100,15 @@ namespace backend.Services
                 .ToDictionaryAsync(x => x.CardId, x => x.RequiredPublicCardIds);
 
             // Krok 4: Pobierz karty Decyzji
-            // Etap 1 (Przygotowawcza): karty bez fazy + Przygotowawcza + Wejście na rynek (wszystko poza Rynkową)
-            // Etap 2 (Rynkowa):        wszystkie karty (Etap 1 + Etap 2)
+            // Etap 1 (Przygotowawcza): karty bez fazy + Przygotowawcza + Wejście na rynek (wszystko poza Rynkową i KONIEC GRY)
+            // Etap 2 (Rynkowa):        wszystkie karty (Etap 1 + Etap 2 + KONIEC GRY)
             var decisionCards = await _context.Decisions
                 .AsNoTracking()
                 .Include(d => d.Card)
                 .Where(d => d.Card.Decks_Id == deckId && !blockedCardInternalIds.Contains(d.Cards_Id))
-                .Where(d => isInRynkowaPhase || !d.Card.Phases_Id.HasValue || !rynkowaPhaseIds.Contains(d.Card.Phases_Id.Value))
+                .Where(d => isInRynkowaPhase
+                    || !d.Card.Phases_Id.HasValue
+                    || (!rynkowaPhaseIds.Contains(d.Card.Phases_Id.Value) && !koniecGryPhaseIds.Contains(d.Card.Phases_Id.Value)))
                 .OrderBy(d => d.Card.Card_Id)
                 .Select(d => new UnifiedCardDto
                 {
