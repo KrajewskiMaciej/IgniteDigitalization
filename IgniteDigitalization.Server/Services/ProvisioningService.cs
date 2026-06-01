@@ -400,9 +400,10 @@ namespace backend.Services
 
         private async Task ImportEconomySettingsFromWorkbookAsync(AppDbContext context, XLWorkbook workbook, int deckId)
         {
-            if (!workbook.TryGetWorksheet("EconomySettings", out var sheet))
+            if (!workbook.TryGetWorksheet("EconomySettings", out var sheet) &&
+                !workbook.TryGetWorksheet("EconomyRules", out sheet))
             {
-                _logger.LogInformation("[ProvisioningService] Brak arkusza 'EconomySettings' w pliku. Tworzę domyślne ustawienia ekonomii dla Szkolenia {DeckId}.", deckId);
+                _logger.LogInformation("[ProvisioningService] Brak arkusza 'EconomySettings' ani 'EconomyRules' w pliku. Tworzę domyślne ustawienia ekonomii dla Szkolenia {DeckId}.", deckId);
                 // Utwórz domyślne jeśli nie istnieją
                 var existingDefault = await context.DeckEconomySettings.FirstOrDefaultAsync(es => es.Decks_Id == deckId);
                 if (existingDefault == null)
