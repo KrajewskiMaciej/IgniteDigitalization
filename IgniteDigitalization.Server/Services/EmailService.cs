@@ -76,14 +76,10 @@ namespace backend.Services
                 mailMessage.To.Add(to);
 
                 var alternateView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
-
-                var svgLogoPath = Path.Combine(AppContext.BaseDirectory, "Templates", "ignite_logo.svg");
                 var pngLogoPath = Path.Combine(AppContext.BaseDirectory, "Templates", "ignite_logo.png");
 
-                string? resolvedLogoPath = File.Exists(svgLogoPath) ? svgLogoPath
-                                         : File.Exists(pngLogoPath) ? pngLogoPath
-                                         : null;
-                string resolvedMimeType  = resolvedLogoPath?.EndsWith(".svg") == true ? "image/svg+xml" : "image/png";
+                string? resolvedLogoPath = File.Exists(pngLogoPath) ? pngLogoPath : null;
+                string resolvedMimeType  = resolvedLogoPath?.EndsWith(".png") == true ? "image/png" : null;
 
                 if (resolvedLogoPath != null)
                 {
