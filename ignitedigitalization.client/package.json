@@ -1,6 +1,6 @@
 {
   "name": "ignitedigitalization.client",
-  "version": "latest",
+  "version": "1.0",
   "private": true,
   "type": "module",
   "engines": {
