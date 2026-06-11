@@ -23,11 +23,12 @@ definitions:
           - docker
         name: 'Build and push docker image'
         script:
-          - export DOCKER_BUILDKIT=1
-          - export MODULE_NAME="ignitedigitalization"
           - git clone git@bitbucket.org:itm_ol_workspace/scriptsplan.git ./scripts
           - cp ./scripts/BuildDockerWS.sh ./
           - chmod +x ./BuildDockerWS.sh
+          - MAJOR_MINOR=$(echo "${VERSION}" | tr '[:upper:]' '[:lower:]' | cut -d '.' -f1,2)
+          - FULL_VERSION="${MAJOR_MINOR}.$(date +"%Y.%U").${BITBUCKET_BUILD_NUMBER}"
+          - echo "VITE_APP_VERSION=${FULL_VERSION}" >> ignitedigitalization.client/.env.production
           - ./BuildDockerWS.sh ${MODULE_NAME} ${VERSION}
         services:
           - docker
