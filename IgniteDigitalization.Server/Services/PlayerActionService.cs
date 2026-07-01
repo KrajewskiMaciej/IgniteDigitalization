@@ -341,6 +341,15 @@ namespace backend.Services
                 }
             }
 
+            // Zagranie karty końcowej ("KONIEC GRY") kończy rozgrywkę drużyny – blokuje kolejne karty.
+            if(logEntryWithSpecs.Cards?.Phase?.Phase_Name == "KONIEC GRY" && logEntryWithSpecs.Status == true)
+            {
+                team.Current_Phase_Id = logEntryWithSpecs.Cards.Phases_Id;
+                _logger.LogInformation("[ExecuteCardEffects] Drużyna {TeamId} zagrała kartę końcową. Rozgrywka drużyny zakończona.", team.Teams_Id);
+                await NotifyTeam(logEntryWithSpecs.Games_Id, logEntryWithSpecs.Teams_Id, "PhaseUpdated");
+                await NotifyAdmin(logEntryWithSpecs.Games_Id, "PhaseUpdated");
+            }
+
             await _context.SaveChangesAsync();
 
             await _playerPosService.SetGameProcessPosAsync(logEntryWithSpecs.Games_Id, logEntryWithSpecs.Teams_Id);

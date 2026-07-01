@@ -141,7 +141,7 @@ export const en = {
   teamColor: 'Team color',
   canTeamMakeDecisions: 'Can the team make independent decisions?',
   gmControl: 'GM Control',
-  independentDecisions: 'Independent decisions',
+  independentDecisions: ' Independent decisions',
   gmControlDescription: 'The team can suggest decisions but the Game Master must approve them.',
   independentDecisionsDescription:
     'The team makes decisions directly from the device and does not require Game Master approval.',
@@ -344,6 +344,7 @@ export const en = {
   manageCardsInTheDeck: 'Manage decision cards in the deck',
   loadDeckFromExcel: 'Load deck from Excel file',
   downloadCardTemplate: 'Download template',
+  deck: 'Training',
   deckName: 'Deck name',
   deckNamePlaceholder: 'Deck name...',
   changeName: 'Change name',
@@ -442,6 +443,10 @@ export const en = {
   newBudget: 'New budget:',
   enterNewBudgetPlaceholder: 'Enter new budget...',
   saveBudget: 'Save budget',
+  teamSettings: 'Team settings',
+  saveTeamSettings: 'Save settings',
+  teamSettingsSaved: 'Team settings saved.',
+  errorSavingTeamSettings: 'Error saving settings for team {teamName}: ',
   unlockCardHeader: 'Unlock card',
   selectCardToUnlockLabel: 'Select card to unlock:',
   cardDescriptionLabel: 'Card description:',
@@ -678,4 +683,5 @@ export const en = {
   bugReportEmailInvalid: 'Please enter a valid email address.',
   bugReportDescriptionRequired: 'Bug description is required.',
   bugReportDescriptionTooShort: 'Description must be at least 10 characters long.',
+  version: 'Version',
 }

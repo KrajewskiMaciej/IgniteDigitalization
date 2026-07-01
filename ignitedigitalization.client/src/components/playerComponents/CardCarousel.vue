@@ -117,7 +117,7 @@
         class="w-full h-full bg-gradient-to-br from-transparent to-transparent rounded-b-2xl shadow-2xl text-surface-0 flex"
         :style="cardStyle"
       >
-        <div class="flex h-full">
+        <div class="flex h-full w-full">
           <!-- Lewy przycisk -->
           <button
             @click.stop="prevCard"
@@ -131,9 +131,9 @@
           <!-- Środek karty -->
           <div
             v-if="selectedCard"
-            class="flex-1 flex flex-col items-center justify-between px-2 text-center py-2"
+            class="flex-1 flex flex-col items-center justify-center gap-2 px-2 text-center py-2"
           >
-            <h2 class="text-3xl font-bold mb-2">
+            <h2 class="text-3xl font-bold">
               {{ selectedCard.title }}
             </h2>
 
@@ -141,7 +141,7 @@
               {{ selectedCard.description }}
             </p>
 
-            <p class="text-xs mt-2">ID: {{ selectedCard.id }}</p>
+            <p class="text-xs mt-auto pt-2">ID: {{ selectedCard.id }}</p>
           </div>
 
           <!-- Prawy przycisk -->

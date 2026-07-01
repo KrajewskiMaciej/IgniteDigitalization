@@ -43,6 +43,70 @@
         </div>
       </div>
 
+      <div
+        v-if="selectedTeamId && selectedTeam"
+        class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl"
+      >
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
+          <div class="bg-primary-500/20 p-3 rounded-lg">
+            <font-awesome-icon :icon="faUsers" class="h-6 text-primary-400" />
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-surface-500">{{ t('teamSettings') }}</h2>
+        </div>
+
+        <form @submit.prevent="saveTeamSettings" class="space-y-5">
+          <div>
+            <label for="team-name-input" class="block mb-2 text-sm font-semibold text-surface-300">
+              {{ t('teamName') }}
+            </label>
+            <InputText id="team-name-input" v-model="teamForm.name" class="w-full" />
+          </div>
+
+          <div class="flex flex-col items-center">
+            <label for="team-color-input" class="block mb-2 text-sm font-semibold text-surface-300">
+              {{ t('teamColor') }}
+            </label>
+            <input
+              id="team-color-input"
+              type="color"
+              v-model="teamForm.colour"
+              class="w-20 h-20 rounded-lg cursor-pointer bg-transparent"
+            />
+          </div>
+
+          <div>
+            <label class="block mb-2 text-sm font-semibold text-surface-300">
+              {{ t('canTeamMakeDecisions') }}
+            </label>
+            <div class="flex items-center gap-2">
+              <label class="relative inline-block w-11 h-6">
+                <input type="checkbox" v-model="teamForm.isAbleToMakeDecisions" class="sr-only peer" />
+                <span
+                  class="absolute cursor-pointer inset-0 bg-lgray-accent rounded-full transition-all duration-300 peer-checked:bg-primary-400 peer-focus:ring-2 peer-focus:ring-primary-400"
+                ></span>
+                <span
+                  class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-5"
+                ></span>
+              </label>
+              <span class="text-sm text-surface-400">{{
+                teamForm.isAbleToMakeDecisions ? t('independentDecisions') : t('gmControl')
+              }}</span>
+            </div>
+          </div>
+
+          <div class="flex justify-center">
+            <Button
+              type="submit"
+              :disabled="isSavingTeam"
+              :loading="isSavingTeam"
+              :label="isSavingTeam ? t('saving') : t('saveTeamSettings')"
+              size="large"
+              class="w-full"
+            />
+          </div>
+        </form>
+      </div>
+
       <div v-if="selectedTeamId" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="border border-surface-700 rounded-xl p-6 bg-secondary shadow-2xl">
           <div class="flex items-center gap-3 mb-5 pb-4 border-b border-surface-700">
@@ -191,6 +255,7 @@ import { useToast } from 'vue-toastification'
 import { faUsers, faCoins, faLock } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'primevue/dropdown'
 import InputNumber from 'primevue/inputnumber'
+import InputText from 'primevue/inputtext'
 import Button from '@/components/base/AppButton.vue'
 import ProgressSpinner from 'primevue/progressspinner'
 import { useI18n } from 'vue-i18n'
@@ -204,6 +269,8 @@ interface Team {
   teamId: number
   teamName: string
   teamBud: number
+  teamColor: string
+  isIndependent: boolean
   deckId: number
 }
 
@@ -235,6 +302,8 @@ const loading = reactive({
 
 const isSavingBudget = ref(false)
 const isUnlockingCard = ref(false)
+const isSavingTeam = ref(false)
+const teamForm = reactive({ name: '', colour: '#000000', isAbleToMakeDecisions: false })
 
 // --- COMPUTED ---
 const selectedTeam = computed<Team | undefined>(() => {
@@ -316,6 +385,31 @@ const saveBudget = async () => {
   }
 }
 
+const saveTeamSettings = async () => {
+  if (!selectedTeam.value) {
+    toast.warning(t('noTeamSelected'))
+    return
+  }
+
+  const { teamId, teamName } = selectedTeam.value
+
+  isSavingTeam.value = true
+  try {
+    await apiService.put(apiConfig.player.updateTeamProperties(gameId, teamId), {
+      name: teamForm.name,
+      colour: teamForm.colour,
+      isAbleToMakeDecisions: teamForm.isAbleToMakeDecisions,
+    })
+    await fetchTeams()
+    toast.success(t('teamSettingsSaved'))
+  } catch (error: any) {
+    toast.error(t('errorSavingTeamSettings', { teamName }) + error)
+    console.error('Błąd podczas aktualizacji drużyny:', error)
+  } finally {
+    isSavingTeam.value = false
+  }
+}
+
 const handleUnlockCard = async () => {
   if (!selectedTeamId.value || !selectedCardId.value) {
     toast.warning(t('selectTeamAndCard'))
@@ -348,6 +442,9 @@ const handleUnlockCard = async () => {
 // --- WATCHERY ---
 watch(selectedTeam, (newTeam) => {
   budgetInputValue.value = newTeam ? newTeam.teamBud : 0
+  teamForm.name = newTeam?.teamName ?? ''
+  teamForm.colour = newTeam?.teamColor ?? '#000000'
+  teamForm.isAbleToMakeDecisions = newTeam?.isIndependent ?? false
 })
 
 watch(selectedTeamId, (newTeamId) => {

@@ -18,6 +18,9 @@
             <div class="rounded-full w-2 h-2" :class="getStatus(game.status).color"></div>
             <span class="text-xs text-surface-400">{{ getStatus(game.status).text }}</span>
           </div>
+          <p v-if="game.deckName" class="text-xs text-surface-400 mt-1 truncate">
+            {{ t('deck') }}: <span class="font-medium">{{ game.deckName }}</span>
+          </p>
         </div>
       </div>
     </div>

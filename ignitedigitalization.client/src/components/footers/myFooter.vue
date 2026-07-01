@@ -1,19 +1,13 @@
 <template>
   <footer>
-    <div class="flex justify-center items-center text-xs md:text-sm text-slate-400 w-full bg-primary py-2 shadow-[0_-2px_4px_theme(colors.primary.400/0.5)]">
-      <div>
-        {{ t('version') }}: {{ version }}
-      </div>
 
-    </div>
     <div
-      class="flex justify-center items-center text-xs md:text-sm text-white w-full bg-secondary py-2 shadow-[0_-2px_4px_theme(colors.primary.400/0.5)]"
+      class="relative flex items-center justify-center text-xs md:text-sm text-white w-full bg-secondary py-1 px-4 shadow-[0_-2px_4px_theme(colors.primary.400/0.5)]"
     >
-      <div>
-        <RouterLink to="/">
-          <img :src="logo" class="h-8" alt="Game Logo" />
-        </RouterLink>
-      </div>
+      <span class="absolute left-4">{{ t('version') }}: {{ version }}</span>
+      <RouterLink to="/">
+        <img :src="logo" class="h-8" alt="Game Logo" />
+      </RouterLink>
     </div>
   </footer>
 </template>

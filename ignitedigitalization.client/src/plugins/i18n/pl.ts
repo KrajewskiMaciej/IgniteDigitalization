@@ -132,7 +132,7 @@ export const pl = {
   teanColor: 'Kolor drużyny',
   canTeamMakeDecisions: 'Czy drużyna może podejmować samodzielne decyzje?',
   gmControl: "Kontrola GM'a",
-  independentDecisions: 'Samodzielne decyzje',
+  independentDecisions: ' Samodzielne decyzje',
   gmControlDescription:
     'Drużyna ma możliwość zasugerowania decyzji ale Game Master musi ją zaakceptować',
   independentDecisionsDescription:
@@ -223,7 +223,7 @@ export const pl = {
   dependentTeamTitle: 'Drużyna zależna',
   dependentTeamInfo:
     'Decyzje tej drużyny muszą być zatwierdzone przez Game Mastera przed ich wykonaniem.',
-  cannotMake: 'nie może podejmować',
+  cannotMake: ' nie może podejmować',
 
   //Tables
   tableWithoutName: 'Stół bez nazwy',
@@ -344,6 +344,7 @@ export const pl = {
   manageCardsInTheDeck: 'Zarządzaj kartami w szkoleniu',
   loadDeckFromExcel: 'Wczytaj szkolenie z pliku Excel',
   downloadCardTemplate: 'Pobierz szablon',
+  deck: 'Szkolenie',
   deckName: 'Nazwa szkolenia',
   deckNamePlaceholder: 'Nazwa szkolenia...',
   changeName: 'Zmień nazwę',
@@ -447,6 +448,10 @@ export const pl = {
   newBudget: 'Nowy budżet:',
   enterNewBudgetPlaceholder: 'Wprowadź nowy budżet...',
   saveBudget: 'Zapisz budżet',
+  teamSettings: 'Ustawienia drużyny',
+  saveTeamSettings: 'Zapisz ustawienia',
+  teamSettingsSaved: 'Zapisano ustawienia drużyny.',
+  errorSavingTeamSettings: 'Błąd podczas zapisywania ustawień drużyny {teamName}: ',
   unlockCardHeader: 'Odblokuj kartę',
   selectCardToUnlockLabel: 'Wybierz kartę do odblokowania:',
   cardDescriptionLabel: 'Opis karty:',
@@ -679,4 +684,5 @@ export const pl = {
   bugReportEmailInvalid: 'Podaj prawidłowy adres e-mail.',
   bugReportDescriptionRequired: 'Opis błędu jest wymagany.',
   bugReportDescriptionTooShort: 'Opis musi zawierać co najmniej 10 znaków.',
+  version: 'Wersja',
 }

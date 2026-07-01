@@ -54,6 +54,7 @@ interface Game {
   id: number
   name: string
   status: string
+  deckName?: string
   // Możesz dodać inne właściwości, które zwraca Twoje API
 }
 

@@ -79,6 +79,8 @@ const endpoints = {
     getTeamsManagement: (gameId: number): string => `/admin/game/${gameId}/teams-management`,
     updateTeamBudget: (gameId: number, teamId: number): string =>
       `player/team/${gameId}/${teamId}/budget`,
+    updateTeamProperties: (gameId: number, teamId: number): string =>
+      `player/team/${gameId}/${teamId}`,
     unlockCard: (gameId: number) => `/player/game/${gameId}/unlock-card`,
     getPendingLogs: (gameId: number) => `/player/game/${gameId}/pending-logs`,
     getPendingLogsForTeam: (gameId: number, teamId: number) =>

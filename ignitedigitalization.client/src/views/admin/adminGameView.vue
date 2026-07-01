@@ -6,6 +6,9 @@
       >
         {{ t('tables') }}
       </h1>
+      <p v-if="deckName" class="text-center text-surface-400 mb-2">
+        {{ t('deck') }}: <span class="font-medium text-surface-500">{{ deckName }}</span>
+      </p>
       <tableButtons />
       <hr class="my-4 border-lgray-accent" />
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-6">
@@ -64,6 +67,17 @@ const origin = typeof window !== 'undefined' ? window.location.origin : ''
 // --- ZMIENNE REAKTYWNE ---
 // POPRAWKA BŁĘDU `never`: Jawnie typujemy tablicę `tables` za pomocą interfejsu `Table`
 const tables = ref<Table[]>([])
+const deckName = ref<string>('')
+
+const fetchGameInfo = async () => {
+  if (isNaN(gameId)) return
+  try {
+    const response = await apiServices.get<{ deckName: string }>(apiConfig.games.getById(gameId))
+    deckName.value = response.data.deckName
+  } catch (error) {
+    console.error('Błąd przy pobieraniu danych gry:', error)
+  }
+}
 
 // --- FUNKCJE ---
 const getTeams = async () => {
@@ -86,5 +100,6 @@ const getTeams = async () => {
 // --- CYKL ŻYCIA KOMPONENTU ---
 onMounted(() => {
   getTeams()
+  fetchGameInfo()
 })
 </script>

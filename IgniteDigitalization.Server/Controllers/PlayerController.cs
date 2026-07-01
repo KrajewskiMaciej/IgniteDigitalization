@@ -106,6 +106,21 @@ namespace backend.Controllers
         }
 
         [Authorize]
+        [HttpPut("team/{gameId}/{teamId}")]
+        public async Task<IActionResult> UpdateTeamProperties(int teamId, int gameId, [FromBody] UpdateTeamPropertiesDto dto)
+        {
+            var team = await _context.Teams.FindAsync(teamId);
+            if (team == null) return NotFound();
+
+            team.Teams_Name = dto.Name;
+            team.Teams_Color = dto.Colour;
+            team.Is_Independent = dto.IsAbleToMakeDecisions;
+            await _context.SaveChangesAsync();
+            await _hubContext.Clients.Group($"game-{gameId}-team-{teamId}").SendAsync("PhaseUpdated");
+            return Ok(new { message = "Dane drużyny zaktualizowane." });
+        }
+
+        [Authorize]
         [HttpPost("game/{gameId}/unlock-card")]
         public async Task<IActionResult> UnlockCard(int gameId, [FromBody] UnlockCardDto dto)
         {

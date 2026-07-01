@@ -662,7 +662,11 @@ const onPhaseUpdate = async () => {
     await fetchGameDataByToken(props.teamToken, true)
     currentBoard.value = 'market'
     mobileView.value = 'market'
-    showPhaseTwoModal.value = true
+    if (isGameOver.value) {
+      toast.info(t('teamGameOverMessage'), { timeout: 8000 })
+    } else {
+      showPhaseTwoModal.value = true
+    }
   }
 }
 let isSignalRInitialized = false

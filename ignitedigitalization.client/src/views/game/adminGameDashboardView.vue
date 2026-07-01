@@ -1,13 +1,13 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-secondary">
+  <div class="flex flex-col h-screen bg-secondary">
     <AdminNavbar />
 
-    <div class="flex flex-1 mt-2">
+    <div class="flex flex-1 mt-2 overflow-hidden">
       <mySidebar class="flex-shrink-0" />
 
       <!--Content-->
       <div
-        class="flex-1 ml-4 bg-secondary border-t border-l border-b border-surface-700 rounded-md flex flex-col"
+        class="flex-1 ml-4 bg-secondary border-t border-l border-b border-surface-700 rounded-md flex flex-col overflow-auto"
       >
         <RouterView />
       </div>

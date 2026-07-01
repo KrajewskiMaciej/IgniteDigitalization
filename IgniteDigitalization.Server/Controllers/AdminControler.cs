@@ -118,6 +118,7 @@ namespace backend.Controllers
                     TeamBud = t.Teams_Bud,
                     TeamToken = t.Teams_Token,
                     TeamColor = t.Teams_Color,
+                    IsIndependent = t.Is_Independent,
                     DeckId = t.Games.Decks_Id,
                     BoardId = t.Games.Teams_Boards_Id
                 }).ToListAsync();

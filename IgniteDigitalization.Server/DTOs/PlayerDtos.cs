@@ -68,6 +68,7 @@ namespace backend.Dtos
         public string TeamName { get; set; } = string.Empty;
         public double TeamBud { get; set; }
         public string TeamColor { get; set; } = string.Empty;
+        public bool IsIndependent { get; set; }
         public int BoardId { get; set; }
         public int? DeckId { get; set; }
         public string? TeamToken { get; set; } = string.Empty;
@@ -76,6 +77,13 @@ namespace backend.Dtos
     public class UpdateBudgetDto
     {
         public double NewBudget { get; set; }
+    }
+
+    public class UpdateTeamPropertiesDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Colour { get; set; } = string.Empty;
+        public bool IsAbleToMakeDecisions { get; set; }
     }
 
     public class CardInfoDto

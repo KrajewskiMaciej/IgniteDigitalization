@@ -60,7 +60,7 @@ namespace backend.Controllers
 
             var activeGames = await _context.Games
                 .Where(g => g.Users_Id == userId.Value && (g.Game_Status == GameStatus.During || g.Game_Status == GameStatus.Paused))
-                .Select(g => new GameListItemDto { Id = g.Games_Id, Name = g.Games_Desc, Status = g.Game_Status.ToString() ?? "" })
+                .Select(g => new GameListItemDto { Id = g.Games_Id, Name = g.Games_Desc, Status = g.Game_Status.ToString() ?? "", DeckName = g.Decks.Deck_Name })
                 .ToListAsync();
 
             return Ok(activeGames);
@@ -73,7 +73,7 @@ namespace backend.Controllers
             var userId = CurrentUserId;
             var game = await _context.Games
                 .Where(g => g.Games_Id == id && g.Users_Id == userId)
-                .Select(g => new { Id = g.Games_Id, Name = g.Games_Desc, Status = g.Game_Status.ToString(), DeckId = g.Decks_Id })
+                .Select(g => new { Id = g.Games_Id, Name = g.Games_Desc, Status = g.Game_Status.ToString(), DeckId = g.Decks_Id, DeckName = g.Decks.Deck_Name })
                 .FirstOrDefaultAsync();
 
             if (game == null) return NotFound();
