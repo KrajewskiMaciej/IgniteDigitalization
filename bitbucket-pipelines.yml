@@ -10,11 +10,14 @@ definitions:
           - linux.shell
         name: 'Get build version'
         script:
-          # Zaktualizowana ścieżka do package.json dla frontendu IgniteDigitalization
           - version=$(jq -r '.version' ./ignitedigitalization.client/package.json)
-          - echo "VERSION=$version" >> $BITBUCKET_PIPELINES_VARIABLES_PATH
+          - MAJOR_MINOR=$(echo "${version}" | tr '[:upper:]' '[:lower:]' | cut -d '.' -f1,2)
+          - FULL_VERSION="${MAJOR_MINOR}.$(date +"%Y.%U").${BITBUCKET_BUILD_NUMBER}"
+          - echo "VERSION=${version}" >> $BITBUCKET_PIPELINES_VARIABLES_PATH
+          - echo "FULL_VERSION=${FULL_VERSION}" >> $BITBUCKET_PIPELINES_VARIABLES_PATH
         output-variables:
           - VERSION
+          - FULL_VERSION
           
     - step: &build-docker
         runs-on:
@@ -26,8 +29,6 @@ definitions:
           - git clone git@bitbucket.org:itm_ol_workspace/scriptsplan.git ./scripts
           - cp ./scripts/BuildDockerWS.sh ./
           - chmod +x ./BuildDockerWS.sh
-          - MAJOR_MINOR=$(echo "${VERSION}" | tr '[:upper:]' '[:lower:]' | cut -d '.' -f1,2)
-          - FULL_VERSION="${MAJOR_MINOR}.$(date +"%Y.%U").${BITBUCKET_BUILD_NUMBER}"
           - echo "VITE_APP_VERSION=${FULL_VERSION}" >> ignitedigitalization.client/.env.production
           - ./BuildDockerWS.sh ${MODULE_NAME} ${VERSION}
         services:
