@@ -80,6 +80,17 @@
                 <font-awesome-icon :icon="faArrowLeft" class="mr-1" />
               </template>
             </Button>
+            <Button
+              :label="t('deleteTraining')"
+              size="small"
+              severity="danger"
+              outlined
+              @click="handleDeleteDeck"
+            >
+              <template #icon>
+                <font-awesome-icon :icon="faTrash" class="mr-1" />
+              </template>
+            </Button>
           </div>
 
           <Button
@@ -158,15 +169,18 @@ import {
   faArrowLeft,
   faFileExcel,
   faDownload,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons'
 import DynamicCheatSheetEdit from '@/components/cheatSheet/DynamicCheatSheetEdit.vue'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
+import { useConfirm } from 'primevue/useconfirm'
 import apiService from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
 
 const { t } = useI18n()
 const toast = useToast()
+const confirm = useConfirm()
 
 interface Deck {
   id: number
@@ -215,6 +229,25 @@ async function handleFileChange(event: Event): Promise<void> {
   } catch (error: any) {
     toast.error(t('errorUploadingDeckFile') + error.message)
   }
+}
+
+function handleDeleteDeck(): void {
+  confirm.require({
+    message: `${t('deckDeletionConfirmation')} "${selectedDeckTitle.value}"`,
+    header: t('deckDeletion'),
+    accept: async () => {
+      try {
+        const response = await apiService.delete<{ message: string }>(
+          apiConfig.admin.deck.delete(selectedDeckId.value!),
+        )
+        toast.success(response.data.message)
+        selectedDeckId.value = undefined
+        await fetchDecks()
+      } catch (error: any) {
+        toast.error(t('errorDeletingDeck') + (error?.message ?? ''))
+      }
+    },
+  })
 }
 
 const handleDownloadTemplate = async () => {

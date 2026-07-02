@@ -12,6 +12,9 @@ namespace backend.Data
         [MaxLength(50)]
         public string Deck_Name { get; set; } = string.Empty;
 
+        /// <summary>Czy Szkolenie jest aktywne. Ustawiane na false zamiast usuwania, gdy istnieją powiązane gry.</summary>
+        public bool IsActive { get; set; } = true;
+
         public int? Users_Id { get; set; }
         public User? User { get; set; }
 

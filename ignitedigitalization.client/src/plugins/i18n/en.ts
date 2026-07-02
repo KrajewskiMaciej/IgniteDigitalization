@@ -667,6 +667,11 @@ export const en = {
 
   orImportFromFile: 'or import from file',
   changeTraining: 'Change training',
+  deleteTraining: 'Delete training',
+  deckDeletion: 'Delete training',
+  deckDeletionConfirmation:
+    'Are you sure you want to delete this training and all data assigned to it?',
+  errorDeletingDeck: 'Error while deleting the training: ',
 
   //BugReport
   bugReportTitle: 'Report a Bug',

@@ -23,6 +23,7 @@ const endpoints = {
     deck: {
       getAll: '/admin/deck/get',
       upload: '/admin/deck/upload',
+      delete: (deckId: number) => `/admin/deck/${deckId}`,
       cards: (deckId: number) => `/admin/deck/decisions?deckId=${deckId}`,
       getCardsTemplate: '/admin/deck/download-template',
       updateDeckName: '/admin/deck/edit',

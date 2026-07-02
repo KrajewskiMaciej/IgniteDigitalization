@@ -125,6 +125,54 @@ namespace backend.Controllers
             return Ok(new { message = "Szkolenie zostało pomyślnie zaktualizowane." });
         }
 
+        [HttpDelete("{deckId}")]
+        public async Task<IActionResult> DeleteDeck(int deckId)
+        {
+            var userId = CurrentUserId;
+            if (userId == null) return Unauthorized("Brak danych użytkownika.");
+
+            var deck = await _context.Decks
+                .FirstOrDefaultAsync(d => d.Decks_Id == deckId && d.Users_Id == userId.Value);
+            if (deck == null)
+                return NotFound("Nie znaleziono szkolenia o podanym ID lub nie masz do niego uprawnień.");
+
+            // Jeśli Szkolenie ma powiązane gry – nie usuwamy fizycznie (utrata historii rozgrywek),
+            // tylko archiwizujemy (IsActive = false), przez co znika z listy.
+            var hasGames = await _context.Games.AnyAsync(g => g.Decks_Id == deckId);
+            if (hasGames)
+            {
+                deck.IsActive = false;
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Szkolenie ma powiązane gry i zostało zarchiwizowane.", archived = true });
+            }
+
+            // Brak gier – twarde usunięcie całej zawartości Szkolenia w kolejności zależności FK.
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                await _context.Feedbacks.Where(f => f.Cards.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.Hardwares.Where(h => h.Cards.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.Softwares.Where(s => s.Cards.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.CardEnablers.Where(ce => ce.Cards.Decks_Id == deckId || ce.Enablers.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.CardWeights.Where(cw => cw.Cards.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.Decisions.Where(d => d.Card.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.GameEvents.Where(ge => ge.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.Cards.Where(c => c.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.Processes.Where(p => p.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.Phases.Where(p => p.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.DeckEconomySettings.Where(es => es.Decks_Id == deckId).ExecuteDeleteAsync();
+                await _context.Decks.Where(d => d.Decks_Id == deckId).ExecuteDeleteAsync();
+
+                await transaction.CommitAsync();
+                return Ok(new { message = "Szkolenie i wszystkie powiązane dane zostały usunięte.", archived = false });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Błąd podczas usuwania szkolenia: {ex.Message}" });
+            }
+        }
+
         [HttpGet("get")]
         public async Task<IActionResult> GetDecks()
         {
@@ -133,7 +181,7 @@ namespace backend.Controllers
 
             var decks = await _context.Decks
                 .AsNoTracking()
-                .Where(deck => deck.Users_Id == userId.Value)
+                .Where(deck => deck.Users_Id == userId.Value && deck.IsActive)
                 .Select(deck => new DeckListItemDto
                 {
                     Id = deck.Decks_Id,

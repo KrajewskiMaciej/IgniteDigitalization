@@ -668,6 +668,11 @@ export const pl = {
 
   orImportFromFile: 'lub zaimportuj z pliku',
   changeTraining: 'Zmień szkolenie',
+  deleteTraining: 'Usuń szkolenie',
+  deckDeletion: 'Usunięcie szkolenia',
+  deckDeletionConfirmation:
+    'Czy na pewno chcesz usunąć szkolenie oraz wszystkie przypisane do niego dane?',
+  errorDeletingDeck: 'Błąd podczas usuwania szkolenia: ',
 
   //BugReport
   bugReportTitle: 'Zgłoś błąd',
