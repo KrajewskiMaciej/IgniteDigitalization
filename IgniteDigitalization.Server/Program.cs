@@ -48,7 +48,18 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("FrontendSettings"));
 
 // --- 5. SERWISY (Zarejestrowane raz, czysto) ---
-builder.Services.AddScoped<IEmailService, EmailService>();
+// EmailService jest teraz cienkim klientem HTTP do MessageService (patrz Services/EmailService.cs).
+// Bazowy URL z konfiguracji "MessageService:BaseUrl"; opcjonalny klucz API "MESSAGE_SERVICE_API_KEY".
+builder.Services.AddHttpClient<IEmailService, EmailService>((sp, client) =>
+{
+    var cfg = sp.GetRequiredService<IConfiguration>();
+    var baseUrl = cfg["MessageService:BaseUrl"];
+    if (!string.IsNullOrWhiteSpace(baseUrl))
+        client.BaseAddress = new Uri(baseUrl);
+    var apiKey = cfg["MESSAGE_SERVICE_API_KEY"];
+    if (!string.IsNullOrWhiteSpace(apiKey))
+        client.DefaultRequestHeaders.Add("X-API-Key", apiKey);
+});
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IProvisioningService, ProvisioningService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
