@@ -49,11 +49,11 @@ builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("F
 
 // --- 5. SERWISY (Zarejestrowane raz, czysto) ---
 // EmailService jest teraz cienkim klientem HTTP do MessageService (patrz Services/EmailService.cs).
-// Bazowy URL z konfiguracji "MessageService:BaseUrl"; opcjonalny klucz API "MESSAGE_SERVICE_API_KEY".
+// Bazowy URL z konfiguracji "MESSAGE_SERVICE_URL"; opcjonalny klucz API "MESSAGE_SERVICE_API_KEY".
 builder.Services.AddHttpClient<IEmailService, EmailService>((sp, client) =>
 {
     var cfg = sp.GetRequiredService<IConfiguration>();
-    var baseUrl = cfg["MessageService:BaseUrl"];
+    var baseUrl = cfg["MESSAGE_SERVICE_URL"];
     if (!string.IsNullOrWhiteSpace(baseUrl))
         client.BaseAddress = new Uri(baseUrl);
     var apiKey = cfg["MESSAGE_SERVICE_API_KEY"];
