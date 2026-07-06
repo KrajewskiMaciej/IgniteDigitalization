@@ -64,7 +64,7 @@ namespace backend.Services
             var confirmationLink = $"{effectiveBaseUrl.TrimEnd('/')}/confirm/{confirmationToken}";
 
             await PostSendAsync(
-                template: "ConfirmationEmail",
+                template: "Confirmation",
                 language: "pl",
                 to: [userEmail],
                 subject: "Potwierdź swoją rejestrację w Digital Wars",
@@ -80,7 +80,7 @@ namespace backend.Services
             var resetLink = $"{_frontendSettings.BaseUrl.TrimEnd('/')}/resetPassword/{resetToken}";
 
             await PostSendAsync(
-                template: "ResetPasswordEmail",
+                template: "PasswordReset",
                 language: "pl",
                 to: [userEmail],
                 subject: "Resetowanie hasła",
