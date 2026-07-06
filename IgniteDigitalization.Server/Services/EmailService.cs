@@ -127,8 +127,27 @@ namespace backend.Services
                 });
         }
 
-        private static string FormatExpire(DateTime? expireDate) =>
-            expireDate.HasValue ? $"{expireDate.Value:dd.MM.yyyy HH:mm}" : "brak daty";
+        // Strefa PL wyznaczana raz. .NET akceptuje oba identyfikatory, ale zależnie od OS jeden bywa nieznany.
+        private static readonly TimeZoneInfo PolandTimeZone = ResolvePolandTimeZone();
+
+        private static TimeZoneInfo ResolvePolandTimeZone()
+        {
+            foreach (var id in new[] { "Europe/Warsaw", "Central European Standard Time" })
+            {
+                try { return TimeZoneInfo.FindSystemTimeZoneById(id); }
+                catch (TimeZoneNotFoundException) { }
+                catch (InvalidTimeZoneException) { }
+            }
+            return TimeZoneInfo.Utc; // ostateczny fallback — lepszy czas UTC niż wyjątek
+        }
+
+        // Token_Expire_Date jest w UTC — pokazujemy czas lokalny PL, inaczej mail pokazuje godzinę o 1–2h wcześniejszą.
+        private static string FormatExpire(DateTime? expireDate)
+        {
+            if (!expireDate.HasValue) return "brak daty";
+            var utc = DateTime.SpecifyKind(expireDate.Value, DateTimeKind.Utc);
+            return TimeZoneInfo.ConvertTimeFromUtc(utc, PolandTimeZone).ToString("dd.MM.yyyy HH:mm");
+        }
 
         /// <summary>Wysyła żądanie do MessageService. Błędy loguje i połyka (nie przerywa flow aplikacji).</summary>
         private async Task PostSendAsync(string template, string language, List<string> to, string subject, Dictionary<string, string> placeholders)
