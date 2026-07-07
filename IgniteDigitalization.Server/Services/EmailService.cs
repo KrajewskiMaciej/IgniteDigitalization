@@ -40,6 +40,7 @@ namespace backend.Services
     public class EmailService : IEmailService
     {
         private const string Application = "Ignite";
+        private const string SenderName = "Ignite";
 
         private readonly HttpClient _httpClient;
         private readonly EmailSettings _emailSettings;
@@ -161,6 +162,7 @@ namespace backend.Services
             var payload = new
             {
                 application = Application,
+                senderName = SenderName,
                 template,
                 language,
                 to,
