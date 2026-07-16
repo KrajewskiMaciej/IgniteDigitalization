@@ -17,6 +17,7 @@ namespace backend.Data
         public int Licenses_Owned { get; set; }
         public int Licenses_Used { get; set; }
         public int Games_In_Progress { get; set; }
+        public int Role { get; set; } = 1;   // 1 = ograniczony, 9 = pełny dostęp
 
     }
 }

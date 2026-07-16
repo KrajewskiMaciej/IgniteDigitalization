@@ -31,7 +31,10 @@ namespace backend.Services
         {
             var user = await _context.Users.FindAsync(userId);
             if (user == null) throw new Exception("Użytkownik nie został znaleziony.");
-            if (user.Licenses_Owned <= 0) throw new Exception("Brak dostępnych licencji.");
+
+            // Licencja = jedna gra (w toku lub zakończona). Liczymy zużycie na żywo z tabeli Games.
+            var gamesUsed = await _context.Games.CountAsync(g => g.Users_Id == userId);
+            if (gamesUsed >= user.Licenses_Owned) throw new Exception("Brak dostępnych licencji.");
 
             // Pobierz Szkolenie z domyślnymi planszami
             var deck = await _context.Decks
@@ -133,12 +136,6 @@ namespace backend.Services
                         Poz_Y = 0
                     });
                 }
-
-                user.Licenses_Owned--;
-                user.Games_In_Progress++;
-                _context.Users.Attach(user);
-                _context.Entry(user).Property(x => x.Licenses_Owned).IsModified = true;
-                _context.Entry(user).Property(x => x.Games_In_Progress).IsModified = true;
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();

@@ -14,7 +14,8 @@ namespace backend.Initializers
                 Email_Confirmed = true,
                 Licenses_Owned = 999,
                 Licenses_Used = 0,
-                Games_In_Progress = 0
+                Games_In_Progress = 0,
+                Role = 9
             };
         }
     }

@@ -31,6 +31,7 @@
         </li>
 
         <li
+          v-if="auth.role === 9"
           class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
@@ -44,6 +45,7 @@
         </li>
 
         <li
+          v-if="auth.role === 9"
           class="border border-surface-700 rounded-md hover:border-accent transition-colors duration-300 cursor-pointer"
         >
           <RouterLink
@@ -89,8 +91,10 @@ import {
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
 
 const { t } = useI18n()
+const auth = useAuthStore()
 const isSideBarOpen = ref(true)
 const isStatsDropdownOpen = ref(false)
 

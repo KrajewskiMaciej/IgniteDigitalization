@@ -77,6 +77,7 @@
 
           <RegisterForm
             v-if="activeView === 'register'"
+            ref="registerFormRef"
             @close="closeModal"
             @switchToConfirmEmail="handleSwitchToConfirmEmail"
             class="animate-fade-right"
@@ -108,6 +109,7 @@ import RegisterForm from '@/components/auth/registerForm.vue'
 import ForgotPassword from './forgotPassword.vue'
 import ConfirmEmail from './confirmEmail.vue'
 import { useI18n } from 'vue-i18n'
+import { useConfirm } from 'primevue/useconfirm'
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
@@ -115,6 +117,7 @@ const breakpoints = useBreakpoints(breakpointsTailwind)
 const bigScreen = breakpoints.greater('md')
 
 const { t } = useI18n()
+const confirm = useConfirm()
 
 type AuthView = 'login' | 'register' | 'forgotPassword' | 'confirmEmail'
 
@@ -135,6 +138,7 @@ const emit = defineEmits(['register', 'close', 'switchToLogin'])
 
 const activeView = ref<AuthView>(props.initialView as AuthView)
 const emailToConfirm = ref('')
+const registerFormRef = ref<{ hasData: boolean } | null>(null)
 
 watch(
   () => props.isVisible,
@@ -153,6 +157,15 @@ watch(
 )
 
 const closeModal = () => {
+  if (activeView.value === 'register' && registerFormRef.value?.hasData) {
+    confirm.require({
+      header: t('discardRegistration'),
+      message: t('discardRegistrationConfirmation'),
+      accept: () => emit('close'),
+      reject: () => {},
+    })
+    return
+  }
   emit('close')
 }
 

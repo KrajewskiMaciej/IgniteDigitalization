@@ -35,11 +35,17 @@ namespace backend.Controllers
             var user = await _context.Users.FindAsync(userId.Value);
             if (user == null) return NotFound("Użytkownik nie istnieje.");
 
+            var gamesInProgress = await _context.Games.CountAsync(g =>
+                g.Users_Id == userId.Value &&
+                (g.Game_Status == GameStatus.During || g.Game_Status == GameStatus.Paused));
+            var gamesCompleted = await _context.Games.CountAsync(g =>
+                g.Users_Id == userId.Value && g.Game_Status == GameStatus.End);
+
             return Ok(new
             {
-                licensesOwned = user.Licenses_Owned,
-                licensesUsed = user.Licenses_Used,
-                licensesLeft = user.Licenses_Owned - user.Licenses_Used
+                gamesInProgress,
+                gamesCompleted,
+                licensesLeft = user.Licenses_Owned - (gamesInProgress + gamesCompleted)
             });
         }
 

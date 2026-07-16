@@ -93,7 +93,11 @@ export const pl = {
   pause: 'wstrzymać',
   changeStatusConfirmation: 'Czy na pewno chcesz zmienić status gry na {status}?',
   gamesInProgress: 'Gry w toku',
+  gamesCompleted: 'Gry zakończone',
   gamesPlayed: 'Rozegrane gry',
+  discardRegistration: 'Przerwać rejestrację?',
+  discardRegistrationConfirmation:
+    'Wprowadzone dane zostaną utracone. Czy na pewno chcesz zamknąć okno?',
   licencesLeft: 'Pozostałe licencje',
   buyMoreLicences: 'Kup więcej licencji',
   gameNamePlaceholder: 'Nazwa gry...',

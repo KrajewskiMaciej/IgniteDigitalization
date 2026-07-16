@@ -72,7 +72,8 @@ namespace backend.Services
                 Password = BCrypt.Net.BCrypt.HashPassword(password),
                 Email_Confirmed = false,
                 Link_Token = Guid.NewGuid().ToString(),
-                Token_Expire_Date = DateTime.UtcNow.AddMinutes(15)
+                Token_Expire_Date = DateTime.UtcNow.AddMinutes(15),
+                Role = 1
             };
 
             _context.Users.Add(user);

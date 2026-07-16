@@ -1,6 +1,7 @@
 <template>
   <!-- Tło z efektem rozmycia -->
   <div
+    @click.self="handleClose"
     class="animate-fade fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
   >
     <!-- Główny Kontener -->
@@ -9,7 +10,7 @@
     >
       <!-- Przycisk Zamknij -->
       <button
-        @click="emit('close')"
+        @click="handleClose"
         class="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full text-surface-400 hover:text-primary-400 hover:bg-secondary transition-all duration-200"
       >
         <font-awesome-icon :icon="faXmark" class="text-xl" />
@@ -65,6 +66,7 @@
 
           <RegisterForm
             v-if="activeView === 'register'"
+            ref="registerFormRef"
             @close="emit('close')"
             @switchToConfirmEmail="handleSwitchToConfirmEmail"
             @error="handleError"
@@ -93,6 +95,7 @@
 <script setup lang="ts">
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useI18n } from 'vue-i18n'
+import { useConfirm } from 'primevue/useconfirm'
 import { ref } from 'vue'
 import LoginForm from './loginForm.vue'
 import RegisterForm from './registerForm.vue'
@@ -104,12 +107,27 @@ import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const isBigScreen = breakpoints.greater('lg')
 const { t } = useI18n()
+const confirm = useConfirm()
 const activeView = ref<'login' | 'register' | 'forgotPassword' | 'confirmEmail'>('login')
 const emailToConfirm = ref<string>('')
+const registerFormRef = ref<{ hasData: boolean } | null>(null)
 
 const emit = defineEmits<{
   (e: 'close'): void
 }>()
+
+const handleClose = () => {
+  if (activeView.value === 'register' && registerFormRef.value?.hasData) {
+    confirm.require({
+      header: t('discardRegistration'),
+      message: t('discardRegistrationConfirmation'),
+      accept: () => emit('close'),
+      reject: () => {},
+    })
+    return
+  }
+  emit('close')
+}
 
 const handleForgotPassword = () => {
   activeView.value = 'forgotPassword'

@@ -11,6 +11,7 @@ import resetPasswordView from '@/views/resetPasswordView.vue'
 import confirmEmailView from '@/views/confirmEmailView.vue'
 import apiServices from '@/services/apiServices'
 import apiConfig from '@/services/apiConfig'
+import { useAuthStore } from '@/stores/auth'
 import gameView from '@/views/admin/adminGameView.vue'
 import exportToPdfView from '@/views/admin/exportToPdfView.vue'
 import TableManagmentView from '@/views/admin/TableManagmentView.vue'
@@ -55,11 +56,13 @@ const router = createRouter({
           path: 'editBoard',
           name: 'edit-board',
           component: editBoardView,
+          meta: { requiresRole: 9 },
         },
         {
           path: 'editGameplayElements',
           name: 'edit-gameplay-elements',
           component: GameplayElementsEditiorView,
+          meta: { requiresRole: 9 },
         },
         {
           path: 'exportToPDF',
@@ -127,7 +130,17 @@ router.beforeEach(async (to, from, next) => {
   }
 
   try {
-    await apiServices.get(apiConfig.auth.me)
+    const res = await apiServices.get<{ role: number }>(apiConfig.auth.me)
+    const auth = useAuthStore()
+    auth.setAuthenticated(true)
+    auth.role = res.data.role
+
+    const required = to.matched.find((r) => r.meta.requiresRole)?.meta.requiresRole as
+      | number
+      | undefined
+    if (required && res.data.role < required) {
+      return next({ name: 'admin-home' })
+    }
     next()
   } catch (err) {
     sessionStorage.setItem('showLoginAfterRedirect', 'true')

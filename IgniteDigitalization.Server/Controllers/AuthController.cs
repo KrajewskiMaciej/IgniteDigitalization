@@ -89,7 +89,9 @@ namespace backend.Controllers
             var user = await _authService.GetUserByIdAsync(userId.Value);
             if (user == null) return Unauthorized();
 
-            return Ok(new { id = user.Users_Id, name = user.Names, email = user.Email });
+            // ponytail: rola tylko w /auth/me (odczyt z DB w guardzie frontendu). Egzekwowanie
+            // serwerowe = dodać claim w JwtService + [Authorize(Roles="9")] na write-endpointach, gdy trzeba.
+            return Ok(new { id = user.Users_Id, name = user.Names, email = user.Email, role = user.Role });
         }
 
         [Authorize]

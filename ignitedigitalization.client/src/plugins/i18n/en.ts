@@ -96,6 +96,9 @@ export const en = {
   gamesInProgress: 'Games in progress',
   gamesCompleted: 'Games completed',
   licencesLeft: 'Licences left',
+  discardRegistration: 'Discard registration?',
+  discardRegistrationConfirmation:
+    'The entered data will be lost. Are you sure you want to close the window?',
   buyMoreLicences: 'Buy more licences',
   gameName: 'Game name',
   gameNamePlaceholder: 'Game name...',

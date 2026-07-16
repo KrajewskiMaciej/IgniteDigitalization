@@ -12,13 +12,13 @@
 
     <div class="mb-4 flex justify-between items-start">
       <p class="font-bold ml-2">{{ t('gamesInProgress') }}</p>
-      <p class="mr-2">{{ licencesData.gamesInSession }}</p>
+      <p class="mr-2">{{ licencesData.gamesInProgress }}</p>
     </div>
     <hr class="border-lgray-accent mb-4" />
 
     <div class="mb-4 flex justify-between items-start">
       <p class="font-bold ml-2">{{ t('gamesCompleted') }}</p>
-      <p class="mr-2">{{ licencesData.gamesInTotal }}</p>
+      <p class="mr-2">{{ licencesData.gamesCompleted }}</p>
     </div>
     <hr class="border-lgray-accent mb-4" />
 
@@ -28,7 +28,9 @@
     </div>
     <hr class="border-lgray-accent mb-6" />
 
+    <!-- ponytail: zakup licencji ukryty do czasu wdrożenia płatności -->
     <button
+      v-if="false"
       type="button"
       class="relative w-full py-4 rounded-lg font-medium transition-all duration-300 overflow-hidden group text-white mb-5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50"
     >
@@ -50,14 +52,14 @@ import apiService from '@/services/apiServices.js'
 const { t } = useI18n()
 
 interface LicencesData {
-  gamesInSession: number
-  gamesInTotal: number
+  gamesInProgress: number
+  gamesCompleted: number
   licensesLeft: number
 }
 
 const licencesData = ref<LicencesData>({
-  gamesInSession: 0,
-  gamesInTotal: 0,
+  gamesInProgress: 0,
+  gamesCompleted: 0,
   licensesLeft: 0,
 })
 
@@ -66,8 +68,8 @@ onMounted(async () => {
     const response = await apiService.get<LicencesData>(apiConfig.admin.settings.licenses)
 
     licencesData.value = {
-      gamesInSession: response.data.gamesInSession,
-      gamesInTotal: response.data.gamesInTotal,
+      gamesInProgress: response.data.gamesInProgress,
+      gamesCompleted: response.data.gamesCompleted,
       licensesLeft: response.data.licensesLeft,
     }
   } catch (error) {

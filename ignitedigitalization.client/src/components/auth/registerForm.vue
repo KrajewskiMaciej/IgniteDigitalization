@@ -222,6 +222,12 @@ const registerData = ref({
   confirmPassword: '',
 })
 
+const hasData = computed(() => {
+  const d = registerData.value
+  return !!(d.username || d.email || d.password || d.confirmPassword)
+})
+defineExpose({ hasData })
+
 const passwordRequirements = computed(() => {
   const password = registerData.value.password
   return {
