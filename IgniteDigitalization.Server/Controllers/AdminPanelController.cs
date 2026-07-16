@@ -34,15 +34,15 @@ namespace backend.Controllers
         [HttpGet("games/{gameId}")]
         public async Task<IActionResult> GetGameById(int gameId)
         {
-            var game = await _context.Games
+            var raw = await _context.Games
                 .AsNoTracking()
                 .Where(g => g.Games_Id == gameId)
-                .Select(g => new { id = g.Games_Id, Status = g.Game_Status.ToString() })
+                .Select(g => new { g.Games_Id, g.Game_Status })
                 .FirstOrDefaultAsync();
 
-            if (game == null) return NotFound(new { message = "Gra nie została znaleziona." });
+            if (raw == null) return NotFound(new { message = "Gra nie została znaleziona." });
 
-            return Ok(game);
+            return Ok(new { id = raw.Games_Id, Status = raw.Game_Status.ToString() });
         }
     }
 }

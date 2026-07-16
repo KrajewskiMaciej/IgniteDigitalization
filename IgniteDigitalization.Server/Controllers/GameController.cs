@@ -58,10 +58,12 @@ namespace backend.Controllers
             var userId = CurrentUserId;
             if (userId == null) return Unauthorized("Nie można zidentyfikować użytkownika.");
 
-            var activeGames = await _context.Games
+            var activeGames = (await _context.Games
                 .Where(g => g.Users_Id == userId.Value && (g.Game_Status == GameStatus.During || g.Game_Status == GameStatus.Paused))
-                .Select(g => new GameListItemDto { Id = g.Games_Id, Name = g.Games_Desc, Status = g.Game_Status.ToString() ?? "", DeckName = g.Decks.Deck_Name })
-                .ToListAsync();
+                .Select(g => new { g.Games_Id, g.Games_Desc, g.Game_Status, DeckName = g.Decks.Deck_Name })
+                .ToListAsync())
+                .Select(g => new GameListItemDto { Id = g.Games_Id, Name = g.Games_Desc, Status = g.Game_Status.ToString() ?? "", DeckName = g.DeckName })
+                .ToList();
 
             return Ok(activeGames);
         }
@@ -71,12 +73,14 @@ namespace backend.Controllers
         public async Task<IActionResult> GetGameById(int id)
         {
             var userId = CurrentUserId;
-            var game = await _context.Games
+            var raw = await _context.Games
                 .Where(g => g.Games_Id == id && g.Users_Id == userId)
-                .Select(g => new { Id = g.Games_Id, Name = g.Games_Desc, Status = g.Game_Status.ToString(), DeckId = g.Decks_Id, DeckName = g.Decks.Deck_Name })
+                .Select(g => new { g.Games_Id, g.Games_Desc, g.Game_Status, g.Decks_Id, DeckName = g.Decks.Deck_Name })
                 .FirstOrDefaultAsync();
 
-            if (game == null) return NotFound();
+            if (raw == null) return NotFound();
+
+            var game = new { Id = raw.Games_Id, Name = raw.Games_Desc, Status = raw.Game_Status.ToString(), DeckId = raw.Decks_Id, DeckName = raw.DeckName };
 
             return Ok(game);
         }
@@ -97,6 +101,13 @@ namespace backend.Controllers
 
             if (game.Game_Status == GameStatus.End && newStatus != GameStatus.End)
                 return BadRequest("Nie można zmienić statusu zakończonej gry.");
+
+            // Zakończenie gry zdejmuje ją z licznika gier w toku
+            if (game.Game_Status != GameStatus.End && newStatus == GameStatus.End)
+            {
+                var user = await _context.Users.FindAsync(userId.Value);
+                if (user != null) user.Games_In_Progress = Math.Max(0, user.Games_In_Progress - 1);
+            }
 
             game.Game_Status = newStatus;
             await _context.SaveChangesAsync();
@@ -127,6 +138,11 @@ namespace backend.Controllers
                 .ToListAsync();
 
             gamesToEnd.ForEach(g => g.Game_Status = GameStatus.End);
+
+            // Wszystkie zakończone gry schodzą z licznika gier w toku
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null) user.Games_In_Progress = Math.Max(0, user.Games_In_Progress - gamesToEnd.Count);
+
             await _context.SaveChangesAsync();
             return Ok(new { message = $"Zakończono {gamesToEnd.Count} gier." });
         }

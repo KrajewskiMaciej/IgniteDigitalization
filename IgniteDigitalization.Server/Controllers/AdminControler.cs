@@ -45,7 +45,7 @@ namespace backend.Controllers
             {
                 gamesInProgress,
                 gamesCompleted,
-                licensesLeft = user.Licenses_Owned - (gamesInProgress + gamesCompleted)
+                licensesLeft = user.Licenses_Owned - user.Licenses_Used
             });
         }
 

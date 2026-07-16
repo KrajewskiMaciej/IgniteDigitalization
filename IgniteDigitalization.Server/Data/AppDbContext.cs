@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Data
@@ -161,6 +162,13 @@ namespace backend.Data
                 .HasOne(g => g.Users)
                 .WithMany()
                 .HasForeignKey(g => g.Users_Id);
+
+            // Game_Status w bazie jako nazwa w lowercase zamiast liczby: "during"/"paused"/"end"
+            modelBuilder.Entity<Game>()
+                .Property(g => g.Game_Status)
+                .HasConversion(
+                    v => v.HasValue ? v.Value.ToString().ToLower() : (string?)null,
+                    v => string.IsNullOrEmpty(v) ? (GameStatus?)null : Enum.Parse<GameStatus>(v, true));
 
             modelBuilder.Entity<GameBoard>()
                 .HasOne(gb => gb.Teams)

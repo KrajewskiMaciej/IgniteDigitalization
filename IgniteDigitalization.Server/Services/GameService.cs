@@ -137,6 +137,10 @@ namespace backend.Services
                     });
                 }
 
+                // Nowa gra = zużyta licencja + gra w toku (user jest śledzony przez FindAsync)
+                user.Licenses_Used++;
+                user.Games_In_Progress++;
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
