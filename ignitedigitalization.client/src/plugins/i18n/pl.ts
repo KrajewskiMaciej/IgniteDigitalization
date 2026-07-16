@@ -100,6 +100,7 @@ export const pl = {
     'Wprowadzone dane zostaną utracone. Czy na pewno chcesz zamknąć okno?',
   licencesLeft: 'Pozostałe licencje',
   buyMoreLicences: 'Kup więcej licencji',
+  licenseContactInfo: 'Aby uzyskać licencje, odezwij się na:',
   gameNamePlaceholder: 'Nazwa gry...',
   selectBoardPlaceholder: 'Wybierz planszę...',
   selectDeckPlaceholder: 'Wybierz talię kart...',

@@ -39,6 +39,21 @@
         class="absolute inset-0 bg-gradient-to-r from-primary-400/0 via-primary-400/20 to-primary-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
       ></div>
     </button>
+
+    <div class="rounded-lg border border-lgray-accent bg-tertiary p-4 text-sm text-surface-300 text-center">
+      <p class="mb-2">{{ t('licenseContactInfo') }}</p>
+      <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+        <template v-for="(email, i) in licenseEmails" :key="email">
+          <span v-if="i > 0" class="text-surface-500 select-none">•</span>
+          <a
+            :href="`mailto:${email.trim()}`"
+            class="text-accent hover:text-purple-300 transition-colors break-all font-medium"
+          >
+            {{ email.trim() }}
+          </a>
+        </template>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -50,6 +65,9 @@ import apiConfig from '@/services/apiConfig.js'
 import apiService from '@/services/apiServices.js'
 
 const { t } = useI18n()
+
+// ponytail: docelowe adresy do uzupełnienia później
+const licenseEmails = ['hpuszczewicz@ksse.pl ', 'ropt@ksse.com.pl']
 
 interface LicencesData {
   gamesInProgress: number

@@ -100,6 +100,7 @@ export const en = {
   discardRegistrationConfirmation:
     'The entered data will be lost. Are you sure you want to close the window?',
   buyMoreLicences: 'Buy more licences',
+  licenseContactInfo: 'To obtain licenses, contact us:',
   gameName: 'Game name',
   gameNamePlaceholder: 'Game name...',
   selectBoardPlaceholder: 'Select board...',
